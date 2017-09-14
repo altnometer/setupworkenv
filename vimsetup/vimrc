@@ -499,7 +499,7 @@ map T <Plug>Sneak_T
 " Run :PlugInstall after adding pluging to the list.
 call plug#begin()
 Plug 'vim-airline/vim-airline'
-Plug 'kien/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 Plug 'scrooloose/syntastic'
 Plug 'pangloss/vim-javascript'
 " Setting up React JSX syntax highlighting and indenting
