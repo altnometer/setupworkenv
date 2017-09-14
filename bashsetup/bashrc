@@ -1,0 +1,283 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# added by rambul
+#PATH=$PATH:$HOME/bin
+#export PATH
+#PYTHONPATH=$PYTHONPATH:$HOME/Gitrep/auctdevram
+#PYTHONPATH=$PYTHONPATH:$HOME/Envs/dj14py27/lib/python2.7/site-packages/django
+#PYTHONPATH=$PYTHONPATH:$HOME/Envs/dj15py27/lib/python2.7/site-packages/django
+#PYTHONPATH=$PYTHONPATH:$HOME/Envs/dj15py27/lib/python2.7/site-packages
+#export PYTHONPATH
+# DJANGO_SETTINGS_MODULE must be in $PYTHONPATH
+#export DJANGO_SETTINGS_MODULE=mysite.settings
+
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=10000
+HISTFILESIZE=20000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+#shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+function parse_tmux_session {
+    tty=$(tty); for s in $(tmux list-sessions -F '#{session_name}' 2>/dev/null); do
+    tmux list-panes -F '#{pane_tty} #{session_name}' -t "$s"; done | grep "$tty\>" | awk '{print "["$2"]"}'
+}
+# added by sam@lf
+# credit to David Winterbottom
+# of http://codeinthehole.com/tips/pull-requests-and-other-good-practices-for-teams-using-github/
+function parse_git_branch {
+    git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+# PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+if [ "$color_prompt" = yes ]; then
+    #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\$ '
+    # 256 colors
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[38;5;24m\]\u@\h\[\033[38;5;37m\]$(parse_tmux_session)\[\033[38;5;132m\]\W/\[\033[38;5;32m\]$(parse_git_branch)\[\033[00m\]:\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+PROMPT_COMMAND="echo ''; echo '';"
+
+# Added by ram@ram
+alias oblivion='gnome-terminal --window-with-profile=.bash_oblivion.cfg'
+# added by sam@lf
+###############tmux################
+tm() {
+    name=${1:-tmuxsn}
+    if ( tmux has-session -t ${name} 2>/dev/null ); then
+        tmux select-window -t ${name}:1
+        tmux -2 attach-session -t ${name}
+        tmux send-keys -t ${name}:1 'git status' C-m
+    else
+        if [ "$name" == "go" ]; then
+            cd $HOME/go/src/github.com/altnometer/godoapi
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n bash
+            tmux new-window  -t ${name}:3 -n bash
+            tmux new-window  -t ${name}:4 -n bash
+            cd $HOME/go/src/github.com/altnometer/godoapi
+            tmux new-window  -t ${name}:5 -n bash
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$name" == "gotry" ]; then
+            cd $HOME/go/src/try-it
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n bash
+            tmux new-window  -t ${name}:3 -n bash
+            tmux new-window  -t ${name}:4 -n bash
+            cd $HOME/go/src/try-it
+            tmux new-window  -t ${name}:5 -n bash
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$name" == "devop" ]; then
+            cd $HOME/redmoo/devops/k8s/setupcluster/docean
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n bash
+            tmux new-window  -t ${name}:3 -n bash
+            tmux new-window  -t ${name}:4 -n bash
+            cd $HOME/redmoo/devops/k8s/setupcluster/docean
+            tmux new-window  -t ${name}:5 -n bash
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        else
+            cd $HOME/redmoo/auct
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n bash
+            tmux new-window  -t ${name}:3 -n bash
+            tmux new-window  -t ${name}:4 -n bash
+            tmux new-window  -t ${name}:5 -n bash
+            cd $HOME/redmoo/auct
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        fi
+    fi
+}
+tmk() {
+    name=${1:-tmuxsn}
+    if ( tmux has-session -t ${name} 2>/dev/null ); then
+        tmux kill-session -t ${name}
+    fi
+}
+###############git#################
+# credit to David Winterbottom
+# of http://codeinthehole.com/tips/pull-requests-and-other-good-practices-for-teams-using-github/
+# alias git='hub'
+alias g='git status -sb'
+alias gs='git status'
+alias gh='git hist'
+alias gp='git pull'
+alias gpr='git pull --rebase'
+alias gpp='git pull --rebase && git push'
+alias gf='git fetch'
+alias gb='git branch'
+alias ga='git add'
+alias gc='git commit'
+alias gca='git commit --amend'
+alias gcv='git commit --no-verify'
+alias gd='git diff --color-words'
+alias gdc='git diff --cached -w'
+alias gdw='git diff --no-ext-diff --word-diff'
+alias gdv='git diff'
+alias gl='git log --oneline --decorate'
+# git log --all --graph --decorate --oneline
+alias gt='git tag'
+alias grc='git rebase --continue'
+alias grs='git rebase --skip'
+alias gsl='git stash list'
+alias gss='git stash save'
+alias gco='git checkout'
+
+# docker aliases
+docker_remove () { docker stop $1 && docker rm $1; }
+docker_remove_all () {
+    echo -e "\n\x1b[33;01m Are you SURE?[Y/n]\x1b[39;49;00m\n"
+    read user_resp
+    if [ "${user_resp}" == "n" -o "${user_resp}" == "N" ]; then
+        exit 0
+    else
+        docker stop $( docker ps -a -q )
+        docker rm $( docker ps -a -q )
+    fi
+}
+alias dp='docker ps -a'
+alias ds='docker stop'
+alias dr=docker_remove
+alias dra=docker_remove_all
+alias dre='docker ps -aq -f status=exited | xargs docker rm'
+alias di='docker images'
+alias dri='docker rmi'
+alias drid='docker images -q --filter dangling=true | xargs docker rmi'
+
+# kubernetes aliases
+alias kn='kubectl get node -o wide'
+alias kp='kubectl get pod -o wide'
+alias ks='kubectl get svc'
+alias kr='kubectl get rc -o wide'
+alias kd='kubectl get deploy'
+alias kpv='kubectl describe pod'
+alias krv='kubectl describe rc'
+alias ksv='kubectl describe svc'
+alias kpd='kubectl  delete pod'
+alias krd='kubectl delete rc'
+alias ksd='kubectl delete svc'
+
+# alias xclip='xclip -selection c'
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "$HOME/share/google-cloud-sdk/path.bash.inc" ]; then source "$HOME/share/google-cloud-sdk/path.bash.inc"; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "$HOME/share/google-cloud-sdk/completion.bash.inc" ]; then source "$HOME/share/google-cloud-sdk/completion.bash.inc"; fi

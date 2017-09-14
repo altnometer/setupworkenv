@@ -1,0 +1,11 @@
+# Use as script
+# awk -f /path/to/the/script /path/to/file/to/read/from > /path/to/file/to/write/to
+#! a[$0]++                     # most concise script
+!($0 in a) {a[$0];print}      # most efficient scrip
+
+# Use as one liners:
+#awk '! a[$0]++' /path/to/file > /path/to/file/to/write/to  # most concise script
+#awk '!($0 in a) {a[$0];print}' /path/to/file > /path/to/file/to/write/to      # most efficient scrip
+#
+# To remove lines starting with 'pattern'
+#awk '!/^pattern/ { print $0 }' /path/to/file > /path/to/file/to/write/to
