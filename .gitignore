@@ -1,0 +1,47 @@
+# Permanently ignore files and directories identified by the following patterns.
+# Empty lines are skipped.
+
+#syntax: glob
+# * matches any line within direcotry. Exp. *.py -> bar.py
+# next lines are relevant only for .hgignore
+# ** matches any line, crosses directory borders. Exp. **.py -> /repository_root/foo/bar.py
+# Character class [...]. Exp. *.[a-z] -> bar.c, foo.py, etc
+#                             *.[cpy] -> bar.c, foo.py, ...
+# Group of subpatterns {...}. Exp *.{c,py,html} -> bar.c, foo.py, bar,html, ...
+
+# File Types #
+###############
+# Back up files left by Emacs editors.
+*~
+
+# Lock files left by Emacs editors.
+.\#*
+
+# Temporary files used by vim  editor.
+.*.swp
+
+*.pyc
+*.log
+# Compiled message files for django translation.
+
+# Specific Files #
+###############
+.coverage
+
+# Directories #
+###############
+#**manage.py # otherwise is not copied when cloned.
+
+tags
+
+# Directories #
+###############
+#
+#mysite/media
+*.ropeproject
+.cache
+#htmlcom/ is the dir created by 'py.test --cov-report html
+htmlcov/
+mysite/media/2012
+mysite/media/img/grass
+mysite/media/uploads
