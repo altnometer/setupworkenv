@@ -232,32 +232,9 @@ set nobackup
 set nowritebackup
 set noswapfile
 
-
-" Setup Pathogen to manage your plugins
-" mkdir -p ~/.vim/autoload ~/.vim/bundle
-" curl -so ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/HEAD/autoload/pathogen.vim
-" Now you can install any plugin into a .vim/bundle/plugin-name/ folder
-call pathogen#infect()
-
-" Added by rambull: To avoid calling :helptags /path/to/plugin/docs
-" ram#ram: update requested change to #incubate() of
-" #runtime_append_all_bundles()
-" call pathogen#runtime_append_all_bundles()
-"call pathogen#incubate()
-call pathogen#infect('bundle/{}')
-call pathogen#helptags()
-
-
 " ============================================================================
 " Python IDE Setup
 " ============================================================================
-
-
-" Settings for vim-powerline
-" cd ~/.vim/bundle
-" git clone git://github.com/Lokaltog/vim-powerline.git
-set laststatus=2
-
 
 " Added by user rambul.
 " Add NerdTree plugin.
@@ -522,22 +499,22 @@ map T <Plug>Sneak_T
 " Run :PlugInstall after adding pluging to the list.
 call plug#begin()
 Plug 'vim-airline/vim-airline'
-Plug 'kien/ctrlp.vim.git'
-Plug 'scrooloose/syntastic.git'
-Plug 'pangloss/vim-javascript.git'
+Plug 'kien/ctrlp.vim'
+Plug 'scrooloose/syntastic'
+Plug 'pangloss/vim-javascript'
 " Setting up React JSX syntax highlighting and indenting
-" Plug 'mxw/vim-jsx.git'
-Plug 'tmhedberg/SimpylFold.git'
-Plug 'tpope/vim-fugitive.git'
-Plug 'tpope/vim-unimpaired.git'
-Plug 'tpope/vim-surround.git'
-Plug 'tpope/vim-repeat.git'
-Plug 'tpope/vim-commentary.git'
-Plug 'tpope/vim-dispatch.git'
+" Plug 'mxw/vim-jsx'
+Plug 'tmhedberg/SimpylFold'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-dispatch'
 Plug 'tweekmonster/braceless.vim'
-Plug 'jeetsukumaran/vim-indentwise.git'
+Plug 'jeetsukumaran/vim-indentwise'
 Plug 'pearofducks/ansible-vim'
-Plug 'mustache/vim-mustache-handlebars.git'
+Plug 'mustache/vim-mustache-handlebars'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
