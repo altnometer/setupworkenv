@@ -48,7 +48,7 @@ pip install flake8
 # # Now you can install any plugin into a .vim/bundle/plugin-name/ folder
 
 # Setup vim-plug to manage your plugins
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+sudo -u ${SUDO_USER} curl -fLo ${HOME}/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # if [ -d "$HOME/.vim/bundle/vim-airline" ]; then
@@ -148,6 +148,7 @@ fi
 #fi
 COLOR_SCHEME_SEOUL256_PATH="${SCRIPT_DIR}/seoul256.vim"
 echo -e "\n\x1b[33;01m linking $HOME/.vim/colors/seoul256.vim to ${COLOR_SCHEME_SEOUL256_PATH}. \x1b[39;49;00m\n" && sleep 1
+sudo -u ${SUDO_USER} mkdir -p ~/.vim/colors
 sudo -u ${SUDO_USER} ln -sf ${COLOR_SCHEME_SEOUL256_PATH} $HOME/.vim/colors/seoul256.vim
 
 # # colorscheme zenburn
