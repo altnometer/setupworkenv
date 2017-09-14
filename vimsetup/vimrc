@@ -1,0 +1,552 @@
+" Sample .vimrc file by Martin Brochhaus
+" Presented at PyCon APAC 2012
+
+
+" ============================================
+" ============================================
+" vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
+set updatetime=250
+
+" Added by sam@lf
+" Treat '-' as part of the word rather than a word separator.
+set iskeyword+=-
+" Added by puppy@dog
+set encoding=utf-8
+set fileencoding=utf-8
+" Added by ram@farm.
+" Define order of searches for word completion. kspell will add
+" dictionary search only if ":set[local] spell" is enabled.
+set complete=.,w,b,u,t,i,kspell
+
+" Automatic reloading of .vimrc
+autocmd! bufwritepost .vimrc source %
+
+
+" Better copy & paste
+" When you want to paste large blocks of code into vim, press F2 before you
+" paste. At the bottom you should see ``-- INSERT (paste) --``.
+set pastetoggle=<F2>
+" set clipboard=unnamed
+set clipboard=unnamedplus
+
+
+" Mouse and backspace
+set mouse=a  " on OSX press ALT and click
+set bs=2     " make backspace behave like normal again
+
+
+" Rebind <Leader> key
+" I like to have it here becuase it is easier to reach than the default and
+" it is next to ``m`` and ``n`` which I use for navigating between tabs.
+let mapleader = ","
+
+" Toggle spell checking on and off with `,z`
+" normal mode
+nmap <silent> <leader>z :setlocal spell! spelllang=en_us<CR>
+" insert mode
+imap <F5> <C-o>:setlocal spell! spelllang=en_us<CR>
+"inoremap <F5> <C-\><C-O>:setlocal spelllang=en_us spell! spell?<CR>
+" Set region to British English
+" ######## User added ########
+
+" Added by rambul.
+"" nnoremap <Leader>s a<CR><Esc>k$
+" cut the line under cusor
+nnoremap <Leader>s i<CR><Esc>^
+
+" Add a space in normal mode and move to the right.
+"nnoremap <Leader>q i <Esc>l
+" Add a # in normal mode and move to the right.
+"nnoremap <Leader>q i#<Esc>
+
+" Added by user rambul
+" Map <Tab> key to <C-x><C-f> file path autocomplete.
+inoremap <Tab> <C-x><C-f>
+
+
+" Bind nohl
+" Removes highlight of your last search
+" ``<C>`` stands for ``CTRL`` and therefore ``<C-n>`` stands for ``CTRL+n``
+noremap <C-n> :nohl<CR>
+vnoremap <C-n> :nohl<CR>
+inoremap <C-n> :nohl<CR>
+
+" Added by sam@lf
+" <C-c> does not check for abbreviations and does not trigger InsertLeave.
+inoremap <C-c> <Esc><Esc>
+
+" Quicksave command
+noremap <C-Z> :update<CR>
+vnoremap <C-Z> <C-C>:update<CR>
+" this  would save and go back to insert mode.
+inoremap <C-Z> <C-O>:update<CR>
+" Added by sam@lf
+" this  would save and exit insert mode.
+inoremap <C-Z> <C-C>:update<CR>
+
+
+" Quick quit command
+noremap <Leader>e :quit<CR>  " Quit current window
+noremap <Leader>E :qa!<CR>   " Quit all windows
+
+
+" bind Ctrl+<movement> keys to move around the windows, instead of using Ctrl+w + <movement>
+" Every unnecessary keystroke that can be saved is good for your health :)
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+map <C-h> <C-w>h
+
+
+" easier moving between tabs
+map <Leader>n <esc>:tabprevious<CR>
+map <Leader>m <esc>:tabnext<CR>
+
+
+" map sort function to a key
+"vnoremap <Leader>s :sort<CR>
+
+
+" easier moving of code blocks
+" Try to go into visual mode (v), thenselect several lines of code here and
+" then press ``>`` several times.
+"" vnoremap < <gv  " better indentation
+"" vnoremap > >gv  " better indentation
+
+" FILE FINDING
+" Search down into subdirrectories
+" Provides tab-comletion for all file-relates tasks
+set path+=**
+" Display all matching files when we tab complete
+set wildmenu
+" Hit tab to :find by partial match
+" Use * to make it fuzzy
+
+" FILE BROWSING
+" Tweak netrw pluging that comes with vim
+let g:netrw_banner=0   " disable the banner
+let g:netrw_browse_split=4  " open in prior window ?Not sure what this does.
+let g:netrw_altv=1  " open splits to the right
+let g:netrw_liststyle=3  " tree view
+let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide=',\(^\|\s\s\)\zs\.\S\+\'
+let g:netrw_list_hide=',.*\.pyc$'
+" - :edit dir <CR> to open file browser.
+" - <CR> - expand, contract.
+" - v,t open in v split, new tab.
+" - check |netrw-browse-maps| for more mappings
+
+
+" Show whitespace
+" MUST be inserted BEFORE the colorscheme command
+autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+au InsertLeave * match ExtraWhitespace /\s\+$/
+" highlighting qickfix, does not work.
+" hi QuickFixLine cterm=None ctermbg=256 guibg=#ffff00
+
+
+" Color scheme
+" mkdir -p ~/.vim/colors && cd ~/.vim/colors
+" wget -O wombat256mod.vim http://www.vim.org/scripts/download_script.php?src_id=13400
+"set t_Co=256
+"color wombat256mod
+"added by kitty@cat: Enabling solarized colorscheme
+syntax enable
+let base16colorspace=256
+set background=dark
+"colorscheme solarized
+"colorscheme base16-eighties
+"colorscheme wombat256mod
+"colorscheme base16-harmonic16-dark
+"""""
+"let g:zenburn_high_Contrast=1
+"colors zenburn
+"""""
+" seoul256 (dark)
+"     Range: 233 (darkest) ~ 239 (lightest)
+"     Default: 237
+" seoul256 (light)
+"     Range: 252 (darkest) ~ 256 (lightest)
+"     Default: 237
+let g:seoul256_background=236
+"let g:seoul256_background=256
+let g:seoul256_srgb=1
+colorscheme seoul256
+"colorscheme seoul256-light
+
+" let g:rehash256 = 1
+" let g:molokai_original = 1
+" colorscheme molokai
+
+" Enable syntax highlighting
+" You need to reload this file for the change to apply
+filetype off
+filetype plugin indent on
+syntax on
+
+" trying to enable omnicompletion:
+" filetype plugin on
+"set omnifunc=syntaxcomplete#Complete
+"set omnifunc=pythoncomplete#Complete  " doesnt work for python:(
+
+
+" Showing line numbers and length
+set relativenumber  " show line numbers
+set number  " show line numbers
+set tw=79   " width of document (used by gd)
+set nowrap  " don't automatically wrap on load
+set fo-=t   " don't automatically wrap text when typing
+set colorcolumn=80
+highlight ColorColumn ctermbg=233
+
+
+" easier formatting of paragraphs
+"" vmap Q gq
+"" nmap Q gqap
+
+
+" Useful settings
+set history=700
+set undolevels=700
+
+
+" Real programmers don't use TABs but spaces
+autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set shiftround
+set expandtab
+
+
+" Make search case insensitive
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+
+
+" Disable stupid backup and swap files - they trigger too many events
+" for file system watchers
+set nobackup
+set nowritebackup
+set noswapfile
+
+
+" Setup Pathogen to manage your plugins
+" mkdir -p ~/.vim/autoload ~/.vim/bundle
+" curl -so ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/HEAD/autoload/pathogen.vim
+" Now you can install any plugin into a .vim/bundle/plugin-name/ folder
+call pathogen#infect()
+
+" Added by rambull: To avoid calling :helptags /path/to/plugin/docs
+" ram#ram: update requested change to #incubate() of
+" #runtime_append_all_bundles()
+" call pathogen#runtime_append_all_bundles()
+"call pathogen#incubate()
+call pathogen#infect('bundle/{}')
+call pathogen#helptags()
+
+
+" ============================================================================
+" Python IDE Setup
+" ============================================================================
+
+
+" Settings for vim-powerline
+" cd ~/.vim/bundle
+" git clone git://github.com/Lokaltog/vim-powerline.git
+set laststatus=2
+
+
+" Added by user rambul.
+" Add NerdTree plugin.
+" cd ~/.vim/bundle/
+" git clone https://github.com/scrooloose/nerdtree.git
+let NERDTreeIgnore=['^.*\.pyc$', '\~$']
+
+" Settings for ctrlp
+" cd ~/.vim/bundle
+" git clone https://github.com/kien/ctrlp.vim.git
+let g:ctrlp_max_height = 30
+set wildignore+=*.pyc
+set wildignore+=*_build/*
+set wildignore+=*/coverage/*
+
+" syntastic options
+
+" On by default, turn it off for html
+" !!! Install 'sudo pip flake8' to enable python checking
+let g:syntastic_mode_map = { 'mode': 'active',
+    \ 'active_filetypes': ['python', 'javascript', 'css'],
+    \ 'passive_filetypes': ['html'] }
+" Use flake8
+"let g:syntastic_python_checkers = ['pep8']
+let g:syntastic_python_checkers = ['flake8']
+"let g:syntastic_python_checkers = ['pyflakes']
+"let g:syntastic_python_checkers = ['pylint']
+"let g:syntastic_python_flake8_args = '--ignore="E501,E302,E261,E701,E241,E126,E127,E128,W801"'
+" E256 - block comment should start with "# " - Incorrectly interpreted on
+" raspbian
+" [E402] module level import not at top of file [E402]
+let g:syntastic_python_flake8_args = '--ignore="E501,W601,E265,E402"'
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_auto_loc_list=1
+
+" Create a ropeproject by executing ``:RopeOpenProject``."""
+" Add your venv to ``.ropeproject/config.py``!'
+" Settings for python-mode
+" cd ~/.vim/bundle
+" git clone https://github.com/klen/python-mode
+"  pymode is being removed
+"let g:pymode = 1
+"let g:pymode_lint = 1
+"let g:pymode_lint_on_write = 1
+""let g:pymode_lint_checkers = ['pylint', 'pyflakes'] " :help pymode.txt for more
+"let g:pymode_lint_checkers = ['pyflakes'] " :help pymode.txt for more
+"let g:pymode_lint_cwindow = 1
+"let g:pymode_lint_signs = 1
+"
+"let g:pymode_virtualenv = 1  " detect virtual env
+"let g:pymode_rope = 1
+"
+"map <Leader>g :call RopeGotoDefinition()<CR>
+"" Added by rambul
+"map <Leader>j :call RopeShowDoc()<CR>
+"let ropevim_enable_shortcuts = 1
+"let g:pymode_rope_goto_def_newwin = "vnew"
+"let g:pymode_rope_extended_complete = 1
+"let g:pymode_breakpoint = 0
+"let g:pymode_syntax = 1
+"let g:pymode_syntax_builtin_objs = 0
+"let g:pymode_syntax_builtin_funcs = 0
+"map <Leader>b Oimport ipdb; ipdb.set_trace() # BREAKPOINT<C-c>
+"" Added by rambul
+"" If .ropeproject not found in current dir, 'True'-Scan all dirs in parent path.
+"let g:pymode_rope_guess_project = 0
+
+" Better navigating through omnicomplete option list
+" See http://stackoverflow.com/questions/2170023/how-to-map-keys-for-popup-menu-in-vim
+set completeopt=longest,menuone
+function! OmniPopup(action)
+    if pumvisible()
+        if a:action == 'j'
+            return "\<C-N>"
+        elseif a:action == 'k'
+            return "\<C-P>"
+        endif
+    endif
+    return a:action
+endfunction
+
+" YouCompleteMe coveres completion navig with <tab>, <s-tab> keys
+" inoremap <silent><C-j> <C-R>=OmniPopup('j')<CR>
+" inoremap <silent><C-k> <C-R>=OmniPopup('k')<CR>
+
+" added by sam@lf
+set foldmethod=indent
+
+" Python folding
+" mkdir -p ~/.vim/ftplugin
+" wget -O ~/.vim/ftplugin/python_editing.vim http://www.vim.org/scripts/download_script.php?src_id=5492
+"set nofoldenable
+autocmd! BufNewFile,BufReadPost *.ino,*.pde setlocal ft=arduino
+autocmd! BufNewFile,BufReadPost *.tpl setlocal ft=mustache
+
+" enable vim-airline integration with plugins.
+let g:airline_enable_fugitive=1
+let g:airline_enable_syntastic=1
+let g:airline_enable_bufferline=1
+
+" fugitive git options
+" set diffopt+=vertical
+" fugitive git bindings
+"autocmd! BufWritePost * :Gstatus " does not work
+"nnoremap <space>ga :Git add %:p<CR><CR>
+nnoremap <space>gs :Gstatus<CR>
+nnoremap <space>gc :Gcommit -v -q<CR>
+nnoremap <space>gt :Gcommit -v -q %:p<CR>
+nnoremap <space>gd :Gdiff<CR>
+"nnoremap <space>ge :Gedit<CR>
+nnoremap <space>gr :Gread<CR>
+nnoremap <space>gw :Gwrite<CR><CR>
+"nnoremap <space>gl :silent! Glog<CR>:bot copen<CR>
+"nnoremap <space>gp :Ggrep<Space>
+"nnoremap <space>gm :Gmove<Space>
+"nnoremap <space>gb :Git branch<Space>
+"nnoremap <space>go :Git checkout<Space>
+"nnoremap <space>gps :Dispatch! git push<CR>
+"nnoremap <space>gpl :Dispatch! git pull<CR>
+
+" next maping doesn't work
+"autocmd User fugitive if fugitive#buffer().type() =~# '^\%(tree\|blob\)$' | nnoremap <buffer> .. :edit %:h<CR> | endif
+
+" Auto-clean fugitive bufferes.
+autocmd BufReadPost fugitive://* set bufhidden=delete
+
+" Modified by sam@lf
+" command! MakeTags !ctags --file-scope=no  -R -f ~/redmoo/auct/.git/tags --exclude=.git ~/redmoo/auct/ ~/Envs/py2.7dj1.10.5/lib/python2.7/site-packages
+command! MakeTags !ctags --file-scope=no  -R -f ~/redmoo/auct/.git/tags --exclude=.git ~/redmoo/auct/
+" Use ^] to jump to def for tag under cursor
+" Use g^] when multiple definitions are possible
+" Use ^t to jump back
+" Run ctags when saving..
+" Edit the location of /path/to/tagsfile
+" !!! Run 'ctags --tag-relative=yes --file-scope=no -R -f ~/redmoo/auct/.git/tags --exclude=.git'
+" to update tags file
+" this  command does not work.
+" autocmd BufWritePost *  if filereadable('~/redmoo/auct/.git/tags') | call system('ctags --tag-relative=yes --file-scope=no -R -a -f ~/redmoo/auct/.git/tags --exclude=.git'.expand('%')) | endif
+
+" Added by sam@lf
+" limit # of lines displaying match candidates.
+let g:ctrlp_max_height=10
+
+" typing {{ transformed to {{_}} where _ indicates cursor placement.
+let g:mustache_abbreviations = 1
+let g:EasyMotion_use_upper = 1
+let g:EasyMotion_keys = 'ASDGHKLQWERTYUIOPZXCVBNMFJ;'
+" ignore letter case.
+let g:EasyMotion_smartcase=1
+" does not work?
+" nnoremap s <Plug>(easymotion-overwin-f2)
+" nnoremap s <Plug>(easymotion-bd-w)
+" nmap s <Plug>(easymotion-s2)
+" nmap t <Plug>(easymotion-t2)
+map  / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+
+" enable braceless.vim +indent features
+autocmd FileType python BracelessEnable +indent
+
+" added by sam@lf
+set cursorline
+set cursorcolumn
+" Jump open folds to the nearest closed fold
+" borrowed from http://stackoverflow.com/questions/9403098/is-it-possible-to-jump-to-closed-folds-in-vim
+" nnoremap <silent> <leader>zj :call NextClosedFold('j')<cr>
+" nnoremap <silent> <leader>zk :call NextClosedFold('k')<cr>
+nnoremap <silent> zj :call NextClosedFold('j')<cr>
+nnoremap <silent> zk :call NextClosedFold('k')<cr>
+function! NextClosedFold(dir)
+    let cmd = 'norm!z' . a:dir
+    let view = winsaveview()
+    let [l0, l, open] = [0, view.lnum, 1]
+    while l != l0 && open
+        exe cmd
+        let [l0, l] = [l, line('.')]
+        let open = foldclosed(l) < 0
+    endwhile
+    if open
+        call winrestview(view)
+    endif
+endfunction
+
+" open 'tag' in a new tab
+nnoremap <Leader>o <C-w><C-]><C-w>T
+
+" vim-go settings
+" autocmd FileType go nmap <leader>b  <Plug>(go-build)
+" run :GoBuild or :GoTestCompile based on the go file
+function! s:build_go_files()
+  let l:file = expand('%')
+  if l:file =~# '^\f\+_test\.go$'
+    call go#test#Test(0, 1)
+  elseif l:file =~# '^\f\+\.go$'
+    call go#cmd#Build(0)
+  endif
+endfunction
+autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+
+autocmd FileType go nmap <leader>r  <Plug>(go-run)
+autocmd FileType go nmap <leader>t  <Plug>(go-test)
+autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
+autocmd FileType go nmap <Leader>de :GoDecls<CR>
+autocmd FileType go nmap <Leader>dr :GoDeclsDir<CR>
+autocmd FileType go nmap <Leader>do :GoDoc<CR>
+autocmd FileType go nmap <Leader>di <Plug>(go-info)
+autocmd FileType go nmap <Leader>ds :GoDescribe<CR>
+autocmd FileType go nmap <Leader>i :GoSameIds<CR>
+" [q and [q should do the same as the next shortcuts
+" map <C-n> :cnext<CR>
+" map <C-m> :cprevious<CR>
+nnoremap <leader>a :cclose<CR>
+" let g:go_list_type = "quickfix"
+" vim setting: saves buffer when :make is called.
+" so, calling GoBuild write the file out.
+set autowrite
+" formats go code and manages imports.
+let g:go_fmt_command = "goimports"
+" stop folding on 'write' as per https://github.com/fatih/vim-go/issues/502
+let g:go_fmt_experimental = 1
+" you might not want all the highlighting.
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_build_constraints = 1
+
+let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
+let g:go_metalinter_autosave = 1
+let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+let g:go_metalinter_deadline = '5s'
+" let g:go_auto_type_info = 1 " shows signature of fn under cursor
+" let g:go_auto_sameids = 1 " too slow
+
+" Toggle alternate files, code and test files.
+autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+" autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+" autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+" autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+" Install plugins.
+
+" ultisnip shortcuts
+" let g:UltiSnipsSnippetsDir        = '~/.vim/snippets/'
+" get g:UltiSnipsSnippetDirectories = ['UltiSnips', 'mysnippets']
+
+let g:UltiSnipsExpandTrigger       = '<c-j>'
+" let g:UltiSnipsJumpForwardTrigger  = '<tab>'
+" let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
+
+""""""""""""""""""vim-sneak settings"""""""""""""""""""""""""""""""""""""""""""
+" press 's' again to move to the next match.
+let g:sneak#s_next = 1
+" 1 : Case sensitivity is determined by 'ignorecase' and 'smartcase'.
+let g:sneak#use_ic_scs = 1
+map f <Plug>Sneak_f
+map F <Plug>Sneak_F
+map t <Plug>Sneak_t
+map T <Plug>Sneak_T
+
+" Run :PlugInstall after adding pluging to the list.
+call plug#begin()
+Plug 'vim-airline/vim-airline'
+Plug 'kien/ctrlp.vim.git'
+Plug 'scrooloose/syntastic.git'
+Plug 'pangloss/vim-javascript.git'
+" Setting up React JSX syntax highlighting and indenting
+" Plug 'mxw/vim-jsx.git'
+Plug 'tmhedberg/SimpylFold.git'
+Plug 'tpope/vim-fugitive.git'
+Plug 'tpope/vim-unimpaired.git'
+Plug 'tpope/vim-surround.git'
+Plug 'tpope/vim-repeat.git'
+Plug 'tpope/vim-commentary.git'
+Plug 'tpope/vim-dispatch.git'
+Plug 'tweekmonster/braceless.vim'
+Plug 'jeetsukumaran/vim-indentwise.git'
+Plug 'pearofducks/ansible-vim'
+Plug 'mustache/vim-mustache-handlebars.git'
+Plug 'vim-scripts/ReplaceWithRegister'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+Plug 'SirVer/ultisnips'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'fatih/molokai'
+Plug 'Valloric/YouCompleteMe'
+Plug 'airblade/vim-gitgutter'
+Plug 'justinmk/vim-sneak'
+call plug#end()
+
+
