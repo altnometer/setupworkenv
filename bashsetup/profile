@@ -1,0 +1,217 @@
+# ~/.profile: executed by the command interpreter for login shells.
+# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
+# exists.
+# see /usr/share/doc/bash/examples/startup-files for examples.
+# the files are located in the bash-doc package.
+
+# the default umask is set in /etc/profile; for setting the umask
+# for ssh logins, install and configure the libpam-umask package.
+#umask 022
+
+# if running bash
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+	. "$HOME/.bashrc"
+    fi
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+###############tmux################
+tm() {
+    name=${1:-tmuxsn}
+    charonly=$( echo $name | sed "s/\([0-9]*\)$//")
+    # echo "handling tmux '$name' session"
+    echo "handling tmux '$charonly' session"
+    # substring match
+    # if ( tmux has-session -t ${name} 2>/dev/null ); then
+    # full string match
+    if ( tmux list-sessions -F "#{session_name}" | grep -q "^${name}$" ); then
+        echo "session $name is running, attaching to it ..."
+        tmux select-window -t ${name}:1
+        tmux -2 attach-session -t ${name}
+        tmux send-keys -t ${name}:1 'git status' C-m
+    else
+        if [ "$charonly" == "go" ]; then
+            cd $HOME/go/src/github.com/altnometer/account
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            # cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n $SHELL
+            tmux new-window  -t ${name}:3 -n $SHELL
+            tmux new-window  -t ${name}:4 -n $SHELL
+            # cd $HOME/go/src/github.com/altnometer/account
+            tmux new-window  -t ${name}:5 -n $SHELL
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "gotry" ]; then
+            cd $HOME/go/src/try
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            # cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n $SHELL
+            tmux new-window  -t ${name}:3 -n $SHELL
+            tmux new-window  -t ${name}:4 -n $SHELL
+            # cd $HOME/go/src/try
+            tmux new-window  -t ${name}:5 -n $SHELL
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "helmtry" ]; then
+            cd $HOME/docker/helm
+            tmux new-session -s ${name} -n git -d
+            # tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n $SHELL
+            tmux new-window  -t ${name}:3 -n $SHELL
+            tmux new-window  -t ${name}:4 -n $SHELL
+            cd $HOME/docker/helm
+            tmux new-window  -t ${name}:5 -n $SHELL
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "helm" ]; then
+            cd $HOME/redmoo/devops/helm
+            tmux new-session -s ${name} -n git -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n $SHELL
+            tmux new-window  -t ${name}:3 -n $SHELL
+            tmux new-window  -t ${name}:4 -n $SHELL
+            cd $HOME/redmoo/devops/helm
+            tmux new-window  -t ${name}:5 -n $SHELL
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "dockimg" ]; then
+            cd $HOME/docker/
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n $SHELL
+            tmux new-window  -t ${name}:3 -n $SHELL
+            tmux new-window  -t ${name}:4 -n $SHELL
+            cd $HOME/docker/
+            tmux new-window  -t ${name}:5 -n $SHELL
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "dock" ]; then
+            cd $HOME/redmoo/devops/dockerimg
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n $SHELL
+            tmux new-window  -t ${name}:3 -n $SHELL
+            tmux new-window  -t ${name}:4 -n $SHELL
+            cd $HOME/redmoo/devops/dockerimg
+            tmux new-window  -t ${name}:5 -n $SHELL
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        else
+            cd $HOME/redmoo/auct
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n $SHELL
+            tmux new-window  -t ${name}:3 -n $SHELL
+            tmux new-window  -t ${name}:4 -n $SHELL
+            tmux new-window  -t ${name}:5 -n $SHELL
+            cd $HOME/redmoo/auct
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        fi
+    fi
+}
+tmk() {
+    name=${1:-tmuxsn}
+    # substring match
+    # if ( tmux has-session -t ${name} 2>/dev/null ); then
+    # full string match
+    if ( tmux list-sessions -F "#{session_name}" | grep -q "^${name}$" ); then
+        tmux kill-session -t ${name}
+    fi
+}
+###############git#################
+# credit to David Winterbottom
+# of http://codeinthehole.com/tips/pull-requests-and-other-good-practices-for-teams-using-github/
+# alias git='hub'
+alias g='git status -sb'
+alias gs='git status'
+alias gh='git hist'
+alias gp='git pull'
+alias gpr='git pull --rebase'
+alias gpp='git pull --rebase && git push'
+alias gf='git fetch'
+alias gb='git branch'
+alias ga='git add'
+alias gc='git commit'
+alias gca='git commit --amend'
+alias gcv='git commit --no-verify'
+alias gd='git diff --color-words'
+alias gdc='git diff --cached -w'
+alias gdw='git diff --no-ext-diff --word-diff'
+alias gdv='git diff'
+alias gl='git log --oneline --decorate'
+# git log --all --graph --decorate --oneline
+alias gt='git tag'
+alias grc='git rebase --continue'
+alias grs='git rebase --skip'
+alias gsl='git stash list'
+alias gss='git stash save'
+alias gco='git checkout'
+
+#############docker################
+docker_remove () { docker stop $1 && docker rm $1; }
+docker_remove_all () {
+    echo -e "\n\x1b[33;01m Are you SURE?[Y/n]\x1b[39;49;00m\n"
+    read user_resp
+    if [ "${user_resp}" == "n" -o "${user_resp}" == "N" ]; then
+        exit 0
+    else
+        docker stop $( docker ps -a -q )
+        docker rm $( docker ps -a -q )
+    fi
+}
+alias dp='docker ps -a'
+alias ds='docker stop'
+alias dr=docker_remove
+alias dra=docker_remove_all
+alias dre='docker ps -aq -f status=exited | xargs docker rm'
+alias di='docker images'
+alias dri='docker rmi'
+alias drid='docker images -q --filter dangling=true | xargs docker rmi'
+
+#########kubernetes################
+alias kn='kubectl get node -o wide'
+alias kp='kubectl get pod -o wide'
+alias ks='kubectl get svc'
+alias kr='kubectl get rc -o wide'
+alias kd='kubectl get deploy'
+alias kpv='kubectl describe pod'
+alias krv='kubectl describe rc'
+alias ksv='kubectl describe svc'
+alias kpd='kubectl  delete pod'
+alias krd='kubectl delete rc'
+alias ksd='kubectl delete svc'
+
