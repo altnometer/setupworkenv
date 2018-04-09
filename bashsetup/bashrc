@@ -137,43 +137,80 @@ alias oblivion='gnome-terminal --window-with-profile=.bash_oblivion.cfg'
 ###############tmux################
 tm() {
     name=${1:-tmuxsn}
-    if ( tmux has-session -t ${name} 2>/dev/null ); then
+    charonly=$( echo $name | sed "s/\([0-9]*\)$//")
+    # echo "handling tmux '$name' session"
+    echo "handling tmux '$charonly' session"
+    # substring match
+    # if ( tmux has-session -t ${name} 2>/dev/null ); then
+    # full string match
+    if ( tmux list-sessions -F "#{session_name}" | grep -q "^${name}$" ); then
+        echo "session $name is running, attaching to it ..."
         tmux select-window -t ${name}:1
         tmux -2 attach-session -t ${name}
         tmux send-keys -t ${name}:1 'git status' C-m
     else
-        if [ "$name" == "go" ]; then
-            cd $HOME/go/src/github.com/altnometer/godoapi
+        if [ "$charonly" == "go" ]; then
+            cd $HOME/go/src/github.com/altnometer/account
             tmux new-session -s ${name} -n git  -d
             tmux send-keys -t ${name}:1 'git status' C-m
-            cd $HOME
+            # cd $HOME
             # tmux new-window  -t ${name}:1 -n var
             tmux new-window  -t ${name}:2 -n bash
             tmux new-window  -t ${name}:3 -n bash
             tmux new-window  -t ${name}:4 -n bash
-            cd $HOME/go/src/github.com/altnometer/godoapi
+            # cd $HOME/go/src/github.com/altnometer/account
             tmux new-window  -t ${name}:5 -n bash
             tmux new-window  -t ${name}:6 -n vim
 
             tmux select-window -t ${name}:1
             tmux -2 attach-session -t ${name}
-        elif [ "$name" == "gotry" ]; then
-            cd $HOME/go/src/try-it
+        elif [ "$charonly" == "gotry" ]; then
+            cd $HOME/go/src/try
             tmux new-session -s ${name} -n git  -d
             tmux send-keys -t ${name}:1 'git status' C-m
-            cd $HOME
+            # cd $HOME
             # tmux new-window  -t ${name}:1 -n var
             tmux new-window  -t ${name}:2 -n bash
             tmux new-window  -t ${name}:3 -n bash
             tmux new-window  -t ${name}:4 -n bash
-            cd $HOME/go/src/try-it
+            # cd $HOME/go/src/try
             tmux new-window  -t ${name}:5 -n bash
             tmux new-window  -t ${name}:6 -n vim
 
             tmux select-window -t ${name}:1
             tmux -2 attach-session -t ${name}
-        elif [ "$name" == "devop" ]; then
-            cd $HOME/redmoo/devops/k8s/setupcluster/docean
+        elif [ "$charonly" == "helmtry" ]; then
+            cd $HOME/docker/helm
+            tmux new-session -s ${name} -n git -d
+            # tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n bash
+            tmux new-window  -t ${name}:3 -n bash
+            tmux new-window  -t ${name}:4 -n bash
+            cd $HOME/docker/helm
+            tmux new-window  -t ${name}:5 -n bash
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "helm" ]; then
+            cd $HOME/redmoo/devops/helm
+            tmux new-session -s ${name} -n git -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n bash
+            tmux new-window  -t ${name}:3 -n bash
+            tmux new-window  -t ${name}:4 -n bash
+            cd $HOME/redmoo/devops/helm
+            tmux new-window  -t ${name}:5 -n bash
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "dockimg" ]; then
+            cd $HOME/docker/
             tmux new-session -s ${name} -n git  -d
             tmux send-keys -t ${name}:1 'git status' C-m
             cd $HOME
@@ -181,7 +218,22 @@ tm() {
             tmux new-window  -t ${name}:2 -n bash
             tmux new-window  -t ${name}:3 -n bash
             tmux new-window  -t ${name}:4 -n bash
-            cd $HOME/redmoo/devops/k8s/setupcluster/docean
+            cd $HOME/docker/
+            tmux new-window  -t ${name}:5 -n bash
+            tmux new-window  -t ${name}:6 -n vim
+
+            tmux select-window -t ${name}:1
+            tmux -2 attach-session -t ${name}
+        elif [ "$charonly" == "dock" ]; then
+            cd $HOME/redmoo/devops/dockerimg
+            tmux new-session -s ${name} -n git  -d
+            tmux send-keys -t ${name}:1 'git status' C-m
+            cd $HOME
+            # tmux new-window  -t ${name}:1 -n var
+            tmux new-window  -t ${name}:2 -n bash
+            tmux new-window  -t ${name}:3 -n bash
+            tmux new-window  -t ${name}:4 -n bash
+            cd $HOME/redmoo/devops/dockerimg
             tmux new-window  -t ${name}:5 -n bash
             tmux new-window  -t ${name}:6 -n vim
 
@@ -207,7 +259,10 @@ tm() {
 }
 tmk() {
     name=${1:-tmuxsn}
-    if ( tmux has-session -t ${name} 2>/dev/null ); then
+    # substring match
+    # if ( tmux has-session -t ${name} 2>/dev/null ); then
+    # full string match
+    if ( tmux list-sessions -F "#{session_name}" | grep -q "^${name}$" ); then
         tmux kill-session -t ${name}
     fi
 }
@@ -281,3 +336,5 @@ if [ -f "$HOME/share/google-cloud-sdk/path.bash.inc" ]; then source "$HOME/share
 
 # The next line enables shell command completion for gcloud.
 if [ -f "$HOME/share/google-cloud-sdk/completion.bash.inc" ]; then source "$HOME/share/google-cloud-sdk/completion.bash.inc"; fi
+
+alias yamltojs="python -c 'import yaml, sys, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < "
