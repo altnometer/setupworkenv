@@ -104,7 +104,7 @@ function cd(){
     [[ ! -e $argv[-1] ]] || [[ -d $argv[-1] ]] || argv[-1]=${argv[-1]%/*}
     builtin cd "$@"
     # do not 'ls' if 'cd' with no arg.
-    [[ ! -e $argv[-1] ]] || ls
+    [[ -z "$argv[-1]" ]] || ls
 }
 # source ~/.profile
 [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
