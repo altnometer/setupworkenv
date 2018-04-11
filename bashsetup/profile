@@ -215,3 +215,7 @@ alias kpd='kubectl  delete pod'
 alias krd='kubectl delete rc'
 alias ksd='kubectl delete svc'
 
+############go env#################
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=/home/sam/go
+export PATH=$PATH:$GOPATH/bin
