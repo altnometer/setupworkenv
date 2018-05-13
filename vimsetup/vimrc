@@ -9,7 +9,8 @@ set updatetime=250
 
 " Added by sam@lf
 " Treat '-' as part of the word rather than a word separator.
-set iskeyword+=-
+" set iskeyword+=-
+set iskeyword+=
 " Added by puppy@dog
 set encoding=utf-8
 set fileencoding=utf-8
@@ -186,9 +187,7 @@ syntax on
 
 " trying to enable omnicompletion:
 " filetype plugin on
-"set omnifunc=syntaxcomplete#Complete
-"set omnifunc=pythoncomplete#Complete  " doesnt work for python:(
-
+" set omnifunc=syntaxcomplete#Complete
 
 " Showing line numbers and length
 set relativenumber  " show line numbers
@@ -236,11 +235,8 @@ set noswapfile
 " Python IDE Setup
 " ============================================================================
 
-" Added by user rambul.
-" Add NerdTree plugin.
-" cd ~/.vim/bundle/
-" git clone https://github.com/scrooloose/nerdtree.git
 let NERDTreeIgnore=['^.*\.pyc$', '\~$']
+nmap <Leader>x  :NERDTreeToggle<CR>
 
 " Settings for ctrlp
 " cd ~/.vim/bundle
@@ -256,7 +252,11 @@ set wildignore+=*/coverage/*
 " !!! Install 'sudo pip flake8' to enable python checking
 let g:syntastic_mode_map = { 'mode': 'active',
     \ 'active_filetypes': ['python', 'javascript', 'css'],
-    \ 'passive_filetypes': ['html'] }
+    \ 'passive_filetypes': ['html', 'go'] }
+    " " \ 'active_filetypes': ['go', 'python', 'javascript', 'css'],
+    " \ 'passive_filetypes': ['html'] }
+" let g:syntastic_go_checkers = ['golint', 'govet']
+" let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
 " Use flake8
 "let g:syntastic_python_checkers = ['pep8']
 let g:syntastic_python_checkers = ['flake8']
@@ -380,17 +380,6 @@ let g:ctrlp_max_height=10
 
 " typing {{ transformed to {{_}} where _ indicates cursor placement.
 let g:mustache_abbreviations = 1
-let g:EasyMotion_use_upper = 1
-let g:EasyMotion_keys = 'ASDGHKLQWERTYUIOPZXCVBNMFJ;'
-" ignore letter case.
-let g:EasyMotion_smartcase=1
-" does not work?
-" nnoremap s <Plug>(easymotion-overwin-f2)
-" nnoremap s <Plug>(easymotion-bd-w)
-" nmap s <Plug>(easymotion-s2)
-" nmap t <Plug>(easymotion-t2)
-map  / <Plug>(easymotion-sn)
-omap / <Plug>(easymotion-tn)
 
 " enable braceless.vim +indent features
 autocmd FileType python BracelessEnable +indent
@@ -443,14 +432,27 @@ autocmd FileType go nmap <Leader>do :GoDoc<CR>
 autocmd FileType go nmap <Leader>di <Plug>(go-info)
 autocmd FileType go nmap <Leader>ds :GoDescribe<CR>
 autocmd FileType go nmap <Leader>i :GoSameIds<CR>
+
+" Build/Test on save.
+augroup auto_go
+    autocmd!
+    autocmd BufWritePost *.go :GoBuild
+    " autocmd BufWritePost *_test.go :GoTest
+    " autocmd BufWritePost *.go :GoTest
+augroup end
 " [q and [q should do the same as the next shortcuts
 " map <C-n> :cnext<CR>
 " map <C-m> :cprevious<CR>
 nnoremap <leader>a :cclose<CR>
 " let g:go_list_type = "quickfix"
+" let g:go_list_type_commands = {"GoMetaLinter": "quickfix"} " default
+" let g:go_list_type_commands = {"GoMetaLinter": "locationlist"}
 " vim setting: saves buffer when :make is called.
 " so, calling GoBuild write the file out.
 set autowrite
+
+let g:go_autodetect_gopath = 0
+let g:go_info_mode = "gocode"
 " formats go code and manages imports.
 let g:go_fmt_command = "goimports"
 " stop folding on 'write' as per https://github.com/fatih/vim-go/issues/502
@@ -466,10 +468,21 @@ let g:go_highlight_build_constraints = 1
 
 let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
 let g:go_metalinter_autosave = 1
+" linting started and linting finished commands
+let g:go_echo_command_info = 0 
 let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+" let g:go_metalinter_autosave_enabled = ['vet']
 let g:go_metalinter_deadline = '5s'
+let g:ale_go_gometalinter_options =
+      \ '--tests ' .
+      \ '--fast ' .
+      \ '--disable=gotype ' .
+      \ '--disable=gotypex ' .
+      \ '--exclude="should have comment" ' .
+      \ '--exclude="error return value not checked \(defer"'
 " let g:go_auto_type_info = 1 " shows signature of fn under cursor
 " let g:go_auto_sameids = 1 " too slow
+let g:go_gocode_unimported_packages = 1
 
 " Toggle alternate files, code and test files.
 autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
@@ -513,17 +526,18 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 Plug 'tweekmonster/braceless.vim'
 Plug 'jeetsukumaran/vim-indentwise'
-Plug 'pearofducks/ansible-vim'
+" Plug 'pearofducks/ansible-vim'
 Plug 'mustache/vim-mustache-handlebars'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 Plug 'SirVer/ultisnips'
 Plug 'AndrewRadev/splitjoin.vim'
-Plug 'fatih/molokai'
+" Plug 'fatih/molokai'
 Plug 'Valloric/YouCompleteMe'
 Plug 'airblade/vim-gitgutter'
 Plug 'justinmk/vim-sneak'
+Plug 'scrooloose/nerdtree'
 call plug#end()
 
 
