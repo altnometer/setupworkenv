@@ -106,6 +106,15 @@ function cd(){
     # do not 'ls' if 'cd' with no arg.
     [[ -z "$argv[-1]" ]] || ls
 }
+
+# run 'pwd' before ls.
+function ls(){
+    args=("$@")
+    echo -n $(pwd)
+    [[ $# -gt 1 ]] && echo -n "/$args[2]"
+    echo
+    /bin/ls "$@"
+}
 # source ~/.profile
 [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
 
@@ -134,3 +143,9 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=037'
 
 # To disable highlighting of globbing expressions
 ZSH_HIGHLIGHT_STYLES[globbing]='none'
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "$HOME/share/google-cloud-sdk/path.zsh.inc" ]; then source "$HOME/share/google-cloud-sdk/path.zsh.inc"; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "$HOME/share/google-cloud-sdk/completion.zsh.inc" ]; then source "$HOME/share/google-cloud-sdk/completion.zsh.inc"; fi
