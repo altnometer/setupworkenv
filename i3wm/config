@@ -58,12 +58,20 @@ bindsym $mod+d exec rofi -show run -lines 3 -eh 2 -width 100 -padding 500 -opaci
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
-# change focus
-bindsym $mod+h focus left
-bindsym $mod+j focus down
-bindsym $mod+k focus up
-bindsym $mod+l focus right
+# edited by sam@lf
+# move to next, prev worksapce
+# bindsym $mod+h workspace prev
+bindsym $mod+j workspace prev
+bindsym $mod+k workspace next
+bindsym $mod+l workspace back_and_forth
 
+# change focus
+# bindsym $mod+h focus left
+# bindsym $mod+j focus down
+# bindsym $mod+k focus up
+# bindsym $mod+l focus right
+
+# change focus
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
