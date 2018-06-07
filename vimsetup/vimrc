@@ -62,7 +62,7 @@ nnoremap <Leader>s i<CR><Esc>^
 
 " Added by user rambul
 " Map <Tab> key to <C-x><C-f> file path autocomplete.
-inoremap <Tab> <C-x><C-f>
+" inoremap <Tab> <C-x><C-f>
 
 
 " Bind nohl
@@ -491,10 +491,12 @@ autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 " autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 " Install plugins.
 
-" ultisnip shortcuts
+""""""""""""""""""UltiSnips""""""""""""""""""""""""""""""""""""""""""""""""""""
 " let g:UltiSnipsSnippetsDir        = '~/.vim/snippets/'
 " get g:UltiSnipsSnippetDirectories = ['UltiSnips', 'mysnippets']
+autocmd FileType gohtmltmpl UltiSnipsAddFiletypes gohtmltmpl.html
 
+" ultisnip shortcuts
 let g:UltiSnipsExpandTrigger       = '<c-j>'
 " let g:UltiSnipsJumpForwardTrigger  = '<tab>'
 " let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
