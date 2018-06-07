@@ -149,3 +149,22 @@ if [ -f "$HOME/share/google-cloud-sdk/path.zsh.inc" ]; then source "$HOME/share/
 
 # The next line enables shell command completion for gcloud.
 if [ -f "$HOME/share/google-cloud-sdk/completion.zsh.inc" ]; then source "$HOME/share/google-cloud-sdk/completion.zsh.inc"; fi
+
+# switch i3wm config.
+func i3conf(){
+case "$1" in
+    "beakl")
+        rm ~/.config/i3/config
+        ln -s ~/redmoo/setupworkenv/i3wm/config.beakl ~/.config/i3/config
+        i3-msg reload
+        ;;
+    *)
+        rm ~/.config/i3/config
+        ln -s ~/redmoo/setupworkenv/i3wm/config ~/.config/i3/config
+        i3-msg reload
+        ;;
+esac
+}
+
+# disable flow control, operated by Ctrl-s, Ctrl-q.
+stty -ixon
