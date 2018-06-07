@@ -469,7 +469,7 @@ let g:go_highlight_build_constraints = 1
 let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
 let g:go_metalinter_autosave = 1
 " linting started and linting finished commands
-let g:go_echo_command_info = 0 
+let g:go_echo_command_info = 0
 let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 " let g:go_metalinter_autosave_enabled = ['vet']
 let g:go_metalinter_deadline = '5s'
@@ -534,6 +534,7 @@ Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 Plug 'AndrewRadev/splitjoin.vim'
 " Plug 'fatih/molokai'
 Plug 'Valloric/YouCompleteMe'
