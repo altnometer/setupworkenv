@@ -35,6 +35,8 @@ set clipboard=unnamedplus
 set mouse=a  " on OSX press ALT and click
 set bs=2     " make backspace behave like normal again
 
+" backspace in normal mode
+nnoremap <bs> X
 
 " Rebind <Leader> key
 " I like to have it here becuase it is easier to reach than the default and
