@@ -501,13 +501,14 @@ autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 
 """"""""""""""""""UltiSnips""""""""""""""""""""""""""""""""""""""""""""""""""""
 " let g:UltiSnipsSnippetsDir        = '~/.vim/snippets/'
-" get g:UltiSnipsSnippetDirectories = ['UltiSnips', 'mysnippets']
-autocmd FileType gohtmltmpl UltiSnipsAddFiletypes gohtmltmpl.html
+let g:UltiSnipsSnippetDirectories = ['UltiSnips',]
+autocmd FileType gohtmltmpl UltiSnipsAddFiletypes gohtmltmpl.html.javascript-jquery
 
 " ultisnip shortcuts
 let g:UltiSnipsExpandTrigger       = '<c-j>'
-" let g:UltiSnipsJumpForwardTrigger  = '<tab>'
-" let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
+let g:UltiSnipsJumpForwardTrigger  = '<c-b>'
+" default JumpBackward is '<c-k>'
+" let g:UltiSnipsJumpBackwardTrigger = '<c-z>'
 
 """"""""""""""""""vim-sneak settings"""""""""""""""""""""""""""""""""""""""""""
 " press 's' again to move to the next match.
