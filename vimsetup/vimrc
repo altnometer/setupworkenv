@@ -7,6 +7,8 @@
 " vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
 set updatetime=250
 
+" place cursor inside an xml/html tag, press % to jump to the matching one.
+runtime macros/matchit.vim
 " Added by sam@lf
 " Treat '-' as part of the word rather than a word separator.
 " set iskeyword+=-
