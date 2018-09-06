@@ -362,6 +362,7 @@ let g:airline_enable_fugitive=1
 let g:airline_enable_syntastic=1
 let g:airline_enable_bufferline=1
 
+""""""""""""""""""""""""""""""""fugitive"""""""""""""""""""""""""""""""""""""""
 " fugitive git options
 " set diffopt+=vertical
 " fugitive git bindings
