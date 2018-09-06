@@ -144,12 +144,6 @@ set timeoutlen=1000 ttimeoutlen=0
 
 " backspace in normal mode
 nnoremap <bs> X
-""""""""""""""""""""""""delimitMate""""""""""""""""""""""""""""""""""""""""""""
-" <S-tab> jump over delimeter
-imap <C-Tab> <S-Tab>
-let delimitMate_expand_cr = 1
-let delimitMate_expand_space = 1
-let delimitMate_jump_expansion = 1
 """"""""""""""""""""""""neoterm""""""""""""""""""""""""""""""""""""""""""""""""
 let neoterm_default_mod = 'vertical'
 
