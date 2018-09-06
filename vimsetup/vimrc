@@ -542,7 +542,8 @@ map F <Plug>Sneak_F
 map t <Plug>Sneak_t
 map T <Plug>Sneak_T
 
-" Run :PlugInstall after adding pluging to the list.
+" Run :PlugInstall after adding plugin to the list.
+" Run :PlugUpdate to update plugin.
 call plug#begin()
 Plug 'vim-airline/vim-airline'
 Plug 'ctrlpvim/ctrlp.vim'
