@@ -125,6 +125,19 @@ function cd(){
     [[ -z "$argv[-1]" ]] || ls
 }
 
+# mv and run ls if mv is successful.
+function mv(){
+    if /bin/mv "$@" ; then
+        ls
+    fi
+}
+
+# rm and run ls if rm is successful.
+function rm(){
+    if /bin/rm "$@" ; then
+        ls
+    fi
+}
 # run 'pwd' before ls.
 function ls(){
     args=("$@")
