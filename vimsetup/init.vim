@@ -5,6 +5,13 @@ filetype off                  " required
 " :PlugInstall, :PlugUpdate, :PlugClean,
 " :PlugUpgrade (plug itself), :PlugStatus
 call plug#begin('~/.local/share/nvim/plugged')
+" Plug 'tmhedberg/SimpylFold'
+Plug 'jeetsukumaran/vim-indentwise'
+Plug 'vim-scripts/ReplaceWithRegister'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'honza/vim-snippets'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'justinmk/vim-sneak'
 Plug 'airblade/vim-gitgutter'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go'}
 Plug 'vim-airline/vim-airline'
