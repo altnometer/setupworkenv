@@ -24,7 +24,7 @@ Plug 'zchee/deoplete-go', {'do': 'make'}
 Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 " provides insert mode auto-completion for quotes, parens, brackets, etc.
-Plug 'Raimondi/delimitMate'
+" Plug 'Raimondi/delimitMate'
 " display the indention levels with thin vertical lines
 Plug 'Yggdroot/indentLine'
 Plug 'Valloric/MatchTagAlways'
