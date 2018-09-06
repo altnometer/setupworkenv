@@ -154,7 +154,7 @@ let delimitMate_jump_expansion = 1
 let neoterm_default_mod = 'vertical'
 
 " Fold, gets it's own section  ----------------------------------------------{{{
-
+" credit to Mike Hartington https://github.com/mhartington/dotfiles/
   function! MyFoldText() " {{{
       let line = getline(v:foldstart)
       let nucolwidth = &fdc + &number * &numberwidth
