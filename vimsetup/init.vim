@@ -45,6 +45,8 @@ set hlsearch
 set incsearch
 set ignorecase
 set smartcase
+" vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
+set updatetime=250
 " Remember cursor position between vim sessions
  autocmd BufReadPost *
              \ if line("'\"") > 0 && line ("'\"") <= line("$") |
