@@ -8,3 +8,10 @@ snippet "wr"  "w http.ResponseWriter, r *http.Request)" r
 w http.ResponseWriter, r *http.Request)
 endsnippet
 
+# this is a duplicate of vim-go UltiSnip snippet. Only an indent is added.
+# struct
+snippet st "type T struct { ... }"
+type ${1:Type} struct {
+	${0}
+}
+endsnippet
