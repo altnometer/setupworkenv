@@ -80,7 +80,13 @@ nnoremap <Leader>s i<CR><Esc>^
 " ``<C>`` stands for ``CTRL`` and therefore ``<C-n>`` stands for ``CTRL+n``
 noremap <C-n> :nohl<CR>
 vnoremap <C-n> :nohl<CR>
-inoremap <C-n> :nohl<CR>
+" inoremap <C-n> :nohl<CR>
+
+"""""""""""""""""":help"""""ins-special-special""""""""""""""""""""""""""""""""
+" This breaks undo at each line break. It also expands abbreviations before this.
+inoremap <CR> <C-]><C-G>u<CR>
+inoremap <C-w> <C-G>u<C-w>
+inoremap <C-u> <C-G>u<C-u>
 
 " Added by sam@lf
 " <C-c> does not check for abbreviations and does not trigger InsertLeave.
