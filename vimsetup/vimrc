@@ -438,6 +438,7 @@ endfunction
 " open 'tag' in a new tab
 nnoremap <Leader>o <C-w><C-]><C-w>T
 
+""""""""""""""""""""""""""""""""vim-go"""""""""""""""""""""""""""""""""""""""""
 " vim-go settings
 " autocmd FileType go nmap <leader>b  <Plug>(go-build)
 " run :GoBuild or :GoTestCompile based on the go file
