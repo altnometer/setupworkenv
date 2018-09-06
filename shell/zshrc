@@ -5,6 +5,9 @@
 # Path to your oh-my-zsh installation.
 export ZSH=/home/sam/.oh-my-zsh
 
+# Path to libevent libs. required by tmux.
+export LD_LIBRARY_PATH="/usr/local/lib"
+
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
