@@ -110,17 +110,17 @@ nnoremap <bs> X
 " }}}
 
 " System mappings  ----------------------------------------------------------{{{
-" Rebind <Leader> key
+" Rebind <leader> key
 " I like to have it here becuase it is easier to reach than the default and
 " it is next to ``m`` and ``n`` which I use for navigating between tabs.
 let mapleader = ","
 
 " Quick quit command
-noremap <Leader>e :quit<CR>  " Quit current window
-noremap <Leader>E :qa!<CR>   " Quit all windows
+noremap <leader>e :quit<CR>  " Quit current window
+noremap <leader>E :qa!<CR>   " Quit all windows
 " easier moving between tabs
-map <Leader>n <esc>:tabprevious<CR>
-map <Leader>m <esc>:tabnext<CR>
+map <leader>n <esc>:tabprevious<CR>
+map <leader>m <esc>:tabnext<CR>
 
 " Quicksave command
 noremap <C-Z> :update<CR>
@@ -256,14 +256,14 @@ autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 
 autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
-autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
-autocmd FileType go nmap <Leader>df :GoDef<CR>
-autocmd FileType go nmap <Leader>de :GoDecls<CR>
-autocmd FileType go nmap <Leader>dr :GoDeclsDir<CR>
-autocmd FileType go nmap <Leader>do :GoDoc<CR>
-autocmd FileType go nmap <Leader>di <Plug>(go-info)
-autocmd FileType go nmap <Leader>ds :GoDescribe<CR>
-autocmd FileType go nmap <Leader>i :GoSameIds<CR>
+autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
+autocmd FileType go nmap <leader>df :GoDef<CR>
+autocmd FileType go nmap <leader>de :GoDecls<CR>
+autocmd FileType go nmap <leader>dr :GoDeclsDir<CR>
+autocmd FileType go nmap <leader>do :GoDoc<CR>
+autocmd FileType go nmap <leader>di <Plug>(go-info)
+autocmd FileType go nmap <leader>ds :GoDescribe<CR>
+autocmd FileType go nmap <leader>i :GoSameIds<CR>
 
 " Build/Test on save.
 augroup auto_go
