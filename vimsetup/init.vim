@@ -360,10 +360,7 @@ let g:deoplete#enable_at_startup = 1
 "}}}
 
 " vim-fugitive --------------------------------------------------------------{{{
-" fugitive git options
 " set diffopt+=vertical
-" fugitive git bindings
-"autocmd! BufWritePost * :Gstatus " does not work
 "nnoremap <space>ga :Git add %:p<CR><CR>
 nnoremap <space>gs :Gstatus<CR>
 nnoremap <space>gc :Gcommit -v -q<CR>
@@ -380,11 +377,14 @@ nnoremap <space>gw :Gwrite<CR><CR>
 "nnoremap <space>gps :Dispatch! git push<CR>
 "nnoremap <space>gpl :Dispatch! git pull<CR>
 
-" next maping doesn't work
-"autocmd User fugitive if fugitive#buffer().type() =~# '^\%(tree\|blob\)$' | nnoremap <buffer> .. :edit %:h<CR> | endif
-
-" Auto-clean fugitive bufferes.
-autocmd BufReadPost fugitive://* set bufhidden=delete
+augroup auto_fugitive
+    autocmd!
+    "autocmd! BufWritePost * :Gstatus " does not work
+    " Auto-clean fugitive bufferes.
+    autocmd BufReadPost fugitive://* set bufhidden=delete
+    " next maping doesn't work
+    "autocmd User fugitive if fugitive#buffer().type() =~# '^\%(tree\|blob\)$' | nnoremap <buffer> .. :edit %:h<CR> | endif
+augroup END
 
 " }}}
 
