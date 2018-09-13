@@ -295,7 +295,8 @@ inoremap <C-Z> <C-C>:update<CR>
 " Plugin key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
 imap <C-j>     <Plug>(neosnippet_expand_or_jump)
-smap <C-j>     <Plug>(neosnippet_expand_or_jump)
+" smap <C-j>     <Plug>(neosnippet_expand_or_jump)
+smap <C-j>     <Plug>(neosnippet_jump)
 xmap <C-j>     <Plug>(neosnippet_expand_target)
 " }}}
 
