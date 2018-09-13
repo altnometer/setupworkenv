@@ -517,6 +517,11 @@ map T <Plug>Sneak_T
 " }}}
 
 " Go ------------------------------------------------------------------------{{{
+augroup auto_go
+    autocmd!
+    autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
+augroup END
+" should't this be in deoplete section?
 let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
 let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 let g:deoplete#sources#go#pointer = 1
