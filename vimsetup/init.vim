@@ -528,3 +528,31 @@ let g:deoplete#sources#go#pointer = 1
 " incredibly slow
 " let g:deoplete#sources#go#source_importer = 1
 "}}}
+
+" terminal ------------------------------------------------------------------{{{
+highlight TermCursor ctermfg=red guifg=red
+set splitbelow
+set splitright
+tnoremap <Leader><ESC> <C-\><C-n>
+tnoremap <leader>x <c-\><c-n>:bp! <BAR> bd! #<CR>
+augroup auto_term
+  autocmd!
+  autocmd TermOpen * nnoremap <buffer> <leader>x :q! <CR>
+  autocmd TermOpen <buffer> * :startinsert
+augroup END
+" }}}
+
+" abbrev --------------------------------------------------------------------{{{
+" common typos.
+iabbrev and and
+iabbrev waht what
+iabbrev tehn then
+" }}}
+
+" abbrev --------------------------------------------------------------------{{{
+" Do not wrap text in html files.
+augroup auto_html
+    autocmd!
+    autocmd BufNewFile,BufRead *.html,*.tmpl setlocal nowrap
+augroup END
+" }}}
