@@ -56,12 +56,28 @@ set ignorecase
 set smartcase
 " vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
 set updatetime=250
-" Remember cursor position between vim sessions
- autocmd BufReadPost *
+" auto ----------------------------------------------------------------------{{{
+augroup auto_system
+    autocmd!
+    " Remember cursor position between vim sessions
+    autocmd BufReadPost *
              \ if line("'\"") > 0 && line ("'\"") <= line("$") |
              \   exe "normal! g'\"" |
              \ endif
              " center buffer around cursor when opening files
+    " Show whitespace
+    " MUST be inserted BEFORE the colorscheme command
+    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    " leave a file mark when you leave the buffer.
+    " Get to where you left it with '|` followed by 'C|H|J|G|...'
+    autocmd BufLeave *.css  normal! mC
+    autocmd BufLeave *.html normal! mH
+    autocmd BufLeave *.tmpl normal! mH
+    autocmd BufLeave *.js   normal! mJ
+    autocmd BufLeave *.go   normal! mG
+augroup END
+" }}}
 let g:ruby_host_prog = "/var/lib/gems/2.3.0/gems/neovim-0.7.1/bin/neovim-ruby-host"
 let g:python_host_prog = "/usr/bin/python2"
 let g:python3_host_prog = "/usr/bin/python3"
