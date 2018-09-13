@@ -52,7 +52,6 @@ call plug#end()
 
 " System Settings  ----------------------------------------------------------{{{
 " Don't use TABs but spaces
-autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
 filetype plugin indent on
 set tabstop=4
 set softtabstop=4
@@ -97,19 +96,16 @@ let g:python3_host_skip_check = 1
 if (has("termguicolors"))
  set termguicolors
 endif
-" Theme
 syntax enable
-colorscheme OceanicNext
-let g:airline_theme='oceanicnext'
 " Showing line numbers and length
 set relativenumber  " show line numbers
 set number  " show line numbers
 set tw=79   " width of document (used by gd)
-set nowrap  " don't automatically wrap on load
-set fo-=t   " don't automatically wrap text when typing
+" set nowrap  " don't automatically wrap on load
+set wrap
+" set fo-=t   " don't automatically wrap text when typing
 set colorcolumn=80
 highlight ColorColumn ctermbg=233
-
 hi CursorLineNR guifg=#ffffff
 " Better copy & paste
 " When you want to paste large blocks of code into vim, press F2 before you
