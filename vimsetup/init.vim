@@ -6,6 +6,7 @@ filetype off                  " required
 " :PlugUpgrade (plug itself), :PlugStatus
 call plug#begin('~/.local/share/nvim/plugged')
 " Plug 'tmhedberg/SimpylFold'
+Plug 'wellle/tmux-complete.vim'
 Plug 'jeetsukumaran/vim-indentwise'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'michaeljsmith/vim-indent-object'
@@ -13,7 +14,11 @@ Plug 'honza/vim-snippets'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'justinmk/vim-sneak'
 Plug 'airblade/vim-gitgutter'
+" go {{{
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go'}
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+" }}}
 " Plug 'mdempsky/gocode', { 'rtp': 'nvim', 'do': '~/.local/share/nvim/plugged/gocode/nvim/symlink.sh' }
 Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-fugitive'
@@ -23,7 +28,12 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 Plug 'mhartington/oceanic-next'
-"""""""""""neosnippet recommended setup""""""""""""
+" denite {{{
+Plug 'Shougo/denite.nvim'
+Plug 'nixprime/cpsm', {'do': 'PY3=ON ./install.sh'}
+Plug 'Shougo/neomru.vim'
+" }}}
+" neosnippet recommended {{{
 Plug 'Shougo/deoplete.nvim'
 Plug 'Shougo/neosnippet.vim'
 Plug 'Shougo/neosnippet-snippets'
