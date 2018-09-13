@@ -459,12 +459,8 @@ augroup end
 " }}}
 " map -----------------------------------------------------------------------{{{
 " let g:go_list_type = "quickfix"
-" let g:go_list_type_commands = {"GoMetaLinter": "quickfix"} " default
+let g:go_list_type_commands = {"GoMetaLinter": "quickfix", "GoTest": "quickfix"}
 " let g:go_list_type_commands = {"GoMetaLinter": "locationlist"}
-" vim setting: saves buffer when :make is called.
-" so, calling GoBuild write the file out.
-set autowrite
-
 let g:go_autodetect_gopath = 0
 let g:go_info_mode = "gocode"
 " formats go code and manages imports.
@@ -475,11 +471,11 @@ let g:go_fmt_experimental = 1
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_build_constraints = 1
-
 let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
 let g:go_metalinter_autosave = 1
 " echo linting started and linting finished messages
@@ -494,13 +490,20 @@ let g:ale_go_gometalinter_options =
       \ '--disable=gotypex ' .
       \ '--exclude="should have comment" ' .
       \ '--exclude="error return value not checked \(defer"'
-" let g:go_auto_type_info = 1 " shows signature of fn under cursor
+" does not seem to work.
+let g:go_auto_type_info = 1 " shows signature of fn under cursor
 " let g:go_auto_sameids = 1 " too slow
 let g:go_gocode_unimported_packages = 1
 let g:go_term_enabled = 1
+let g:go_term_mode = 'split'
+let g:go_term_height = 13
 " Specifies whether `gocode` should use source files instead of binary packages
 " It is currently much slower for source files.
-let g:go_gocode_propose_source = 1
+" let g:go_gocode_propose_source = 1
+" let g:go_guru_scope = ['github.com/...', expand("%:p:h")] " too slow
+" let g:go_guru_scope = [expand("%:p:h")]  " does not work
+" }}}
+" }}}
 
 " Toggle alternate files, code and test files.
 autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
