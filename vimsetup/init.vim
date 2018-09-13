@@ -123,6 +123,18 @@ set bs=2     " make backspace behave like normal again
 set timeoutlen=1000 ttimeoutlen=0
 " backspace in normal mode
 nnoremap <bs> X
+" place cursor inside an xml/html tag, press % to jump to the matching one.
+runtime macros/matchit.vim
+" Treat '-' as part of the word rather than a word separator.
+" set iskeyword+=-
+set iskeyword+=
+set encoding=utf-8
+set fileencoding=utf-8
+" Define order of searches for word completion. kspell will add
+" dictionary search only if ":set[local] spell" is enabled.
+set complete=.,w,b,u,t,i,kspell
+colorscheme OceanicNext
+set completeopt-=preview " do not open preview window for completion.
 " }}}
 
 " System mappings  ----------------------------------------------------------{{{
