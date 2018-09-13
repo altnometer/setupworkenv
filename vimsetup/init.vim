@@ -458,8 +458,6 @@ augroup END
 " }}}
 
 " vim-go --------------------------------------------------------------------{{{
-" vim-go settings
-" autocmd FileType go nmap <leader>b  <Plug>(go-build)
 " run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
   let l:file = expand('%')
