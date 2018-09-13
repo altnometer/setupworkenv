@@ -505,12 +505,15 @@ let g:go_term_height = 13
 " }}}
 " }}}
 
-" Toggle alternate files, code and test files.
-autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
-" autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-" autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
-" autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
-" Install plugins.
+" vim-sneak -----------------------------------------------------------------{{{
+" press 's'|'f'|'t' again to move to the next match.
+let g:sneak#s_next = 1
+" 1 : Case sensitivity is determined by 'ignorecase' and 'smartcase'.
+let g:sneak#use_ic_scs = 1
+map f <Plug>Sneak_f
+map F <Plug>Sneak_F
+map t <Plug>Sneak_t
+map T <Plug>Sneak_T
 " }}}
 
 " Go ------------------------------------------------------------------------{{{
