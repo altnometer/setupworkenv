@@ -467,21 +467,8 @@ function! s:build_go_files()
     call go#cmd#Build(0)
   endif
 endfunction
-autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-
-autocmd FileType go nmap <leader>r  <Plug>(go-run)
-autocmd FileType go nmap <leader>t  <Plug>(go-test)
-autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
-autocmd FileType go nmap <leader>df :GoDef<CR>
-autocmd FileType go nmap <leader>de :GoDecls<CR>
-autocmd FileType go nmap <leader>dr :GoDeclsDir<CR>
-autocmd FileType go nmap <leader>do :GoDoc<CR>
-autocmd FileType go nmap <leader>di <Plug>(go-info)
-autocmd FileType go nmap <leader>ds :GoDescribe<CR>
-autocmd FileType go nmap <leader>i :GoSameIds<CR>
-
-" Build/Test on save.
-augroup auto_go
+" auto ----------------------------------------------------------------------{{{
+augroup auto_vim-go
     autocmd!
     " autocmd FileType go nmap <leader>b  <Plug>(go-build)
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
