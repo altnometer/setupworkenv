@@ -370,7 +370,7 @@ xmap <C-j>     <Plug>(neosnippet_expand_target)
 " }}}
 
 " neoterm -------------------------------------------------------------------{{{
-let neoterm_default_mod = 'vertical'
+let neoterm_default_mod = 'horizontal'
 " }}}
 
 " denite --------------------------------------------------------------------{{{
