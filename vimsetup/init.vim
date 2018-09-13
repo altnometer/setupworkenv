@@ -148,14 +148,33 @@ set completeopt-=preview " do not open preview window for completion.
 " I like to have it here becuase it is easier to reach than the default and
 " it is next to ``m`` and ``n`` which I use for navigating between tabs.
 let mapleader = ","
+let maplocalleader = "/"
 
-" Quick quit command
-noremap <leader>e :quit<CR>  " Quit current window
-noremap <leader>E :qa!<CR>   " Quit all windows
+" Move the line down.
+noremap <leader>- yyddp
+" Move the line up.
+noremap <leader>_ yydd2kp
+" Uppercase the word.
+inoremap <c-u> <esc>gUiwea
+nnoremap <c-u> gUiwe
+" Open vimrc/vim.init file.
+" nnoremap <leader>v :vsplit $MYVIMRC<cr>
+nnoremap <localleader>v :vsplit $MYVIMRC<cr>
+" Source vimrc/vim.init file.
+nnoremap <leader>V :source $MYVIMRC<cr>
+" Quit current window
+noremap <leader>e :quit<CR>
+noremap <leader>E :qa!<CR>
+" delete buffer
+" nnoremap <leader>x :bdelete<CR>
+nnoremap <leader>x :bdelete<CR>
 " easier moving between tabs
-map <leader>n <esc>:tabprevious<CR>
-map <leader>m <esc>:tabnext<CR>
-
+" map <leader>n <esc>:tabprevious<CR>
+" map <leader>m <esc>:tabnext<CR>
+nnoremap <PageUp>   :bprevious<CR>
+nnoremap <PageDown> :bnext<CR>
+nnoremap <Home>   :bfirst<CR>
+nnoremap <End> :blast<CR>
 " Quicksave command
 noremap <C-Z> :update<CR>
 vnoremap <C-Z> <C-C>:update<CR>
@@ -164,6 +183,50 @@ vnoremap <C-Z> <C-C>:update<CR>
 " Added by sam@lf
 " this  would save and exit insert mode.
 inoremap <C-Z> <C-C>:update<CR>
+" open buffer list and wait for # input
+nnoremap <leader>f :ls<CR>:b<Space>
+" Toggle spell checking on and off with `,z`
+" normal mode
+nmap <silent> <leader>z :setlocal spell! spelllang=en_us<CR>
+" insert mode
+imap <F5> <C-o>:setlocal spell! spelllang=en_us<CR>
+"inoremap <F5> <C-\><C-O>:setlocal spelllang=en_us spell! spell?<CR>
+" Removes highlight of your last search
+noremap <C-n> :nohl<CR>
+vnoremap <C-n> :nohl<CR>
+" inoremap <C-n> :nohl<CR>
+" help ins-special-special
+" This breaks undo at each line break. It also expands abbreviations before this.
+inoremap <CR> <C-]><C-G>u<CR>
+inoremap <C-w> <C-G>u<C-w>
+inoremap <C-u> <C-G>u<C-u>
+" bind Ctrl+<movement> keys to move around the windows, instead of using Ctrl+w + <movement>
+" Every unnecessary keystroke that can be saved is good for your health :)
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+map <C-h> <C-w>h
+" FILE FINDING
+" Search down into subdirrectories
+" Provides tab-comletion for all file-relates tasks
+set path+=**
+" Display all matching files when we tab complete
+set wildmenu
+set wildmode=list:full
+set wildignore+=*.pyc,*.bak
+set wildignore+=*/.git/**/*
+set wildignore+=tags
+set wildignore+=*.tar.
+" Hit tab to :find by partial match
+" Use * to make it fuzzy
+" FILE BROWSING, start with :Vex[plore], or :Sex[plore] for horizontal split.
+" hit <i> to change view.
+let g:netrw_banner=0   " disable the banner
+let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide=',\(^\|\s\s\)\zs\.\S\+\'
+let g:netrw_list_hide=',.*\.pyc$'
+" close quickfix window.
+nnoremap <leader>q :cclose<CR>
 " }}}
 
 " Fold, gets it's own section  ----------------------------------------------{{{
