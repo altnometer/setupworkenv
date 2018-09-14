@@ -148,7 +148,8 @@ set completeopt-=preview " do not open preview window for completion.
 " I like to have it here becuase it is easier to reach than the default and
 " it is next to ``m`` and ``n`` which I use for navigating between tabs.
 let mapleader = ","
-let maplocalleader = "/"
+" shadowing '/' for search slows it down.
+" let maplocalleader = "/"
 
 " Move the line down.
 noremap <leader>- yyddp
@@ -159,7 +160,8 @@ inoremap <c-u> <esc>gUiwea
 nnoremap <c-u> gUiwe
 " Open vimrc/vim.init file.
 " nnoremap <leader>v :vsplit $MYVIMRC<cr>
-nnoremap <localleader>v :vsplit $MYVIMRC<cr>
+" nnoremap <localleader>v :vsplit $MYVIMRC<cr>
+nnoremap <leader>v :vsplit $MYVIMRC<cr>
 " Source vimrc/vim.init file.
 nnoremap <leader>V :source $MYVIMRC<cr>
 " Quit current window
