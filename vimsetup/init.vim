@@ -497,8 +497,8 @@ augroup auto_vim-go
     " autocmd FileType go map O :GoDeclsDir
     " autocmd FileType go map d :GoDoc
     " autocmd FileType go map I :GoInfo
-    " autocmd FileType go map ii :GoImport
-    " autocmd FileType go map ia :GoImportAs
+    autocmd FileType go nmap <leader>ii :GoImport
+    autocmd FileType go nmap <leader>ia :GoImportAs
     " autocmd FileType go map f :GoFillStruct
     " autocmd FileType go map t :GoTestFunc -v -race
     " autocmd FileType go map T :GoTest -v -race
@@ -506,7 +506,7 @@ augroup auto_vim-go
     " autocmd FileType go map at :GoAddTags
     " Other Guru commands:GoReferrers, GoImplements, GoWhichErr, GoChannelPeers
     " GoFreeVars
-    autocmd FileType go nmap <leader>i :GoSameIds<CR>
+    autocmd FileType go nmap <leader>id :GoSameIds<CR>
     " Build/Test on save.
     autocmd BufWritePost *.go :GoBuild
     " autocmd BufWritePost *_test.go :GoTest
