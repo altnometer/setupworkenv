@@ -1,7 +1,7 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
-" Plugins--------------------------------------------------------------------{{{
+" Plugins -----------------------------------------------------------------{{{1
 " :PlugInstall, :PlugUpdate, :PlugClean,
 " :PlugUpgrade (plug itself), :PlugStatus
 call plug#begin('~/.local/share/nvim/plugged')
@@ -13,11 +13,12 @@ Plug 'michaeljsmith/vim-indent-object'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'justinmk/vim-sneak'
 Plug 'airblade/vim-gitgutter'
-" go {{{
+
+" go {{{2
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go'}
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-" }}}
+" 2}}}
 " Plug 'mdempsky/gocode', { 'rtp': 'nvim', 'do': '~/.local/share/nvim/plugged/gocode/nvim/symlink.sh' }
 Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-fugitive'
@@ -27,18 +28,21 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 Plug 'mhartington/oceanic-next'
-" denite {{{
+
+" denite {{{2
 Plug 'Shougo/denite.nvim'
 Plug 'nixprime/cpsm', {'do': 'PY3=ON ./install.sh'}
 Plug 'Shougo/neomru.vim'
-" }}}
-" neosnippet recommended {{{
+" 2}}}
+
+" neosnippet recommended {{{2
 Plug 'Shougo/deoplete.nvim'
 Plug 'Shougo/neosnippet.vim'
 Plug 'Shougo/neosnippet-snippets'
 Plug 'honza/vim-snippets'
 Plug 'zchee/deoplete-go', {'do': 'make'}
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+" 2}}}
+
 Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 " provides insert mode auto-completion for quotes, parens, brackets, etc.
@@ -48,7 +52,7 @@ Plug 'Yggdroot/indentLine'
 Plug 'Valloric/MatchTagAlways'
 " Initialize plugin system
 call plug#end()
-"}}}
+" 1}}}
 
 " System Settings  ----------------------------------------------------------{{{
 " Don't use TABs but spaces
