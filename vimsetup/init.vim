@@ -166,7 +166,7 @@ nnoremap <c-u> gUiwe
 " Open vimrc/vim.init file.
 " nnoremap <leader>v :vsplit $MYVIMRC<cr>
 " nnoremap <localleader>v :vsplit $MYVIMRC<cr>
-nnoremap <leader>v :vsplit $MYVIMRC<cr>
+nnoremap <leader>v :edit $MYVIMRC<cr>
 " Source vimrc/vim.init file.
 nnoremap <leader>V :source $MYVIMRC<cr>
 " Quit current window
