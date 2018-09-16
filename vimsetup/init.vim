@@ -413,9 +413,10 @@ call denite#custom#source('grep', 'vars', {
     \'final_opts': [],
     \})
 nnoremap <silent> <c-p> :Denite file_rec<CR>
-nnoremap <silent> <leader>h :Denite help<CR>
+nnoremap <silent> <leader>w :Denite help<CR>
 " nnoremap <silent> <leader>c :Denite colorscheme<CR>
 nnoremap <silent> <leader>b :Denite buffer<CR>
+nnoremap <silent> <leader>l :Denite line:buffers:noempty<CR>
 nnoremap <silent> <leader>a :Denite grep:::!<CR>
 nnoremap <silent> <leader>g :Denite grep:::`expand('<cword>')`<CR>
 call denite#custom#map('insert','<C-n>','<denite:move_to_next_line>','noremap')
