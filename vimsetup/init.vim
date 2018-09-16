@@ -611,8 +611,9 @@ tnoremap <Leader><ESC> <C-\><C-n>
 tnoremap <leader>x <c-\><c-n>:bp! <BAR> bd! #<CR>
 augroup auto_term
   autocmd!
-  autocmd TermOpen * nnoremap <buffer> <leader>x :q! <CR>
-  autocmd TermOpen <buffer> * :startinsert
+  autocmd TermOpen * nnoremap <buffer> <leader>x :bp! <BAR> bd! #<CR>
+  " does not work
+  " autocmd TermOpen <buffer> * :startinsert
 augroup END
 " }}}
 
