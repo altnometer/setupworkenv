@@ -200,3 +200,5 @@ esac
 
 # disable flow control, operated by Ctrl-s, Ctrl-q.
 stty -ixon
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

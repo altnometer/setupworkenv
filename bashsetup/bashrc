@@ -338,3 +338,5 @@ if [ -f "$HOME/share/google-cloud-sdk/path.bash.inc" ]; then source "$HOME/share
 if [ -f "$HOME/share/google-cloud-sdk/completion.bash.inc" ]; then source "$HOME/share/google-cloud-sdk/completion.bash.inc"; fi
 
 alias yamltojs="python -c 'import yaml, sys, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < "
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
