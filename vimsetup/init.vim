@@ -518,7 +518,7 @@ augroup auto_vim-go
     " autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
     " autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
     " Install plugins.
-augroup end
+augroup END
 " }}}
 " map -----------------------------------------------------------------------{{{
 " let g:go_list_type = "quickfix"
