@@ -579,6 +579,17 @@ map t <Plug>Sneak_t
 map T <Plug>Sneak_T
 " }}}
 
+" vim-indentwise ----------------------------------------------------------{{{1
+nnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin)  :<C-U>call <SID>move_to_indent_block_scope_boundary(0, "n")<CR>
+vnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin)       :call <SID>move_to_indent_block_scope_boundary(0, "v")<CR>
+onoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin) V:<C-U>call <SID>move_to_indent_block_scope_boundary(0, "o")<CR>
+nnoremap [% <Plug>(IndentWiseBlockScopeBoundaryBegin)
+nnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryEnd)      :<C-U>call <SID>move_to_indent_block_scope_boundary(1, "n")<CR>
+vnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryEnd)           :call <SID>move_to_indent_block_scope_boundary(1, "v")<CR>
+onoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryEnd)     V:<C-U>call <SID>move_to_indent_block_scope_boundary(1, "o")<CR>
+nnoremap ]% <Plug>(IndentWiseBlockScopeBoundaryEnd)
+" 1}}}
+
 " Go ------------------------------------------------------------------------{{{
 augroup auto_go
     autocmd!
