@@ -129,8 +129,6 @@ set bs=2     " make backspace behave like normal again
 set timeoutlen=1000 ttimeoutlen=0
 " backspace in normal mode
 nnoremap <bs> X
-" place cursor inside an xml/html tag, press % to jump to the matching one.
-runtime macros/matchit.vim
 " Treat '-' as part of the word rather than a word separator.
 " set iskeyword+=-
 set iskeyword+=
