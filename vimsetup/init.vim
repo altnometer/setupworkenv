@@ -69,6 +69,9 @@ set ignorecase
 set smartcase
 " vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
 set updatetime=250
+" Open 'help' in a new buffer of the same window.
+command! -nargs=1 -complete=help H :enew | :set buftype=help | :h <args>
+
 " auto ----------------------------------------------------------------------{{{
 augroup auto_system
     autocmd!
