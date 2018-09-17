@@ -210,7 +210,8 @@ vnoremap <C-n> :nohl<CR>
 " This breaks undo at each line break. It also expands abbreviations before this.
 inoremap <CR> <C-]><C-G>u<CR>
 inoremap <C-w> <C-G>u<C-w>
-inoremap <C-u> <C-G>u<C-u>
+" Delete line
+" inoremap <C-u> <C-G>u<C-u>
 " bind Ctrl+<movement> keys to move around the windows, instead of using Ctrl+w + <movement>
 " Every unnecessary keystroke that can be saved is good for your health :)
 map <C-j> <C-w>j
