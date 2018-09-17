@@ -92,6 +92,10 @@ augroup auto_system
     autocmd BufLeave *.tmpl normal! mH
     autocmd BufLeave *.js   normal! mJ
     autocmd BufLeave *.go   normal! mG
+    autocmd Filetype neosnippet setlocal tabstop=2
+    autocmd Filetype neosnippet setlocal shiftwidth=2
+    autocmd Filetype vim setlocal tabstop=2
+    autocmd Filetype vim setlocal shiftwidth=2
 augroup END
 " }}}
 let g:ruby_host_prog = "/var/lib/gems/2.3.0/gems/neovim-0.7.1/bin/neovim-ruby-host"
