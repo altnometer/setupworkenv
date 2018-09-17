@@ -239,6 +239,9 @@ let g:netrw_list_hide=',\(^\|\s\s\)\zs\.\S\+\'
 let g:netrw_list_hide=',.*\.pyc$'
 " close quickfix window.
 nnoremap <leader>q :cclose<CR>
+" Add 'relative number'k and 'relative number'j to jump list
+nnoremap <expr> k (v:count > 1 ? "m'" . v:count : '') .'gk'
+nnoremap <expr> j (v:count > 1 ? "m'" . v:count : '') .'gj'
 " }}}
 
 " Fold, gets it's own section  ----------------------------------------------{{{
