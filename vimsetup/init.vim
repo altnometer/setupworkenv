@@ -12,7 +12,6 @@ Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'justinmk/vim-sneak'
-Plug 'airblade/vim-gitgutter'
 
 " go {{{2
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go'}
@@ -21,7 +20,11 @@ Plug 'junegunn/fzf.vim'
 " 2}}}
 " Plug 'mdempsky/gocode', { 'rtp': 'nvim', 'do': '~/.local/share/nvim/plugged/gocode/nvim/symlink.sh' }
 Plug 'vim-airline/vim-airline'
+" git {{{2
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
+Plug 'airblade/vim-gitgutter'
+" 2}}}
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
