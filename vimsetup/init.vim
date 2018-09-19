@@ -630,7 +630,7 @@ augroup END
 
 " abbrev --------------------------------------------------------------------{{{
 " common typos.
-iabbrev and and
+iabbrev adn and
 iabbrev waht what
 iabbrev tehn then
 " }}}
