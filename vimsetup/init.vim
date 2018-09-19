@@ -635,7 +635,7 @@ iabbrev waht what
 iabbrev tehn then
 " }}}
 
-" abbrev --------------------------------------------------------------------{{{
+" html ----------------------------------------------------------------------{{{
 " Do not wrap text in html files.
 augroup auto_html
     autocmd!
