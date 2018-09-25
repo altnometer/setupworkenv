@@ -390,9 +390,10 @@ nnoremap <expr> j (v:count > 1 ? "m'" . v:count : '') .'gj'
 " neosnippet ----------------------------------------------------------------{{{
 " Plugin key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-imap <C-j>     <Plug>(neosnippet_expand_or_jump)
+imap <C-j>     <Plug>(neosnippet_expand)
+imap <C-b>     <Plug>(neosnippet_jump)
 " smap <C-j>     <Plug>(neosnippet_expand_or_jump)
-smap <C-j>     <Plug>(neosnippet_jump)
+smap <C-b>     <Plug>(neosnippet_jump)
 xmap <C-j>     <Plug>(neosnippet_expand_target)
 let g:neosnippet#snippets_directory='~/.local/share/nvim/snippets'
 " }}}
