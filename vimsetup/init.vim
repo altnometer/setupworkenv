@@ -595,7 +595,7 @@ let g:go_auto_type_info = 1 " shows signature of fn under cursor
 let g:go_gocode_unimported_packages = 1
 let g:go_term_enabled = 1
 let g:go_term_mode = 'split'
-let g:go_term_height = 13
+let g:go_term_height = 10
 " Specifies whether `gocode` should use source files instead of binary packages
 " It is currently much slower for source files.
 " let g:go_gocode_propose_source = 1
