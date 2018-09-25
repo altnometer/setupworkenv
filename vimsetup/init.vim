@@ -106,6 +106,8 @@ augroup auto_system
     autocmd Filetype neosnippet setlocal shiftwidth=2
     autocmd Filetype vim setlocal tabstop=2
     autocmd Filetype vim setlocal shiftwidth=2
+    " Wrap lines in quickfix
+    autocmd FileType qf setlocal wrap
 augroup END
 " }}}
 let g:ruby_host_prog = "/var/lib/gems/2.3.0/gems/neovim-0.7.1/bin/neovim-ruby-host"
