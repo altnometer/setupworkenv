@@ -434,7 +434,9 @@ nnoremap <silent> <c-p> :Denite file_rec<CR>
 nnoremap <silent> <leader>w :Denite help<CR>
 " nnoremap <silent> <leader>c :Denite colorscheme<CR>
 nnoremap <silent> <leader>b :Denite buffer<CR>
-nnoremap <silent> <leader>l :Denite line:buffers:noempty<CR>
+nnoremap <silent> <leader>lb :Denite line:buffers:noempty<CR>
+" ':all:' means search from the top in the current buffer.
+nnoremap <silent> <leader>la :Denite line:all:noempty<CR>
 nnoremap <silent> <leader>a :Denite grep:::!<CR>
 nnoremap <silent> <leader>g :Denite grep:::`expand('<cword>')`<CR>
 call denite#custom#map('insert','<C-n>','<denite:move_to_next_line>','noremap')
