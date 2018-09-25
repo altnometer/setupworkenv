@@ -446,6 +446,18 @@ call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
 \   'venv/', 'images/', '*.min.*', 'img/', 'fonts/'])
 call denite#custom#var('menu', 'menus', s:menus)
 let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+" --column: Show column number
+" --line-number: Show line number
+" --no-heading: Do not show file headings in results
+" --fixed-strings: Search term as a literal string
+" --ignore-case: Case insensitive search
+" --no-ignore: Do not respect .gitignore, etc...
+" --hidden: Search hidden files and folders
+" --follow: Follow symlinks
+" --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+" --color: Search color options
+" :Find someword, will show files containing the word
+command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
 "}}}
 
 " deoplete ------------------------------------------------------------------{{{
