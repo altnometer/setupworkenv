@@ -280,6 +280,8 @@ nnoremap <expr> j (v:count > 1 ? "m'" . v:count : '') .'gj'
   " Space to toggle folds.
   "nnoremap <Space> za
   "vnoremap <Space> za
+  " open folds when searched string in focus.
+  set foldopen=search
 " auto ----------------------------------------------------------------------{{{
     augroup auto_fold
         autocmd!
