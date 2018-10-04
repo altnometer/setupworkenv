@@ -204,8 +204,6 @@ vnoremap <C-Z> <C-C>:update<CR>
 " Added by sam@lf
 " this  would save and exit insert mode.
 inoremap <C-Z> <C-C>:update<CR>
-" open buffer list and wait for # input
-nnoremap <leader>f :ls<CR>:b<Space>
 " Toggle spell checking on and off with `,z`
 " normal mode
 nmap <silent> <leader>z :setlocal spell! spelllang=en_us<CR>
