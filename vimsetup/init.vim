@@ -512,7 +512,7 @@ function! s:build_go_files()
     call go#cmd#Build(0)
   endif
 endfunction
-" auto ----------------------------------------------------------------------{{{
+" auto --------------------------------------------------------------------{{{2
 augroup auto_vim-go
     autocmd!
     " autocmd FileType go nmap <leader>b  <Plug>(go-build)
