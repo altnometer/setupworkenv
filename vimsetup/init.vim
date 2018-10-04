@@ -69,11 +69,7 @@ call plug#end()
 " System Settings  ----------------------------------------------------------{{{
 " Don't use TABs but spaces
 filetype plugin indent on
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set shiftround
-set expandtab
+set tabstop=4 softtabstop=4 shiftwidth=4 shiftround expandtab
 " Make search case insensitive
 set hlsearch
 set incsearch
