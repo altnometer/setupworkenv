@@ -556,7 +556,7 @@ augroup auto_vim-go
     " Install plugins.
 augroup END
 " }}}
-" settings ------------------------------------------------------------------{{{
+" settings ----------------------------------------------------------------{{{2
 " let g:go_list_type = "quickfix"
 let g:go_list_type_commands = {"GoMetaLinter": "quickfix", "GoTest": "quickfix"}
 " let g:go_list_type_commands = {"GoMetaLinter": "locationlist"}
