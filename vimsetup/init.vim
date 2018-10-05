@@ -193,9 +193,13 @@ nnoremap <leader>x :bdelete<CR>
 " map <leader>n <esc>:tabprevious<CR>
 " map <leader>m <esc>:tabnext<CR>
 nnoremap <PageUp>   :bprevious<CR>
+tmap <PageUp>, <C-\><C-n>:bprevious<cr>
 nnoremap <PageDown> :bnext<CR>
+tmap <PageDown>, <C-\><C-n>:bnext<cr>
 nnoremap <Home>   :bfirst<CR>
+tmap <Home>, <C-\><C-n>:bfirst<cr>
 nnoremap <End> :blast<CR>
+tmap <End>, <C-\><C-n>:blast<cr>
 " Quicksave command
 noremap <C-Z> :update<CR>
 vnoremap <C-Z> <C-C>:update<CR>
