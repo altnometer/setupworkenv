@@ -591,7 +591,6 @@ let g:ale_go_gometalinter_options =
       \ '--disable=gotypex ' .
       \ '--exclude="should have comment" ' .
       \ '--exclude="error return value not checked \(defer"'
-" does not seem to work.
 let g:go_auto_type_info = 1 " shows signature of fn under cursor
 " let g:go_auto_sameids = 1 " too slow
 let g:go_gocode_unimported_packages = 1
