@@ -638,6 +638,7 @@ let g:deoplete#sources#go#pointer = 1
 
 " terminal ------------------------------------------------------------------{{{
 highlight TermCursor ctermfg=red guifg=red
+highlight TermCursorNC ctermfg=blue guifg=blue
 set splitbelow
 set splitright
 tnoremap <Leader><ESC> <C-\><C-n>
