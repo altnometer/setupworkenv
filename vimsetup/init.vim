@@ -193,13 +193,9 @@ nnoremap <leader>x :bdelete<CR>
 " map <leader>n <esc>:tabprevious<CR>
 " map <leader>m <esc>:tabnext<CR>
 nnoremap <PageUp>   :bprevious<CR>
-tnoremap <PageUp> <C-\><C-n>:bprevious<cr>
 nnoremap <PageDown> :bnext<CR>
-tnoremap <PageDown> <C-\><C-n>:bnext<cr>
 nnoremap <Home>   :bfirst<CR>
-tnoremap <Home> <C-\><C-n>:bfirst<cr>
 nnoremap <End> :blast<CR>
-tnoremap <End> <C-\><C-n>:blast<cr>
 " Quicksave command
 noremap <C-Z> :update<CR>
 vnoremap <C-Z> <C-C>:update<CR>
@@ -646,6 +642,10 @@ set splitbelow
 set splitright
 tnoremap <Leader><ESC> <C-\><C-n>
 tnoremap <leader>x <c-\><c-n>:bp! <BAR> bd! #<CR>
+tnoremap <PageUp> <C-\><C-n>:bprevious<cr>
+tnoremap <PageDown> <C-\><C-n>:bnext<cr>
+tnoremap <Home> <C-\><C-n>:bfirst<cr>
+tnoremap <End> <C-\><C-n>:blast<cr>
 augroup auto_term
   autocmd!
   autocmd TermOpen * nnoremap <buffer> <leader>x :bp! <BAR> bd! #<CR>
