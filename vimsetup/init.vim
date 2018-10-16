@@ -201,6 +201,8 @@ noremap <leader>o :qa!<CR>
 " delete buffer
 " nnoremap <leader>x :bdelete<CR>
 nnoremap <leader>x :bdelete<CR>
+" Bonly, BOnly, Bufonly, BufOnly are of BufOnly.vim plugin
+nnoremap <leader>X :Bonly<CR>
 " easier moving between tabs
 " map <leader>n <esc>:tabprevious<CR>
 " map <leader>m <esc>:tabnext<CR>
