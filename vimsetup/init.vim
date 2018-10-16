@@ -623,8 +623,11 @@ augroup END
 " }}}
 
 " settings ----------------------------------------------------------------{{{2
+" default is 'guru'
+let g:go_def_mode = 'godef'
 " let g:go_list_type = "quickfix"
-let g:go_list_type_commands = {"GoMetaLinter": "quickfix", "GoTest": "quickfix"}
+" let g:go_list_type_commands = {"GoMetaLinter": "quickfix", "GoTest": "quickfix"}
+let g:go_list_type_commands = {"GoMetaLinter": "quickfix"}
 " let g:go_list_type_commands = {"GoMetaLinter": "locationlist"}
 let g:go_autodetect_gopath = 0
 let g:go_info_mode = "gocode"
@@ -636,10 +639,10 @@ let g:go_fmt_experimental = 1
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
-let g:go_highlight_function_calls = 1
+let g:go_highlight_function_calls = 0
 let g:go_highlight_methods = 1
 let g:go_highlight_operators = 1
-let g:go_highlight_extra_types = 1
+let g:go_highlight_extra_types = 0
 let g:go_highlight_build_constraints = 1
 let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
 let g:go_metalinter_autosave = 1
@@ -655,12 +658,13 @@ let g:ale_go_gometalinter_options =
       \ '--disable=gotypex ' .
       \ '--exclude="should have comment" ' .
       \ '--exclude="error return value not checked \(defer"'
-let g:go_auto_type_info = 1 " shows signature of fn under cursor
+let g:go_auto_type_info = 0 " shows signature of fn under cursor
 " let g:go_auto_sameids = 1 " too slow
 let g:go_gocode_unimported_packages = 1
 let g:go_term_enabled = 1
-let g:go_term_mode = 'split'
+let g:go_term_mode = 'vsplit'
 let g:go_term_height = 10
+let g:go_term_width = 50
 " Specifies whether `gocode` should use source files instead of binary packages
 " It is currently much slower for source files.
 " let g:go_gocode_propose_source = 1
