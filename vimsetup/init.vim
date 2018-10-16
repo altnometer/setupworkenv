@@ -12,6 +12,7 @@ Plug 'michaeljsmith/vim-indent-object'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'justinmk/vim-sneak'
 Plug 'wellle/targets.vim'
+Plug 'machakann/vim-highlightedyank'
 
 " go {{{2
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go'}
