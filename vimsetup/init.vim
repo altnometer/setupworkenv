@@ -264,6 +264,11 @@ nnoremap <leader>q :cclose<CR>
 " Add 'relative number'k and 'relative number'j to jump list
 nnoremap <expr> k (v:count > 1 ? "m'" . v:count : '') .'gk'
 nnoremap <expr> j (v:count > 1 ? "m'" . v:count : '') .'gj'
+" jump to '{' or '}', :help section
+map [[ ?{<CR>w99[{
+map ][ /}<CR>b99]}
+map ]] j0[[%/{<CR>
+map [] k$][%?}<CR>
 " }}}
 
 " Fold, gets it's own section  ----------------------------------------------{{{
