@@ -110,6 +110,7 @@ augroup auto_system
     autocmd BufLeave *.tmpl normal! mH
     autocmd BufLeave *.js   normal! mJ
     autocmd BufLeave *.go   normal! mG
+    autocmd BufLeave *.vim  normal! mV
     autocmd Filetype neosnippet setlocal tabstop=2
     autocmd Filetype neosnippet setlocal shiftwidth=2
     autocmd Filetype vim setlocal tabstop=2
