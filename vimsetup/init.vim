@@ -80,6 +80,8 @@ set smartcase
 set updatetime=250
 " Open 'help' in a new buffer of the same window.
 command! -nargs=1 -complete=help H :enew | :set buftype=help | :h <args>
+set cursorline
+set cursorcolumn
 
 " auto ----------------------------------------------------------------------{{{
 augroup auto_system
