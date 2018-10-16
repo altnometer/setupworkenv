@@ -216,7 +216,7 @@ alias krd='kubectl delete rc'
 alias ksd='kubectl delete svc'
 
 ############go env#################
-export GOROOT=/home/sam/share/go1.10
-# export GOROOT=/home/sam/share/go1.11
+# export GOROOT=/home/sam/share/go1.10
+export GOROOT=/home/sam/share/go1.11
 export GOPATH=/home/sam/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
