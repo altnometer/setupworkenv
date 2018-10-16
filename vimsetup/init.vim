@@ -416,7 +416,8 @@ let g:neosnippet#snippets_directory='~/.local/share/nvim/snippets'
 " }}}
 
 " neoterm -------------------------------------------------------------------{{{
-let neoterm_default_mod = 'tab'
+" let neoterm_default_mod = 'tab'
+let neoterm_default_mod = 'split'
 " let neoterm_autoinsert = 1
 " }}}
 
