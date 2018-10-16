@@ -2,37 +2,46 @@
 " Presented at PyCon APAC 2012
 
 
-" ============================================
-" ============================================
+" System Settings  ----------------------------------------------------------{{{
 " vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
 set updatetime=250
-
+" Enable syntax highlighting
+" You need to reload this file for the change to apply
+filetype off
+filetype plugin indent on
+syntax on
 " place cursor inside an xml/html tag, press % to jump to the matching one.
 runtime macros/matchit.vim
-" Added by sam@lf
+set relativenumber  " show line numbers
+set number  " show line numbers
+set tw=79   " width of document (used by gd)
+set nowrap  " don't automatically wrap on load
+set fo-=t   " don't automatically wrap text when typing
+set colorcolumn=80
+highlight ColorColumn ctermbg=233
+set history=700
+set undolevels=700
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set shiftround
+set expandtab
 " Treat '-' as part of the word rather than a word separator.
 " set iskeyword+=-
 set iskeyword+=
-" Added by puppy@dog
 set encoding=utf-8
 set fileencoding=utf-8
-" Added by ram@farm.
 " Define order of searches for word completion. kspell will add
 " dictionary search only if ":set[local] spell" is enabled.
 set complete=.,w,b,u,t,i,kspell
-
 " Automatic reloading of .vimrc
 autocmd! bufwritepost .vimrc source %
-
-
 " Better copy & paste
 " When you want to paste large blocks of code into vim, press F2 before you
 " paste. At the bottom you should see ``-- INSERT (paste) --``.
 set pastetoggle=<F2>
 " set clipboard=unnamed
 set clipboard=unnamedplus
-
-
 " Mouse and backspace
 set mouse=a  " on OSX press ALT and click
 set bs=2     " make backspace behave like normal again
@@ -42,109 +51,77 @@ set bs=2     " make backspace behave like normal again
 " ttimeoutlen is used for key code delays
 " set timeoutlen=1000 ttimeoutlen=10
 set timeoutlen=1000 ttimeoutlen=0
+" Show whitespace
+" MUST be inserted BEFORE the colorscheme command
+autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+au InsertLeave * match ExtraWhitespace /\s\+$/
+syntax enable
+let base16colorspace=256
+set background=dark
+let g:seoul256_background=236
+let g:seoul256_srgb=1
+colorscheme seoul256
+"}}}
 
+" System mappings  ----------------------------------------------------------{{{
 " backspace in normal mode
 nnoremap <bs> X
-
 " Rebind <Leader> key
-" I like to have it here becuase it is easier to reach than the default and
-" it is next to ``m`` and ``n`` which I use for navigating between tabs.
 let mapleader = ","
-
 " Toggle spell checking on and off with `,z`
 " normal mode
 nmap <silent> <leader>z :setlocal spell! spelllang=en_us<CR>
 " insert mode
 imap <F5> <C-o>:setlocal spell! spelllang=en_us<CR>
 "inoremap <F5> <C-\><C-O>:setlocal spelllang=en_us spell! spell?<CR>
-" Set region to British English
-" ######## User added ########
-
-" Added by rambul.
 "" nnoremap <Leader>s a<CR><Esc>k$
 " cut the line under cusor
 nnoremap <Leader>s i<CR><Esc>^
-
 " Add a space in normal mode and move to the right.
 "nnoremap <Leader>q i <Esc>l
 " Add a # in normal mode and move to the right.
 "nnoremap <Leader>q i#<Esc>
-
-" Added by user rambul
-" Map <Tab> key to <C-x><C-f> file path autocomplete.
-" inoremap <Tab> <C-x><C-f>
-
-
-" Bind nohl
 " Removes highlight of your last search
-" ``<C>`` stands for ``CTRL`` and therefore ``<C-n>`` stands for ``CTRL+n``
 noremap <C-n> :nohl<CR>
 vnoremap <C-n> :nohl<CR>
 " inoremap <C-n> :nohl<CR>
-
-"""""""""""""""""":help"""""ins-special-special""""""""""""""""""""""""""""""""
+" help ins-special-special
 " This breaks undo at each line break. It also expands abbreviations before this.
 inoremap <CR> <C-]><C-G>u<CR>
 inoremap <C-w> <C-G>u<C-w>
 inoremap <C-u> <C-G>u<C-u>
-
-" Added by sam@lf
 " <C-c> does not check for abbreviations and does not trigger InsertLeave.
 inoremap <C-c> <Esc><Esc>
-
 " Quicksave command
 noremap <C-Z> :update<CR>
 vnoremap <C-Z> <C-C>:update<CR>
 " this  would save and go back to insert mode.
 " inoremap <C-Z> <C-O>:update<CR>
-" Added by sam@lf
 " this  would save and exit insert mode.
 inoremap <C-Z> <C-C>:update<CR>
-
-
 " Quick quit command
 noremap <Leader>e :quit<CR>  " Quit current window
 noremap <Leader>E :qa!<CR>   " Quit all windows
-
-
 " bind Ctrl+<movement> keys to move around the windows, instead of using Ctrl+w + <movement>
 " Every unnecessary keystroke that can be saved is good for your health :)
 map <C-j> <C-w>j
 map <C-k> <C-w>k
 map <C-l> <C-w>l
 map <C-h> <C-w>h
-
-
 " easier moving between tabs
-map <Leader>n <esc>:tabprevious<CR>
-map <Leader>m <esc>:tabnext<CR>
-
-
+" map <Leader>n <esc>:tabprevious<CR>
+" map <Leader>m <esc>:tabnext<CR>
 " map sort function to a key
 "vnoremap <Leader>s :sort<CR>
-
-
-" easier moving of code blocks
-" Try to go into visual mode (v), thenselect several lines of code here and
-" then press ``>`` several times.
-"" vnoremap < <gv  " better indentation
-"" vnoremap > >gv  " better indentation
-
 " FILE FINDING
 " Search down into subdirrectories
 " Provides tab-comletion for all file-relates tasks
 set path+=**
 " Display all matching files when we tab complete
 set wildmenu
-" Hit tab to :find by partial match
-" Use * to make it fuzzy
-
-" FILE BROWSING
-" Tweak netrw pluging that comes with vim
+" Hit tab to :find by partial match. Use * to make it fuzzy
+" FILE BROWSING, start with :Vex[plore], or :Sex[plore] for horizontal split.
 let g:netrw_banner=0   " disable the banner
-let g:netrw_browse_split=4  " open in prior window ?Not sure what this does.
-let g:netrw_altv=1  " open splits to the right
-let g:netrw_liststyle=3  " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide=',\(^\|\s\s\)\zs\.\S\+\'
 let g:netrw_list_hide=',.*\.pyc$'
@@ -152,87 +129,11 @@ let g:netrw_list_hide=',.*\.pyc$'
 " - <CR> - expand, contract.
 " - v,t open in v split, new tab.
 " - check |netrw-browse-maps| for more mappings
+" }}}
 
-
-" Show whitespace
-" MUST be inserted BEFORE the colorscheme command
-autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
-au InsertLeave * match ExtraWhitespace /\s\+$/
-" highlighting qickfix, does not work.
-" hi QuickFixLine cterm=None ctermbg=256 guibg=#ffff00
-
-
-" Color scheme
-" mkdir -p ~/.vim/colors && cd ~/.vim/colors
-" wget -O wombat256mod.vim http://www.vim.org/scripts/download_script.php?src_id=13400
-"set t_Co=256
-"color wombat256mod
-"added by kitty@cat: Enabling solarized colorscheme
-syntax enable
-let base16colorspace=256
-set background=dark
-"colorscheme solarized
-"colorscheme base16-eighties
-"colorscheme wombat256mod
-"colorscheme base16-harmonic16-dark
-"""""
-"let g:zenburn_high_Contrast=1
-"colors zenburn
-"""""
-" seoul256 (dark)
-"     Range: 233 (darkest) ~ 239 (lightest)
-"     Default: 237
-" seoul256 (light)
-"     Range: 252 (darkest) ~ 256 (lightest)
-"     Default: 237
-let g:seoul256_background=236
-"let g:seoul256_background=256
-let g:seoul256_srgb=1
-colorscheme seoul256
-"colorscheme seoul256-light
-
-" let g:rehash256 = 1
-" let g:molokai_original = 1
-" colorscheme molokai
-
-" Enable syntax highlighting
-" You need to reload this file for the change to apply
-filetype off
-filetype plugin indent on
-syntax on
-
-" trying to enable omnicompletion:
-" filetype plugin on
-" set omnifunc=syntaxcomplete#Complete
-
-" Showing line numbers and length
-set relativenumber  " show line numbers
-set number  " show line numbers
-set tw=79   " width of document (used by gd)
-set nowrap  " don't automatically wrap on load
-set fo-=t   " don't automatically wrap text when typing
-set colorcolumn=80
-highlight ColorColumn ctermbg=233
-
-
-" easier formatting of paragraphs
-"" vmap Q gq
-"" nmap Q gqap
-
-
-" Useful settings
-set history=700
-set undolevels=700
-
-
-" Real programmers don't use TABs but spaces
+" Go ------------------------------------------------------------------------{{{
 autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set shiftround
-set expandtab
-
+" }}}
 
 " Make search case insensitive
 set hlsearch
@@ -438,7 +339,7 @@ endfunction
 " open 'tag' in a new tab
 nnoremap <Leader>o <C-w><C-]><C-w>T
 
-""""""""""""""""""""""""""""""""vim-go"""""""""""""""""""""""""""""""""""""""""
+" vim-go --------------------------------------------------------------------{{{
 " vim-go settings
 " autocmd FileType go nmap <leader>b  <Plug>(go-build)
 " run :GoBuild or :GoTestCompile based on the go file
@@ -520,6 +421,7 @@ autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 " autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
 " autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 " Install plugins.
+" }}}
 
 """"""""""""""""""UltiSnips""""""""""""""""""""""""""""""""""""""""""""""""""""
 " let g:UltiSnipsSnippetsDir        = '~/.vim/snippets/'
@@ -532,8 +434,8 @@ let g:UltiSnipsJumpForwardTrigger  = '<c-b>'
 " default JumpBackward is '<c-k>'
 " let g:UltiSnipsJumpBackwardTrigger = '<c-z>'
 
-""""""""""""""""""vim-sneak settings"""""""""""""""""""""""""""""""""""""""""""
-" press 's' again to move to the next match.
+" vim-sneak -----------------------------------------------------------------{{{
+" press 's'|'f'|'t' again to move to the next match.
 let g:sneak#s_next = 1
 " 1 : Case sensitivity is determined by 'ignorecase' and 'smartcase'.
 let g:sneak#use_ic_scs = 1
@@ -541,7 +443,9 @@ map f <Plug>Sneak_f
 map F <Plug>Sneak_F
 map t <Plug>Sneak_t
 map T <Plug>Sneak_T
+" }}}
 
+" Plugins--------------------------------------------------------------------{{{
 " Run :PlugInstall after adding plugin to the list.
 " Run :PlugUpdate to update plugin.
 call plug#begin()
@@ -569,11 +473,12 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'AndrewRadev/splitjoin.vim'
 " Plug 'fatih/molokai'
-Plug 'Valloric/YouCompleteMe'
+" Plug 'Valloric/YouCompleteMe'
 Plug 'airblade/vim-gitgutter'
 Plug 'justinmk/vim-sneak'
 Plug 'scrooloose/nerdtree'
 call plug#end()
+" }}}
 
 
 " Fold, gets it's own section  ----------------------------------------------{{{
