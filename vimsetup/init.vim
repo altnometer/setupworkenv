@@ -91,7 +91,8 @@ augroup auto_system
              \ if line("'\"") > 0 && line ("'\"") <= line("$") |
              \   exe "normal! g'\"" |
              \ endif
-             " center buffer around cursor when opening files
+    " center buffer around cursor when opening files
+    autocmd BufRead * normal zz
     " Show whitespace
     " MUST be inserted BEFORE the colorscheme command
     autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
