@@ -246,7 +246,7 @@ map <C-h> <C-w>h
 set path+=**
 " Display all matching files when we tab complete
 set wildmenu
-set wildmode=list:full
+" set wildmode=list:full
 set wildignore+=*.pyc,*.bak
 set wildignore+=*/.git/**/*
 set wildignore+=tags
