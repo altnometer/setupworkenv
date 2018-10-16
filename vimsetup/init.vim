@@ -494,6 +494,49 @@ let g:deoplete#enable_at_startup = 1
 " call deoplete#custom#source('go', 'is_debug_enabled', 1)
 "}}}
 
+" fzf ---------------------------------------------------------------------{{{1
+" Augmenting Ag command using fzf#vim#with_preview function
+"   * fzf#vim#with_preview([[options], preview window, [toggle keys...]])
+"     * For syntax-highlighting, Ruby and any of the following tools are required:
+"       - Highlight: http://www.andre-simon.de/doku/highlight/en/highlight.php
+"       - CodeRay: http://coderay.rubychan.de/
+"       - Rouge: https://github.com/jneen/rouge
+"
+"   :Ag  - Start fzf with hidden preview window that can be enabled with "?" key
+"   :Ag! - Start fzf in fullscreen and display the preview window above
+command! -bang -nargs=* Ag
+  \ call fzf#vim#ag(<q-args>,
+  \                 <bang>0 ? fzf#vim#with_preview('up:60%')
+  \                         : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \                 <bang>0)
+
+" Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+command! -bang -nargs=? -complete=dir FzfFiles
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+" command! -bang -nargs=0 FzfBuffers
+"   \ call fzf#vim#buffers(<q-args>, fzf#vim#with_preview('up:60%'), <bang>0)
+let g:fzf_command_prefix = 'Fzf'
+nnoremap <leader>ff :FzfFiles<cr>
+nnoremap <leader>fg :FzfGFiles<cr>
+nnoremap <leader>fb :FzfBuffers!<cr>
+nnoremap <leader>f: :FzfHistory:<cr>
+nnoremap <leader>f/ :FzfHistory/<cr>
+nnoremap <leader>fl :FzfBLines<CR>
+nnoremap <leader>fL :FzfLines<CR>
+nnoremap <leader>fc :FzfBCommits!<CR>
+nnoremap <leader>fC :FzfCommits<CR>
+" <bang> use as per the above cmd modification
+nnoremap <leader>fs :FzfRg!<CR>
+nnoremap <leader>fh :FzfHelp<CR>
+nnoremap <leader>fm :FzfCommands<cr>
+" }}}
+
 " vim-fugitive --------------------------------------------------------------{{{
 " set diffopt+=vertical
 "nnoremap <space>ga :Git add %:p<CR><CR>
