@@ -1,0 +1,23 @@
+# neosnippet-snippet-syntax which is similar to snipMate syntax.
+
+# # oe -> os.Exit(1)
+# snippet "oe"  "os.Exit(...)" r
+# os.Exit(${1:1})
+# endsnippet
+
+# # wr -> w http.ResponseWriter, r *http.Request)
+# snippet "wr"  "w http.ResponseWriter, r *http.Request)" r
+# w http.ResponseWriter, r *http.Request)
+# endsnippet
+snippet     wr
+abbr        w http.ResponseWriter, r *http.Request
+# alias fn
+options     word
+  w http.ResponseWriter, r *http.Request
+
+# same as 'honza/vim-snippets/snippets/go.snippets'
+# but without ${0} place holder
+snippet fum "mymethod"
+  func (${1:receiver} ${2:type}) ${3:funcName}(${4}) ${5:error} {
+    ${6}
+  }

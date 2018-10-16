@@ -1,0 +1,24 @@
+# UltiSnip snippets for filetype=html
+# neosnippet-snippet-syntax which is similar to snipMate syntax.
+
+# snippet pl "<p>Lorem ipsum ...</p>"
+# <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+# tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At
+# vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
+# no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+# endsnippet
+# # Semantic-UI tag for icons.
+# snippet i. "<i class='name icon'></i>"
+# <i class="${1:name} icon"></i>
+# endsnippet
+
+# # expands ".foo.bar" to "<div class="foo bar">..."
+# snippet "\s\.([.\w]*)" "<div class='foo bar'>..." r
+# <div class="`!p snip.rv = match.group(1).replace(".", " ")`">
+# 	$1
+# </div>$0
+# endsnippet
+
+# snippet button# "<button> with ID and class"
+# <button`!p snip.rv=' id="' if t[1] else ""`${1:name}`!p snip.rv = '"' if t[1] else ""``!p snip.rv=' class="' if t[2] else ""`${2:ui button}`!p snip.rv = '"' if t[2] else ""`>${3:submit}</button>
+# endsnippet
