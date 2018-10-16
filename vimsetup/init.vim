@@ -196,7 +196,8 @@ nnoremap <leader>v :edit $MYVIMRC<cr>
 nnoremap <leader>V :source $MYVIMRC<cr>
 " Quit current window
 noremap <leader>e :quit<CR>
-noremap <leader>E :qa!<CR>
+noremap <leader>E <c-w>o
+noremap <leader>o :qa!<CR>
 " delete buffer
 " nnoremap <leader>x :bdelete<CR>
 nnoremap <leader>x :bdelete<CR>
