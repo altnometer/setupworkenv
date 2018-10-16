@@ -455,12 +455,15 @@ call denite#custom#source('grep', 'vars', {
 nnoremap <silent> <c-p> :Denite file_rec<CR>
 nnoremap <silent> <leader>w :Denite help<CR>
 " nnoremap <silent> <leader>c :Denite colorscheme<CR>
-nnoremap <silent> <leader>b :Denite buffer<CR>
-nnoremap <silent> <leader>lb :Denite line:buffers:noempty<CR>
-" ':all:' means search from the top in the current buffer.
-nnoremap <silent> <leader>la :Denite line:all:noempty<CR>
-nnoremap <silent> <leader>a :Denite grep:::!<CR>
-nnoremap <silent> <leader>g :Denite grep:::`expand('<cword>')`<CR>
+" nnoremap <silent> <leader>b :Denite buffer<CR>
+" edge case: does not show search result, but indicates one match.
+" example: search this buffer with 'leader>r'. There must be only one such
+" line, remove the example line to replicate.
+" nnoremap <silent> <leader>lb :Denite line:bufers:noempty<CR>
+" " ':all:' means search from the top in the current buffer.
+" nnoremap <silent> <leader>la :Denite line:all:noempty<CR>
+" nnoremap <silent> <leader>a :Denite grep:::!<CR>
+" nnoremap <silent> <leader>g :Denite grep:::`expand('<cword>')`<CR>
 call denite#custom#map('insert','<C-n>','<denite:move_to_next_line>','noremap')
 call denite#custom#map('insert','<C-p>','<denite:move_to_previous_line>','noremap')
 call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
