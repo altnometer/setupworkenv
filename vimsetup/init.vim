@@ -567,6 +567,8 @@ augroup END
 " }}}
 
 " vim-go --------------------------------------------------------------------{{{
+
+" function! s:build_go_files() --------------------------------------------{{{2
 " run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
   let l:file = expand('%')
@@ -576,6 +578,8 @@ function! s:build_go_files()
     call go#cmd#Build(0)
   endif
 endfunction
+" }}}2
+
 " auto --------------------------------------------------------------------{{{2
 augroup auto_vim-go
     autocmd!
@@ -620,6 +624,7 @@ augroup auto_vim-go
     " Install plugins.
 augroup END
 " }}}
+
 " settings ----------------------------------------------------------------{{{2
 " let g:go_list_type = "quickfix"
 let g:go_list_type_commands = {"GoMetaLinter": "quickfix", "GoTest": "quickfix"}
@@ -665,6 +670,7 @@ let g:go_term_height = 10
 " let g:go_guru_scope = ['github.com/...', expand("%:p:h")] " too slow
 " let g:go_guru_scope = [expand("%:p:h")]  " does not work
 " }}}
+
 " }}}
 
 " vim-sneak -----------------------------------------------------------------{{{
