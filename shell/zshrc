@@ -204,3 +204,25 @@ esac
 stty -ixon
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+export FZF_DEFAULT_OPS="--extended -m --border --height 40%"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+# fuzzy grep open via ag
+vg() {
+  local file
+
+  # format 'filename:line_number:line_string'
+  # search_result="$(ag --nobreak --noheading --ignore-dir={.git,} $@ | fzf -0 -1 --delimiter=: --nth=3..| awk -F: '{print $1}')"
+  # sometimes you need file names to either select or exclude files
+  # search_result="$(ag --nobreak --noheading --ignore-dir={.git,} $@ | fzf -0 -1 --delimiter=: --nth=3..)"
+  search_result="$(ag --nobreak --noheading --ignore-dir={.git,} $@ | fzf -0 -1 )"
+  file="$(echo ${search_result} | awk -F: '{print $1}')"
+  line_number="$(echo ${search_result} | awk -F: '{print $2}')"
+
+  if [[ -n $file ]]
+  then
+     vim  +${line_number} ${file}
+  fi
+}
