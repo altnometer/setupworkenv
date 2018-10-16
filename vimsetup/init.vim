@@ -95,8 +95,14 @@ augroup auto_system
     autocmd BufRead * normal zz
     " Show whitespace
     " MUST be inserted BEFORE the colorscheme command
-    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+    " as per http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+    " autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+    highlight ExtraWhitespace ctermbg=red guibg=red
+    match ExtraWhitespace /\s\+$/
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
     autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
     " leave a file mark when you leave the buffer.
     " Get to where you left it with '|` followed by 'C|H|J|G|...'
     autocmd BufLeave *.css  normal! mC
