@@ -583,33 +583,34 @@ endfunction
 " auto --------------------------------------------------------------------{{{2
 augroup auto_vim-go
     autocmd!
+    autocmd FileType go setlocal foldmethod=syntax
     " autocmd FileType go nmap <leader>b  <Plug>(go-build)
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
     autocmd FileType go nmap <leader>r <Plug>(go-run)
     autocmd FileType go nmap <leader>t <Plug>(go-test)
+    autocmd FileType go nmap <leader>a :GoAlternate<CR>
+    " autocmd FileType go nmap <leader>t :GoTestFunc -v -race<CR>
+    " autocmd FileType go nmap <leader>T :GoTest -v -race<CR>
+    autocmd FileType go nmap <leader>t :GoTest<CR>
     autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
     autocmd FileType go nmap <leader>df :GoDef<CR>
     autocmd FileType go nmap <leader>de :GoDecls<CR>
     autocmd FileType go nmap <leader>dr :GoDeclsDir<CR>
     autocmd FileType go nmap <leader>do :GoDoc<CR>
     autocmd FileType go nmap <leader>di <Plug>(go-info)
+    " Guru commands:GoReferrers, GoImplements, GoWhichErr, GoChannelPeers
+    " GoFreeVars
     autocmd FileType go nmap <leader>ds :GoDescribe<CR>
+    autocmd FileType go nmap <leader>dm :GoImplements<CR>
+    autocmd FileType go vmap <leader>df :GoFreevars<CR>
     " au FileType go nmap RT (go-run-tab)
     " autocmd FileType go map l :GoMetaLinter
-    " autocmd FileType go nmap R :GoRename
-    " autocmd FileType go map o :GoDecls
-    " autocmd FileType go map O :GoDeclsDir
-    " autocmd FileType go map d :GoDoc
-    " autocmd FileType go map I :GoInfo
-    autocmd FileType go nmap <leader>ii :GoImport
+    autocmd FileType go nmap <leader>ir :GoRename<CR>
+    autocmd FileType go nmap <leader>ii :GoImport<space>
     autocmd FileType go nmap <leader>ia :GoImportAs
     " autocmd FileType go map f :GoFillStruct
-    " autocmd FileType go map t :GoTestFunc -v -race
-    " autocmd FileType go map T :GoTest -v -race
     " autocmd FileType go map c :GoTestCompile
     " autocmd FileType go map at :GoAddTags
-    " Other Guru commands:GoReferrers, GoImplements, GoWhichErr, GoChannelPeers
-    " GoFreeVars
     autocmd FileType go nmap <leader>id :GoSameIds<CR>
     " Build/Test on save.
     autocmd BufWritePost *.go :GoBuild
@@ -618,10 +619,6 @@ augroup auto_vim-go
     autocmd BufNewFile,BufRead *.go setlocal autowrite
     " Toggle alternate files, code and test files.
     autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
-    " autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-    " autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
-    " autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
-    " Install plugins.
 augroup END
 " }}}
 
