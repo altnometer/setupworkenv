@@ -13,6 +13,7 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'justinmk/vim-sneak'
 Plug 'wellle/targets.vim'
 Plug 'machakann/vim-highlightedyank'
+Plug 'christoomey/vim-tmux-navigator'
 
 " go {{{2
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go'}
