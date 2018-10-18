@@ -14,10 +14,10 @@ then
 else 
     apt-get install -y zsh 
     chsh --shell $(which zsh) ${SUDO_USER}
+    sudo -u ${SUDO_USER} sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 fi
 
 # install oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 # if [ -z "$DESKTOP_SESSION" -a "$DESKTOP_SESSION" == "lightdm-xsession" ];
 # then
 #     echo -e "$COL_GREEN seting up color scheme for xfce4 $COL_RESET"
@@ -27,6 +27,10 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 #     sudo -u ${SUDO_USER} mkdir -pv "${dir_conf_dest}"
 #     sudo -u ${SUDO_USER} cp "$file_conf_orig"  "$file_conf_dest"
 # fi
+ZSH_PRE_OH_MY_ZSH_SOURCE=${SCRIPT_DIR}/zshrc.pre-oh-my-zsh
+ZSH_PRE_OH_MY_ZSH_DEST=${HOME}/.zshrc.pre-oh-my-zsh
 echo -e "\n\x1b[33;01m linking .zshrc and .profile \x1b[39;49;00m\n" && sleep 1
 sudo -u ${SUDO_USER} ln -fs ${SCRIPT_DIR}/zshrc ${HOME}/.zshrc
 sudo -u ${SUDO_USER} ln -fs ${SCRIPT_DIR}/profile ${HOME}/.profile
+echo -e "\n\x1b[33;01m linking ${ZSH_PRE_OH_MY_ZSH_SOURCE} to ${ZSH_PRE_OH_MY_ZSH_DEST}\x1b[39;49;00m\n" && sleep 1
+sudo -u ${SUDO_USER} ln -fs ${ZSH_PRE_OH_MY_ZSH_SOURCE} ${ZSH_PRE_OH_MY_ZSH_DEST}
