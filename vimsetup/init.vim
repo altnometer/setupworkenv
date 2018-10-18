@@ -176,8 +176,8 @@ set fileencoding=utf-8
 " Define order of searches for word completion. kspell will add
 " dictionary search only if ":set[local] spell" is enabled.
 set complete=.,w,b,u,t,i,kspell
-" colorscheme OceanicNext
-colorscheme desert
+colorscheme OceanicNext
+" colorscheme desert
 set completeopt-=preview " do not open preview window for completion.
 " }}}
 
