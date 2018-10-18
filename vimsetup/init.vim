@@ -87,8 +87,8 @@ set smartcase
 set updatetime=250
 " Open 'help' in a new buffer of the same window.
 command! -nargs=1 -complete=help H :enew | :set buftype=help | :h <args>
-set cursorline
-set cursorcolumn
+" set cursorline
+" set cursorcolumn
 
 " auto ----------------------------------------------------------------------{{{
 augroup auto_system
@@ -176,7 +176,8 @@ set fileencoding=utf-8
 " Define order of searches for word completion. kspell will add
 " dictionary search only if ":set[local] spell" is enabled.
 set complete=.,w,b,u,t,i,kspell
-colorscheme OceanicNext
+" colorscheme OceanicNext
+colorscheme desert
 set completeopt-=preview " do not open preview window for completion.
 " }}}
 
