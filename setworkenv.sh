@@ -75,28 +75,42 @@ else
     source ${VIMSETUPFILE}
 fi
 
+# Install vim
+if hash vim 2>/dev/null && [ -d "${HOME}/.vim" ]; then
+    echo -e "\n${COL_YELLOW} vim is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
+else
+    echo -e "\n${COL_YELLOW} Installing, configuring vim ...  ${COL_RESET}\n" && sleep 1
+    VIMSETUPDIR=${REDMOO_PROJECT_DIR}/vimsetup
+    VIMSETUPFILE=${VIMSETUPDIR}/setup_vim.sh
+    cd ${VIMSETUPDIR}
+    source ${VIMSETUPFILE}
+fi
+
 echo -e "\n${COL_YELLOW} Configuring shell ... ${COL_RESET}\n" && sleep 1
 SHELLSETUPDIR=${REDMOO_PROJECT_DIR}/shell
 SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
 source ${SHELLSETUPFILE}
-exit
 
 if hash tmux 2>/dev/null; then
     echo -e "\n${COL_YELLOW} tmux is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
 else
     echo -e "\n${COL_YELLOW} Installing, configuring tmux ...  ${COL_RESET}\n" && sleep 1
     apt-get install -y tmux
-    TMUXSETUPDIR=${PROJECT_SETUP_DIR}/tmuxsetup
+    TMUXSETUPDIR=${REDMOO_PROJECT_DIR}/tmuxsetup
     TMUXCONFIGFILE=${TMUXSETUPDIR}/tmux.conf
     sudo -u ${SUDO_USER} ln -fs ${TMUXCONFIGFILE} ${HOME}/.tmux.conf
 fi
 
-if ! hash /usr/sbin/iftop 2>/dev/null; then
-    echo -e "\n${COL_YELLOW} Installing iftop...  ${COL_RESET}\n" && sleep 1
-    apt-get install -y iftop
-fi
+#if ! hash /usr/sbin/iftop 2>/dev/null; then
+#    echo -e "\n${COL_YELLOW} Installing iftop...  ${COL_RESET}\n" && sleep 1
+#    apt-get install -y iftop
+#fi
+
+# install GUI
+apt-get install -y xorg firefox i3 suckless-tools
 
 
+exit
 source ${PROJECT_SETUP_DIR}/iptablessetup/setupnewserveriptables.sh
 setup_iptables_for_newserver
 
