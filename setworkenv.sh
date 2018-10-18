@@ -74,23 +74,12 @@ else
     cd ${VIMSETUPDIR}
     source ${VIMSETUPFILE}
 fi
-exit
-if hash vim 2>/dev/null && [ -d "${HOME}/.vim" ]; then
-    echo -e "\n${COL_YELLOW} vim is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
-else
-    echo -e "\n${COL_YELLOW} Installing, configuring vim ...  ${COL_RESET}\n" && sleep 1
-    VIMSETUPDIR=${PROJECT_SETUP_DIR}/vimsetup
-    VIMSETUPFILE=${VIMSETUPDIR}/setup_vim.sh
-    cd ${VIMSETUPDIR}
-    source ${VIMSETUPFILE}
-fi
-exit
 
-echo -e "\n${COL_YELLOW} Configuring bash ... ${COL_RESET}\n" && sleep 1
-BASHSETUPDIR=${PROJECT_SETUP_DIR}/bashsetup
-BASHSETUPFILE=${BASHSETUPDIR}/setupbash.sh
-#cd ${BASHSETUPDIR}
-source ${BASHSETUPFILE}
+echo -e "\n${COL_YELLOW} Configuring shell ... ${COL_RESET}\n" && sleep 1
+SHELLSETUPDIR=${REDMOO_PROJECT_DIR}/shell
+SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
+source ${SHELLSETUPFILE}
+exit
 
 if hash tmux 2>/dev/null; then
     echo -e "\n${COL_YELLOW} tmux is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
