@@ -16,6 +16,8 @@ else
     chsh --shell $(which zsh) ${SUDO_USER}
 fi
 
+# install oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 # if [ -z "$DESKTOP_SESSION" -a "$DESKTOP_SESSION" == "lightdm-xsession" ];
 # then
 #     echo -e "$COL_GREEN seting up color scheme for xfce4 $COL_RESET"
