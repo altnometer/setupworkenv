@@ -16,8 +16,9 @@ else
     apt-get install -y zsh 
     chsh --shell $(which zsh) ${SUDO_USER}
     sudo -u ${SUDO_USER} sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-    sudo -u ${SUDO_USER} git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM_PLUG_DIR}
-    sudo -u ${SUDO_USER} git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM_PLUG_DIR}
+    sudo -u ${SUDO_USER} git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM_PLUG_DIR}/zsh-autosuggestions
+    sudo -u ${SUDO_USER} git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM_PLUG_DIR}/zsh-syntax-highlighting
+
 fi
 
 # install oh-my-zsh
@@ -37,3 +38,7 @@ sudo -u ${SUDO_USER} ln -fs ${SCRIPT_DIR}/zshrc ${HOME}/.zshrc
 sudo -u ${SUDO_USER} ln -fs ${SCRIPT_DIR}/profile ${HOME}/.profile
 echo -e "\n\x1b[33;01m linking ${ZSH_PRE_OH_MY_ZSH_SOURCE} to ${ZSH_PRE_OH_MY_ZSH_DEST}\x1b[39;49;00m\n" && sleep 1
 sudo -u ${SUDO_USER} ln -fs ${ZSH_PRE_OH_MY_ZSH_SOURCE} ${ZSH_PRE_OH_MY_ZSH_DEST}
+ZSH_CUSTOM_THEME_SOURCE=${SCRIPT_DIR}/my256.zsh-theme
+ZSH_CUSTOM_THEME_DEST=${HOME}/.oh-my-zsh/custom/themes
+echo -e "\n\x1b[33;01m linking ${ZSH_CUSTOM_THEME_SOURCE} to ${ZSH_CUSTOM_THEME_DEST}\x1b[39;49;00m\n" && sleep 1
+sudo -u ${SUDO_USER} ln -fs ${ZSH_CUSTOM_THEME_SOURCE} ${ZSH_CUSTOM_THEME_DEST}
