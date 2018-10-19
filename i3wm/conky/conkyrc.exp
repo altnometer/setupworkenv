@@ -1,0 +1,85 @@
+out_to_x no
+own_window no
+out_to_console yes
+background no
+max_text_width 0
+
+# Update interval in seconds
+update_interval 2.0
+
+# This is the number of times Conky will update before quitting.
+# Set to zero to run forever.
+total_run_times 0
+
+# Shortens units to a single character (kiB->k, GiB->G, etc.). Default is off.
+short_units yes
+
+# How strict should if_up be when testing an interface for being up?
+# The value is one of up, link or address, to check for the interface
+# being solely up, being up and having link or being up, having link
+# and an assigned IP address.
+if_up_strictness address
+
+# Add spaces to keep things from moving about?  This only affects certain objects.
+# use_spacer should have an argument of left, right, or none
+use_spacer left
+#pad_percents = 2  # doesn't seem to work
+
+# Force UTF8? note that UTF8 support required XFT
+override_utf8_locale no
+
+# number of cpu samples to average
+# set to 1 to disable averaging
+cpu_avg_samples 2
+
+lua_load ~/.conky/conky_lua_scripts.lua
+# Stuff after 'TEXT' will be formatted on screen
+TEXT
+
+# JSON for i3bar
+
+
+#€  Ƀ
+ [
+#{"full_text": " Ƀ/ΞC: ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XETCXXBT` | grep -Po '"c":.*?[^\\]",' | grep  -Po '[0-9.]+'}", "color":"\#D683FF"},
+#{"full_text": " ${execi 60 echo  `curl -s -m 2 https://poloniex.com/public?command=returnTicker` | \
+#    sed 's/.*BTC_BTS[^{}]*\({[^{}]*}\).*BTC_XRP[^{}]*\({[^{}]*}\).*BTC_ETH[^{}]*\({[^{}]*}\).*/\1 \2 \3/' | \
+#    tr ' ' '\n' | \
+#    sed 's/.*last[^\.0-9]*\([\.0-9]*\).*/\1/'}", "color":"\#178CAA"},
+#{"full_text": " ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XRPXBT` grep -Po 'BTC_BTS'}",
+#{"full_text": " BTS XRP ETH ${execi 60 echo  `curl -s -m 2 https://poloniex.com/public?command=returnTicker` |
+#    sed 's/.*BTC_BTS[^{}]*\({[^{}]*}\).*BTC_XRP[^{}]*\({[^{}]*}\).*BTC_ETH[^{}]*\({[^{}]*}\).*/\1 \2 \3/' | \
+#    sed 's/.*last[^\.0-9]*\([\.0-9]*\).*last[^\.0-9]*\([\.0-9]*\).*last[^\.0-9]*\([\.0-9]*\).*/\1/'} ", "color":"\#178CAA"},
+#"full_text": " ${execi 60 echo  `curl -s -m 2 https://poloniex.com/public?command=returnTicker` |
+#   grep -o 'BTC_BTS[^{}]*\({[^{}]*}\)' | grep -o 'last[^\.1-9]*\([\.0-9]*\)' | grep -o '[\.0-9]*' | xargs printf '%0.7f'} ",  "color":"\#178CAA"},
+#{"full_text": " ${execi 60 echo  `curl -s -m 2 https://poloniex.com/public?command=returnTicker` |
+#    grep -o 'BTC_XRP[^{}]*\({[^{}]*}\)' | grep -o 'last[^\.1-9]*\([\.0-9]*\)' | grep -o '[\.0-9]*' | xargs printf '%0.7f'} ",  "color":"\#178CFF"},
+#{"full_text": " Ƀ/ΞC: ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XRPXBT` |
+#{"full_text": " ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XRPXBT` |
+#    grep -Po '"c":.*?[^\\]",' | grep  -Po '[0-9.]+' | xargs printf '%0.7f'} ", "color":"\#178Cff"},
+#{"full_text": " Ƀ/Ξ: ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XETHXXBT` |
+#{"full_text": " ${execi 60 echo  `curl -s -m 2 https://poloniex.com/public?command=returnTicker` |
+#    grep -o 'BTC_ETH[^{}]*\({[^{}]*}\)' | grep -o 'last[^\.1-9]*\([\.0-9]*\)' | grep -o '[\.0-9]*' | xargs printf '%0.5f'} ",  "color":"\#888888"},
+#{"full_text": " ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XETHXXBT` |
+#    grep -Po '"c":.*?[^\\]",' | grep  -Po '[0-9.]+' | xargs printf '%0.5f'} ", "color":"\#888888"},
+#{"full_text": " $$/Ƀ: ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XBTUSD` |
+#{"full_text": " ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XBTUSD` |
+#    grep -Po '"c":.*?[^\\]",' | grep  -Po '[0-9.]+' | xargs printf '%0.f'} ", "color":"\#FF9900"},
+#{"full_text": " $$/Ƀ: ${execi 60 echo `curl -s https://api.kraken.com/0/public/Ticker?pair=XBTUSD` | grep -Po '"c":.*?[^\\]",' | grep  -Po '[0-9.]+'}", "color":"\#D683FF"},
+{"full_text": " ❤ $acpitemp°C [${lua_parse pad_num %02i ${cpu} }%] ","color":
+              ${if_match ${acpitemp}<50}"\#007000"${else}"\#E60000"${endif}},
+#{"full_text": " I/O: ${lua_parse pad_try ${diskio} }", "color":"\#D683FF"},
+
+#{"full_text": " GPU: ${execi 60 nvidia-smi -q -d TEMPERATURE | grep Gpu | cut -c39-40}°C",
+#              "color": "\#3E63D1"},
+{"full_text": " ≣ [$memeasyfree] ", "color":"\#B58900"},
+{"full_text": " ⛁ / [${fs_free /}] ", "color": "\#99CC33"},
+#{"full_text": " ⛁ /home [${fs_free /home}] ", "color": "\#99CC33"},
+#{"full_text": " ≈ ${wireless_essid wlan0} [${lua_parse pad_num %03i ${wireless_link_qual_perc wlan0}}%] ","color":"\#33CC99"},
+#{"full_text": " ≈ ${wireless_essid wlp1s0} [${lua_parse pad_num %03i ${wireless_link_qual_perc wlp1s0}}%] ","color":"\#33CC99"},
+#{"full_text": " ☍ eno1 [${addr eno1}] ","color":"\#33CC99"},
+#{"full_text": " up [${uptime}] ", "color": "\#3399CC"},
+#{"full_text": " ${time %a %Y-%m-%d %H:%M:%S} ", "color": "\#888888"}
+{"full_text": " ${time %a %Y-%m-%d %H:%M} ", "color": "\#888888"},
+{"full_text": " ${battery_percent BAT0}% ", "color": ${if_match ${battery_percent}<20}"\#E60000"${else}"\#007000"${endif}}
+],
