@@ -107,7 +107,61 @@ fi
 #fi
 
 # install GUI
-apt-get install -y xorg firefox i3 suckless-tools
+apt-get install -y xorg firefox i3 suckless-tools conky-all rxvt-unicode
+
+# link i3wm config file
+I3_CONF_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/config_beakl.conf
+I3_CONF_DEST=${HOME}/.config/i3/config
+if [ -f $I3_CONF_SOURCE ];
+then
+    echo -e "\n\x1b[33;01m Linking $I3_CONF_SOURCE to $I3_CONF_DEST ... \x1b[39;49;00m\n"
+    if [ -f "$I3_CONF_DEST" ]; then
+        rm $I3_CONF_DEST
+    fi
+    if [ -h "$I3_CONF_DEST" ]; then # -h, true if file exist and a symbolic link.
+        rm $I3_CONF_DEST
+    fi
+	sudo -u ${SUDO_USER} ln -s $I3_CONF_SOURCE $I3_CONF_DEST
+else
+    echo -e "\n\x1b[31;01m $I3_CONF_SOURCE does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
+# link conky config files
+CONKY_DIR_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/conky
+CONKY_DIR_DEST=${HOME}/.conky
+if [ -d $CONKY_DIR_SOURCE ];
+then
+    echo -e "\n\x1b[33;01m Linking $CONKY_DIR_SOURCE to $CONKY_DIR_DEST ... \x1b[39;49;00m\n"
+    if [ -d "$CONKY_DIR_DEST" ]; then
+        rm -r $CONKY_DIR_DEST
+    fi
+    if [ -h "$CONKY_DIR_DEST" ]; then # -h, true if file exist and a symbolic link.
+        rm -r $CONKY_DIR_DEST
+    fi
+    sudo -u ${SUDO_USER} ln -s $CONKY_DIR_SOURCE $CONKY_DIR_DEST
+else
+    echo -e "\n\x1b[31;01m $CONKY_DIR_SOURCE does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
+sudo -u ${SUDO_USER} mkdir -p ${HOME}/.local/bin
+CONKY_SCRIPT_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/conky-i3-bar.sh
+CONKY_SCRIPT_DEST=${HOME}/.local/bin/conky-i3-bar.sh
+if [ -f $CONKY_SCRIPT_SOURCE ];
+then
+    echo -e "\n\x1b[33;01m Linking $CONKY_SCRIPT_SOURCE to $CONKY_SCRIPT_DEST ... \x1b[39;49;00m\n"
+    if [ -f "$CONKY_SCRIPT_DEST" ]; then
+        rm $CONKY_SCRIPT_DEST
+    fi
+    if [ -h "$CONKY_SCRIPT_DEST" ]; then # -h, true if file exist and a symbolic link.
+        rm $CONKY_SCRIPT_DEST
+    fi
+	sudo -u ${SUDO_USER} ln -s $CONKY_SCRIPT_SOURCE $CONKY_SCRIPT_DEST
+else
+    echo -e "\n\x1b[31;01m $CONKY_SCRIPT_SOURCE does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
 
 
 exit
