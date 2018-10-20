@@ -107,7 +107,8 @@ fi
 #fi
 
 # install GUI
-apt-get install -y xorg firefox i3 suckless-tools conky-all rxvt-unicode
+apt-get install -y xorg firefox i3 suckless-tools conky-all rxvt-unicode \
+    silversearcher-ag ripgrep rofi
 
 # link i3wm config file
 I3_CONF_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/config_beakl.conf
@@ -163,6 +164,16 @@ else
 	exit 1
 fi
 
+# Install GUI
+# if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
+#     echo -e "\n${COL_YELLOW} neovim is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
+# else
+#     echo -e "\n${COL_YELLOW} Installing, configuring neovim ...  ${COL_RESET}\n" && sleep 1
+    GUISETUPDIR=${REDMOO_PROJECT_DIR}/i3wm
+    GUISETUPFILE=${GUISETUPDIR}/setup_GUI.sh
+    cd ${GUISETUPDIR}
+    source ${GUISETUPFILE}
+# fi
 
 exit
 source ${PROJECT_SETUP_DIR}/iptablessetup/setupnewserveriptables.sh
