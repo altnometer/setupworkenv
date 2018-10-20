@@ -27,7 +27,7 @@ else
     echo -e "\n\x1b[33;01m Installing neovim ...  \x1b[39;49;00m\n" && sleep 1
     # TODO: python-neovim python3-neovim are available only in 'unstable' deb
     # repository
-    apt-get install -y neovim curl python-neovim python3-neovim
+    apt-get install -y neovim curl python-neovim python3-neovim silversearcher-ag ripgrep
 fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIMRC_PATH="${SCRIPT_DIR}/init.vim"
