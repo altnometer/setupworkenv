@@ -101,6 +101,12 @@ else
     sudo -u ${SUDO_USER} ln -fs ${TMUXCONFIGFILE} ${HOME}/.tmux.conf
 fi
 
+# setup st terminal emulator
+STSETUPDIR=${REDMOO_PROJECT_DIR}/term
+STSETUPFILE=${STSETUPDIR}/setup_st.sh
+cd ${STSETUPDIR}
+source ${STSETUPFILE}
+
 #if ! hash /usr/sbin/iftop 2>/dev/null; then
 #    echo -e "\n${COL_YELLOW} Installing iftop...  ${COL_RESET}\n" && sleep 1
 #    apt-get install -y iftop
