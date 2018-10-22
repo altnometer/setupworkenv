@@ -227,4 +227,4 @@ vg() {
   fi
 }
 # default value is 'fg=8' which is hard/impossible to read in dark themes
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=5'
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=5'
