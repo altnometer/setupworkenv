@@ -227,6 +227,8 @@ vg() {
   fi
 }
 # default value is 'fg=8' which is hard/impossible to read in dark themes
+# is not visible in dark solarised (true color).
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=5'
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=grey'
 # diable auto correct
 unsetopt correct_all
