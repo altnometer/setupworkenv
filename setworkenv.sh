@@ -66,9 +66,9 @@ fi
 
 # Install neovim
 if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
-    echo -e "\n${COL_YELLOW} neovim is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
+    echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
-    echo -e "\n${COL_YELLOW} Installing, configuring neovim ...  ${COL_RESET}\n" && sleep 1
+    echo -e "\n\x1b[33;01m Installing, configuring neovim ...  \x1b[39;49;00m\n" && sleep 1
     VIMSETUPDIR=${REDMOO_PROJECT_DIR}/vimsetup
     VIMSETUPFILE=${VIMSETUPDIR}/setup_neovim.sh
     cd ${VIMSETUPDIR}
@@ -77,24 +77,24 @@ fi
 
 # Install vim
 if hash vim 2>/dev/null && [ -d "${HOME}/.vim" ]; then
-    echo -e "\n${COL_YELLOW} vim is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
+    echo -e "\n\x1b[33;01m vim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
-    echo -e "\n${COL_YELLOW} Installing, configuring vim ...  ${COL_RESET}\n" && sleep 1
+    echo -e "\n\x1b[33;01m Installing, configuring vim ...  \x1b[39;49;00m\n" && sleep 1
     VIMSETUPDIR=${REDMOO_PROJECT_DIR}/vimsetup
     VIMSETUPFILE=${VIMSETUPDIR}/setup_vim.sh
     cd ${VIMSETUPDIR}
     source ${VIMSETUPFILE}
 fi
 
-echo -e "\n${COL_YELLOW} Configuring shell ... ${COL_RESET}\n" && sleep 1
+echo -e "\n\x1b[33;01m Configuring shell ... \x1b[39;49;00m\n" && sleep 1
 SHELLSETUPDIR=${REDMOO_PROJECT_DIR}/shell
 SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
 source ${SHELLSETUPFILE}
 
 if hash tmux 2>/dev/null; then
-    echo -e "\n${COL_YELLOW} tmux is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
+    echo -e "\n\x1b[33;01m tmux is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
-    echo -e "\n${COL_YELLOW} Installing, configuring tmux ...  ${COL_RESET}\n" && sleep 1
+    echo -e "\n\x1b[33;01m Installing, configuring tmux ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y tmux
     TMUXSETUPDIR=${REDMOO_PROJECT_DIR}/tmuxsetup
     TMUXCONFIGFILE=${TMUXSETUPDIR}/tmux.conf
@@ -107,8 +107,10 @@ STSETUPFILE=${STSETUPDIR}/setup_st.sh
 cd ${STSETUPDIR}
 source ${STSETUPFILE}
 
+exit
+
 #if ! hash /usr/sbin/iftop 2>/dev/null; then
-#    echo -e "\n${COL_YELLOW} Installing iftop...  ${COL_RESET}\n" && sleep 1
+#    echo -e "\n\x1b[33;01m Installing iftop...  \x1b[39;49;00m\n" && sleep 1
 #    apt-get install -y iftop
 #fi
 
@@ -172,9 +174,9 @@ fi
 
 # Install GUI
 # if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
-#     echo -e "\n${COL_YELLOW} neovim is installed, not installing or upgrading.${COL_RESET}\n" && sleep 1
+#     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 # else
-#     echo -e "\n${COL_YELLOW} Installing, configuring neovim ...  ${COL_RESET}\n" && sleep 1
+#     echo -e "\n\x1b[33;01m Installing, configuring neovim ...  \x1b[39;49;00m\n" && sleep 1
     GUISETUPDIR=${REDMOO_PROJECT_DIR}/i3wm
     GUISETUPFILE=${GUISETUPDIR}/setup_GUI.sh
     cd ${GUISETUPDIR}
