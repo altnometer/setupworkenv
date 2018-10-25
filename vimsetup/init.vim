@@ -42,6 +42,8 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 Plug 'mhartington/oceanic-next'
+Plug 'lifepillar/vim-solarized8'
+Plug 'romainl/flattened'
 
 " denite {{{2
 Plug 'Shougo/denite.nvim'
