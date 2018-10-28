@@ -85,11 +85,6 @@ else
 	exit 1
 fi
 
-# setup urxvt
-URXVT_EXT_DIR=${HOME}/.urxvt/ext
-# sudo -u ${SUDO_USER} mkdir -p $URXVT_EXT_DIR
-sudo -u ${SUDO_USER} wget -P $URXVT_EXT_DIR https://raw.githubusercontent.com/simmel/urxvt-resize-font/master/resize-font
-
 # setup color theme
 COLOR_THEME_DEST=${HOME}/.Xresources.d/colors
 sudo -u ${SUDO_USER} wget -P $COLOR_THEME_DEST https://raw.githubusercontent.com/solarized/xresources/master/Xresources.dark
