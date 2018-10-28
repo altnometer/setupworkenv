@@ -40,5 +40,6 @@ echo -e "\n\x1b[33;01m linking ${ZSH_PRE_OH_MY_ZSH_SOURCE} to ${ZSH_PRE_OH_MY_ZS
 sudo -u ${SUDO_USER} ln -fs ${ZSH_PRE_OH_MY_ZSH_SOURCE} ${ZSH_PRE_OH_MY_ZSH_DEST}
 ZSH_CUSTOM_THEME_SOURCE=${SCRIPT_DIR}/my256.zsh-theme
 ZSH_CUSTOM_THEME_DEST=${HOME}/.oh-my-zsh/custom/themes
+sudo -u ${SUDO_USER} mkdir -p $ZSH_CUSTOM_THEME_DEST
 echo -e "\n\x1b[33;01m linking ${ZSH_CUSTOM_THEME_SOURCE} to ${ZSH_CUSTOM_THEME_DEST}\x1b[39;49;00m\n" && sleep 1
 sudo -u ${SUDO_USER} ln -fs ${ZSH_CUSTOM_THEME_SOURCE} ${ZSH_CUSTOM_THEME_DEST}
