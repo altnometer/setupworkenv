@@ -71,12 +71,11 @@ then
     echo -e "\n\x1b[32;01m Built patch ... success ... \x1b[39;49;00m\n"
 else
     echo -e "\n\x1b[33;01m Dir $ST_INSTALL_DIR already exits, not installing 'st' \x1b[39;49;00m\n"
-    exit
 fi
 
-FONTS_SOURCE_DIR="${SCRIPT_DIR}/../fonts"
-FONTS_DEST_DIR="${HOME}/.local/share/fonts"
-# install fonts
-sudo -u ${SUDO_USER} mkdir -p $FONTS_DEST_DIR
-sudo -u ${SUDO_USER} cp -a "${FONTS_SOURCE_DIR}/." $FONTS_DEST_DIR
-echo -e "\n\x1b[33;01m Copying $FONTS_SOURCE_DIR to $FONTS_DEST_DIR ... \x1b[39;49;00m\n"
+# FONTS_SOURCE_DIR="${SCRIPT_DIR}/../fonts"
+# FONTS_DEST_DIR="${HOME}/.local/share/fonts"
+# # install fonts
+# sudo -u ${SUDO_USER} mkdir -p $FONTS_DEST_DIR
+# sudo -u ${SUDO_USER} cp -a "${FONTS_SOURCE_DIR}/." $FONTS_DEST_DIR
+# echo -e "\n\x1b[33;01m Copying $FONTS_SOURCE_DIR to $FONTS_DEST_DIR ... \x1b[39;49;00m\n"
