@@ -16,9 +16,9 @@ else
     apt-get install -y zsh 
     chsh --shell $(which zsh) ${SUDO_USER}
     sudo -u ${SUDO_USER} sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    sudo -u ${SUDO_USER} mkdir -p $ZSH_CUSTOM_PLUG_DIR
     sudo -u ${SUDO_USER} git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM_PLUG_DIR}/zsh-autosuggestions
     sudo -u ${SUDO_USER} git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM_PLUG_DIR}/zsh-syntax-highlighting
-
 fi
 
 # install oh-my-zsh
