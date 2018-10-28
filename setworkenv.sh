@@ -113,7 +113,7 @@ source ${STSETUPFILE}
 #fi
 
 # install GUI
-apt-get install -y xorg firefox i3 suckless-tools conky-all rxvt-unicode \
+apt-get install -y xorg xinput firefox-esr i3 suckless-tools conky-all \
     silversearcher-ag ripgrep
 
 # link i3wm config file
