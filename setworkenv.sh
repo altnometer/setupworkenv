@@ -107,8 +107,6 @@ STSETUPFILE=${STSETUPDIR}/setup_st.sh
 cd ${STSETUPDIR}
 source ${STSETUPFILE}
 
-exit
-
 #if ! hash /usr/sbin/iftop 2>/dev/null; then
 #    echo -e "\n\x1b[33;01m Installing iftop...  \x1b[39;49;00m\n" && sleep 1
 #    apt-get install -y iftop
