@@ -21,13 +21,19 @@ fi
 
 # install packages
 # apt-get install -y vim-nox curl git wgepython-pip exuberant-ctags
+NVIM_INST_DIR="${HOME}/.local/share/nvim"
+NVIM_EXEC_FILE="${NVIM_INST_DIR}/nvim.appimage"
 if hash nvim 2>/dev/null; then
     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing neovim ...  \x1b[39;49;00m\n" && sleep 1
     # TODO: python-neovim python3-neovim are available only in 'unstable' deb
     # repository
-    apt-get install -y neovim curl python-neovim python3-neovim silversearcher-ag ripgrep
+    apt-get install -y curl fuse python-neovim python3-neovim silversearcher-ag ripgrep
+    sudo -u ${SUDO_USER} mkdir -p $NVIM_INST_DIR
+    sudo -u ${SUDO_USER} curl -Lo $NVIM_EXEC_FILE https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
+    chmod u+x $NVIM_EXEC_FILE
+    ln -s $NVIM_EXEC_FILE /usr/local/bin/nvim
 fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIMRC_PATH="${SCRIPT_DIR}/init.vim"
