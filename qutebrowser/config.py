@@ -950,7 +950,7 @@ c.fonts.hints = 'bold 12pt monospace'
 ## Characters used for hint strings.
 ## Type: UniqueCharString
 # c.hints.chars = 'asdfghjkl'
-c.hints.chars = 'yieasrtw'
+c.hints.chars = '0123456789'
 
 ## Dictionary file to be used by the word hints.
 ## Type: File
