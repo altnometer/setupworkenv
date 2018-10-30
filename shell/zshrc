@@ -84,6 +84,7 @@ plugins=(
   zsh-autosuggestions
   colored-man-pages
   zsh-syntax-highlighting
+  zsh-completions
 )
 
 source $ZSH/oh-my-zsh.sh
