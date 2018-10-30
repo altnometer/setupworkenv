@@ -17,6 +17,9 @@ if [ -z ${SUDO_USER} ]; then
 fi
 # }}}
 
+apt-get install -y xorg xinput firefox-esr i3 suckless-tools conky-all
+apt-get install -y silversearcher-ag ripgrep pass
+
 # link .XResources --------------------------------------------------------{{{
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 XRESOURCES_SOURCE="${SCRIPT_DIR}/XResources"

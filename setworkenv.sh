@@ -113,8 +113,6 @@ source ${STSETUPFILE}
 #fi
 
 # install GUI
-apt-get install -y xorg xinput firefox-esr i3 suckless-tools conky-all \
-    silversearcher-ag ripgrep
 
 # link i3wm config file
 I3_CONF_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/config_beakl.conf
