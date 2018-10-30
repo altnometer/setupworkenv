@@ -114,26 +114,6 @@ source ${STSETUPFILE}
 
 # install GUI
 
-# link i3wm config file
-I3_CONF_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/config_beakl.conf
-I3_CONF_DEST_DIR=${HOME}/.config/i3
-I3_CONF_DEST=${I3_CONF_DEST_DIR}/config
-if [ -f $I3_CONF_SOURCE ];
-then
-    echo -e "\n\x1b[33;01m Linking $I3_CONF_SOURCE to $I3_CONF_DEST ... \x1b[39;49;00m\n"
-    if [ -f "$I3_CONF_DEST" ]; then
-        rm $I3_CONF_DEST
-    fi
-    if [ -h "$I3_CONF_DEST" ]; then # -h, true if file exist and a symbolic link.
-        rm $I3_CONF_DEST
-    fi
-    sudo -u ${SUDO_USER} mkdir -p $I3_CONF_DEST_DIR
-	sudo -u ${SUDO_USER} ln -s $I3_CONF_SOURCE $I3_CONF_DEST
-else
-    echo -e "\n\x1b[31;01m $I3_CONF_SOURCE does not exist. Quiting ... \x1b[39;49;00m\n"
-	exit 1
-fi
-
 # link conky config files
 CONKY_DIR_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/conky
 CONKY_DIR_DEST=${HOME}/.conky

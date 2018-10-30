@@ -22,6 +22,27 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 apt-get install -y xorg xinput firefox-esr i3 suckless-tools conky-all
 apt-get install -y silversearcher-ag ripgrep pass
 
+# link i3wm config --------------------------------------------------------{{{
+I3_CONF_SOURCE=${SCRIPT_DIR}/config_beakl.conf
+I3_CONF_DEST_DIR=${HOME}/.config/i3
+I3_CONF_DEST=${I3_CONF_DEST_DIR}/config
+if [ -f $I3_CONF_SOURCE ];
+then
+    echo -e "\n\x1b[33;01m Linking $I3_CONF_SOURCE to $I3_CONF_DEST ... \x1b[39;49;00m\n"
+    if [ -f "$I3_CONF_DEST" ]; then
+        rm $I3_CONF_DEST
+    fi
+    if [ -h "$I3_CONF_DEST" ]; then # -h, true if file exist and a symbolic link.
+        rm $I3_CONF_DEST
+    fi
+    sudo -u ${SUDO_USER} mkdir -p $I3_CONF_DEST_DIR
+	sudo -u ${SUDO_USER} ln -s $I3_CONF_SOURCE $I3_CONF_DEST
+else
+    echo -e "\n\x1b[31;01m $I3_CONF_SOURCE does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+# }}}
+
 # link .XResources --------------------------------------------------------{{{
 XRESOURCES_SOURCE="${SCRIPT_DIR}/XResources"
 XRESOURCES_DEST="${HOME}/.XResources"
