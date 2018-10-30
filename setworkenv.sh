@@ -114,43 +114,6 @@ source ${STSETUPFILE}
 
 # install GUI
 
-# link conky config files
-CONKY_DIR_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/conky
-CONKY_DIR_DEST=${HOME}/.conky
-if [ -d $CONKY_DIR_SOURCE ];
-then
-    echo -e "\n\x1b[33;01m Linking $CONKY_DIR_SOURCE to $CONKY_DIR_DEST ... \x1b[39;49;00m\n"
-    if [ -d "$CONKY_DIR_DEST" ]; then
-        rm -r $CONKY_DIR_DEST
-    fi
-    if [ -h "$CONKY_DIR_DEST" ]; then # -h, true if file exist and a symbolic link.
-        rm -r $CONKY_DIR_DEST
-    fi
-    sudo -u ${SUDO_USER} ln -s $CONKY_DIR_SOURCE $CONKY_DIR_DEST
-else
-    echo -e "\n\x1b[31;01m $CONKY_DIR_SOURCE does not exist. Quiting ... \x1b[39;49;00m\n"
-	exit 1
-fi
-
-sudo -u ${SUDO_USER} mkdir -p ${HOME}/.local/bin
-CONKY_SCRIPT_SOURCE=${REDMOO_PROJECT_DIR}/i3wm/conky-i3-bar.sh
-CONKY_SCRIPT_DEST=${HOME}/.local/bin/conky-i3-bar.sh
-if [ -f $CONKY_SCRIPT_SOURCE ];
-then
-    echo -e "\n\x1b[33;01m Linking $CONKY_SCRIPT_SOURCE to $CONKY_SCRIPT_DEST ... \x1b[39;49;00m\n"
-    if [ -f "$CONKY_SCRIPT_DEST" ]; then
-        rm $CONKY_SCRIPT_DEST
-    fi
-    if [ -h "$CONKY_SCRIPT_DEST" ]; then # -h, true if file exist and a symbolic link.
-        rm $CONKY_SCRIPT_DEST
-    fi
-	sudo -u ${SUDO_USER} ln -s $CONKY_SCRIPT_SOURCE $CONKY_SCRIPT_DEST
-else
-    echo -e "\n\x1b[31;01m $CONKY_SCRIPT_SOURCE does not exist. Quiting ... \x1b[39;49;00m\n"
-	exit 1
-fi
-
-# Install GUI
 # if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
 #     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 # else
