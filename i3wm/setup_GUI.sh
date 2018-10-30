@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # This scrip should set up a GUI
+
+# check sudo -E -----------------------------------------------------------{{{
 if [[ $EUID -ne 0 ]]; then
     echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
     exit 1
@@ -13,8 +15,9 @@ if [ -z ${SUDO_USER} ]; then
     echo -e "\n\x1b[31;01m No \$SUDO_USER available, quiting ... \x1b[39;49;00m\n"
     exit 1
 fi
+# }}}
 
-# link .XResources file
+# link .XResources --------------------------------------------------------{{{
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 XRESOURCES_SOURCE="${SCRIPT_DIR}/XResources"
 XRESOURCES_DEST="${HOME}/.XResources"
@@ -32,8 +35,9 @@ else
     echo -e "\n\x1b[31;01m ${XRESOURCES_SOURCE} does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
+# }}}
 
-# link .Xmodmap file
+# link .Xmodmap -----------------------------------------------------------{{{
 XMODMAP_SOURCE="${SCRIPT_DIR}/XResources"
 XMODMAP_DEST="${HOME}/.Xresources"
 if [ -f $XMODMAP_SOURCE ];
@@ -50,8 +54,9 @@ else
     echo -e "\n\x1b[31;01m ${XMODMAP_SOURCE} does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
+# }}}
 
-# link .xinitrc file
+# link .xinitrc -----------------------------------------------------------{{{
 XINIT_SOURCE="${SCRIPT_DIR}/xinitrc"
 XINIT_DEST="${HOME}/.xinitrc"
 if [ -f $XINIT_SOURCE ];
@@ -68,6 +73,7 @@ else
     echo -e "\n\x1b[31;01m ${XINIT_SOURCE} does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
+# }}}
 
 # setup color theme
 COLOR_THEME_DEST=${HOME}/.Xresources.d/colors
