@@ -80,6 +80,18 @@ else
 fi
 # }}}
 
+# install qutebrowser -----------------------------------------------------{{{
+if hash qutebrowser 2>/dev/null && [ -d "${HOME}/.config/qutebrowser" ]; then
+    echo -e "\n\x1b[33;01m qutebrowser is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
+else
+#     echo -e "\n\x1b[33;01m Installing, configuring qutebrowser ...  \x1b[39;49;00m\n" && sleep 1
+    QB_SETUPDIR=${SCRIPT_DIR}/../qutebrowser
+    QB_SETUPFILE=${QB_SETUPDIR}/setup_qb.sh
+    cd ${QB_SETUPDIR}
+    source ${QB_SETUPFILE}
+fi
+# }}}
+
 # link .XResources --------------------------------------------------------{{{
 XRESOURCES_SOURCE="${SCRIPT_DIR}/XResources"
 XRESOURCES_DEST="${HOME}/.XResources"
