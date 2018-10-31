@@ -86,6 +86,7 @@ else
     source ${VIMSETUPFILE}
 fi
 
+# Install zsh
 echo -e "\n\x1b[33;01m Configuring shell ... \x1b[39;49;00m\n" && sleep 1
 SHELLSETUPDIR=${REDMOO_PROJECT_DIR}/shell
 SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
