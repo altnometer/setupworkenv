@@ -103,6 +103,13 @@ else
 fi
 # }}}
 
+# Install ranger
+RANGERSETUPDIR=${REDMOO_PROJECT_DIR}/ranger
+RANGERCONFIGFILE=${RANGERSETUPDIR}/setup_ranger.sh
+cd ${RANGERSETUPDIR}
+source ${RANGERCONFIGFILE}
+
+# should go to gui setup
 # setup st terminal emulator
 STSETUPDIR=${REDMOO_PROJECT_DIR}/term
 STSETUPFILE=${STSETUPDIR}/setup_st.sh
