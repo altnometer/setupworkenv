@@ -887,6 +887,8 @@ c.fonts.hints = 'bold 12pt monospace'
 ## Font used in the tab bar.
 ## Type: QtFont
 # c.fonts.tabs = '12pt monospace'
+# c.fonts.tabs = 'bold 12pt SFNS Display'
+c.fonts.tabs = '12pt SFNS Display'
 
 ## Font family for cursive fonts.
 ## Type: FontFamily
