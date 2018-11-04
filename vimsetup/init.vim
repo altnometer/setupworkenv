@@ -321,7 +321,7 @@ map [] k$][%?}<CR>
         autocmd FileType css,scss,json setlocal foldmethod=marker
         autocmd FileType css,scss,json setlocal foldmarker={,}
         autocmd FileType coffee setl foldmethod=indent
-        autocmd FileType xml,cpp setl foldmethod=syntax
+        autocmd FileType xml,cpp,c setl foldmethod=syntax
         autocmd FileType html setl foldmethod=expr
         autocmd FileType html setl foldexpr=HTMLFolds()
         " autocmd FileType javascript,typescript,json setl foldmethod=syntax
