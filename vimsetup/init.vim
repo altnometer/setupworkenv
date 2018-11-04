@@ -321,7 +321,7 @@ map [] k$][%?}<CR>
         autocmd FileType css,scss,json setlocal foldmethod=marker
         autocmd FileType css,scss,json setlocal foldmarker={,}
         autocmd FileType coffee setl foldmethod=indent
-        autocmd FileType xml setl foldmethod=syntax
+        autocmd FileType xml,cpp setl foldmethod=syntax
         autocmd FileType html setl foldmethod=expr
         autocmd FileType html setl foldexpr=HTMLFolds()
         " autocmd FileType javascript,typescript,json setl foldmethod=syntax
@@ -545,6 +545,7 @@ nnoremap <leader>fC :FzfCommits<CR>
 nnoremap <leader>fs :FzfRg!<CR>
 nnoremap <leader>fh :FzfHelp<CR>
 nnoremap <leader>fm :FzfCommands<cr>
+nnoremap <leader>ft :FzfBTags<cr>
 " }}}
 
 " vim-fugitive --------------------------------------------------------------{{{
