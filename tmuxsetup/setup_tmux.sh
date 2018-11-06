@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# This scrip should set up neovim
+# This scrip should set up tmux
 # check if run with sudo -E -----------------------------------------------{{{
 if [[ $EUID -ne 0 ]]; then
     echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
