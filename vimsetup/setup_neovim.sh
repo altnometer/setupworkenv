@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # This scrip should set up neovim
 if [[ $EUID -ne 0 ]]; then
@@ -19,22 +20,37 @@ fi
 #     apt-get update
 # fi
 
+# setup neovim ------------------------------------------------------------{{{
 # install packages
 # apt-get install -y vim-nox curl git wgepython-pip exuberant-ctags
-NVIM_INST_DIR="${HOME}/.local/share/nvim"
-NVIM_EXEC_FILE="${NVIM_INST_DIR}/nvim.appimage"
+# NVIM_INST_DIR="${HOME}/.local/share/nvim"
+NVIM_INST_DIR="${HOME}/Repos/neovim"
+# NVIM_EXEC_FILE="${NVIM_INST_DIR}/nvim.appimage"
+NVIM_EXEC_FILE_SOURCE="${NVIM_INST_DIR}/nvim"
+NVIM_EXEC_FILE_DEST="/usr/local/bin/nvim"
 if hash nvim 2>/dev/null; then
     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing neovim ...  \x1b[39;49;00m\n" && sleep 1
-    # TODO: python-neovim python3-neovim are available only in 'unstable' deb
-    # repository
-    apt-get install -y curl fuse python-neovim python3-neovim silversearcher-ag ripgrep
-    sudo -u ${SUDO_USER} mkdir -p $NVIM_INST_DIR
-    sudo -u ${SUDO_USER} curl -Lo $NVIM_EXEC_FILE https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
-    chmod u+x $NVIM_EXEC_FILE
-    ln -s $NVIM_EXEC_FILE /usr/local/bin/nvim
+    apt-get install -y curl python-neovim python3-neovim silversearcher-ag ripgrep
+    # apt-get install -y fuse
+    apt-get install -y exuberant-ctags
+    apt-get install -y ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip
+    # sudo -u ${SUDO_USER} mkdir -p $NVIM_INST_DIR
+    # sudo -u ${SUDO_USER} curl -Lo $NVIM_EXEC_FILE_SOURCE https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
+    if [ ! -d "$NVIM_INST_DIR" ] ; then
+        sudo -u ${SUDO_USER} git clone https://github.com/neovim/neovim $NVIM_INST_DIR
+    fi
+    cd $NVIM_INST_DIR
+    sudo -u ${SUDO_USER} git checkout v0.3.1
+    # sudo -u ${SUDO_USER} make
+    make install
+    # chmod u+x $NVIM_EXEC_FILE_SOURCE
+    # rm -f $NVIM_EXEC_FILE_DEST
+    # ln -s $NVIM_EXEC_FILE_SOURCE $NVIM_EXEC_FILE_DEST
 fi
+# }}}
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIMRC_PATH="${SCRIPT_DIR}/init.vim"
 VIMRC_DEST_DIR="${HOME}/.config/nvim"
