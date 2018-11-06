@@ -93,15 +93,10 @@ SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
 source ${SHELLSETUPFILE}
 
 # Install tmux ------------------------------------------------------------{{{
-if hash tmux 2>/dev/null; then
-    echo -e "\n\x1b[33;01m tmux is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
-else
-    echo -e "\n\x1b[33;01m Installing, configuring tmux ...  \x1b[39;49;00m\n" && sleep 1
-    apt-get install -y tmux
-    TMUXSETUPDIR=${REDMOO_PROJECT_DIR}/tmuxsetup
-    TMUXCONFIGFILE=${TMUXSETUPDIR}/tmux.conf
-    sudo -u ${SUDO_USER} ln -fs ${TMUXCONFIGFILE} ${HOME}/.tmux.conf
-fi
+echo -e "\n\x1b[33;01m Configuring tmux ... \x1b[39;49;00m\n" && sleep 1
+TMUXSETUPDIR=${REDMOO_PROJECT_DIR}/tmuxsetup
+TMUXSETUPFILE=${TMUXSETUPDIR}/setup_tmux.sh
+source ${TMUXSETUPFILE}
 # }}}
 
 # Install ranger
