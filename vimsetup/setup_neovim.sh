@@ -2,6 +2,7 @@
 set -e
 
 # This scrip should set up neovim
+# check if run with sudo -E -----------------------------------------------{{{
 if [[ $EUID -ne 0 ]]; then
     echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
     exit 1
@@ -14,11 +15,14 @@ if [ -z ${SUDO_USER} ]; then
     echo -e "\n\x1b[31;01m No \$SUDO_USER available, quiting ... \x1b[39;49;00m\n"
     exit 1
 fi
-# run apt-get update
+# }}}
+
+# run apt-get update ------------------------------------------------------{{{
 # if [ "$(( $(date +%s) - $(stat -c %Z /var/cache/apt/pkgcache.bin 2>/dev/null || echo '0') ))" -ge 600 ]; then
 #     echo -e "\n\x1b[33;01m Running apt-get update ... \x1b[39;49;00m\n" && sleep 1
 #     apt-get update
 # fi
+# }}}
 
 # setup neovim ------------------------------------------------------------{{{
 # install packages
@@ -51,18 +55,22 @@ else
 fi
 # }}}
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-VIMRC_PATH="${SCRIPT_DIR}/init.vim"
-VIMRC_DEST_DIR="${HOME}/.config/nvim"
-VIMRC_DEST="${VIMRC_DEST_DIR}/init.vim"
-echo -e "\n\x1b[33;01m Creating $VIMRC_DEST_DIR dir ... \x1b[39;49;00m\n"
-sudo -u ${SUDO_USER} mkdir -p $VIMRC_DEST_DIR
+# setup junegunn/vim-plug -------------------------------------------------{{{
 if [ ! -f ~/.local/share/nvim/site/autoload/plug.vim  ];
 then
     # Setup vim-plug to manage your plugins
     sudo -u ${SUDO_USER} curl -fLo ${HOME}/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
+# }}}
+
+# linking config ----------------------------------------------------------{{{
+SCRPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VIMRC_PATH="${SCRIPT_DIR}/init.vim"
+VIMRC_DEST_DIR="${HOME}/.config/nvim"
+VIMRC_DEST="${VIMRC_DEST_DIR}/init.vim"
+echo -e "\n\x1b[33;01m Creating $VIMRC_DEST_DIR dir ... \x1b[39;49;00m\n"
+sudo -u ${SUDO_USER} mkdir -p $VIMRC_DEST_DIR
 if [ -f $VIMRC_PATH ];
 then
     echo -e "\n\x1b[33;01m Linking $VIMRC_PATH to $VIMRC_DEST ... \x1b[39;49;00m\n"
@@ -77,4 +85,4 @@ else
     echo -e "\n\x1b[31;01m vimrc does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
-
+# }}}
