@@ -722,7 +722,7 @@ let g:deoplete#sources#go#pointer = 1
 " let g:deoplete#sources#go#source_importer = 1
 "}}}
 
-" terminal ------------------------------------------------------------------{{{
+" terminal ----------------------------------------------------------------{{{
 highlight TermCursor ctermfg=red guifg=red
 highlight TermCursorNC ctermfg=blue guifg=blue
 set splitbelow
@@ -733,15 +733,14 @@ tnoremap <PageUp> <C-\><C-n>:bprevious<cr>
 tnoremap <PageDown> <C-\><C-n>:bnext<cr>
 tnoremap <Home> <C-\><C-n>:bfirst<cr>
 tnoremap <End> <C-\><C-n>:blast<cr>
-augroup auto_term
+augroup auto_term " {{{
   autocmd!
   autocmd TermOpen * nnoremap <buffer> <leader>x :bp! <BAR> bd! #<CR>
   " does not work
   " autocmd TermOpen <buffer> * :startinsert
   " au TermOpen * let g:last_terminal_job_id = b:terminal_job_id
-augroup END
-" function! s:get_visual_selection() " {{{
-function! s:get_visual_selection()
+augroup END " }}}
+function! s:get_visual_selection() " {{{
     " credit: https://stackoverflow.com/a/6271254
     " Why is this not a built-in Vim script function?!
     let [line_start, column_start] = getpos("'<")[1:2]
@@ -761,11 +760,11 @@ function! s:get_visual_selection()
     " return lines
 endfunction
 " }}}
-function! TermSend(lines)
+function! TermSend(lines) " {{{
   " credit: https://vi.stackexchange.com/a/3390
   " call jobsend(g:last_terminal_job_id, add(a:lines, ''))
   execute "normal! :T " .  a:lines . "\<cr>"
-endfunction
+endfunction " }}}
 command! TermSendLine call TermSend(substitute(getline('.'), '\\$', "", ""))
 command! TermSendVisLine call TermSend(<sid>get_visual_selection())
 nnoremap <silent> <leader>sr :TermSendLine<cr>
