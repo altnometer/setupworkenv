@@ -736,8 +736,57 @@ augroup auto_term
   autocmd TermOpen * nnoremap <buffer> <leader>x :bp! <BAR> bd! #<CR>
   " does not work
   " autocmd TermOpen <buffer> * :startinsert
+  " au TermOpen * let g:last_terminal_job_id = b:terminal_job_id
 augroup END
+" function! s:get_visual_selection() " {{{
+function! s:get_visual_selection()
+    " credit: https://stackoverflow.com/a/6271254
+    " Why is this not a built-in Vim script function?!
+    let [line_start, column_start] = getpos("'<")[1:2]
+    let [line_end, column_end] = getpos("'>")[1:2]
+    let lines = getline(line_start, line_end)
+    if len(lines) == 0
+        return ''
+    endif
+    let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
+    let lines[0] = lines[0][column_start - 1:]
+    for i in range(len(lines))
+      let lines[i] = substitute(lines[i], '\\$', "", "") 
+    endfor
+    echom join(lines, "; ")
+    return join(lines, "; ")
+    " return join(lines, "\n")
+    " return lines
+endfunction
 " }}}
+function! TermSend(lines)
+  " credit: https://vi.stackexchange.com/a/3390
+  " call jobsend(g:last_terminal_job_id, add(a:lines, ''))
+  execute "normal! :T " .  a:lines . "\<cr>"
+endfunction
+command! TermSendLine call TermSend(substitute(getline('.'), '\\$', "", ""))
+command! TermSendVisLine call TermSend(<sid>get_visual_selection())
+nnoremap <silent> <leader>sr :TermSendLine<cr>
+vnoremap <silent> <leader>sr <esc>:TermSendVisLine<cr>
+" To simulate |i_CTRL-R| in terminal-mode: >
+tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
+
+" Quickly create a new terminal in a new tab
+" tnoremap <Leader>c <C-\><C-n>:tab new<CR>:term<CR>
+" noremap <Leader>c :tab new<CR>:term<CR>
+" inoremap <Leader>c <Esc>:tab new<CR>:term<CR>
+
+" " Quickly create a new terminal in a vertical split
+" tnoremap <Leader>% <C-\><C-n>:vsp<CR><C-w><C-w>:term<CR>
+" noremap <Leader>% :vsp<CR><C-w><C-w>:term<CR>
+" inoremap <Leader>% <Esc>:vsp<CR><C-w><C-w>:term<CR>
+
+" " Quickly create a new terminal in a horizontal split
+"
+" tnoremap <Leader>" <C-\><C-n>:sp<CR><C-w><C-w>:term<CR>
+" noremap <Leader>" :sp<CR><C-w><C-w>:term<CR>
+" inoremap <Leader>" <Esc>:sp<CR><C-w><C-w>:term<CR>
+" 
 
 " abbrev --------------------------------------------------------------------{{{
 " common typos.
