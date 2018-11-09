@@ -103,6 +103,8 @@ source $ZSH/oh-my-zsh.sh
 #   export EDITOR='mvim'
 # fi
 export EDITOR='nvim'
+export BROWSER='qutebrowser'
+export BROWSERCLI='w3m'
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -120,7 +122,8 @@ alias vim="nvim"
 # Example aliases
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
-
+alias sr="sr -browser=$BROWSERCLI"
+alias surfraw="surfraw -browser=$BROWSER"
 # cd into a dir (disregard the file in the path) and ls.
 function cd(){
     [[ ! -e $argv[-1] ]] || [[ -d $argv[-1] ]] || argv[-1]=${argv[-1]%/*}
