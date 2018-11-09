@@ -436,9 +436,11 @@ let g:neosnippet#snippets_directory='~/.local/share/nvim/snippets'
 " neoterm -------------------------------------------------------------------{{{
 " let neoterm_default_mod = 'tab'
 let neoterm_default_mod = 'split'
-noremap <leader>se :TcloseAll!<cr>
-noremap <leader>so :Topen<cr>
-noremap <leader>sc :Tclear<cr>
+nnoremap <leader>se :let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
+tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
+nnoremap <leader>so :Topen<cr>
+nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
+nnoremap <leader>sc :Tclear<cr>
 " let neoterm_autoinsert = 1
 " }}}
 
