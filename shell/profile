@@ -20,6 +20,9 @@ fi
 if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
+local_bin="${HOME}/.local/bin"
+mkdir -p $local_bin
+PATH=$local_bin:$PATH
 ###############tmux################
 tm() {
     name=${1:-tmuxsn}
