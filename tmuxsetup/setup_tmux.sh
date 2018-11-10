@@ -44,3 +44,13 @@ echo -e "\n\x1b[33;01m Linking $TMUX_CONFIG_SOURCE to $TMUX_CONFIG_DEST ... \x1b
 rm $TMUX_CONFIG_DEST
 sudo -u ${SUDO_USER} ln -fs ${TMUX_CONFIG_SOURCE} ${TMUX_CONFIG_DEST}
 # }}}
+# link TMUX_STATUS_BAR_FILE_NAME ------------------------------------------{{{
+# filename is hardcoded in tmux.conf
+TMUX_STATUS_BAR_FILE_NAME="status_bar_left.sh"
+TMUX_STATUS_BAR_FILE_SOURCE="${SCRIPT_DIR}/${TMUX_STATUS_BAR_FILE_NAME}"
+TMUX_STATUS_BAR_DIR_DEST="${HOME}/.tmux/scrips"
+TMUX_STATUS_BAR_FILE_DEST="${TMUX_STATUS_BAR_DIR_DEST}/${TMUX_STATUS_BAR_FILE_NAME}"
+sudo -u ${SUDO_USER} mkdir -p $TMUX_STATUS_BAR_DIR_DEST
+echo -e "\n\x1b[33;01m Linking $TMUX_STATUS_BAR_FILE_SOURCE to $TMUX_STATUS_BAR_FILE_DEST ... \x1b[39;49;00m\n"
+sudo -u ${SUDO_USER} ln -fs ${TMUX_STATUS_BAR_FILE_SOURCE} ${TMUX_STATUS_BAR_FILE_DEST}
+# }}}
