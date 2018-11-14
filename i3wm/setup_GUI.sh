@@ -112,8 +112,8 @@ fi
 # }}}
 
 # link .Xmodmap -----------------------------------------------------------{{{
-XMODMAP_SOURCE="${SCRIPT_DIR}/XResources"
-XMODMAP_DEST="${HOME}/.Xresources"
+XMODMAP_SOURCE="${SCRIPT_DIR}/Xmodmap"
+XMODMAP_DEST="${HOME}/.Xmodmap"
 if [ -f $XMODMAP_SOURCE ];
 then
     echo -e "\n\x1b[33;01m Linking $XMODMAP_SOURCE to $XMODMAP_DEST ... \x1b[39;49;00m\n"
