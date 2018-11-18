@@ -604,7 +604,7 @@ function! s:build_go_files()
 endfunction
 " }}}2
 
-" auto --------------------------------------------------------------------{{{2
+" go mappings -------------------------------------------------------------{{{2
 augroup auto_vim-go
     autocmd!
     autocmd FileType go setlocal foldmethod=syntax
