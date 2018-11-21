@@ -12,6 +12,7 @@ filetype off                  " required
 " :PlugUpgrade (plug itself), :PlugStatus
 call plug#begin('~/.local/share/nvim/plugged')
 " Plug 'tmhedberg/SimpylFold'
+Plug 'tyru/open-browser.vim'
 Plug 'jeetsukumaran/vim-indentwise'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'michaeljsmith/vim-indent-object'
@@ -89,8 +90,8 @@ set smartcase
 set updatetime=250
 " Open 'help' in a new buffer of the same window.
 command! -nargs=1 -complete=help H :enew | :set buftype=help | :h <args>
-set cursorline
-set cursorcolumn
+" let xdg-open decide which browser to open a url link with.
+let g:netrw_browsex_viewer="qutebrowser"
 
 " auto ----------------------------------------------------------------------{{{
 augroup auto_system
