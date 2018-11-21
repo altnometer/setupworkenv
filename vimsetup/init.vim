@@ -483,9 +483,9 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " Plugin key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
 imap <A-j>     <Plug>(neosnippet_expand)
-imap <A-b>     <Plug>(neosnippet_jump)
+imap <C-b>     <Plug>(neosnippet_jump)
 " smap <C-j>     <Plug>(neosnippet_expand_or_jump)
-smap <A-b>     <Plug>(neosnippet_jump)
+smap <C-b>     <Plug>(neosnippet_jump)
 xmap <A-j>     <Plug>(neosnippet_expand_target)
 let g:neosnippet#snippets_directory='~/.local/share/nvim/snippets'
 " }}}
