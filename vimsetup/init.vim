@@ -127,6 +127,18 @@ augroup auto_system
     autocmd Filetype vim setlocal shiftwidth=2
     " Wrap lines in quickfix
     autocmd FileType qf setlocal wrap
+    " manpage with table of contents sidebar with neovim
+    " https://asciinema.org/a/165076
+    " add to shellrc: export MANPAGER="nvim +set\ filetype=man -"
+    if has('nvim')
+        autocmd FileType man
+            \ call man#show_toc() |
+            \ setlocal laststatus=0 nonumber norelativenumber |
+            \ nnoremap <buffer> l <Enter> |
+            \ wincmd H |
+            \ vert resize 35 |
+            \ wincmd p
+    endif
 augroup END
 " }}}
 let g:ruby_host_prog = "/var/lib/gems/2.3.0/gems/neovim-0.7.1/bin/neovim-ruby-host"
