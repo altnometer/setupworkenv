@@ -496,6 +496,7 @@ let neoterm_default_mod = 'split'
 nnoremap <leader>se :let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
 tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
 nnoremap <leader>so :Topen<cr>
+nnoremap <leader>sv :vertical  Topen<cr>
 nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 nnoremap <leader>sc :Tclear<cr>
 " let neoterm_autoinsert = 1
