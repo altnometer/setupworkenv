@@ -191,8 +191,50 @@ set fileencoding=utf-8
 " Define order of searches for word completion. kspell will add
 " dictionary search only if ":set[local] spell" is enabled.
 set complete=.,w,b,u,t,i,kspell
+" colors ------------------------------------------------------------------{{{2
 colorscheme OceanicNext
 " colorscheme desert
+set cursorline
+set cursorcolumn
+" Default Colors for CursorLine
+" highlight  CursorLine ctermbg=Yellow ctermfg=None
+" highlight  CursorLine ctermbg=8 ctermfg=15
+
+" colorscheme 'OceanicNext' colors for reference.
+"               '#1b2b34' " background
+" let s:base08=['#ec5f67', '203'] red
+" let s:base09=['#f99157', '209'] red-yellow
+" let s:base0A=['#fac863', '221'] yellow
+" let s:base0B=['#99c794', '114'] cian green
+" let s:base0C=['#62b3b2', '73'] cian
+" let s:base0D=['#6699cc', '68'] ciun blue
+" let s:base0E=['#c594c5', '176'] pink
+" let s:base0F=['#ab7967', '137'] biege
+
+" let cursorlinebg = '#1b2b34' " background
+" let cursorlinebg = '#4b4b2b' " " yellow
+" let cursorlinebg = '#5b5b2b' " " yellow
+let cursorlinebg = '#2b5b34' " " green
+" let cursorlinebg = '#2b5b2b' " " green
+" let cursorlinebg = '#1b4b1b' " " green
+" let cursorlinebg = '#1b3b4b' " cian
+" let cursorlineinsertbg = '#2b4b2b' " " green
+" let cursorlineinsertbg = '#4b4b2b' " " yellow
+let cursorlineinsertbg = '#5b5b2b' " " yellow
+" execute "highlight CursorColumn ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorlinebg
+" execute "highlight CursorLine ctermfg=White ctermbg=Yellow cterm=bold guifg=fg guibg=" . cursorlinebg
+execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
+execute "highlight CursorLine cterm=bold guifg=fg guibg=" . cursorlinebg
+augroup color_cursor
+    autocmd!
+    " Change Color when entering Insert Mode
+    autocmd InsertEnter * execute "highlight CursorColumn guifg=fg guibg=" . cursorlineinsertbg
+    autocmd InsertEnter * execute "highlight CursorLine guifg=fg guibg=" . cursorlineinsertbg
+    " Revert Color to default when leaving Insert Mode
+    autocmd InsertLeave * execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
+    autocmd InsertLeave * execute "highlight CursorLine guifg=fg guibg=" . cursorlinebg
+augroup END
+" }}}2
 set completeopt-=preview " do not open preview window for completion.
 " }}}
 
