@@ -811,7 +811,7 @@ vmap gx <Plug>(openbrowser-open)
 
 augroup auto_term " {{{
   autocmd!
-  autocmd TermOpen * nnoremap <buffer> <leader>x :bp! <BAR> bd! #<CR>
+  autocmd TermOpen * nnoremap <buffer> <leader>k :bp! <BAR> bd! #<CR>
   " does not work
   " autocmd TermOpen <buffer> * :startinsert
   " au TermOpen * let g:last_terminal_job_id = b:terminal_job_id
@@ -836,14 +836,17 @@ function! s:get_visual_selection() " {{{
     " return lines
 endfunction
 " }}}
-function! TermSend(lines) " {{{
+function! TermSend(lines, mods) " {{{
   " credit: https://vi.stackexchange.com/a/3390
   " call jobsend(g:last_terminal_job_id, add(a:lines, ''))
-  execute "normal! :T " .  a:lines . "\<cr>"
+  " execute "normal! :a:mods T " .  a:lines . "\<cr>"
+  " execute "normal! " . a:mods . " T " .  a:lines . "\<cr>"
+  execute a:mods . " T " .  a:lines 
 endfunction " }}}
-command! TermSendLine call TermSend(substitute(getline('.'), '\\$', "", ""))
+command! TermSendLine call TermSend(substitute(getline('.'), '\\$', "", ""), <q-mods>)
 command! TermSendVisLine call TermSend(<sid>get_visual_selection())
 nnoremap <silent> <leader>sr :TermSendLine<cr>
+nnoremap <silent> <leader>sR :vertical TermSendLine<cr>
 vnoremap <silent> <leader>sr <esc>:TermSendVisLine<cr>
 " To simulate |i_CTRL-R| in terminal-mode: >
 tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
