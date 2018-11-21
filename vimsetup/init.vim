@@ -220,7 +220,8 @@ let cursorlinebg = '#2b5b34' " " green
 " let cursorlinebg = '#1b3b4b' " cian
 " let cursorlineinsertbg = '#2b4b2b' " " green
 " let cursorlineinsertbg = '#4b4b2b' " " yellow
-let cursorlineinsertbg = '#5b5b2b' " " yellow
+" let cursorlineinsertbg = '#5b5b2b' " " yellow
+let cursorlineinsertbg = '#0b1b24' " " darker background
 " execute "highlight CursorColumn ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorlinebg
 " execute "highlight CursorLine ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorlinebg
 " execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
