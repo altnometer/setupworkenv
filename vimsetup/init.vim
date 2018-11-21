@@ -342,6 +342,8 @@ map [[ ?{<CR>w99[{
 map ][ /}<CR>b99]}
 map ]] j0[[%/{<CR>
 map [] k$][%?}<CR>
+" search for visually selected text.
+vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " }}}
 
 " Fold, gets it's own section  ----------------------------------------------{{{
