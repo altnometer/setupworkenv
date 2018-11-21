@@ -803,6 +803,12 @@ tnoremap <PageUp> <C-\><C-n>:bprevious<cr>
 tnoremap <PageDown> <C-\><C-n>:bnext<cr>
 tnoremap <Home> <C-\><C-n>:bfirst<cr>
 tnoremap <End> <C-\><C-n>:blast<cr>
+
+" Disable netrw gx mapping.
+let g:netrw_nogx = get(g:, 'netrw_nogx', 1)
+nmap gx <Plug>(openbrowser-open)
+vmap gx <Plug>(openbrowser-open)
+
 augroup auto_term " {{{
   autocmd!
   autocmd TermOpen * nnoremap <buffer> <leader>x :bp! <BAR> bd! #<CR>
