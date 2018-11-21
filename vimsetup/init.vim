@@ -222,17 +222,21 @@ let cursorlinebg = '#2b5b34' " " green
 " let cursorlineinsertbg = '#4b4b2b' " " yellow
 let cursorlineinsertbg = '#5b5b2b' " " yellow
 " execute "highlight CursorColumn ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorlinebg
-" execute "highlight CursorLine ctermfg=White ctermbg=Yellow cterm=bold guifg=fg guibg=" . cursorlinebg
-execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
-execute "highlight CursorLine cterm=bold guifg=fg guibg=" . cursorlinebg
+" execute "highlight CursorLine ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorlinebg
+" execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
+" execute "highlight CursorLine guifg=fg guibg=" . cursorlinebg
+execute "highlight CursorColumn guibg=" . cursorlinebg
+execute "highlight CursorLine guibg=" . cursorlinebg
 augroup color_cursor
     autocmd!
     " Change Color when entering Insert Mode
-    autocmd InsertEnter * execute "highlight CursorColumn guifg=fg guibg=" . cursorlineinsertbg
-    autocmd InsertEnter * execute "highlight CursorLine guifg=fg guibg=" . cursorlineinsertbg
+    autocmd InsertEnter * execute "highlight CursorColumn guibg=" . cursorlineinsertbg
+    autocmd InsertEnter * execute "highlight CursorLine guibg=" . cursorlineinsertbg
     " Revert Color to default when leaving Insert Mode
-    autocmd InsertLeave * execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
-    autocmd InsertLeave * execute "highlight CursorLine guifg=fg guibg=" . cursorlinebg
+    " autocmd InsertLeave * execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
+    " autocmd InsertLeave * execute "highlight CursorLine guifg=fg guibg=" . cursorlinebg
+    autocmd InsertLeave * execute "highlight CursorColumn guibg=" . cursorlinebg
+    autocmd InsertLeave * execute "highlight CursorLine guibg=" . cursorlinebg
 augroup END
 " }}}2
 set completeopt-=preview " do not open preview window for completion.
