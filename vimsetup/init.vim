@@ -261,7 +261,10 @@ nnoremap <c-u> gUiwe
 " Open vimrc/vim.init file.
 " nnoremap <leader>v :vsplit $MYVIMRC<cr>
 " nnoremap <localleader>v :vsplit $MYVIMRC<cr>
-nnoremap <leader>v :edit $MYVIMRC<cr>
+" nnoremap <leader>v :edit $MYVIMRC<cr>
+" 'fugitive' does not follow symlinks yet.
+" https://github.com/tpope/vim-fugitive/issues/147
+nnoremap <leader>v :edit $HOME/redmoo/setupworkenv/vimsetup/init.vim<cr>
 " Source vimrc/vim.init file.
 nnoremap <leader>V :source $MYVIMRC<cr>
 " Quit current window
@@ -712,10 +715,10 @@ augroup END
 " settings ----------------------------------------------------------------{{{2
 " default is 'guru'
 let g:go_def_mode = 'godef'
-" let g:go_list_type = "quickfix"
-" let g:go_list_type_commands = {"GoMetaLinter": "quickfix", "GoTest": "quickfix"}
-let g:go_list_type_commands = {"GoMetaLinter": "quickfix"}
-" let g:go_list_type_commands = {"GoMetaLinter": "locationlist"}
+" let g:go_list_type = 'quickfix'
+" let g:go_list_type_commands = {'GoMetaLinter': 'quickfix', 'GoTest': 'quickfix'}
+" let g:go_list_type_commands = {'GoMetaLinter': 'quickfix'}
+" let g:go_list_type_commands = {'GoMetaLinter': 'locationlist'}
 let g:go_autodetect_gopath = 0
 let g:go_info_mode = "gocode"
 " formats go code and manages imports.
