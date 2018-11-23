@@ -717,6 +717,7 @@ augroup END
 let g:go_def_mode = 'godef'
 " let g:go_list_type = 'quickfix'
 " let g:go_list_type_commands = {'GoMetaLinter': 'quickfix', 'GoTest': 'quickfix'}
+let g:go_list_type_commands = {'GoTest': 'locationlist'}
 " let g:go_list_type_commands = {'GoMetaLinter': 'quickfix'}
 " let g:go_list_type_commands = {'GoMetaLinter': 'locationlist'}
 let g:go_autodetect_gopath = 0
