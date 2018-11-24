@@ -839,7 +839,6 @@ function! s:get_visual_selection() " {{{
     for i in range(len(lines))
       let lines[i] = substitute(lines[i], '\\$', "", "") 
     endfor
-    echom join(lines, "; ")
     return join(lines, "; ")
     " return join(lines, "\n")
     " return lines
