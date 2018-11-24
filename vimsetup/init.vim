@@ -6,10 +6,9 @@ if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
 endif
 " }}}
 
+" Plugins -----------------------------------------------------------------{{{1
 set nocompatible              " be iMproved, required
 filetype off                  " required
-
-" Plugins -----------------------------------------------------------------{{{1
 " :PlugInstall, :PlugUpdate, :PlugClean,
 " :PlugUpgrade (plug itself), :PlugStatus
 call plug#begin('~/.local/share/nvim/plugged')
