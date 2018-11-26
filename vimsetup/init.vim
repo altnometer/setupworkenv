@@ -107,8 +107,8 @@ augroup auto_system
     " Show whitespace
     " MUST be inserted BEFORE the colorscheme command
     " as per http://vim.wikia.com/wiki/Highlight_unwanted_spaces
-    " autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
-    highlight ExtraWhitespace ctermbg=red guibg=red
+    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+    " highlight ExtraWhitespace ctermbg=red guibg=red
     match ExtraWhitespace /\s\+$/
     autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
     autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
