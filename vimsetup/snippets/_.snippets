@@ -1,4 +1,5 @@
 # snippets for all filetypes
+# :help neosnippet-snippet-syntax
 # neosnippet-snippet-syntax which is similar to snipMate syntax.
 
 # # [ -> ["..."] = ...
@@ -17,11 +18,10 @@
 # endsnippet
 
 # # close "{" and put cursor in between
-# snippet !\{! "close curly braces" r
-# {
-#     ${1:${VISUAL}}
-# }
-# endsnippet
+snippet {
+  {
+    ${1:TARGET}
+  }
 
 # # expand "{)" to "{\n   }) and put cursor in between
 # snippet !\{\)! "close curly braces" r
