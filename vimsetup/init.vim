@@ -308,12 +308,10 @@ inoremap <CR> <C-]><C-G>u<CR>
 inoremap <C-w> <C-G>u<C-w>
 " Delete line
 " inoremap <C-u> <C-G>u<C-u>
-" bind Ctrl+<movement> keys to move around the windows, instead of using Ctrl+w + <movement>
-" Every unnecessary keystroke that can be saved is good for your health :)
-map <C-j> <C-w>j
-map <C-k> <C-w>k
-map <C-l> <C-w>l
-map <C-h> <C-w>h
+" Ctrl+<movement> to move around the windows.
+" this is taken care with 'christoomey/vim-tmux-navigator'
+" if these mappings are kept here, the plugin mappings stop working.
+" map <C-j> <C-w>j map <C-k> <C-w>k map <C-l> <C-w>l map <C-h> <C-w>h
 inoremap <C-j> <esc><C-w>j
 inoremap <C-k> <esc><C-w>k
 inoremap <C-l> <esc><C-w>l
