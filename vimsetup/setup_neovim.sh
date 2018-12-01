@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# vars --------------------------------------------------------------------{{{
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# }}}
+
 # This scrip should set up neovim
 # check if run with sudo -E -----------------------------------------------{{{
 if [[ $EUID -ne 0 ]]; then
@@ -65,7 +69,6 @@ fi
 # }}}
 
 # linking config ----------------------------------------------------------{{{
-SCRPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIMRC_PATH="${SCRIPT_DIR}/init.vim"
 VIMRC_DEST_DIR="${HOME}/.config/nvim"
 VIMRC_DEST="${VIMRC_DEST_DIR}/init.vim"
@@ -82,7 +85,39 @@ then
     fi
 	sudo -u ${SUDO_USER} ln -s $VIMRC_PATH $VIMRC_DEST
 else
-    echo -e "\n\x1b[31;01m vimrc does not exist. Quiting ... \x1b[39;49;00m\n"
+    echo -e "\n\x1b[31;01m $VIMRC_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+# }}}
+
+# linking custom plugins --------------------------------------------------{{{
+SOURCE_DIR="${SCRIPT_DIR}/myvimplugins"
+DEST_DIR="${HOME}/.local/share/nvim/myvimplugins"
+if [ -d $SOURCE_DIR ];
+then
+    echo -e "\n\x1b[33;01m Linking $SOURCE_DIR to $DEST_DIR ... \x1b[39;49;00m\n"
+    if [ -d "$DEST_DIR" ]; then
+        rm $DEST_DIR
+    fi
+	sudo -u ${SUDO_USER} ln -s $SOURCE_DIR $DEST_DIR
+else
+echo -e "\n\x1b[31;01m $SOURCE_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+# }}}
+
+# linking custom neosnippets ----------------------------------------------{{{
+SOURCE_DIR="${SCRIPT_DIR}/snippets"
+DEST_DIR="${HOME}/.local/share/nvim/snippets"
+if [ -d $SOURCE_DIR ];
+then
+    echo -e "\n\x1b[33;01m Linking $SOURCE_DIR to $DEST_DIR ... \x1b[39;49;00m\n"
+    if [ -d "$DEST_DIR" ]; then
+        rm $DEST_DIR
+    fi
+	sudo -u ${SUDO_USER} ln -s $SOURCE_DIR $DEST_DIR
+else
+echo -e "\n\x1b[31;01m $SOURCE_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
 # }}}
