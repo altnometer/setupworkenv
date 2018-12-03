@@ -21,6 +21,8 @@ function! s:MyGoImport() abort " {{{
     let m = "html/template"
   elseif m ==# "json"
     let m = "encoding/json"
+  elseif m ==# "ioutil"
+    let m = "io/ioutil"
   endif
   execute 'normal! :GoImport ' . m . "\r"
 endfunction " }}}
