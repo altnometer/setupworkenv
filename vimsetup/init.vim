@@ -500,7 +500,8 @@ let g:neosnippet#snippets_directory='~/.local/share/nvim/snippets'
 " neoterm -------------------------------------------------------------------{{{
 " let neoterm_default_mod = 'tab'
 let neoterm_default_mod = 'split'
-nnoremap <leader>se :let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
+nnoremap <expr> <Plug>(CloseAllNeoterms) ':let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>'
+nmap <leader>se <Plug>(CloseAllNeoterms)
 tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
 nnoremap <leader>so :Topen<cr>
 nnoremap <leader>sv :vertical  Topen<cr>
