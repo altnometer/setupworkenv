@@ -88,7 +88,10 @@ set incsearch
 set ignorecase
 set smartcase
 " vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
-set updatetime=250
+set updatetime=100
+" program to use for the |K| command, e.g. :Man option will open man page for
+" the word under cursor.
+set keywordprg=:Man
 " Open 'help' in a new buffer of the same window.
 command! -nargs=1 -complete=help H :enew | :set buftype=help | :h <args>
 " let xdg-open decide which browser to open a url link with.
