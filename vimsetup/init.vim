@@ -779,6 +779,31 @@ map t <Plug>Sneak_t
 map T <Plug>Sneak_T
 " }}}
 
+" vim-test ----------------------------------------------------------------{{{
+" make test commands execute using neoterm.
+" https://github.com/janko-m/vim-test#strategies
+let test#strategy = {
+  \ 'nearest': 'neoterm',
+  \ 'file':    'neoterm',
+  \ 'suite':   'neoterm',
+\}
+" https://github.com/janko-m/vim-test#configuring
+let test#go#gotest#options = {
+  \ 'nearest': '-v',
+  \ 'file':    '-failfast',
+\}
+  " \ 'suite':   '--tag ~slow',
+" let test#go#runner = 'ginkgo'
+" Runners available are 'gotest', 'ginkgo'
+" https://github.com/janko-m/vim-test#setup
+nmap <silent> <leader>tn :TestNearest<CR>
+nmap <silent> <leader>tf :TestFile<CR>
+nmap <silent> <leader>ts :TestSuite<CR>
+nmap <silent> <leader>tl :TestLast<CR>
+nmap <silent> <leader>tv :TestVisit<CR>
+nmap <silent> <leader>te <Plug>(CloseAllNeoterms)
+" }}}
+
 " vim-indentwise ----------------------------------------------------------{{{1
 nnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin)  :<C-U>call <SID>move_to_indent_block_scope_boundary(0, "n")<CR>
 vnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin)       :call <SID>move_to_indent_block_scope_boundary(0, "v")<CR>
