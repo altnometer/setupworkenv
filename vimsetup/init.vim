@@ -620,7 +620,8 @@ nnoremap <leader>fb :FzfBuffers!<cr>
 nnoremap <leader>f: :FzfHistory:<cr>
 nnoremap <leader>f/ :FzfHistory/<cr>
 nnoremap <leader>fl :FzfBLines<CR>
-nnoremap <leader>fL :FzfLines<CR>
+" nnoremap <leader>fL :FzfLines<CR>
+nnoremap <leader>fL :execute ':Ag ' . expand('<cword>')<cr>
 nnoremap <leader>fc :FzfBCommits!<CR>
 nnoremap <leader>fC :FzfCommits<CR>
 " <bang> use as per the above cmd modification
