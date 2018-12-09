@@ -806,14 +806,8 @@ nmap <silent> <leader>te <Plug>(CloseAllNeoterms)
 " }}}
 
 " vim-indentwise ----------------------------------------------------------{{{1
-nnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin)  :<C-U>call <SID>move_to_indent_block_scope_boundary(0, "n")<CR>
-vnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin)       :call <SID>move_to_indent_block_scope_boundary(0, "v")<CR>
-onoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryBegin) V:<C-U>call <SID>move_to_indent_block_scope_boundary(0, "o")<CR>
-nnoremap [% <Plug>(IndentWiseBlockScopeBoundaryBegin)
-nnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryEnd)      :<C-U>call <SID>move_to_indent_block_scope_boundary(1, "n")<CR>
-vnoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryEnd)           :call <SID>move_to_indent_block_scope_boundary(1, "v")<CR>
-onoremap <silent> <Plug>(IndentWiseBlockScopeBoundaryEnd)     V:<C-U>call <SID>move_to_indent_block_scope_boundary(1, "o")<CR>
-nnoremap ]% <Plug>(IndentWiseBlockScopeBoundaryEnd)
+" 'matchit' plugin messes ]%, [% mappings for vim-indentwise. Disable it.
+let loaded_matchit = 1
 " 1}}}
 
 " Go ------------------------------------------------------------------------{{{
