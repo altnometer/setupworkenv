@@ -860,7 +860,7 @@ function! s:get_visual_selection() " {{{
     let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
     let lines[0] = lines[0][column_start - 1:]
     for i in range(len(lines))
-      let lines[i] = substitute(lines[i], '\\$', "", "") 
+      let lines[i] = substitute(lines[i], '\\$', "", "")
     endfor
     return join(lines, "; ")
     " return join(lines, "\n")
@@ -872,7 +872,7 @@ function! TermSend(lines, mods) " {{{
   " call jobsend(g:last_terminal_job_id, add(a:lines, ''))
   " execute "normal! :a:mods T " .  a:lines . "\<cr>"
   " execute "normal! " . a:mods . " T " .  a:lines . "\<cr>"
-  execute a:mods . " T " .  a:lines 
+  execute a:mods . " T " .  a:lines
 endfunction " }}}
 command! TermSendLine call TermSend(substitute(getline('.'), '\\$', "", ""), <q-mods>)
 command! TermSendVisLine call TermSend(<sid>get_visual_selection())
@@ -897,7 +897,7 @@ tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 " tnoremap <Leader>" <C-\><C-n>:sp<CR><C-w><C-w>:term<CR>
 " noremap <Leader>" :sp<CR><C-w><C-w>:term<CR>
 " inoremap <Leader>" <Esc>:sp<CR><C-w><C-w>:term<CR>
-" 
+"
 
 " abbrev --------------------------------------------------------------------{{{
 " common typos.
