@@ -769,6 +769,10 @@ let g:go_term_width = 50
 
 " }}}
 
+" vim-polyglot ------------------------------------------------------------{{{
+let g:polyglot_disabled = ['go']
+" }}}
+
 " vim-sneak -----------------------------------------------------------------{{{
 " press 's'|'f'|'t' again to move to the next match.
 let g:sneak#s_next = 1
