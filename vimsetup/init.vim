@@ -357,7 +357,7 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " }}}
 
 " Fold, gets it's own section  ----------------------------------------------{{{
-" credit to Mike Hartington https://github.com/mhartington/dotfiles/
+" credit to Mike Hartington https://github.com/mhartington/dotfiles/blob/master/vimrc
   function! MyFoldText() " {{{
       let line = getline(v:foldstart)
       let nucolwidth = &fdc + &number * &numberwidth
