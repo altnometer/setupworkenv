@@ -30,6 +30,12 @@ Plug 'junegunn/fzf.vim'
 " Plug 'mdempsky/gocode', { 'rtp': 'nvim', 'do': '~/.local/share/nvim/plugged/gocode/nvim/symlink.sh' }
 " 2}}}
 
+" syntax {{{2
+Plug 'scrooloose/syntastic'
+" 'vim-polyglot' must be after vim-go.
+Plug 'sheerun/vim-polyglot'
+"}}}
+
 Plug 'vim-airline/vim-airline'
 
 " git {{{2
