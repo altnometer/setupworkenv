@@ -646,6 +646,53 @@ nnoremap <leader>fm :FzfCommands<cr>
 nnoremap <leader>ft :FzfBTags<cr>
 " }}}
 
+" gitgutter ---------------------------------------------------------------{{{1
+" keep the signcolumn always on.
+  set signcolumn=yes
+" }}}
+
+" mta MatchTagAlways ------------------------------------------------------{{{
+  let g:mta_filetypes = {
+      \ 'html' : 1,
+      \ 'xhtml' : 1,
+      \ 'xml' : 1,
+      \ 'jinja' : 1,
+      \ 'gohtmltmpl' : 1,
+      \}
+let g:mta_use_matchparen_group = 1 " use the plugins colors (lightgrey)
+" highlight MatchTag ctermfg=black ctermbg=lightgreen guifg=black guibg=lightgreen
+let g:mta_use_matchparen_group = 0 " use colorscheme defined colors
+" }}}
+
+" merginal ----------------------------------------------------------------{{{1
+map <silent> <leader>m <esc>:Merginal<CR>
+tnoremap <leader>m <c-\><c-n>:Merginal<CR>
+" }}}
+
+" syntastic ---------------------------------------------------------------{{{
+" On by default, turn it off for html
+let g:syntastic_mode_map = { 'mode': 'active',
+    \ 'active_filetypes': ['python', 'javascript', 'css', 'html'],
+    \ 'passive_filetypes': ['go'] }
+    " " \ 'active_filetypes': ['go', 'python', 'javascript', 'css'],
+    " \ 'passive_filetypes': ['html'] }
+" let g:syntastic_go_checkers = ['golint', 'govet']
+" let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
+" Use flake8
+" !!! Install 'sudo pip flake8' to enable python checking
+"let g:syntastic_python_checkers = ['pep8']
+let g:syntastic_python_checkers = ['flake8']
+"let g:syntastic_python_checkers = ['pyflakes']
+"let g:syntastic_python_checkers = ['pylint']
+"let g:syntastic_python_flake8_args = '--ignore="E501,E302,E261,E701,E241,E126,E127,E128,W801"'
+" E256 - block comment should start with "# " - Incorrectly interpreted on
+" raspbian
+" [E402] module level import not at top of file [E402]
+let g:syntastic_python_flake8_args = '--ignore="E501,W601,E265,E402"'
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_auto_loc_list=1
+" }}}
+
 " vim-fugitive --------------------------------------------------------------{{{
 " set diffopt+=vertical
 "nnoremap <space>ga :Git add %:p<CR><CR>
