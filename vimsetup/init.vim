@@ -659,7 +659,7 @@ nnoremap <leader>ft :FzfBTags<cr>
       \ 'jinja' : 1,
       \ 'gohtmltmpl' : 1,
       \}
-let g:mta_use_matchparen_group = 1 " use the plugins colors (lightgrey)
+" let g:mta_use_matchparen_group = 1 " use the plugins colors (lightgrey)
 " highlight MatchTag ctermfg=black ctermbg=lightgreen guifg=black guibg=lightgreen
 let g:mta_use_matchparen_group = 0 " use colorscheme defined colors
 " }}}
