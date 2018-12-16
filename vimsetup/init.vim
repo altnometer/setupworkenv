@@ -204,8 +204,12 @@ set complete=.,w,b,u,t,i,kspell
 " colors ------------------------------------------------------------------{{{2
 colorscheme OceanicNext
 " colorscheme desert
-set cursorline
-set cursorcolumn
+augroup CursorLineOnlyInActiveWindow
+  autocmd!
+  " set cursorline, cursorcolumn only in active buffer
+  autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline cursorcolumn
+  autocmd WinLeave * setlocal nocursorline nocursorcolumn
+augroup END
 " Default Colors for CursorLine
 " highlight  CursorLine ctermbg=Yellow ctermfg=None
 " highlight  CursorLine ctermbg=8 ctermfg=15
@@ -224,29 +228,35 @@ set cursorcolumn
 " let cursorlinebg = '#1b2b34' " background
 " let cursorlinebg = '#4b4b2b' " " yellow
 " let cursorlinebg = '#5b5b2b' " " yellow
-let cursorlinebg = '#2b5b34' " " green
+" let cursorlinebg = '#2b5b34' " " green
 " let cursorlinebg = '#2b5b2b' " " green
-" let cursorlinebg = '#1b4b1b' " " green
+let cursorcolbg = '#1b4b24' " green
+let cursorlinebg = '#1b4b24' " " green
+" let cursorlinebg = '#0b1b0b' " dark green
 " let cursorlinebg = '#1b3b4b' " cian
 " let cursorlineinsertbg = '#2b4b2b' " " green
 " let cursorlineinsertbg = '#4b4b2b' " " yellow
 " let cursorlineinsertbg = '#5b5b2b' " " yellow
-let cursorlineinsertbg = '#0b1b24' " " darker background
-" execute "highlight CursorColumn ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorlinebg
+" let cursorlineinsertbg = '#0b1b24' " " darker background
+" let cursorcolinsertbg = '#2b4b5b' " " lighter cian
+let cursorcolinsertbg = '#0b0b1b' " " darker background
+let cursorlineinsertbg = '#0b0b1b' " " darker background
+" execute "highlight CursorColumn ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorcolbg
 " execute "highlight CursorLine ctermfg=White ctermbg=Yellow guifg=fg guibg=" . cursorlinebg
 " execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
 " execute "highlight CursorLine guifg=fg guibg=" . cursorlinebg
-execute "highlight CursorColumn guibg=" . cursorlinebg
+execute "highlight CursorColumn guibg=" . cursorcolbg
 execute "highlight CursorLine guibg=" . cursorlinebg
 augroup color_cursor
     autocmd!
     " Change Color when entering Insert Mode
-    autocmd InsertEnter * execute "highlight CursorColumn guibg=" . cursorlineinsertbg
+    autocmd InsertEnter * execute "highlight CursorColumn guibg=" . cursorcolinsertbg
     autocmd InsertEnter * execute "highlight CursorLine guibg=" . cursorlineinsertbg
     " Revert Color to default when leaving Insert Mode
     " autocmd InsertLeave * execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
     " autocmd InsertLeave * execute "highlight CursorLine guifg=fg guibg=" . cursorlinebg
-    autocmd InsertLeave * execute "highlight CursorColumn guibg=" . cursorlinebg
+    autocmd SelectEnter * setlocal cursorline cursorcolumn
+    autocmd InsertLeave * execute "highlight CursorColumn guibg=" . cursorcolbg
     autocmd InsertLeave * execute "highlight CursorLine guibg=" . cursorlinebg
 augroup END
 " }}}2
