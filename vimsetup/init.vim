@@ -255,7 +255,6 @@ augroup color_cursor
     " Revert Color to default when leaving Insert Mode
     " autocmd InsertLeave * execute "highlight CursorColumn guifg=fg guibg=" . cursorlinebg
     " autocmd InsertLeave * execute "highlight CursorLine guifg=fg guibg=" . cursorlinebg
-    autocmd SelectEnter * setlocal cursorline cursorcolumn
     autocmd InsertLeave * execute "highlight CursorColumn guibg=" . cursorcolbg
     autocmd InsertLeave * execute "highlight CursorLine guibg=" . cursorlinebg
 augroup END
