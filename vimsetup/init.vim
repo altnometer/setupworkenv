@@ -306,6 +306,22 @@ nnoremap <expr> n <sid>IsVisible(search(@/, 'nw')) ?  'nzO' :  'nzOzz'
 nnoremap <expr> N <sid>IsVisible(search(@/, 'bnw')) ?  'NzO' :  'NzOzz'
 nnoremap <expr> * <sid>IsVisible(search(expand("<cword>"), 'nw')) ?  '*zO' :  '*zOzz'
 nnoremap <expr> # <sid>IsVisible(search(expand("<cword>"), 'bnw')) ?  '#zO' :  '#zOzz'
+
+" maximize window horizontally.
+noremap _ <c-w>_
+" minimize window horizontally.
+noremap - <c-w>1_
+" equalize window horizontally.
+" see ':map =', it is mapped to something. single '=' is slow because of that.
+noremap == <c-w>=
+" Toggle Uppercase of the word.
+inoremap <c-u> <c-c>g~iwea
+nnoremap <c-u> g~iwe
+" capitalize the word.
+" inoremap <A-u> <c-c>guiw~hea
+inoremap <A-u> <c-c>b~hea
+" nnoremap <A-u> guiw~he
+nnoremap <A-u> b~he
 " Open vimrc/vim.init file.
 " nnoremap <leader>v :vsplit $MYVIMRC<cr>
 " nnoremap <localleader>v :vsplit $MYVIMRC<cr>
