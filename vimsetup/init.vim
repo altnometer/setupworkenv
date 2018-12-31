@@ -85,7 +85,7 @@ Plug 'janko-m/vim-test'
 " provides insert mode auto-completion for quotes, parens, brackets, etc.
 " Plug 'Raimondi/delimitMate'
 " display the indention levels with thin vertical lines
-Plug 'Yggdroot/indentLine'
+" Plug 'Yggdroot/indentLine'
 Plug 'Valloric/MatchTagAlways'
 " Initialize plugin system
 Plug '~/proj/myvimplugins/scratchpad'
