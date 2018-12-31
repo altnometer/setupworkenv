@@ -495,8 +495,8 @@ augroup END
   let g:airline_theme='oceanicnext'
   " cnoreabbrev <silent> <expr> x getcmdtype() == ":" && getcmdline() == 'x' ? 'Bdelete' : 'x'
   " cnoreabbrev x Sayonara
-  nmap <leader>, :bnext<CR>
-  tmap <leader>, <C-\><C-n>:bnext<cr>
+  nmap <leader>, :b#<CR>
+  tmap <leader>, <C-\><C-n>:b#<cr>
   nmap <leader>. :bprevious<CR>
   tmap <leader>. <C-\><C-n>:bprevious<CR>
   tmap <leader>1  <C-\><C-n><Plug>AirlineSelectTab1
