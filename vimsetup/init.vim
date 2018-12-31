@@ -125,6 +125,9 @@ let g:netrw_browsex_viewer="qutebrowser"
 " auto ----------------------------------------------------------------------{{{
 augroup auto_system
     autocmd!
+    " Remember cursor position between switching buffers.
+    autocmd BufLeave * let b:winview = winsaveview()
+    autocmd BufEnter * if(exists('b:winview')) | call winrestview(b:winview) | endif
     " Remember cursor position between vim sessions
     autocmd BufReadPost *
              \ if line("'\"") > 0 && line ("'\"") <= line("$") |
