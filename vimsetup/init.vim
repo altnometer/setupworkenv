@@ -352,9 +352,9 @@ noremap <C-s> :update<CR>
 nnoremap <C-z> <nop>
 " this  would save and go back to insert mode.
 " inoremap <C-Z> <C-O>:update<CR>
-" Added by sam@lf
 " this  would save and exit insert mode.
-inoremap <C-Z> <C-C>:update<CR>
+inoremap <C-s> <Esc>:update<CR>
+inoremap <C-z> <c-c>zza
 " Toggle spell checking on and off with `,z`
 " normal mode
 nmap <silent> <leader>z :setlocal spell! spelllang=en_us<CR>
