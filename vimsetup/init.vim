@@ -289,6 +289,9 @@ set completeopt-=preview " do not open preview window for completion.
 let mapleader = ","
 " shadowing '/' for search slows it down.
 " let maplocalleader = "/"
+" open all folds in the fold and put the cursor to the center.
+nnoremap za zAzz
+" jump to the next search result and put the cursor to
 
 " Move the line down.
 noremap <leader>- yyddp
