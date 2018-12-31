@@ -612,10 +612,13 @@ let g:neosnippet#snippets_directory='~/.local/share/nvim/snippets'
 let neoterm_default_mod = 'split'
 nnoremap <expr> <Plug>(CloseAllNeoterms) ':let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>'
 nmap <leader>se <Plug>(CloseAllNeoterms)
+nmap <A-e> <Plug>(CloseAllNeoterms)
 tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
+tnoremap <A-e> <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
 nnoremap <leader>so :Topen<cr>
 nnoremap <leader>sv :vertical  Topen<cr>
 nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
+nnoremap <A-o> :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 nnoremap <leader>sc :Tclear<cr>
 " let neoterm_autoinsert = 1
 " }}}
