@@ -348,8 +348,8 @@ nnoremap <PageDown> :bnext<CR>
 nnoremap <Home>   :bfirst<CR>
 nnoremap <End> :blast<CR>
 " Quicksave command
-noremap <C-Z> :update<CR>
-vnoremap <C-Z> <C-C>:update<CR>
+noremap <C-s> :update<CR>
+nnoremap <C-z> <nop>
 " this  would save and go back to insert mode.
 " inoremap <C-Z> <C-O>:update<CR>
 " Added by sam@lf
