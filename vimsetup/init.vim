@@ -596,7 +596,11 @@ let g:user_emmet_settings = {
 " Plugin key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
 imap <A-j>     <Plug>(neosnippet_expand)
-imap <C-b>     <Plug>(neosnippet_jump)
+imap <C-y>     <Plug>(neosnippet_expand_or_jump)
+smap <C-y>     <Plug>(neosnippet_expand_or_jump)
+imap <A-t>     <Plug>(neosnippet_expand_target)
+" imap <C-b>     <Plug>(neosnippet_jump)
+imap <C-b>     <nop>
 " smap <C-j>     <Plug>(neosnippet_expand_or_jump)
 smap <C-b>     <Plug>(neosnippet_jump)
 xmap <A-j>     <Plug>(neosnippet_expand_target)
