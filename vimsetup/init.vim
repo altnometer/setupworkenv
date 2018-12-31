@@ -96,6 +96,17 @@ call plug#end()
 " Don't use TABs but spaces
 filetype plugin indent on
 set tabstop=4 softtabstop=4 shiftwidth=4 shiftround expandtab
+set nostartofline " do not move cursor to start of line on commands like 'jump'
+" do not remove inserted indentation when switching to normal mode.
+" https://stackoverflow.com/questions/7413036/stopping-vim-from-removing-indentation-on-empty-lines
+" http://vim.wikia.com/wiki/Get_the_correct_indent_for_new_lines_despite_blank_lines
+inoremap <CR> <CR>x<BS>
+nnoremap o ox<BS>
+nnoremap O Ox<BS>
+augroup augroup_remove_trailing_spaces
+  autocmd!
+  autocmd BufWritePre *.html,*.tmpl,*.vim :%s/\s\+$//e
+augroup END
 " Make search case insensitive
 set hlsearch
 set incsearch
