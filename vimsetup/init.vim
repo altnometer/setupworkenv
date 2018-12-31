@@ -416,6 +416,12 @@ map [] k$][%?}<CR>
 vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " }}}
 
+" setfiletype -------------------------------------------------------------{{{
+augroup filetypedetect
+    " autocmd BufNew,BufNewFile,BufRead *.tmpl,*.gohtml,*.template :setfiletype html
+augroup END
+" }}}
+
 " Fold, gets it's own section  ----------------------------------------------{{{
 " credit to Mike Hartington https://github.com/mhartington/dotfiles/blob/master/vimrc
   function! MyFoldText() " {{{
