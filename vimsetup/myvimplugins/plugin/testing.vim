@@ -37,9 +37,7 @@ function! s:StartDocLine() abort " {{{
   exec "normal! jg$a "
 endfunction " }}}
 
-augroup test_plug
-    autocmd!
-    autocmd FileType go inoremap <c-y> <ESC>h :<C-u>call <SID>MyGoImport()<CR>a
-    autocmd FileType go nnoremap <c-y> :<C-u>call <SID>MyGoImport()<CR>:w<CR>
-    autocmd FileType go nnoremap <leader>im :<C-u>call <SID>StartDocLine()<CR>a
-augroup END
+
+inoremap <silent> <Plug>(MyGoImport) <ESC>h :<C-u>call <SID>MyGoImport()<CR>a
+nnoremap <silent> <Plug>(MyGoImport) :<C-u>call <SID>MyGoImport()<CR>:w<CR>
+nnoremap <silent> <Plug>(StartDocLine) :<C-u>call <SID>StartDocLine()<CR>a
