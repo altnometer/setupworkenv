@@ -21,3 +21,21 @@ snippet fum "mymethod"
   func (${1:receiver} ${2:type}) ${3:funcName}(${4}) ${5:error} {
     ${6}
   }
+
+snippet errm "if err != nil {...}"
+  if err != nil {
+    ${1:log.Printf("${2\}", ${0\})}
+  }
+
+# goroutine anonymous function
+snippet gom
+abbr go func(...) { ... }(...)
+	go func(${1}) {
+		${0:TARGET}
+	}(${2})
+
+# overrides default.
+snippet fumh "http handler function on reciever"
+	func (${1:receiver} ${2:type}) ${3:ServeHTTP}(${4:w} http.ResponseWriter, ${5:r} *http.Request) {
+		${0:${VISUAL}}
+	}
