@@ -153,10 +153,8 @@ augroup auto_system
     autocmd BufLeave *.js   normal! mJ
     autocmd BufLeave *.go   normal! mG
     autocmd BufLeave *.vim  normal! mV
-    autocmd Filetype neosnippet setlocal tabstop=2
-    autocmd Filetype neosnippet setlocal shiftwidth=2
-    autocmd Filetype vim setlocal tabstop=2
-    autocmd Filetype vim setlocal shiftwidth=2
+    autocmd Filetype vim,neosnippet,html,gohtmltmpl setlocal tabstop=2 shiftwidth=2
+    autocmd Filetype vim,neosnippet setlocal keywordprg=:help
     " Wrap lines in quickfix
     autocmd FileType qf setlocal wrap
     " manpage with table of contents sidebar with neovim
