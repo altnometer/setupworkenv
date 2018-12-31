@@ -293,13 +293,19 @@ let mapleader = ","
 nnoremap za zAzz
 " jump to the next search result and put the cursor to
 
-" Move the line down.
-noremap <leader>- yyddp
-" Move the line up.
-noremap <leader>_ yydd2kp
-" Uppercase the word.
-inoremap <c-u> <esc>gUiwea
-nnoremap <c-u> gUiwe
+function! s:IsVisible(line) " {{{2
+  " IsVisible returns true if 'line' is within screenlimits.
+  " line("w0"), line("w$") do not work correctly with folds.
+  let l:diff = a:line - line(".")
+  if l:diff < 0 | let l:diff = - l:diff | endif
+  return (winheight(0) - winline()) - l:diff > 2
+endfunction
+" }}}2
+
+nnoremap <expr> n <sid>IsVisible(search(@/, 'nw')) ?  'nzO' :  'nzOzz'
+nnoremap <expr> N <sid>IsVisible(search(@/, 'bnw')) ?  'NzO' :  'NzOzz'
+nnoremap <expr> * <sid>IsVisible(search(expand("<cword>"), 'nw')) ?  '*zO' :  '*zOzz'
+nnoremap <expr> # <sid>IsVisible(search(expand("<cword>"), 'bnw')) ?  '#zO' :  '#zOzz'
 " Open vimrc/vim.init file.
 " nnoremap <leader>v :vsplit $MYVIMRC<cr>
 " nnoremap <localleader>v :vsplit $MYVIMRC<cr>
