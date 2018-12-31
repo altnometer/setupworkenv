@@ -335,7 +335,8 @@ nnoremap <leader>V :source $MYVIMRC<cr>
 noremap <leader>e :quit<CR>
 noremap <leader>x :quitall<CR>
 noremap <leader>E <c-w>o
-noremap <leader>o :qa!<CR>
+" Close_QFix_Or_Other_Win defined in QFixClose.vim myvimplugins
+nmap q <plug>(Close_QFix_Or_Other_Win)
 " delete buffer
 nnoremap <leader>x :bdelete<CR>
 nnoremap <leader>k :bdelete<CR>
