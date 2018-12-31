@@ -788,6 +788,20 @@ let g:syntastic_always_populate_loc_list=1
 let g:syntastic_auto_loc_list=1
 " }}}
 
+" splitjoin ---------------------------------------------------------------{{{
+augroup splitjoin_set_callbacks
+  autocmd!
+  autocmd FileType gohtmltmpl let b:splitjoin_split_callbacks = [
+            \ 'sj#html#SplitTags',
+            \ 'sj#html#SplitAttributes'
+            \ ]
+  autocmd FileType gohtmltmpl let b:splitjoin_join_callbacks = [
+            \ 'sj#html#JoinAttributes',
+            \ 'sj#html#JoinTags'
+            \ ]
+augroup END
+" }}}
+
 " vim-fugitive --------------------------------------------------------------{{{
 " set diffopt+=vertical
 "nnoremap <space>ga :Git add %:p<CR><CR>
