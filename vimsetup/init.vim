@@ -424,6 +424,7 @@ augroup END
 
 " Fold, gets it's own section  ----------------------------------------------{{{
 " credit to Mike Hartington https://github.com/mhartington/dotfiles/blob/master/vimrc
+" https://github.com/mhartington/dotfiles/blob/linux/vimrc
   function! MyFoldText() " {{{
       let line = getline(v:foldstart)
       let nucolwidth = &fdc + &number * &numberwidth
