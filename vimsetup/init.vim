@@ -559,6 +559,39 @@ augroup END
         \}
 " }}}
 
+" emmet-vim ---------------------------------------------------------------{{{
+" Filters                |emmet-filters-list|
+" Customize              |emmet-customize|
+" http://docs.emmet.io/customization/snippets/
+" http://docs.emmet.io/cheat-sheet/
+" http://docs.emmet.io/filters/
+" https://github.com/mattn/emmet-vim
+" let g:user_emmet_mode='n'    "only enable normal mode functions.
+let g:user_emmet_mode='a'    "enable all function in all mode.
+let g:user_emmet_install_global = 0  " 1, Emmet will create global mappings.
+let g:emmet_html5 = 1
+let g:user_emmet_complete_tag = 1 " setlocal omnifunc=emmet#completeTag
+augroup autogroup_emmet
+  autocmd!
+  autocmd FileType html,css,gohtmltmpl EmmetInstall
+augroup END
+let g:user_emmet_settings = {
+\  'indentation': '  ',
+\  'html': {
+\    'default_attributes': {
+\       'link': [{'rel': 'stylesheet'}, {'href': ''}],
+\    },
+\    'filters': 'html',
+\    'indentation': '  ',
+\    'indent_blockelement': 1,
+\    'block_all_childless': 0,
+\  },
+\  'gohtmltmpl': {
+\     'extends': 'html',
+\  },
+\}
+" }}}
+
 " neosnippet ----------------------------------------------------------------{{{
 " Plugin key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
