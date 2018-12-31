@@ -333,6 +333,7 @@ nnoremap <leader>v :edit $HOME/redmoo/setupworkenv/vimsetup/init.vim<cr>
 nnoremap <leader>V :source $MYVIMRC<cr>
 " Quit current window
 noremap <leader>e :quit<CR>
+noremap <leader>x :quitall<CR>
 noremap <leader>E <c-w>o
 noremap <leader>o :qa!<CR>
 " delete buffer
