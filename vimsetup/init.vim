@@ -337,9 +337,7 @@ noremap <leader>x :quitall<CR>
 noremap <leader>E <c-w>o
 " Close_QFix_Or_Other_Win defined in QFixClose.vim myvimplugins
 nmap q <plug>(Close_QFix_Or_Other_Win)
-" delete buffer
-nnoremap <leader>x :bdelete<CR>
-nnoremap <leader>k :bdelete<CR>
+noremap <leader>k :wincmd b <bar> :bdelete<CR>
 " Bonly, BOnly, Bufonly, BufOnly are of BufOnly.vim plugin
 nnoremap <leader>X :Bonly<CR>
 " easier moving between tabs
