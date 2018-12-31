@@ -44,6 +44,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 Plug 'airblade/vim-gitgutter'
+Plug 'idanarye/vim-merginal'
 " 2}}}
 
 Plug 'tpope/vim-unimpaired'
