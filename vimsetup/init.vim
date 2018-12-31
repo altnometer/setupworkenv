@@ -339,7 +339,7 @@ noremap <leader>E <c-w>o
 nmap q <plug>(Close_QFix_Or_Other_Win)
 noremap <leader>k :wincmd b <bar> :bdelete<CR>
 " Bonly, BOnly, Bufonly, BufOnly are of BufOnly.vim plugin
-nnoremap <leader>X :Bonly<CR>
+nnoremap <leader>K :Bonly<CR>
 " easier moving between tabs
 " map <leader>n <esc>:tabprevious<CR>
 " map <leader>m <esc>:tabnext<CR>
