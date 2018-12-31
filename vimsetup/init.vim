@@ -75,6 +75,11 @@ Plug 'honza/vim-snippets'
 Plug 'zchee/deoplete-go', {'do': 'make'}
 " 2}}}
 
+" html,css,js {{{2
+" https://github.com/mattn/emmet-vim
+Plug 'mattn/emmet-vim'
+" 2}}}
+
 Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 " provides insert mode auto-completion for quotes, parens, brackets, etc.
