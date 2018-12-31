@@ -88,7 +88,7 @@ Plug 'janko-m/vim-test'
 " Plug 'Yggdroot/indentLine'
 Plug 'Valloric/MatchTagAlways'
 " Initialize plugin system
-Plug '~/proj/myvimplugins/scratchpad'
+Plug '~/.local/share/nvim/myvimplugins'
 call plug#end()
 " 1}}}
 
