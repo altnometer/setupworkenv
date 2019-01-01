@@ -870,12 +870,16 @@ augroup auto_vim-go
     autocmd FileType go nmap <leader>de :GoDecls<CR>
     autocmd FileType go nmap <leader>dr :GoDeclsDir<CR>
     autocmd FileType go nmap <leader>do :GoDoc<CR>
-    autocmd FileType go nmap <leader>di <Plug>(go-info)
-    " Guru commands:GoReferrers, GoImplements, GoWhichErr, GoChannelPeers
-    " GoFreeVars
-    autocmd FileType go nmap <leader>ds :GoDescribe<CR>
-    autocmd FileType go nmap <leader>dm :GoImplements<CR>
-    autocmd FileType go vmap <leader>df :GoFreevars<CR>
+    autocmd FileType go nmap <leader>di :GoInfo<CR>
+    " Guru commands:
+    autocmd FileType go nmap <leader>gr :GoReferrers<CR>
+    autocmd FileType go nmap <leader>gh :GoChannelPeers<CR>
+    autocmd FileType go nmap <leader>gc :GoCallers<CR>
+    autocmd FileType go nmap <leader>ge :GoWhicherrs<CR>
+    autocmd FileType go nmap <leader>gd :GoDescribe<CR>
+    autocmd FileType go nmap <leader>gi :GoImplements<CR>
+    autocmd FileType go nmap <leader>gs :GoCallstack<CR>
+    autocmd FileType go vmap <leader>gf :GoFreevars<CR>
     " au FileType go nmap RT (go-run-tab)
     " autocmd FileType go map l :GoMetaLinter
     autocmd FileType go nmap <leader>ir :GoRename<CR>
