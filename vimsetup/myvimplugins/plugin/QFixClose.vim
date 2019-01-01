@@ -21,7 +21,7 @@ function! QFix_Close()
   endif
 endfunction
 
-function QFix_Setup()
+function! QFix_Setup()
   let g:QFix_Bufnr = bufnr("$")
 endfunction
 
