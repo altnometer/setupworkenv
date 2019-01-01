@@ -898,6 +898,12 @@ augroup auto_vim-go
     " Toggle alternate files, code and test files.
     autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 augroup END
+augroup my_go_plugin_mappings
+    autocmd!
+    autocmd FileType go imap <a-i> <plug>(MyGoImport)
+    " autocmd FileType go nmap <a-i> <plug>(MyGoImport)
+    autocmd FileType go nmap <leader>im <plug>(StartDocLine)
+augroup END
 " }}}
 
 " settings ----------------------------------------------------------------{{{2
