@@ -959,8 +959,9 @@ let g:ale_go_gometalinter_options =
 let g:go_auto_type_info = 0 " shows signature of fn under cursor
 " let g:go_auto_sameids = 1 " too slow
 let g:go_gocode_unimported_packages = 1
-let g:go_term_enabled = 1
-let g:go_term_mode = 'vsplit'
+let g:go_term_enabled = 0
+" let g:go_term_mode = 'vsplit'
+let g:go_term_mode = 'split'
 let g:go_term_height = 10
 let g:go_term_width = 50
 " Specifies whether `gocode` should use source files instead of binary packages
