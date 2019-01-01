@@ -969,6 +969,11 @@ let g:go_term_width = 50
 " let g:go_gocode_propose_source = 1
 " let g:go_guru_scope = ['github.com/...', expand("%:p:h")] " too slow
 " let g:go_guru_scope = [expand("%:p:h")]  " does not work
+" Echoes information about various Go commands, such as `:GoBuild`, `:GoTest`,
+" `:GoCoverage`, etc... Useful to disable if you use the statusline integration,
+" i.e: |go#statusline#Show()|. By default it's enabled
+" let g:go_echo_command_info = 1
+let g:go_fold_enable = ['block', 'import', 'varconst', 'package_comment', 'comment']
 " }}}
 
 " }}}
