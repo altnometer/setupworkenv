@@ -864,7 +864,9 @@ augroup auto_vim-go
     " autocmd FileType go nmap <leader>T :GoTest -v -race<CR>
     autocmd FileType go nmap <leader>tt :GoTest<CR>
     autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
-    autocmd FileType go nmap <leader>df :GoDef<CR>
+    " GoFiles, GoDeps
+    " use default 'gd' '<c-]>' mappings for :GoDef
+    " autocmd FileType go nmap <leader>df :GoDef<CR>
     autocmd FileType go nmap <leader>de :GoDecls<CR>
     autocmd FileType go nmap <leader>dr :GoDeclsDir<CR>
     autocmd FileType go nmap <leader>do :GoDoc<CR>
