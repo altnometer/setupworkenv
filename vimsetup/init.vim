@@ -922,7 +922,16 @@ let g:go_autodetect_gopath = 0
 " let g:go_info_mode = 'gocode' " default value
 let g:go_info_mode = 'guru'
 " formats go code and manages imports.
-" let g:go_fmt_command = 'goimports'
+let g:go_fmt_command = 'goimports'
+" formats go on save.
+let g:go_fmt_autosave = 1
+" let g:go_snippet_engine = "automatic"
+let g:go_snippet_engine = "neosnippet"
+" Specifies the window height for the quickfix and location list windows.
+let g:go_list_height = 15
+" Use this option to jump to an existing buffer for the split, vsplit and tab
+" mappings of |:GoDef|. By default it's disabled. >
+" let g:go_def_reuse_buffer = 0
 " stop folding on 'write' as per https://github.com/fatih/vim-go/issues/502
 let g:go_fmt_experimental = 1
 " you might not want all the highlighting.
