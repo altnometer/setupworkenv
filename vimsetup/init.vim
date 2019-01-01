@@ -943,10 +943,9 @@ let g:go_highlight_methods = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_extra_types = 0
 let g:go_highlight_build_constraints = 1
-let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
-let g:go_metalinter_autosave = 1
-" echo linting started and linting finished messages
-" let g:go_echo_command_info = 0
+" let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
+let g:go_metalinter_enabled = ['vet', 'golint']
+let g:go_metalinter_autosave = 0
 let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 " let g:go_metalinter_autosave_enabled = ['vet']
 let g:go_metalinter_deadline = '10s'
