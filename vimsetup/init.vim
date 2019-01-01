@@ -848,7 +848,12 @@ endfunction
 " go mappings -------------------------------------------------------------{{{2
 augroup auto_vim-go
     autocmd!
+    " https://github.com/fatih/vim-go/issues/502
+    autocmd BufWritePost *.go normal! zv
     autocmd FileType go setlocal foldmethod=syntax
+    " :help go_echo_go_info for info on noshowmode
+    autocmd FileType go setlocal noshowmode
+    autocmd FileType go setlocal foldlevel=99 foldnestmax=1
     " autocmd FileType go nmap <leader>b  <Plug>(go-build)
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
     autocmd FileType go nmap <leader>r <Plug>(go-run)
