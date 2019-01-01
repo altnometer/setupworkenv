@@ -888,14 +888,12 @@ augroup auto_vim-go
     autocmd FileType go nmap <leader>ii :GoImport<space>
     autocmd FileType go nmap <leader>ia :GoImportAs
     " autocmd FileType go map f :GoFillStruct
-    " autocmd FileType go map c :GoTestCompile
     " autocmd FileType go map at :GoAddTags
     autocmd FileType go nmap <leader>id :GoSameIds<CR>
     " Build/Test on save.
     " autocmd BufWritePost *.go :GoBuild
     autocmd BufWritePost *.go :GoMetaLinter --exclude=exported\s(var|const|function|method|type)\s[\w.]+\sshould\shave\scomment\sor\sbe\sunexported
     " autocmd BufWritePost *_test.go :GoTest
-    " autocmd BufWritePost *.go :GoTest
     autocmd BufNewFile,BufRead *.go setlocal autowrite
     " Toggle alternate files, code and test files.
     autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
