@@ -856,8 +856,8 @@ augroup auto_vim-go
     autocmd FileType go setlocal foldlevel=99 foldnestmax=1
     " autocmd FileType go nmap <leader>b  <Plug>(go-build)
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-    autocmd FileType go nmap <leader>r <Plug>(go-run)
-    autocmd FileType go nmap <leader>t <Plug>(go-test)
+    autocmd FileType go imap <A-b> <Esc>:<C-u>call <SID>build_go_files()<CR>a
+    autocmd FileType go nmap <buffer> <leader>r <Plug>(go-run)
     autocmd FileType go nmap <leader>a :GoAlternate<CR>
     " autocmd FileType go nmap <leader>t :GoTestFunc -v -race<CR>
     " autocmd FileType go nmap <leader>T :GoTest -v -race<CR>
