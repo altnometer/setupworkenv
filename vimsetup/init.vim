@@ -897,6 +897,8 @@ augroup auto_vim-go
     autocmd BufNewFile,BufRead *.go setlocal autowrite
     " Toggle alternate files, code and test files.
     autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+    autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+    autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
 augroup END
 augroup my_go_plugin_mappings
     autocmd!
