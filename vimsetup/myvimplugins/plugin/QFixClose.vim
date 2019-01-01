@@ -15,7 +15,7 @@ function! s:QFix_Is_Open() " {{{
   endif
 endfunction " }}}
 
-function QFix_Close()
+function! QFix_Close()
   if exists("g:QFix_Bufnr") && expand("<abuf>") == g:QFix_Bufnr
     unlet! g:QFix_Bufnr
   endif
