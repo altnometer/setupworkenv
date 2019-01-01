@@ -949,7 +949,7 @@ let g:go_metalinter_autosave = 1
 " let g:go_echo_command_info = 0
 let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 " let g:go_metalinter_autosave_enabled = ['vet']
-let g:go_metalinter_deadline = '5s'
+let g:go_metalinter_deadline = '10s'
 let g:ale_go_gometalinter_options =
       \ '--tests ' .
       \ '--fast ' .
