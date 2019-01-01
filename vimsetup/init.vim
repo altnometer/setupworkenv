@@ -881,7 +881,9 @@ augroup auto_vim-go
     autocmd FileType go nmap <leader>gs :GoCallstack<CR>
     autocmd FileType go vmap <leader>gf :GoFreevars<CR>
     " au FileType go nmap RT (go-run-tab)
-    " autocmd FileType go map l :GoMetaLinter
+    autocmd FileType go nmap <leader>if :GoFmt<CR>
+    " https://stackoverflow.com/questions/50678503/is-it-possible-to-ignore-specific-warnings-with-visual-studio-codes-linter
+    autocmd FileType go nmap <leader>il :GoMetaLinter --exclude=exported\s(var\|const\|function\|method\|type)\s[\w.]+\sshould\shave\scomment\sor\sbe\sunexported<CR>
     autocmd FileType go nmap <leader>ir :GoRename<CR>
     autocmd FileType go nmap <leader>ii :GoImport<space>
     autocmd FileType go nmap <leader>ia :GoImportAs
@@ -890,7 +892,8 @@ augroup auto_vim-go
     " autocmd FileType go map at :GoAddTags
     autocmd FileType go nmap <leader>id :GoSameIds<CR>
     " Build/Test on save.
-    autocmd BufWritePost *.go :GoBuild
+    " autocmd BufWritePost *.go :GoBuild
+    autocmd BufWritePost *.go :GoMetaLinter --exclude=exported\s(var|const|function|method|type)\s[\w.]+\sshould\shave\scomment\sor\sbe\sunexported
     " autocmd BufWritePost *_test.go :GoTest
     " autocmd BufWritePost *.go :GoTest
     autocmd BufNewFile,BufRead *.go setlocal autowrite
