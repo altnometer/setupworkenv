@@ -1032,7 +1032,7 @@ let loaded_matchit = 1
 " Go ------------------------------------------------------------------------{{{
 augroup auto_go
     autocmd!
-    autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
+    autocmd BufNewFile,BufRead *.go setlocal expandtab tabstop=4 shiftwidth=4
 augroup END
 " should't this be in deoplete section?
 let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
