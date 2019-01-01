@@ -1048,7 +1048,6 @@ highlight TermCursorNC ctermfg=blue guifg=blue
 set splitbelow
 set splitright
 tnoremap <Leader><ESC> <C-\><C-n>
-tnoremap <leader>x <c-\><c-n>:bp! <BAR> bd! #<CR>
 tnoremap <leader>k <c-\><c-n>:bp! <BAR> bd! #<CR>
 tnoremap <PageUp> <C-\><C-n>:bprevious<cr>
 tnoremap <PageDown> <C-\><C-n>:bnext<cr>
