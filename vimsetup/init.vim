@@ -919,7 +919,8 @@ let g:go_list_type_commands = {'GoBuild': 'locationlist'}
 " let g:go_list_type_commands = {'GoMetaLinter': 'quickfix'}
 " let g:go_list_type_commands = {'GoMetaLinter': 'locationlist'}
 let g:go_autodetect_gopath = 0
-let g:go_info_mode = 'gocode'
+" let g:go_info_mode = 'gocode' " default value
+let g:go_info_mode = 'guru'
 " formats go code and manages imports.
 " let g:go_fmt_command = 'goimports'
 " stop folding on 'write' as per https://github.com/fatih/vim-go/issues/502
