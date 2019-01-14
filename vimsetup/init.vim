@@ -122,7 +122,7 @@ command! -nargs=1 -complete=help H :enew | :set buftype=help | :h <args>
 " let xdg-open decide which browser to open a url link with.
 let g:netrw_browsex_viewer="qutebrowser"
 
-" auto ----------------------------------------------------------------------{{{
+" auto {{{2
 augroup auto_system
     autocmd!
     " Remember cursor position between switching buffers.
@@ -170,7 +170,8 @@ augroup auto_system
             \ wincmd p
     endif
 augroup END
-" }}}
+" }}}2
+"
 let g:ruby_host_prog = "/var/lib/gems/2.3.0/gems/neovim-0.7.1/bin/neovim-ruby-host"
 let g:python_host_prog = "/usr/bin/python2"
 let g:python3_host_prog = "/usr/bin/python3"
