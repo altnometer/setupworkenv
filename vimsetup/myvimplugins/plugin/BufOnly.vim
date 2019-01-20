@@ -6,7 +6,7 @@
 "
 " Usage:
 "
-" :Bonly / :BOnly / :Bufonly / :BufOnly [buffer] 
+" :Bonly / :BOnly / :Bufonly / :BufOnly [buffer]
 "
 " Without any arguments the current buffer is kept.  With an argument the
 " buffer name/number supplied is kept.
