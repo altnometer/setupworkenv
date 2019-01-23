@@ -4,20 +4,18 @@
 let g:PREV = [0, 0, 0]
 let g:NEXT = [0, 0, 0]
 
-inoremap <silent> <Plug>(ToggleCharInsertMode) <c-c>:call <SID>ToggleCharInsertMode()<cr>a
-imap <a-u> <plug>(ToggleCharInsertMode)
-nnoremap <silent> <Plug>(ToggleChar) :call <SID>ToggleChar()<cr>
-nmap <a-u> <plug>(ToggleChar)
+inoremap <silent> <Plug>(ToggleCharInsertMode) <C-c>:<C-u>call <SID>ToggleCharInsertMode()<CR>a
+nnoremap <silent> <Plug>(ToggleChar) :<C-u>call <SID>ToggleChar()<CR>
 
-nnoremap <silent> <Plug>(TogglePrevNChars) :<c-u>call <SID>TogglePrevNChars(v:count)<cr>
-nmap <c-u> <plug>(TogglePrevNChars)
-inoremap <silent> <Plug>(ToggleLastNChars0) <c-c>:<c-u>call <SID>TogglePrevNChars(0)<cr>a
-imap <c-u> <plug>(ToggleLastNChars0)
+nnoremap <silent> <Plug>(TogglePrevNChars) :<C-u>call <SID>TogglePrevNChars(v:count)<CR>
+inoremap <silent> <Plug>(ToggleLastNChars0) <C-c>:<C-u>call <SID>TogglePrevNChars(0)<CR>a
+
+inoremap <silent> <C-w> <C-c>:let g:PREV = [0, 0, 0] <BAR> let g:NEXT = [0, 0, 0] <CR>a<C-w>
 
 
 function! s:TogglePrevNChars(count) abort " {{{
   let l:save_cursor = getcurpos()
-  let l:first_char_pos = GetFirstCharPos(l:save_cursor)
+  let l:first_char_pos = s:GetFirstCharPos(l:save_cursor)
   let l:last_char_pos = s:GetLastCharPos(l:save_cursor)
   call setpos('.', l:last_char_pos)
   " 0. v:count is given, ignore other cases.
@@ -43,6 +41,7 @@ function! s:TogglePrevNChars(count) abort " {{{
   endif
   " 1. Marker is on the same line, in the word and before the cursor.
   if a:count == 0 && l:save_cursor[1] == g:NEXT[1] && l:first_char_pos[2] < g:NEXT[2] && l:save_cursor[2] > g:NEXT[2]
+    " echomsg "if a:count == 0 && l:save_cursor[1] == g:NEXT[1] && l:first_char_pos[2] < g:NEXT[2] && l:save_cursor[2] > g:NEXT[2]"
     let g:NEXT[2] += 1
     call s:ToggleLastNCharsRange(g:NEXT, l:last_char_pos)
     let g:PREV = g:NEXT
@@ -51,10 +50,12 @@ function! s:TogglePrevNChars(count) abort " {{{
   endif
   " 2. Marker is in the same col and line as the cursor.
   if l:save_cursor[1:2] == g:NEXT[1:2]
+    " echomsg "case: " . "if l:save_cursor[1:2] == g:NEXT[1:2]"
     call s:ToggleLastNCharsRange(g:PREV, l:last_char_pos)
     return
   endif
   if a:count == 0
+    " echomsg "if a:count == 0"
     " toggle the whole word.
     exe "normal! g~iwe"
     call setpos('.', l:last_char_pos)
@@ -91,7 +92,7 @@ endfunction " }}}
 
 function! s:ToggleChar() " {{{
   let l:save_cursor = getcurpos()
-  let l:first_char_pos = GetFirstCharPos(l:save_cursor)
+  let l:first_char_pos = s:GetFirstCharPos(l:save_cursor)
   let l:last_char_pos = s:GetLastCharPos(l:save_cursor)
   " 1. g:NEXT is not set.
   if g:NEXT[1] == 0
@@ -129,6 +130,22 @@ function! s:ToggleChar() " {{{
     call s:ToggleFirstChar(l:first_char_pos, l:last_char_pos)
     return
   endif
+  " 7. g:PREV, g:NEXT are in invalid positions.
+  if !s:PrevNextValid(l:first_char_pos, l:last_char_pos, g:PREV, g:NEXT)
+    " echomsg "7. g:PREV, g:NEXT are invalid."
+    call s:ToggleFirstChar(l:first_char_pos, l:last_char_pos)
+    return
+  endif
+endfunction " }}}
+
+function! s:PrevNextValid(first, last, prev, next) " {{{
+  " prev inside the word.
+  let l:prev_inside = a:prev[2] >= a:first[2] && a:prev[2] <= a:first[2]
+  let l:next_inside = a:next[2] >= a:first[2] && a:next[2] <= a:first[2]
+  if l:prev_inside && l:next_inside
+    return 1
+  endif
+  return 0
 endfunction " }}}
 
 function! s:ToggleNext(next, last_char_pos) " {{{
@@ -167,7 +184,7 @@ function! s:TogglePrev(prev, last_char_pos) " {{{
   let g:NEXT = a:last_char_pos
 endfunction " }}}
 
-function! GetFirstCharPos(save_cursor) " {{{
+function! s:GetFirstCharPos(save_cursor) " {{{
   " may misbehave if cursor is next to '})]'
   " https://stackoverflow.com/questions/23323747/vim-vimscript-get-exact-character-under-the-cursor
   let l:prev_char = getline('.')[col('.') - 2]
