@@ -11,7 +11,7 @@ if !exists("g:quote_char")
   let g:quote_char = '"'
 endif
 
-inoremap <Plug>(QuoteToTheLeft) <C-c>:<C-u>call <SID>QuoteUnquoteToTheLeft()<CR>a
+inoremap <silent> <Plug>(QuoteToTheLeft) <C-c>:<C-u>call <SID>QuoteUnquoteToTheLeft()<CR>a
 
 function! s:QuoteUnquoteToTheLeft() abort " {{{
   " may misbehave if cursor is next to '})]'
@@ -27,7 +27,8 @@ endfunction " }}}
 function! s:Quote() abort " {{{
   let l:save_pos = getcurpos()
   call searchpos(g:quote_delemeter, 'b', line('.'))
-  exe "normal! i" . g:quote_char . "\<c-c>"
+  " exe "normal! i" . g:quote_char . "\<c-c>"
+  exe "normal! i" . g:quote_char
   let l:save_pos[2] += 1
   call setpos('.', l:save_pos)
   exe "normal! a" . g:quote_char
