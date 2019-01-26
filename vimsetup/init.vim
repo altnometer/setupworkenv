@@ -577,6 +577,31 @@ augroup END
         \}
 " }}}
 
+" commentary --------------------------------------------------------------{{{
+xmap <C-c>  <Plug>Commentary
+nmap <C-c>  <Plug>Commentary
+omap <C-c>  <Plug>Commentary
+nmap <C-c><C-c> <Plug>CommentaryLine
+nmap <C-c>u <Plug>Commentary<Plug>Commentary
+" }}}
+
+" custom plugins ----------------------------------------------------------{{{
+
+" quote {{{2
+imap <C-u> <Plug>(QuoteToTheLeft)
+" }}}2
+
+" capitalize {{{2
+" this is my custom plugin, user discretion advised.
+imap <C-e> <plug>(ToggleCharInsertMode)
+nmap <C-e> <plug>(ToggleChar)
+" imap <c-u> <plug>(ToggleLastNChars0)
+imap <A-e> <plug>(ToggleLastNChars0)
+nmap <A-e> <plug>(TogglePrevNChars)
+" }}}2
+"
+" }}}
+
 " emmet-vim ---------------------------------------------------------------{{{
 " Filters                |emmet-filters-list|
 " Customize              |emmet-customize|
