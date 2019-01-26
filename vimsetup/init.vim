@@ -155,6 +155,8 @@ augroup auto_system
     autocmd BufLeave *.vim  normal! mV
     autocmd Filetype vim,neosnippet,html,gohtmltmpl setlocal tabstop=2 shiftwidth=2
     autocmd Filetype vim,neosnippet setlocal keywordprg=:help
+    " stop jumping to the next line when the current line goes over the limit.
+    autocmd Filetype html,gohtmltmpl setlocal textwidth=0
     " Wrap lines in quickfix
     autocmd FileType qf setlocal wrap
     " manpage with table of contents sidebar with neovim
