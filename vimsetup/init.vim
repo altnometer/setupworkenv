@@ -1159,7 +1159,9 @@ nnoremap <silent> <leader>sr :TermSendLine<cr>
 nnoremap <silent> <leader>sR :vertical TermSendLine<cr>
 vnoremap <silent> <leader>sr <esc>:TermSendVisLine<cr>
 " To simulate |i_CTRL-R| in terminal-mode: >
-tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
+" <C-R> clashes with zsh fzf shortcut to search history.
+" tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
+tnoremap <expr> <A-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 
 " Quickly create a new terminal in a new tab
 " tnoremap <Leader>c <C-\><C-n>:tab new<CR>:term<CR>
