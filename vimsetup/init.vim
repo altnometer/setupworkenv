@@ -739,11 +739,17 @@ command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-h
 
 " deoplete ------------------------------------------------------------------{{{
 " <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 let g:deoplete#enable_at_startup = 1
 " let g:deoplete#enable_debug = 1
 " call deoplete#enable_logging('DEBUG', 'deoplete.log')
 " call deoplete#custom#source('go', 'is_debug_enabled', 1)
+  " Pass a dictionary to set multiple options
+  call deoplete#custom#option({
+  \ 'auto_complete_delay': 20,
+  \ 'smart_case': v:false,
+  \ })
+<
 "}}}
 
 " fzf ---------------------------------------------------------------------{{{1
