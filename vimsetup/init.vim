@@ -624,6 +624,8 @@ let g:user_emmet_settings = {
 \  'html': {
 \    'default_attributes': {
 \       'link': [{'rel': 'stylesheet'}, {'href': ''}],
+\       'input': [{'type': ''}, {'name': ''}, {'value': ''}],
+\       'textarea': [{'name': ''}, {'id': ''}, {'cols': '20'}, {'rows': '5'}],
 \    },
 \    'filters': 'html',
 \    'indentation': '  ',
