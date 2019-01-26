@@ -1083,7 +1083,11 @@ augroup END
 
 " vim-indentwise ----------------------------------------------------------{{{1
 " 'matchit' plugin messes ]%, [% mappings for vim-indentwise. Disable it.
-let loaded_matchit = 1
+" let loaded_matchit = 1
+map ]<bar> <Plug>(IndentWiseBlockScopeBoundaryEnd)
+sunmap ]<bar>
+map [<bar> <Plug>(IndentWiseBlockScopeBoundaryBegin)
+sunmap [<bar>
 " 1}}}
 
 " Go ------------------------------------------------------------------------{{{
