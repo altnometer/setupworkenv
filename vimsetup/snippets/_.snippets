@@ -19,14 +19,14 @@
 
 # # close "{" and put cursor in between
 snippet {
-options word
+options word indent
   {
     ${1:TARGET}
   }
 
 # # close "(...{ with matching })" and put cursor in between
 snippet {)
-options word
+options word indent
   {
     ${0:TARGET}
   })
