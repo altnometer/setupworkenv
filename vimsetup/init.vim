@@ -298,6 +298,21 @@ let mapleader = ","
 vnoremap <A-/> <esc>/\%V
 " open all folds in the fold and put the cursor to the center.
 nnoremap za zAzz
+" window manipulation {{{2
+" help window-moving
+nnoremap <leader>ww <C-w><C-w>
+" switch to horizontal layout.
+nnoremap <leader>wv <C-w>H
+" switch to vertical layout.
+nnoremap <leader>wh <C-w>K
+" diff between windows.
+nnoremap <leader>wd :windo diffthis<CR><C-w><C-w>
+nnoremap <leader>wu :diffupdate!<CR>
+nnoremap <leader>wo :diffoff!<CR>
+" }}}2
+" put the word in qoutes.
+" inoremap <C-u> <c-c>bi"<c-c>ea"<c-c>a
+" inoremap <C-u> <c-c>:<c-u>let save_pos=getcurpos() <bar> call searchpos('\v[^\[({< ]+', 'b', line('.'))<cr>i"<c-c>:call setpos('.', save_pos)<cr>la"<c-c>a
 " jump to the next search result and put the cursor to
 
 function! s:IsVisible(line) " {{{2
