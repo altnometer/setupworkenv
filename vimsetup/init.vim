@@ -314,7 +314,7 @@ nnoremap <leader>wo :diffoff!<CR>
 " inoremap <C-u> <c-c>bi"<c-c>ea"<c-c>a
 " inoremap <C-u> <c-c>:<c-u>let save_pos=getcurpos() <bar> call searchpos('\v[^\[({< ]+', 'b', line('.'))<cr>i"<c-c>:call setpos('.', save_pos)<cr>la"<c-c>a
 " jump to the next search result and put the cursor to
-
+" the center if is too close to the edges.
 function! s:IsVisible(line) " {{{2
   " IsVisible returns true if 'line' is within screenlimits.
   " line("w0"), line("w$") do not work correctly with folds.
@@ -337,13 +337,6 @@ noremap - <c-w>1_
 " see ':map =', it is mapped to something. single '=' is slow because of that.
 noremap == <c-w>=
 " Toggle Uppercase of the word.
-inoremap <c-u> <c-c>g~iwea
-nnoremap <c-u> g~iwe
-" capitalize the word.
-" inoremap <A-u> <c-c>guiw~hea
-inoremap <A-u> <c-c>b~hea
-" nnoremap <A-u> guiw~he
-nnoremap <A-u> b~he
 " Open vimrc/vim.init file.
 " nnoremap <leader>v :vsplit $MYVIMRC<cr>
 " nnoremap <localleader>v :vsplit $MYVIMRC<cr>
