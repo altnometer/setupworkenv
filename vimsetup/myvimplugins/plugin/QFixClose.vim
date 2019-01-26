@@ -15,18 +15,18 @@ function! s:QFix_Is_Open() " {{{
   endif
 endfunction " }}}
 
-function! QFix_Close()
+function! s:QFix_Close() " {{{
   if exists("g:QFix_Bufnr") && expand("<abuf>") == g:QFix_Bufnr
     unlet! g:QFix_Bufnr
   endif
-endfunction
+endfunction " }}}
 
-function! QFix_Setup()
+function! s:QFix_Setup() " {{{
   let g:QFix_Bufnr = bufnr("$")
-endfunction
+endfunction " }}}
 
-augroup QFix_Autocmds
+augroup QFix_Autocmds " {{{
   autocmd!
-  autocmd BufWinEnter quickfix call QFix_Setup()
-  autocmd BufWinLeave * call QFix_Close()
-augroup END
+  autocmd BufWinEnter quickfix call s:QFix_Setup()
+  autocmd BufWinLeave * call s:QFix_Close()
+augroup END " }}}
