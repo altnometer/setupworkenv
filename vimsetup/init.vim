@@ -614,6 +614,7 @@ let g:user_emmet_mode='a'    "enable all function in all mode.
 let g:user_emmet_install_global = 0  " 1, Emmet will create global mappings.
 let g:emmet_html5 = 1
 let g:user_emmet_complete_tag = 1 " setlocal omnifunc=emmet#completeTag
+let g:user_emmet_leader_key = '<C-t>'
 augroup autogroup_emmet
   autocmd!
   autocmd FileType html,css,gohtmltmpl EmmetInstall
