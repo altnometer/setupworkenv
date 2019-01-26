@@ -31,6 +31,27 @@ options word
     ${0:TARGET}
   })
 
+# # close "(...{ with matching });" and put cursor in between
+snippet {);
+options word indent
+  {
+    ${0:TARGET}
+  });
+
+# # # close "( with )" and put cursor in between
+# snippet (
+# options word indent
+#   (
+#     ${0:TARGET}
+#   )
+
+# # # close "( with );" and put cursor in between
+# snippet (;
+# options word indent
+#   (
+#     ${0:TARGET}
+#   );
+
 # # expand "{)" to "{\n   }) and put cursor in between
 # snippet !\{\)! "close curly braces" r
 # {
