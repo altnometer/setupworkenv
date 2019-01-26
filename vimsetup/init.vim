@@ -434,6 +434,9 @@ vnoremap // y/\V<C-r>=escape(@",'/\')<CR><CR>
 " setfiletype -------------------------------------------------------------{{{
 augroup filetypedetect
     " autocmd BufNew,BufNewFile,BufRead *.tmpl,*.gohtml,*.template :setfiletype html
+    " autocmd BufNew,BufNewFile,BufRead *.html set ft=html.javascript
+    " autocmd BufNew,BufNewFile,BufRead *.html.tmpl set ft=gohtmltmpl.html.javascript
+
 augroup END
 " }}}
 
