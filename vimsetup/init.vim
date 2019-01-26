@@ -662,7 +662,7 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 let neoterm_default_mod = 'split'
 nnoremap <expr> <Plug>(CloseAllNeoterms) ':let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>'
 nmap <leader>se <Plug>(CloseAllNeoterms)
-nmap <A-e> <Plug>(CloseAllNeoterms)
+" nmap <A-e> <Plug>(CloseAllNeoterms)
 tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
 tnoremap <A-e> <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
 nnoremap <leader>so :Topen<cr>
