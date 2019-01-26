@@ -283,6 +283,9 @@ augroup color_cursor
 augroup END
 " }}}2
 set completeopt-=preview " do not open preview window for completion.
+" diff {{{2
+set diffopt+=iwhite
+set diffexpr=""
 " }}}
 
 " System mappings  ----------------------------------------------------------{{{
