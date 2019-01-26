@@ -4,6 +4,7 @@
 set -e
 
 
+# check if run with sudo -E -----------------------------------------------{{{
 if [[ $EUID -ne 0 ]]; then
     echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
     exit 1
@@ -16,6 +17,9 @@ if [ -z ${SUDO_USER} ]; then
     echo -e "\n\x1b[31;01m No \$SUDO_USER available, quiting ... \x1b[39;49;00m\n"
     exit 1
 fi
+# }}}
+
+# vars --------------------------------------------------------------------{{{
 # source $HOME/redmoo/auct/setup/setup_conf/all_scripts_conf.sh
 # which isn't cloned yet. So, they are redefined here, check
 # that they haveh't changed.
@@ -32,12 +36,14 @@ if [ ! -f "${SSH_KEY_FOR_GIT_REPOSITORY}" ]; then
     echo -e "\n\x1b[31;01m No ${SSH_KEY_FOR_GIT_REPOSITORY}. scp the keys before running the script. \x1b[39;49;00m\n"
     exit 1
 fi
+# }}}
 
 # To this poin:
 # a username must be created,
 # sudo must be installed and username should be
 # useradd username sudo
 
+# git ---------------------------------------------------------------------{{{
 if hash git 2>/dev/null; then
     echo -e "\n\x1b[33;01m git is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
 else
@@ -47,7 +53,9 @@ else
     sudo -u ${SUDO_USER} git config --global user.name "${SUDO_USER} at ${HOSTNAME}"
     sudo -u ${SUDO_USER} git config --global push.default simple
 fi
+# }}}
 
+# redmoo repo -------------------------------------------------------------{{{
 if [ -d "${REDMOO_PROJECT_DIR}" ];
 then
     echo -e "\n\x1b[33;01m ${REDMOO_PROJECT_DIR} directory exists, not cloning. \x1b[39;49;00m\n" && sleep 1
@@ -63,8 +71,9 @@ fi
 # Now the all_scripts_conf.sh is available from the cloned project,
 # source it to make needed constatns available.
 # source ${REDMOO_PROJECT_DIR}/setup/setup_conf/all_scripts_conf.sh
+# }}}
 
-# Install neovim
+# neovim ------------------------------------------------------------------{{{
 if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
@@ -74,8 +83,9 @@ else
     cd ${VIMSETUPDIR}
     source ${VIMSETUPFILE}
 fi
+# }}}
 
-# Install vim
+# vim ---------------------------------------------------------------------{{{
 if hash vim 2>/dev/null && [ -d "${HOME}/.vim" ]; then
     echo -e "\n\x1b[33;01m vim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
@@ -85,40 +95,46 @@ else
     cd ${VIMSETUPDIR}
     source ${VIMSETUPFILE}
 fi
+# }}}
 
-# Install zsh
+# zsh ---------------------------------------------------------------------{{{
 echo -e "\n\x1b[33;01m Configuring shell ... \x1b[39;49;00m\n" && sleep 1
 SHELLSETUPDIR=${REDMOO_PROJECT_DIR}/shell
 SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
 source ${SHELLSETUPFILE}
+# }}}
 
-# Install tmux ------------------------------------------------------------{{{
+# tmux --------------------------------------------------------------------{{{
 echo -e "\n\x1b[33;01m Configuring tmux ... \x1b[39;49;00m\n" && sleep 1
 TMUXSETUPDIR=${REDMOO_PROJECT_DIR}/tmuxsetup
 TMUXSETUPFILE=${TMUXSETUPDIR}/setup_tmux.sh
 source ${TMUXSETUPFILE}
 # }}}
 
-# Install ranger
+# ranger ------------------------------------------------------------------{{{
 RANGERSETUPDIR=${REDMOO_PROJECT_DIR}/ranger
 RANGERCONFIGFILE=${RANGERSETUPDIR}/setup_ranger.sh
 cd ${RANGERSETUPDIR}
 source ${RANGERCONFIGFILE}
+# }}}
 
+# terminal ----------------------------------------------------------------{{{
 # should go to gui setup
 # setup st terminal emulator
 STSETUPDIR=${REDMOO_PROJECT_DIR}/term
 STSETUPFILE=${STSETUPDIR}/setup_st.sh
 cd ${STSETUPDIR}
 source ${STSETUPFILE}
+# }}}
 
+# iftop -------------------------------------------------------------------{{{
 #if ! hash /usr/sbin/iftop 2>/dev/null; then
 #    echo -e "\n\x1b[33;01m Installing iftop...  \x1b[39;49;00m\n" && sleep 1
 #    apt-get install -y iftop
 #fi
+# }}}
 
-# install GUI
-
+# GUI ---------------------------------------------------------------------{{{
 # if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
 #     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 # else
@@ -128,6 +144,7 @@ source ${STSETUPFILE}
     cd ${GUISETUPDIR}
     source ${GUISETUPFILE}
 # fi
+# }}}
 
 exit
 source ${PROJECT_SETUP_DIR}/iptablessetup/setupnewserveriptables.sh
