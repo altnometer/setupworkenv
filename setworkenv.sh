@@ -3,7 +3,6 @@
 
 set -e
 
-
 # check if run with sudo -E -----------------------------------------------{{{
 if [[ $EUID -ne 0 ]]; then
     echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
@@ -144,6 +143,13 @@ source ${STSETUPFILE}
     cd ${GUISETUPDIR}
     source ${GUISETUPFILE}
 # fi
+# }}}
+
+# docker ------------------------------------------------------------------{{{
+DOCKERSETUPDIR=${REDMOO_PROJECT_DIR}/docker
+DOCKERSETUPFILE=${DOCKERSETUPDIR}/setup_docker.sh
+cd ${DOCKERSETUPDIR}
+source ${DOCKERSETUPFILE}
 # }}}
 
 exit
