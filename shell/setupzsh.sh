@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 # cd to the folder before running
@@ -12,8 +13,8 @@ ZSH_CUSTOM_PLUG_DIR=${HOME}/.oh-my-zsh/custom/plugins
 if hash zsh 2>/dev/null;
 then
     echo -e "\n\x1b[33;01m zsh is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
-else 
-    apt-get install -y zsh 
+else
+    apt-get install -y zsh
     chsh --shell $(which zsh) ${SUDO_USER}
     sudo -u ${SUDO_USER} sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     sudo -u ${SUDO_USER} mkdir -p $ZSH_CUSTOM_PLUG_DIR
