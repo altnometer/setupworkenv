@@ -29,7 +29,7 @@ snippet errm "if err != nil { log.Printf }"
 
 snippet errf "if err != nil { log.Fatal }"
   if err != nil {
-    log.Fatal(${1:"${2\}"}${3:, err})
+    log.Fatal(${1:"${2\}", }${3:err})
   }${0}
 
 snippet lft "log.Fatal"
