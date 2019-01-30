@@ -33,7 +33,7 @@ snippet errf "if err != nil { log.Fatal }"
   }${0}
 
 snippet lft "log.Fatal"
-  log.Fatal(${1:"${2\}"}${3:, err})${0}
+  log.Fatal(${1:"${2\}", }${3:err})${0}
 
 # goroutine anonymous function
 snippet gom
