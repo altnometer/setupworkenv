@@ -302,6 +302,7 @@ set diffexpr=""
 let mapleader = ","
 " shadowing '/' for search slows it down.
 " let maplocalleader = "/"
+" use this to search in visually selected region.
 vnoremap <A-/> <esc>/\%V
 " open all folds in the fold and put the cursor to the center.
 nnoremap za zAzz
