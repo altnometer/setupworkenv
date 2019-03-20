@@ -941,8 +941,9 @@ let g:mta_use_matchparen_group = 0 " use colorscheme defined colors
 " }}}
 
 " merginal ----------------------------------------------------------------{{{1
-map <silent> <leader>m <esc>:Merginal<CR>
-tnoremap <leader>m <c-\><c-n>:Merginal<CR>
+" map <silent> <leader>m <esc>:Merginal<CR>
+map <silent> <leader>m <esc>:MerginalToggle<CR>
+" tnoremap <leader>m <c-\><c-n>:Merginal<CR>
 " }}}
 
 " syntastic ---------------------------------------------------------------{{{
