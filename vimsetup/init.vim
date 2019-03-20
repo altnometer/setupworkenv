@@ -160,6 +160,7 @@ augroup auto_system
     autocmd BufLeave *.go   normal! mG
     autocmd BufLeave *.vim  normal! mV
     autocmd Filetype vim,neosnippet,html,gohtmltmpl setlocal tabstop=2 shiftwidth=2
+    autocmd Filetype text setlocal tabstop=8 softtabstop=4 shiftwidth=4 noexpandtab
     autocmd Filetype vim,neosnippet setlocal keywordprg=:help
     " stop jumping to the next line when the current line goes over the limit.
 autocmd Filetype html,gohtmltmpl,sh setlocal textwidth=0
