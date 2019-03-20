@@ -965,7 +965,8 @@ let g:syntastic_python_checkers = ['flake8']
 " E256 - block comment should start with "# " - Incorrectly interpreted on
 " raspbian
 " [E402] module level import not at top of file [E402]
-let g:syntastic_python_flake8_args = '--ignore="E501,W601,E265,E402"'
+" E266 - too many # for block comment
+let g:syntastic_python_flake8_args = '--ignore="E501,W601,E265,E402,E266"'
 let g:syntastic_always_populate_loc_list=1
 let g:syntastic_auto_loc_list=1
 " }}}
