@@ -711,6 +711,10 @@ augroup elixir_cmds
   " autocmd FileType elixir nmap <leader>r :<C-u>Texec elixir %"<CR>
   " autocmd FileType elixir nmap <leader>f :wall!<CR>:silent !mix format %<CR>
   autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> Texec iex clear<CR>
+  autocmd FileType elixir nmap <buffer> <A-s> :TREPLSendLine<CR>
+  autocmd FileType elixir vmap <buffer> <A-s> :<C-u>TREPLSendSelection<CR>
+  autocmd FileType elixir imap <buffer> <A-s> <C-c>:TREPLSendLine<CR>a
+  " nnoremap <A-s> :TREPLSendFile<CR>
 " nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 " nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
   " autocmd BufWritePost *.ex,*.exs :silent !mix format % :redraw!
