@@ -791,10 +791,10 @@ nnoremap <A-o> :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 nnoremap <leader>sc :Tclear<cr>
 " vnoremap <A-s> :<C-u>TREPLSetTerm 1 <bar> TREPLSendSelection<CR>
 " nnoremap <A-s> :TREPLSetTerm 1 <bar> TREPLSendLine<CR>
-nnoremap <A-s> :TREPLSendLine<CR>
+" nnoremap <A-s> :TREPLSendLine<CR>
 " nnoremap <A-s> :TREPLSendFile<CR>
-vnoremap <A-s> :<C-u>TREPLSendSelection<CR>
-inoremap <A-s> <C-c>:TREPLSendLine<CR>a
+" vnoremap <A-s> :<C-u>TREPLSendSelection<CR>
+" inoremap <A-s> <C-c>:TREPLSendLine<CR>a
 " let neoterm_autoinsert = 1
 " }}}
 
