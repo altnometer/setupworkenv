@@ -485,9 +485,8 @@ augroup END
         " http://vim.wikia.com/wiki/Keep_folds_closed_while_inserting_text
         autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
         autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
-        autocmd FileType vim,tmux,sh,conf setlocal fdc=1
-        autocmd FileType vim,tmux,sh,conf setlocal foldmethod=marker
-        autocmd FileType vim,tmux,sh,conf setlocal foldlevel=0
+        autocmd FileType vim,tmux,sh,conf,text,python setlocal fdc=1 foldmethod=marker
+        autocmd FileType vim,tmux,sh,conf,text,python setlocal foldlevel=0
         autocmd FileType javascript,html,css,scss,typescript setlocal foldlevel=99
         autocmd FileType css,scss,json setlocal foldmethod=marker
         autocmd FileType css,scss,json setlocal foldmarker={,}
