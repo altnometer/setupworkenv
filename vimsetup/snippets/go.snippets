@@ -24,7 +24,7 @@ snippet fum "mymethod"
 
 snippet errm "if err != nil { log.Printf }"
   if err != nil {
-    ${1:log.Printf("${2\}"${3:, err\})}
+    ${1:log.Printf("${2\}", ${3:err\})}
   }${0}
 
 snippet errf "if err != nil { log.Fatal }"
