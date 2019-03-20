@@ -354,12 +354,12 @@ noremap == <c-w>=
 nnoremap <leader>v :edit $HOME/redmoo/setupworkenv/vimsetup/init.vim<cr>
 " Source vimrc/vim.init file.
 nnoremap <leader>V :source $MYVIMRC<cr>
-" Quit current window
-noremap <leader>e :quit<CR>
-noremap <leader>x :quitall<CR>
-noremap <leader>E <c-w>o
-" Close_QFix_Or_Other_Win defined in QFixClose.vim myvimplugins
-nmap q <plug>(Close_QFix_Or_Other_Win)
+" my smart close. quit quickfix, locationlist, terminals, windows, buffers.
+" for exact behavior is in QFixClose.vim myvimplugins
+nmap q <plug>(MySmartClose)
+tmap <C-q> <C-\><C-n><plug>(MySmartClose)
+" close all buffers
+nmap Q :quitall<CR>
 noremap <leader>k :wincmd b <bar> :bdelete<CR>
 " Bonly, BOnly, Bufonly, BufOnly are of BufOnly.vim plugin
 nnoremap <leader>K :Bonly<CR>
