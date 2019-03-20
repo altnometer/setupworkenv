@@ -1155,7 +1155,7 @@ function! TermSend(lines, mods) " {{{
 endfunction " }}}
 command! TermSendLine call TermSend(substitute(getline('.'), '\\$', "", ""), <q-mods>)
 command! TermSendVisLine call TermSend(<sid>get_visual_selection())
-nnoremap <silent> <leader>sr :TermSendLine<cr>
+nnoremap <silent> <leader>sr :belowright TermSendLine<cr>
 nnoremap <silent> <leader>sR :vertical TermSendLine<cr>
 vnoremap <silent> <leader>sr <esc>:TermSendVisLine<cr>
 " To simulate |i_CTRL-R| in terminal-mode: >
