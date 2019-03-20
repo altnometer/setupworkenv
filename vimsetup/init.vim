@@ -521,18 +521,7 @@ augroup END
   " cnoreabbrev <silent> <expr> x getcmdtype() == ":" && getcmdline() == 'x' ? 'Bdelete' : 'x'
   " cnoreabbrev x Sayonara
   nmap <leader>, :b#<CR>
-  tmap <leader>, <C-\><C-n>:b#<cr>
   nmap <leader>. :bprevious<CR>
-  tmap <leader>. <C-\><C-n>:bprevious<CR>
-  tmap <leader>1  <C-\><C-n><Plug>AirlineSelectTab1
-  tmap <leader>2  <C-\><C-n><Plug>AirlineSelectTab2
-  tmap <leader>3  <C-\><C-n><Plug>AirlineSelectTab3
-  tmap <leader>4  <C-\><C-n><Plug>AirlineSelectTab4
-  tmap <leader>5  <C-\><C-n><Plug>AirlineSelectTab5
-  tmap <leader>6  <C-\><C-n><Plug>AirlineSelectTab6
-  tmap <leader>7  <C-\><C-n><Plug>AirlineSelectTab7
-  tmap <leader>8  <C-\><C-n><Plug>AirlineSelectTab8
-  tmap <leader>9  <C-\><C-n><Plug>AirlineSelectTab9
   nmap <leader>1 <Plug>AirlineSelectTab1
   nmap <leader>2 <Plug>AirlineSelectTab2
   nmap <leader>3 <Plug>AirlineSelectTab3
