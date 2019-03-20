@@ -778,12 +778,15 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 let neoterm_default_mod = 'split'
 nnoremap <expr> <Plug>(CloseAllNeoterms) ':let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>'
 nmap <leader>se <Plug>(CloseAllNeoterms)
-" nmap <A-e> <Plug>(CloseAllNeoterms)
-tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
-tnoremap <A-e> <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
+" tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
+nmap <A-h> <Plug>(CloseAllNeoterms)
+tnoremap <A-h> <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
+nmap <A-o> :let g:neoterm_autoinsert=1 <bar> Topen<cr>
+tnoremap <A-o> <C-\><C-n>:let g:neoterm_autoinsert=1 <bar> Topen<cr>
 nnoremap <leader>so :Topen<cr>
 nnoremap <leader>sv :vertical  Topen<cr>
 nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
+nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
 nnoremap <A-o> :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 nnoremap <leader>sc :Tclear<cr>
 " vnoremap <A-s> :<C-u>TREPLSetTerm 1 <bar> TREPLSendSelection<CR>
