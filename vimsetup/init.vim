@@ -701,7 +701,9 @@ augroup elixir_cmds
   " autocmd BufWritePost *.ex,*.exs normal! :MixCompile<CR> :copen<CR>
   " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T clear<CR>
   autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :Texec iex clear<CR>
-  autocmd FileType elixir tmap <a-c> <c-\><c-n>:T clear<CR>a
+  autocmd FileType elixir nmap <buffer> <A-c> :wall!<CR> :Texec iex clear<CR>
+  autocmd FileType elixir imap <buffer> <A-c> <C-c>:Texec iex clear<CR>a
+  autocmd FileType elixir tmap <A-c> <c-\><c-n>:T clear<CR>a
   " autocmd FileType elixir nmap <leader>r :wall!<CR> :terminal elixir %<CR>
   " autocmd FileType elixir nmap <leader>r :wall!<CR> :terminal iex %<CR>a
   autocmd FileType elixir nmap <buffer> <leader>r :wall!<CR>:let g:neoterm_autoinsert=1 <bar> T iex  %<CR>
