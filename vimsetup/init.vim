@@ -80,6 +80,12 @@ Plug 'zchee/deoplete-go', {'do': 'make'}
 Plug 'mattn/emmet-vim'
 " 2}}}
 
+" elixir {{{2
+Plug 'gasparch/vim-elixir-exunit'
+Plug 'slashmili/alchemist.vim'
+Plug 'w0rp/ale'
+" 2}}}
+
 Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 " provides insert mode auto-completion for quotes, parens, brackets, etc.
