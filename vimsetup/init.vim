@@ -602,6 +602,126 @@ nmap <A-e> <plug>(TogglePrevNChars)
 "
 " }}}
 
+" ale ---------- ----------------------------------------------------------{{{
+let g:ale_elixir_elixir_ls_release = '/home/puppy/.local/share/elixir-ls/rel'
+set completeopt=menu,menuone,preview,noselect,noinsert
+" let g:ale_completion_enabled = 1
+let g:ale_elixir_elixir_ls_config = {
+    \   'elixirLS': {
+    \     'dialyzerEnabled': v:false,
+    \   },
+    \ }
+augroup ale_elixir
+  autocmd!
+  autocmd FileType elixir let b:ale_warn_about_trailing_blank_lines = 0
+  autocmd FileType elixir let b:ale_warn_about_trailing_whitespace = 0
+  autocmd FileType elixir nnoremap <buffer> <c-]> :ALEGoToDefinition<cr>
+  autocmd FileType elixir nnoremap <buffer> <c-]> :ALEGoToDefinition<cr>
+  autocmd FileType elixir nnoremap <buffer> ]l :ALENext<cr>
+  autocmd FileType elixir nnoremap <buffer> [l :ALEPrevious<cr>
+  " nmap <silent> <leader>aj :ALENext<cr>
+  " nmap <silent> <leader>ak :ALEPrevious<cr>
+augroup END
+" When set to `1`, only the linters from |g:ale_linters| and |b:ale_linters|
+let g:ale_linters_explicit = 1
+let g:ale_linters = {}
+let g:ale_linters.elixir = ['credo']
+" let g:ale_linters.elixir = ['elixir-ls', 'credo']
+
+let g:ale_fixers = {'*': ['remove_trailing_lines', 'trim_whitespace']}
+let g:ale_fixers.javascript = ['eslint']
+let g:ale_fixers.scss = ['stylelint']
+let g:ale_fixers.css = ['stylelint']
+let g:ale_fixers.elixir = ['mix_format']
+
+let g:ale_sign_column_always = 1
+let g:ale_echo_cursor = 0
+let g:ale_fix_on_save = 1
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_insert_leave = 1
+let g:ale_lint_delay = 200  " msec
+let g:ale_lint_on_text_changed = 0
+let g:ale_open_list = 0
+
+" nnoremap df :ALEFix<CR>
+" }}}
+
+" elixir ------------------------------------------------------------------{{{
+" credit to vim-go function! go#alternate#Switch(bang, cmd) abort
+" Test alternates between the implementation of code and the test code.
+function! s:alternate_test(bang, cmd) abort
+  let file = expand('%')
+  if empty(file)
+    " call go#util#EchoError("no buffer name")
+    echohl ErrorMsg
+    echomsg "No buffer name"
+    echohl None
+    return
+  elseif file =~# '^\f\+_test\.exs$'
+    let l:root = split(file, '_test.exs$')[0]
+    let l:alt_file = substitute(l:root, 'test', 'lib', "") . ".ex"
+  elseif file =~# '^\f\+\.ex$'
+    let l:root = split(file, ".ex$")[0]
+    let l:alt_file = substitute(l:root, 'lib', 'test', "") . "_test.exs"
+  else
+    echohl ErrorMsg
+    echomsg "not an elixir file"
+    echohl None
+    return
+  endif
+  if !filereadable(alt_file) && !bufexists(alt_file) && !a:bang
+    echohl ErrorMsg
+    echomsg "couldn't find " . alt_file
+    echohl None
+    return
+  elseif empty(a:cmd)
+    " execute ":" . go#config#AlternateMode() . " " . alt_file
+    execute ":" . "edit" . " " . alt_file
+  else
+    execute ":" . "edit" . " " . alt_file
+    " execute ":" . a:cmd . " " . alt_file
+  endif
+endfunction
+command! -bang ElAlternate call <SID>alternate_test(<bang>0, '')
+" autocmd FileType elixir nmap <leader>r :<C-u>call <SID>build_go_files()<CR>
+augroup elixir_cmds
+  autocmd!
+  " autocmd FileType elixir setlocal makeprg=mix\ credo\ suggest\ --format=flycheck
+  " autocmd FileType elixir setlocal makeprg=mix\ compile
+  " autocmd FileType elixir setlocal makeprg='mix'
+  " autocmd FileType elixir setlocal makeef=/tmp/elixir_vim_compile_error.txt
+  " autocmd FileType elixir setlocal shellpipe=2>
+  " autocmd FileType elixir setlocal errorformat=%A%f:%l:\ %m,%C%m
+  " autocmd FileType elixir setlocal errorformat=%f:%l:\ %t:\ %m
+  " autocmd FileType elixir setlocal errorformat=%A%t%*[^:]:\ %m,%C%f:%l:\ %m,%C%f:%l,%Z
+  " noremap <M-1> :w<CR>:set ch=5<CR>:make -d C:\\dev\\classes %:p<CR>
+  " autocmd FileType elixir nmap <buffer> <leader>b :w<CR>:set ch=5<CR>:make %:p<CR>
+  autocmd FileType elixir nmap <buffer> <leader>do :ExDoc<CR>
+  autocmd FileType elixir nmap <buffer> <leader>dd :ExDef<CR>
+  autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
+  autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
+  autocmd FileType elixir nmap <buffer> <leader>a :ElAlternate<CR>
+    " autocmd FileType go nmap <leader>a :GoAlternate<CR>
+  " autocmd BufWritePost *.ex,*.exs normal! :MixCompile<CR> :copen<CR>
+  " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T clear<CR>
+  autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :Texec iex clear<CR>
+  autocmd FileType elixir tmap <a-c> <c-\><c-n>:T clear<CR>a
+  " autocmd FileType elixir nmap <leader>r :wall!<CR> :terminal elixir %<CR>
+  " autocmd FileType elixir nmap <leader>r :wall!<CR> :terminal iex %<CR>a
+  autocmd FileType elixir nmap <buffer> <leader>r :wall!<CR>:let g:neoterm_autoinsert=1 <bar> T iex  %<CR>
+  " autocmd FileType elixir nmap <leader>r :wall!<CR>:let g:neoterm_autoinsert=1<CR>:T iex  %<CR>
+  autocmd FileType elixir nmap <buffer> <A-r> :wall!<CR> :terminal elixir %<CR>
+  autocmd FileType elixir imap <buffer> <A-r> <C-c>:wall!<CR> :terminal elixir %<CR>
+  " autocmd FileType elixir nmap <leader>r :<C-u>Texec elixir %"<CR>
+  " autocmd FileType elixir nmap <leader>f :wall!<CR>:silent !mix format %<CR>
+  autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> Texec iex clear<CR>
+" nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
+" nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
+  " autocmd BufWritePost *.ex,*.exs :silent !mix format % :redraw!
+  autocmd BufNewFile,BufRead *.ex,*.exs setlocal autowrite
+augroup END
+" }}}
+
 " emmet-vim ---------------------------------------------------------------{{{
 " Filters                |emmet-filters-list|
 " Customize              |emmet-customize|
