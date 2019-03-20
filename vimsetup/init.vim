@@ -1205,6 +1205,7 @@ augroup go_test_mappings
     autocmd!
     autocmd FileType go nmap <leader>tn :TestNearest -count=1<CR>
     autocmd FileType go nmap <leader>tr :TestNearest -race -count=1<CR>
+    " autocmd FileType go nmap <A-t> :TestLast<CR>
 augroup END
 " }}}
 
