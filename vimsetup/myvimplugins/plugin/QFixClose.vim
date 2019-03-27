@@ -24,7 +24,6 @@ endfunction
 function! s:MySmartClose() abort
   " TODO: implement winbufnr()
   " buflisted(), bufloaded()
-  exe "normal! :bdelete! " . b . "\r"
   let l:b_all = filter(range(1, bufnr("$")), 'bufexists(v:val)')
   let l:help_all = filter(copy(l:b_all), 'getbufvar(v:val, ''&ft'') ==# ''help''')
   " 0. delete 'help' buffer and exit.
