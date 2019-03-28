@@ -58,6 +58,14 @@ function! s:MySmartClose() abort
     endfor
     return
   endif
+  " 2.5. delete buffers with filetype 'diff'
+  let l:diff_all = filter(copy(l:b_all), 'getbufvar(v:val, ''&ft'') ==# ''diff''')
+  if len(l:diff_all) > 0
+    for b in l:diff_all
+        exe "normal! :bdelete! " . b . "\r"
+    endfor
+    return
+  endif
   " 3. If there is only one window open, delete current buffer and exit.
   " !!!MUST be called before closing the other windows.
   if winnr('$') == 1
