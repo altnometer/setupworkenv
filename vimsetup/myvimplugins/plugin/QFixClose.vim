@@ -23,10 +23,10 @@ endfunction
 " 4. If there is more than one window left, close them except the first one.
 function! s:MySmartClose() abort
   " TODO: implement winbufnr()
-  " buflisted(), bufloaded()
+  " collect all buffers
   let l:b_all = filter(range(1, bufnr("$")), 'bufexists(v:val)')
-  let l:help_all = filter(copy(l:b_all), 'getbufvar(v:val, ''&ft'') ==# ''help''')
   " 0. delete 'help' buffer and exit.
+  let l:help_all = filter(copy(l:b_all), 'getbufvar(v:val, ''&ft'') ==# ''help''')
   if len(l:help_all) > 0
     for b in l:help_all
         exe "normal! :bdelete! " . b . "\r"
