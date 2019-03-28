@@ -1,5 +1,4 @@
-# ~/.profile: executed by the command interpreter for login shells.
-# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
+# ~/.profile: executed by the command interpreter for login shells.  This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
 # exists.
 # see /usr/share/doc/bash/examples/startup-files for examples.
 # the files are located in the bash-doc package.
@@ -20,6 +19,13 @@ fi
 if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
+
+# add elixir binaries if they exist
+ELIXIR_LOCAL_BINARIES="$HOME/.local/share/elixir/bin"
+if [ -d "$ELIXIR_LOCAL_BINARIES" ] ; then
+    PATH="$ELIXIR_LOCAL_BINARIES:$PATH"
+fi
+
 local_bin="${HOME}/.local/bin"
 mkdir -p $local_bin
 PATH=$local_bin:$PATH
@@ -222,3 +228,12 @@ alias ksd='kubectl delete svc'
 export GOROOT=${HOME}/.local/share/go
 export GOPATH=${HOME}/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
+############nodejs#################
+VERSION=v10.15.1
+DISTRO=linux-x64
+# add nodejs binaries if they exist
+NODEJS_LOCAL_BINARIES="$HOME/.local/share/nodejs/node-$VERSION-$DISTRO/bin"
+if [ -d "$NODEJS_LOCAL_BINARIES" ] ; then
+   export PATH=$NODEJS_LOCAL_BINARIES:$PATH
+fi
