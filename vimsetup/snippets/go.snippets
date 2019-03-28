@@ -33,7 +33,7 @@ snippet errf "if err != nil { log.Fatal }"
   }${0}
 
 snippet lft "log.Fatal"
-  log.Fatal(${1:"${2\}", }${3:err})${0}
+  log.Fatalf("${1}", ${2:err})${0}
 
 # goroutine anonymous function
 snippet gom
@@ -47,3 +47,10 @@ snippet fumh "http handler function on reciever"
 	func (${1:receiver} ${2:type}) ${3:ServeHTTP}(${4:w} http.ResponseWriter, ${5:r} *http.Request) {
 		${0:${VISUAL}}
 	}
+
+# for range loop
+snippet form
+abbr for _, v := range items { ... }
+	for ${2:_, }${3:, v} := range ${1} {
+		${4}
+	}${0}
