@@ -695,7 +695,6 @@ augroup elixir_cmds
   autocmd FileType elixir nmap <buffer> <leader>do :ExDoc<CR>
   autocmd FileType elixir nmap <buffer> <leader>dd :ExDef<CR>
   autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
-  autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
   autocmd FileType elixir nmap <buffer> <leader>a :ElAlternate<CR>
     " autocmd FileType go nmap <leader>a :GoAlternate<CR>
   " autocmd BufWritePost *.ex,*.exs normal! :MixCompile<CR> :copen<CR>
