@@ -699,7 +699,7 @@ augroup elixir_cmds
     " autocmd FileType go nmap <leader>a :GoAlternate<CR>
   " autocmd BufWritePost *.ex,*.exs normal! :MixCompile<CR> :copen<CR>
   " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T clear<CR>
-  autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :Texec iex clear<CR>
+  " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :Texec iex clear<CR>
   autocmd FileType elixir nmap <buffer> <A-c> :Texec iex clear<CR>
   autocmd FileType elixir imap <buffer> <A-c> <C-c>:Texec iex clear<CR>a
   autocmd FileType elixir tmap <A-c> <c-\><c-n>:T clear<CR>a
