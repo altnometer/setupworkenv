@@ -1206,6 +1206,7 @@ nmap <silent> <leader>tn :TestNearest<CR>
 nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>ts :TestSuite<CR>
 nmap <silent> <leader>tl :TestLast<CR>
+nmap <silent> <A-t> :TestLast<CR>
 " go back to the tests file.
 nmap <silent> <leader>tv :TestVisit<CR>
 nmap <silent> <leader>te <Plug>(CloseAllNeoterms)
