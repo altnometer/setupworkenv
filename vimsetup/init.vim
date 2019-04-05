@@ -782,7 +782,8 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 
 " neoterm -------------------------------------------------------------------{{{
 " let neoterm_default_mod = 'tab'
-let neoterm_default_mod = 'split'
+" let neoterm_default_mod = 'split'
+let neoterm_default_mod = 'vertical'
 nnoremap <expr> <Plug>(CloseAllNeoterms) ':let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>'
 nmap <leader>se <Plug>(CloseAllNeoterms)
 " tnoremap <leader>se <C-\><C-n>:let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>
