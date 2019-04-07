@@ -93,6 +93,7 @@ Plug 'janko-m/vim-test'
 " display the indention levels with thin vertical lines
 " Plug 'Yggdroot/indentLine'
 Plug 'Valloric/MatchTagAlways'
+Plug 'sirtaj/vim-openscad'
 " Initialize plugin system
 Plug '~/.local/share/nvim/myvimplugins'
 call plug#end()
