@@ -805,6 +805,7 @@ nnoremap <leader>sc :Tclear<cr>
 " vnoremap <A-s> :<C-u>TREPLSendSelection<CR>
 " inoremap <A-s> <C-c>:TREPLSendLine<CR>a
 " let neoterm_autoinsert = 1
+let neoterm_autoscroll = 1
 " }}}
 
 " denite --------------------------------------------------------------------{{{
