@@ -660,7 +660,7 @@ function! s:alternate_test(bang, cmd) abort
     let l:alt_file = substitute(l:root, 'test', 'lib', "") . ".ex"
   elseif file =~# '^\f\+\.ex$'
     let l:root = split(file, ".ex$")[0]
-    let l:alt_file = substitute(l:root, 'lib', 'test', "") . "_test.exs"
+    let l:alt_file = substitute(l:root, 'lib/\([^/]\+/\)*', 'test/', "") . "_test.exs"
   else
     echohl ErrorMsg
     echomsg "not an elixir file"
