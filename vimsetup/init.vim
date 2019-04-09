@@ -647,7 +647,37 @@ let g:ale_open_list = 1
 " elixir ------------------------------------------------------------------{{{
 " credit to vim-go function! go#alternate#Switch(bang, cmd) abort
 " Test alternates between the implementation of code and the test code.
-function! s:alternate_test(bang, cmd) abort
+function! s:run_file_tests(bang, cmd) abort " {{{
+  let file = expand('%')
+  if empty(file)
+    echohl ErrorMsg
+    echomsg "No buffer name"
+    echohl None
+    return
+  elseif file =~# '^\f\+_test\.exs$'
+    let l:test_file = file
+  elseif file =~# '^\f\+\.ex$'
+    let l:root = split(file, ".ex$")[0]
+    let l:test_file = substitute(l:root, 'lib/\([^/]\+/\)*', 'test/', "") . "_test.exs"
+  else
+    echohl ErrorMsg
+    echomsg "not an elixir file"
+    echohl None
+    return
+  endif
+  if !filereadable(test_file) && !bufexists(test_file) && !a:bang
+    echohl ErrorMsg
+    echomsg "couldn't find " . alt_file
+    echohl None
+    return
+  elseif empty(a:cmd)
+    execute ":T mix test " . test_file
+    " execute "normal! :T mix test " .  test_file . "\<cr>"
+  else
+    execute ":T mix test " . test_file
+  endif
+endfunction " }}}
+function! s:alternate_test(bang, cmd) abort " {{{
   let file = expand('%')
   if empty(file)
     " call go#util#EchoError("no buffer name")
@@ -682,8 +712,9 @@ function! s:alternate_test(bang, cmd) abort
     execute ":" . "edit" . " " . alt_file
     " execute ":" . a:cmd . " " . alt_file
   endif
-endfunction
+endfunction " }}}
 command! -bang ElAlternate call <SID>alternate_test(<bang>0, '')
+command! -bang RunElixirTests call <SID>run_file_tests(<bang>0, '')
 " autocmd FileType elixir nmap <leader>r :<C-u>call <SID>build_go_files()<CR>
 augroup elixir_cmds
   autocmd!
@@ -722,6 +753,7 @@ augroup elixir_cmds
   autocmd FileType elixir nmap <buffer> <A-s> :TREPLSendLine<CR>
   autocmd FileType elixir vmap <buffer> <A-s> :<C-u>TREPLSendSelection<CR>
   autocmd FileType elixir imap <buffer> <A-s> <C-c>:TREPLSendLine<CR>a
+  autocmd FileType elixir nmap <buffer> <A-t> :RunElixirTests<CR>
   " nnoremap <A-s> :TREPLSendFile<CR>
 " nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 " nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
