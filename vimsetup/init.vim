@@ -657,7 +657,10 @@ function! s:alternate_test(bang, cmd) abort
     return
   elseif file =~# '^\f\+_test\.exs$'
     let l:root = split(file, '_test.exs$')[0]
-    let l:alt_file = substitute(l:root, 'test', 'lib', "") . ".ex"
+    let l:lib_path = substitute(expand('%:h'), "test", "lib", "")
+    let l:source_file = split(expand('%:t'), '_test.exs')[0] . ".ex"
+    let l:alt_file = globpath(l:lib_path, "**/" . l:source_file)
+    " let l:alt_file = substitute(l:root, 'test', 'lib', "") . ".ex"
   elseif file =~# '^\f\+\.ex$'
     let l:root = split(file, ".ex$")[0]
     let l:alt_file = substitute(l:root, 'lib/\([^/]\+/\)*', 'test/', "") . "_test.exs"
