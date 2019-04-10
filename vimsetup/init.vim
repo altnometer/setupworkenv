@@ -735,9 +735,9 @@ augroup elixir_cmds
     " autocmd FileType go nmap <leader>a :GoAlternate<CR>
   " autocmd BufWritePost *.ex,*.exs normal! :MixCompile<CR> :copen<CR>
   " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T clear<CR>
-  " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :Texec iex clear<CR>
-  autocmd FileType elixir nmap <buffer> <A-c> :Texec iex clear<CR>
-  autocmd FileType elixir imap <buffer> <A-c> <C-c>:Texec iex clear<CR>a
+  " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T iex clear<CR>
+  autocmd FileType elixir nmap <buffer> <A-c> :T iex clear<CR>
+  autocmd FileType elixir imap <buffer> <A-c> <C-c>:T iex clear<CR>a
   autocmd FileType elixir tmap <A-c> <c-\><c-n>:T clear<CR>a
   " autocmd FileType elixir nmap <leader>r :wall!<CR> :terminal elixir %<CR>
   " autocmd FileType elixir nmap <leader>r :wall!<CR> :terminal iex %<CR>a
@@ -747,9 +747,9 @@ augroup elixir_cmds
   " autocmd FileType elixir imap <buffer> <A-r> <C-c>:wall!<CR> :terminal elixir %<CR>
   autocmd FileType elixir nmap <buffer> <A-r> :TREPLSendFile<CR>
   autocmd FileType elixir imap <buffer> <A-r> <C-c>:TREPLSendFile<CR>a
-  " autocmd FileType elixir nmap <leader>r :<C-u>Texec elixir %"<CR>
+  " autocmd FileType elixir nmap <leader>r :<C-u>T elixir %"<CR>
   " autocmd FileType elixir nmap <leader>f :wall!<CR>:silent !mix format %<CR>
-  autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> Texec iex clear<CR>
+  autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> T iex clear<CR>
   autocmd FileType elixir nmap <buffer> <A-s> :TREPLSendLine<CR>
   autocmd FileType elixir vmap <buffer> <A-s> :<C-u>TREPLSendSelection<CR>
   autocmd FileType elixir imap <buffer> <A-s> <C-c>:TREPLSendLine<CR>a
