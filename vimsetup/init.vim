@@ -745,14 +745,14 @@ augroup elixir_cmds
   " autocmd FileType elixir nmap <leader>r :wall!<CR>:let g:neoterm_autoinsert=1<CR>:T iex  %<CR>
   " autocmd FileType elixir nmap <buffer> <A-r> :wall!<CR> :terminal elixir %<CR>
   " autocmd FileType elixir imap <buffer> <A-r> <C-c>:wall!<CR> :terminal elixir %<CR>
-  autocmd FileType elixir nmap <buffer> <A-r> :TREPLSendFile<CR>
-  autocmd FileType elixir imap <buffer> <A-r> <C-c>:TREPLSendFile<CR>a
+  autocmd FileType elixir nmap <buffer> <A-r> :Topen <bar> TREPLSendFile<CR>
+  autocmd FileType elixir imap <buffer> <A-r> <C-c>:Topen <bar> :TREPLSendFile<CR>a
   " autocmd FileType elixir nmap <leader>r :<C-u>T elixir %"<CR>
   " autocmd FileType elixir nmap <leader>f :wall!<CR>:silent !mix format %<CR>
-  autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> T iex clear<CR>
-  autocmd FileType elixir nmap <buffer> <A-s> :TREPLSendLine<CR>
-  autocmd FileType elixir vmap <buffer> <A-s> :<C-u>TREPLSendSelection<CR>
-  autocmd FileType elixir imap <buffer> <A-s> <C-c>:TREPLSendLine<CR>a
+  " autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> T iex clear<CR>
+  autocmd FileType elixir nmap <buffer> <A-s> :Topen <bar> :TREPLSendLine<CR>
+  autocmd FileType elixir vmap <buffer> <A-s> :<C-u>Topen <bar> :TREPLSendSelection<CR>
+  autocmd FileType elixir imap <buffer> <A-s> <C-c>:Topen <bar> :TREPLSendLine<CR>a
   autocmd FileType elixir nmap <buffer> <A-t> :RunElixirTests<CR>
   " nnoremap <A-s> :TREPLSendFile<CR>
 " nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
