@@ -342,6 +342,10 @@ nnoremap <expr> # <sid>IsVisible(search(expand("<cword>"), 'bnw')) ?  '#zO' :  '
 noremap _ <c-w>_
 " minimize window horizontally.
 noremap - <c-w>1_
+" maximize window vertically.
+" noremap <bar> <c-w><bar>
+" minimize window vertically.
+noremap <bar> <c-w>1<bar>
 " equalize window horizontally.
 " see ':map =', it is mapped to something. single '=' is slow because of that.
 noremap == <c-w>=
