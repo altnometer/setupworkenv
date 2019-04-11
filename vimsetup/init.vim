@@ -675,10 +675,10 @@ function! s:run_file_tests(bang, cmd) abort " {{{
     echohl None
     return
   elseif empty(a:cmd)
-    execute ":T mix test " . test_file
+    execute ":Topen | :T mix test " . test_file
     " execute "normal! :T mix test " .  test_file . "\<cr>"
   else
-    execute ":T mix test " . test_file
+    execute ":Topen | :T mix test " . test_file
   endif
 endfunction " }}}
 function! s:alternate_test(bang, cmd) abort " {{{
