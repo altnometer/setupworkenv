@@ -343,7 +343,8 @@ noremap _ <c-w>_
 " minimize window horizontally.
 noremap - <c-w>1_
 " maximize window vertically.
-" noremap <bar> <c-w><bar>
+" this is remapping of default behavior to stop over remaps.
+noremap <c-w><bar> <c-w><bar>
 " minimize window vertically.
 noremap <bar> <c-w>1<bar>
 " equalize window horizontally.
