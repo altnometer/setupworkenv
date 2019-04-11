@@ -54,7 +54,16 @@ function! s:MySmartClose() abort
   let l:term_all = filter(copy(l:b_all), 'match(bufname(v:val), ''^term'') != -1')
   if len(l:term_all) > 0
     for b in l:term_all
-      exe "normal! :bdelete! " . b . "\r"
+      " hide neoterm buffer
+      exe "normal! :Tclose\r"
+      " delete neoterm buffer
+      " exe "normal! :Tclose!\r"
+      " kill process in neoterm buffer
+      " exe "normal! :Tkill"
+      " kill IEx (elixir interactive shell, REPL)
+      " exe "normal! :Tkill | :Tkill\r"
+      " delete the buffer
+      " exe "normal! :bdelete! " . b . "\r"
     endfor
     return
   endif
