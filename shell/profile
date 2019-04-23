@@ -237,3 +237,8 @@ NODEJS_LOCAL_BINARIES="$HOME/.local/share/nodejs/node-$VERSION-$DISTRO/bin"
 if [ -d "$NODEJS_LOCAL_BINARIES" ] ; then
    export PATH=$NODEJS_LOCAL_BINARIES:$PATH
 fi
+
+############erlang#################
+# persist IEx and erland interactive shell history
+# and increase its size from default 512KB to 1MB
+export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_file_bytes 1024000"
