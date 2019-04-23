@@ -689,12 +689,15 @@ function! s:mymix_compile() abort " {{{
     " execute ":MixCompileAll"
     execute ":copen"
     return
-  elseif empty(a:cmd)
-    " execute ":" . go#config#AlternateMode() . " " . alt_file
-    execute ":" . "edit" . " " . alt_file
   else
-    execute ":" . "edit" . " " . alt_file
-    " execute ":" . a:cmd . " " . alt_file
+    let l:output = system("iex " . shellescape(expand('%')))
+    if match(l:output, 'Error') != -1
+      echohl ErrorMsg
+      echomsg "found error"
+      " echomsg "not a mix project"
+      echohl None
+      echomsg l:output
+    endif
   endif
 endfunction "}}}
 
