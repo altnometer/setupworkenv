@@ -64,15 +64,22 @@ function! s:MySmartClose() abort
     let g:neoterm_autoinsert=0
     for b in l:neoterm_all
       " hide neoterm buffer
-      exe "normal! :Tclose\r"
-      " delete neoterm buffer
-      " exe "normal! :Tclose!\r"
+      " exe "normal! :Tclose\r"
       " kill process in neoterm buffer
       " exe "normal! :Tkill"
       " kill IEx (elixir interactive shell, REPL)
-      " exe "normal! :Tkill | :Tkill\r"
-      " delete the buffer
-      " exe "normal! :bdelete! " . b . "\r"
+      exe "normal! :Tkill | :Tkill\r"
+      " delete neoterm buffer
+      exe "normal! :Tclose!\r"
+    endfor
+    return
+  endif
+  " 2.3 If any terminals are open, close them and exit.
+  let l:term_all = filter(copy(l:b_all), 'match(bufname(v:val), ''^term'') != -1')
+  if len(l:term_all) > 0
+    let g:neoterm_autoinsert=0
+    for b in l:term_all
+      exe "normal! :bdelete! " . b . "\r"
     endfor
     return
   endif
