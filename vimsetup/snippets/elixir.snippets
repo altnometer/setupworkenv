@@ -3,4 +3,13 @@
 # include c.snippets
 # whole directory
 # include javascript/*
-include ~/.local/share/nvim/plugged/snippets/elixir.snippets
+# include ~/.local/share/nvim/plugged/snippets/elixir.snippets
+include ~/.local/share/nvim/plugged/vim-snippets/snippets/elixir.snippets
+
+
+snippet df "def name(), do: ..."
+	def ${1:name}(${2}), do: ${3}
+
+# snippet fn "fn args -> ... end"
+#   option word
+# 	fn ${1:args} -> ${0} end
