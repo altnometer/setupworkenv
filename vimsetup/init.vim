@@ -650,8 +650,6 @@ let g:ale_open_list = 1
 " }}}
 
 " elixir ------------------------------------------------------------------{{{
-" credit to vim-go function! go#alternate#Switch(bang, cmd) abort
-" Test alternates between the implementation of code and the test code.
 function! s:run_file_tests(bang, cmd) abort " {{{
   let file = expand('%')
   if empty(file)
@@ -682,33 +680,14 @@ function! s:run_file_tests(bang, cmd) abort " {{{
     execute ":Topen | :T mix test " . test_file
   endif
 endfunction " }}}
-function! s:alternate_test(bang, cmd) abort " {{{
-  let file = expand('%')
-  if empty(file)
-    " call go#util#EchoError("no buffer name")
-    echohl ErrorMsg
-    echomsg "No buffer name"
-    echohl None
-    return
-  elseif file =~# '^\f\+_test\.exs$'
-    let l:root = split(file, '_test.exs$')[0]
-    let l:lib_path = substitute(expand('%:h'), "test", "lib", "")
-    let l:source_file = split(expand('%:t'), '_test.exs')[0] . ".ex"
-    let l:alt_file = globpath(l:lib_path, "**/" . l:source_file)
-    " let l:alt_file = substitute(l:root, 'test', 'lib', "") . ".ex"
-  elseif file =~# '^\f\+\.ex$'
-    let l:root = split(file, ".ex$")[0]
-    let l:alt_file = substitute(l:root, 'lib/\([^/]\+/\)*', 'test/', "") . "_test.exs"
-  else
-    echohl ErrorMsg
-    echomsg "not an elixir file"
-    echohl None
-    return
-  endif
-  if !filereadable(alt_file) && !bufexists(alt_file) && !a:bang
-    echohl ErrorMsg
-    echomsg "couldn't find " . alt_file
-    echohl None
+command! -bang RunElixirTests call <SID>run_file_tests(<bang>0, '')
+command! -bang MyMixCompile call <SID>mymix_compile()
+function! s:mymix_compile() abort " {{{
+  " if s:mix_file_exist(expand('%:h'))
+  if s:mix_file_exist(expand('%'))
+    execute ":MixCompile"
+    " execute ":MixCompileAll"
+    execute ":copen"
     return
   elseif empty(a:cmd)
     " execute ":" . go#config#AlternateMode() . " " . alt_file
@@ -717,9 +696,18 @@ function! s:alternate_test(bang, cmd) abort " {{{
     execute ":" . "edit" . " " . alt_file
     " execute ":" . a:cmd . " " . alt_file
   endif
-endfunction " }}}
-command! -bang ElAlternate call <SID>alternate_test(<bang>0, '')
-command! -bang RunElixirTests call <SID>run_file_tests(<bang>0, '')
+endfunction "}}}
+
+function! s:mix_file_exist(filepath) "{{{
+  if match(a:filepath, "lib/") != -1
+    let l:root = split(a:filepath, "lib/", 1)[0]
+  elseif match(a:filepath, "test/") != -1
+    let l:root = split(a:filepath, "test/", 1)[0]
+  end
+  let l:mix_file = strlen(l:root) ? l:root . "/mix.exs" : "./mix.exs"
+  return filereadable(l:mix_file)
+endfunction
+" }}}
 " autocmd FileType elixir nmap <leader>r :<C-u>call <SID>build_go_files()<CR>
 augroup elixir_cmds
   autocmd!
