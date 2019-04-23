@@ -49,11 +49,20 @@ function! s:MySmartClose() abort
   "   exe "normal! :cclose \<bar> :lclose\r"
   "   return
   " endif
-  " 2. If any terminals are open, close them and exit.
-  " let l:term_all = filter(l:b_all, 'match(bufname(v:val), ''^term'') != -1')
-  let l:term_all = filter(copy(l:b_all), 'match(bufname(v:val), ''^term'') != -1')
-  if len(l:term_all) > 0
-    for b in l:term_all
+  " 2. Close terminals.
+  " 2.1 Close fzf terminals.
+  let l:fzfterm_all = filter(copy(l:b_all), 'getbufvar(v:val, ''&ft'') ==# ''fzf''')
+  if len(l:fzfterm_all) > 0
+    for b in l:fzfterm_all
+      exe "normal! :bdelete! " . b . "\r"
+    endfor
+    return
+  endif
+  " 2.2 Close neoterm terminals.
+  let l:neoterm_all = filter(copy(l:b_all), 'getbufvar(v:val, ''&ft'') ==# ''neoterm''')
+  if len(l:neoterm_all) > 0
+    let g:neoterm_autoinsert=0
+    for b in l:neoterm_all
       " hide neoterm buffer
       exe "normal! :Tclose\r"
       " delete neoterm buffer
