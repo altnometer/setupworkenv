@@ -104,6 +104,12 @@ call plug#end()
 " Don't use TABs but spaces
 filetype plugin indent on
 set tabstop=4 softtabstop=4 shiftwidth=4 shiftround expandtab
+" Show (partial) commands (or size of selection in Visual mode) in the status line
+set showcmd
+" Show matching brackets when text indicator is over them
+set showmatch
+" How many tenths of a second to blink when matching brackets
+set mat=2
 set nostartofline " do not move cursor to start of line on commands like 'jump'
 " do not remove inserted indentation when switching to normal mode.
 " https://stackoverflow.com/questions/7413036/stopping-vim-from-removing-indentation-on-empty-lines
