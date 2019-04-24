@@ -84,6 +84,7 @@ Plug 'mattn/emmet-vim'
 Plug 'gasparch/vim-elixir-exunit'
 Plug 'slashmili/alchemist.vim'
 Plug 'w0rp/ale'
+" https://github.com/mhinz/vim-mix-format
 Plug 'mhinz/vim-mix-format'
 " 2}}}
 
