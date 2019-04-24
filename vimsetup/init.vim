@@ -638,7 +638,7 @@ let g:ale_linters = {}
 let g:ale_linters.elixir = ['credo']
 " let g:ale_linters.elixir = ['elixir-ls', 'credo']
 
-" let g:ale_fixers = {'*': ['remove_trailing_lines', 'trim_whitespace']}
+let g:ale_fixers = {'*': ['remove_trailing_lines', 'trim_whitespace']}
 let g:ale_fixers.javascript = ['eslint']
 let g:ale_fixers.scss = ['stylelint']
 let g:ale_fixers.css = ['stylelint']
