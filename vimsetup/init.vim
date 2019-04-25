@@ -81,6 +81,7 @@ Plug 'mattn/emmet-vim'
 " 2}}}
 
 " elixir {{{2
+Plug 'elixir-editors/vim-elixir'
 Plug 'gasparch/vim-elixir-exunit'
 Plug 'slashmili/alchemist.vim'
 Plug 'w0rp/ale'
