@@ -641,7 +641,7 @@ let g:ale_fixers = {'*': ['remove_trailing_lines', 'trim_whitespace']}
 let g:ale_fixers.javascript = ['eslint']
 let g:ale_fixers.scss = ['stylelint']
 let g:ale_fixers.css = ['stylelint']
-let g:ale_fixers.elixir = ['mix_format']
+" let g:ale_fixers.elixir = ['mix_format']
 
 let g:ale_sign_column_always = 1
 let g:ale_echo_cursor = 0
