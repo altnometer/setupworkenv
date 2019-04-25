@@ -658,11 +658,6 @@ let g:ale_open_list = 1
 " }}}
 
 " elixir ------------------------------------------------------------------{{{
-" vim-mix-format ----------------------------------------------------------{{{2
-let g:mix_format_on_save = 1
-let g:mix_format_options = '--check-equivalent'
-" let g:mix_format_silent_errors = 1
-" }}}2
 function! s:run_file_tests(bang, cmd) abort " {{{
   let file = expand('%')
   if empty(file)
