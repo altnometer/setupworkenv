@@ -138,7 +138,7 @@ function! elixir#job#Options(args) " {{{
         \ 'jobdir': fnameescape(expand("%:p:h")),
         \ 'messages': [],
         \ 'bang': 0,
-        \ 'for': "_job",
+        \ 'for': '_job',
         \ 'exited': 0,
         \ 'exit_status': 0,
         \ 'closed': 0,
@@ -176,42 +176,42 @@ function! elixir#job#Options(args) " {{{
       call win_gotoid(l:winid)
     endif
 
-    " call self.show_errors(a:job, a:exit_status, a:data)
+    call self.show_errors(a:job, a:exit_status, a:data)
   endfunction
 
-  " function state.show_status(job, exit_status) dict " {{{2
-  "   if self.statustype == ''
-  "     return
-  "   endif
+  function state.show_status(job, exit_status) dict " {{{2
+    if self.statustype == ''
+      return
+    endif
 
-  "   if go#config#EchoCommandInfo()
-  "     let prefix = '[' . self.statustype . '] '
-  "     if a:exit_status == 0
-  "       call go#util#EchoSuccess(prefix . "SUCCESS")
-  "     else
-  "       call go#util#EchoError(prefix . "FAIL")
-  "     endif
-  "   endif
+    " if go#config#EchoCommandInfo()
+    let prefix = '[' . self.statustype . '] '
+    if a:exit_status == 0
+      call elixir#echo#Success(prefix . "SUCCESS")
+    else
+      call elixir#echo#Error(prefix . "FAIL")
+    endif
+    " endif
 
-  "   let status = {
-  "         \ 'desc': 'last status',
-  "         \ 'type': self.statustype,
-  "         \ 'state': "success",
-  "         \ }
+    let status = {
+          \ 'desc': 'last status',
+          \ 'type': self.statustype,
+          \ 'state': "success",
+          \ }
 
-  "   if a:exit_status
-  "     let status.state = "failed"
-  "   endif
+    if a:exit_status
+      let status.state = "failed"
+    endif
 
-  "   if has_key(self, 'started_at')
-  "     let elapsed_time = reltimestr(reltime(self.started_at))
-  "     " strip whitespace
-  "     let elapsed_time = substitute(elapsed_time, '^\s*\(.\{-}\)\s*$', '\1', '')
-  "     let status.state .= printf(" (%ss)", elapsed_time)
-  "   endif
+    if has_key(self, 'started_at')
+      let elapsed_time = reltimestr(reltime(self.started_at))
+      " strip whitespace
+      let elapsed_time = substitute(elapsed_time, '^\s*\(.\{-}\)\s*$', '\1', '')
+      let status.state .= printf(" (%ss)", elapsed_time)
+    endif
 
-  "   call go#statusline#Update(self.jobdir, status)
-  " endfunction "}}}2
+    " call go#statusline#Update(self.jobdir, status)
+  endfunction "}}}2
 
   if has_key(a:args, 'complete')
     let state.custom_complete = a:args.complete
@@ -232,63 +232,63 @@ function! elixir#job#Options(args) " {{{
   " to state. See :help Partial for more information.
   let cbs.exit_cb = function('s:exit_cb', [], state)
 
-  " function state.show_errors(job, exit_status, data) " {{{2
-  "   if self.for == '_'
-  "     return
-  "   endif
+  function state.show_errors(job, exit_status, data) " {{{2
+    if self.for == '_'
+      return
+    endif
 
-  "   let l:winid = win_getid(winnr())
-  "   " Always set the active window to the window that was active when the job
-  "   " was started. Among other things, this makes sure that the correct
-  "   " window's location list will be populated when the list type is
-  "   " 'location' and the user has moved windows since starting the job.
-  "   call win_gotoid(self.winid)
+    let l:winid = win_getid(winnr())
+    " Always set the active window to the window that was active when the job
+    " was started. Among other things, this makes sure that the correct
+    " window's location list will be populated when the list type is
+    " 'location' and the user has moved windows since starting the job.
+    call win_gotoid(self.winid)
 
-  "   let l:listtype = go#list#Type(self.for)
-  "   if a:exit_status == 0
-  "     call go#list#Clean(l:listtype)
-  "     call win_gotoid(l:winid)
-  "     return
-  "   endif
+    let l:listtype = self.for
+    if a:exit_status == 0
+      call elixir#list#Clean(l:listtype)
+      call win_gotoid(l:winid)
+      return
+    endif
 
-  "   let l:listtype = go#list#Type(self.for)
-  "   if len(a:data) == 0
-  "     call go#list#Clean(l:listtype)
-  "     call win_gotoid(l:winid)
-  "     return
-  "   endif
+    let l:listtype = elixir#list#Type(self.for)
+    if len(a:data) == 0
+      call elixir#list#Clean(l:listtype)
+      call win_gotoid(l:winid)
+      return
+    endif
 
-  "   let out = join(self.messages, "\n")
+    let out = join(self.messages, "\n")
 
-  "   let l:cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
-  "   try
-  "     " parse the errors relative to self.jobdir
-  "     execute l:cd self.jobdir
-  "     call go#list#ParseFormat(l:listtype, self.errorformat, out, self.for)
-  "     let errors = go#list#Get(l:listtype)
-  "   finally
-  "     execute l:cd fnameescape(self.dir)
-  "   endtry
+    let l:cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+    try
+      " parse the errors relative to self.jobdir
+      execute l:cd self.jobdir
+      call elixir#list#ParseFormat(l:listtype, self.errorformat, out, self.for)
+      let errors = elixir#list#Get(l:listtype)
+    finally
+      execute l:cd fnameescape(self.dir)
+    endtry
 
 
-  "   if empty(errors)
-  "     " failed to parse errors, output the original content
-  "     call go#util#EchoError([self.dir] + self.messages)
-  "     call win_gotoid(l:winid)
-  "     return
-  "   endif
+    if empty(errors)
+      " failed to parse errors, output the original content
+      call go#util#EchoError([self.dir] + self.messages)
+      call win_gotoid(l:winid)
+      return
+    endif
 
-  "   " only open the error window if user was still in the window from which
-  "   " the job was started.
-  "   if self.winid == l:winid
-  "     call go#list#Window(l:listtype, len(errors))
-  "     if self.bang
-  "       call win_gotoid(l:winid)
-  "     else
-  "       call go#list#JumpToFirst(l:listtype)
-  "     endif
-  "   endif
-  " endfunction " }}}2
+    " only open the error window if user was still in the window from which
+    " the job was started.
+    if self.winid == l:winid
+      call elixir#list#Window(l:listtype, len(errors))
+      if self.bang
+        call win_gotoid(l:winid)
+      else
+        call elixir#list#JumpToFirst(l:listtype)
+      endif
+    endif
+  endfunction " }}}2
 
   return cbs
 endfunction " }}}
@@ -434,7 +434,7 @@ function! s:exit_cb(job, exitval) dict
   let self.exit_status = a:exitval
   let self.exited = 1
 
-  " call self.show_status(a:job, a:exitval)
+  call self.show_status(a:job, a:exitval)
 
   if self.closed || has('nvim')
     call self.complete(a:job, self.exit_status, self.messages)
