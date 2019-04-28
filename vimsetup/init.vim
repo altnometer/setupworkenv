@@ -82,6 +82,7 @@ Plug 'mattn/emmet-vim'
 
 " elixir {{{2
 Plug 'elixir-editors/vim-elixir'
+" https://github.com/gasparch/vim-elixir-exunit
 Plug 'gasparch/vim-elixir-exunit'
 Plug 'slashmili/alchemist.vim'
 Plug 'w0rp/ale'
