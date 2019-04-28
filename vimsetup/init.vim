@@ -524,7 +524,7 @@ augroup END
     "   let g:airline_symbols = {}
     " endif
 
-    let g:airline#extensions#tabline#enabled = 1
+    " let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#mike#enabled = 0
     set hidden
     let g:airline#extensions#tabline#fnamemod = ':t'
