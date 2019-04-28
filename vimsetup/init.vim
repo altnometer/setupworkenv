@@ -710,6 +710,7 @@ function! s:mymix_compile() abort " {{{
 endfunction "}}}
 
 function! s:mix_file_exist(filepath) "{{{
+  let l:root = ''
   if match(a:filepath, "lib/") != -1
     let l:root = split(a:filepath, "lib/", 1)[0]
   elseif match(a:filepath, "test/") != -1
