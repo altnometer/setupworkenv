@@ -739,7 +739,8 @@ augroup elixir_cmds
   autocmd FileType elixir nmap <buffer> <leader>do :ExDoc<CR>
   autocmd FileType elixir nmap <buffer> <leader>dd :ExDef<CR>
   autocmd FileType elixir nmap <buffer> <leader>df :wall!<CR>:silent !mix format  %<CR>
-  autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
+  " autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
+  autocmd FileType elixir nmap <buffer> <leader>b :ElixirCompile<CR>
   autocmd FileType elixir nmap <buffer> <leader>a :ElAlternate!<CR>
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-vertical)
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-split)
