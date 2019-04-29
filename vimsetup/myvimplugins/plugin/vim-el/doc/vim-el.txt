@@ -1,0 +1,48 @@
+
+                                                          *'g:el_list_height'*
+
+Sets the quickfix/location list window heights.
+If not set, the lists would accommodate up to 10 items.
+>
+  let g:el_list_height = 0
+<
+                                                            *'g:el_list_type'*
+
+Sets the default quickfix/location list type for commands outputs.
+If not set, the preset values are used.
+>
+  let g:el_list_type = ""
+<
+                                                   *'g:el_list_type_commands'*
+
+Sets a quickfix/location list type for a specific command output.
+If not set for a specific command, |'g:el_list_type'| is used.
+>
+  let g:el_list_type_commands = {}
+<
+This example sets the list type for all commands to
+`locationlist` except for `:ElCompile` where `quickfix` is used:
+>
+  let g:el_list_type = "locationlist"
+  let g:el_list_type_commands = {"ElixirCompile": "quickfix"}
+<
+
+                                                       *'g:el_list_autoclose'*
+
+Specifies whether the quickfix/location list should be closed automatically
+in the absence of errors.  The default value is 1.
+If you prefer to keep a long running error window open, you can disable
+this by setting the value to 0.
+>
+  let g:el_list_autoclose = 1
+<
+                                                                *'g:el_debug'*
+
+A list of options to debug; useful for development and/or reporting bugs.
+
+Currently accepted values:
+
+  shell-commands     Echo all shell commands that vim-el runs.
+>
+      let g:el_debug = []
+<
