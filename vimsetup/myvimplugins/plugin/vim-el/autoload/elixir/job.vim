@@ -54,24 +54,21 @@ function! elixir#job#Start(cmd, options) " {{{
     call remove(l:options, 'noblock')
   endif
 
-  " if go#util#HasDebug('shell-commands')
-  "   call elixir#echo#Info('job command: ' . string(a:cmd))
-  " endif
+  if elixir#config#HasDebug('shell-commands')
+    call elixir#echo#Info('job command: ' . string(a:cmd))
+  endif
 
-  if has('nvim')
-    let l:input = []
-    if has_key(a:options, 'in_io') && a:options.in_io ==# 'file' && !empty(a:options.in_name)
-      let l:input = readfile(a:options.in_name, "b")
-    endif
+  let l:input = []
+  if has_key(a:options, 'in_io') && a:options.in_io ==# 'file' && !empty(a:options.in_name)
+    let l:input = readfile(a:options.in_name, "b")
+  endif
 
-    let job = jobstart(a:cmd, l:options)
+  let job = jobstart(a:cmd, l:options)
 
-    if len(l:input) > 0
-      call chansend(job, l:input)
-      " close stdin to signal that no more bytes will be sent.
-      call chanclose(job, 'stdin')
-    endif
-  else
+  if len(l:input) > 0
+    call chansend(job, l:input)
+    " close stdin to signal that no more bytes will be sent.
+    call chanclose(job, 'stdin')
   endif
 
   if l:manualcd
@@ -146,9 +143,13 @@ function! elixir#job#Options(args) " {{{
         \ 'statustype' : ''
       \ }
 
-  let cbs.cwd = state.jobdir
+  if has_key(a:args, 'jobdir')
+    let cbs.cwd = a:args.jobdir
+  else
+    let cbs.cwd = state.jobdir
+  endif
 
-  if has_key(a:args, 'bang')
+  if has_key(a:args, 'bang') " {{{2
     let state.bang = a:args.bang
   endif
 
@@ -164,7 +165,12 @@ function! elixir#job#Options(args) " {{{
     let state.errorformat = a:args.errorformat
   endif
 
-  function state.complete(job, exit_status, data)
+  if has_key(a:args, 'complete')
+    let state.custom_complete = a:args.complete
+  endif
+  " }}}2
+
+  function state.complete(job, exit_status, data) " {{{2
     if has_key(self, 'custom_complete')
       let l:winid = win_getid(winnr())
       " Always set the active window to the window that was active when the job
@@ -177,7 +183,7 @@ function! elixir#job#Options(args) " {{{
     endif
 
     call self.show_errors(a:job, a:exit_status, a:data)
-  endfunction
+  endfunction " }}}2
 
   function state.show_status(job, exit_status) dict " {{{2
     if self.statustype == ''
@@ -213,10 +219,7 @@ function! elixir#job#Options(args) " {{{
     " call go#statusline#Update(self.jobdir, status)
   endfunction "}}}2
 
-  if has_key(a:args, 'complete')
-    let state.custom_complete = a:args.complete
-  endif
-
+  " explicitly bind functions to state dict {{{2
   " explicitly bind _start to state so that within it, self will
   " always refer to state. See :help Partial for more information.
   "
@@ -231,6 +234,7 @@ function! elixir#job#Options(args) " {{{
   " explicitly bind exit_cb to state so that within it, self will always refer
   " to state. See :help Partial for more information.
   let cbs.exit_cb = function('s:exit_cb', [], state)
+  " }}}2
 
   function state.show_errors(job, exit_status, data) " {{{2
     if self.for == '_'
@@ -244,7 +248,7 @@ function! elixir#job#Options(args) " {{{
     " 'location' and the user has moved windows since starting the job.
     call win_gotoid(self.winid)
 
-    let l:listtype = self.for
+    let l:listtype = elixir#list#Type(self.for)
     if a:exit_status == 0
       call elixir#list#Clean(l:listtype)
       call win_gotoid(l:winid)
@@ -271,9 +275,13 @@ function! elixir#job#Options(args) " {{{
     endtry
 
 
-    if empty(errors)
+    if !empty(errors)
       " failed to parse errors, output the original content
-      call go#util#EchoError([self.dir] + self.messages)
+      echomsg "errorformat: " . self.errorformat
+      let prefix = '[' . self.statustype . '] '
+      call elixir#echo#Error(['[' . self.statustype . '] ' .
+            \'FAILED PARSING ERRORS'] + self.messages)
+            " \self.dir] + self.messages)
       call win_gotoid(l:winid)
       return
     endif

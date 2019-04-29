@@ -6,8 +6,8 @@ let s:compile_opt = [
   \ '--return-errors',
   \]
 " credit to https://github.com/gasparch/vim-elixir-exunit
-function! elixir#compile#findMixDirectory() "{{{
-    let fName = expand("%:p:h")
+function! elixir#compile#findMixDirectory(filename) "{{{
+    let fName = a:filename
 
     while 1
         let mixFileName = fName . "/mix.exs"
@@ -29,17 +29,21 @@ function! elixir#compile#Build(bang, ...) abort " {{{
   " Create our command arguments. go build discards any results when it
   " compiles multiple packages. So we pass the `errors` package just as an
   " placeholder with the current folder (indicated with '.').
-  " let l:args =
-        " \ ['mix', 'compile', '--force'] +
-        " \ map(copy(a:000), "expand(v:val)")
+  let l:args =
+        \ ['mix', 'compile', '--force'] +
+        \ map(copy(a:000), "expand(v:val)")
   " let l:args = ['echo', 'hello from vim-el']
-  let l:args = [ 'iex', shellescape(expand('%')) ]
+  " let l:args = [ 'iex', shellescape(expand('%:p')) ]
+  " let l:args = [ 'iex', expand('%:p') ]
+  let l:project_dir = elixir#compile#findMixDirectory(expand("%:p:h"))
 
   call s:cmd_job({
         \ 'cmd': args,
         \ 'bang': a:bang,
+        \ 'jobdir': l:project_dir,
         \ 'for': 'ElixirCompile',
-        \ 'statustype': 'compile'
+        \ 'statustype': 'compile',
+        \ 'errorformat': s:ERROR_FORMATS['mix_compile']
         \})
 endfunction " }}}
 
@@ -114,3 +118,37 @@ endfunction " }}}
 
 "     return errors
 " endfunction " }}}
+  let s:ERROR_FORMATS = {
+              \ "mix_compile":
+                \'%-G%[\ ]%[\ ]%[\ ]%#(%.%#,'.
+                \'%E**\ (%[A-Z]%[%^)]%#)\ %f:%l:\ %m,'.
+                \'%Z%^%[\ ]%#%$,'.
+                \'%W%>warning:\ %m,'.
+                \'%-C\ \ %f:%l,'.
+                \'%-G==\ Compilation error%.%#,'.
+                \'%-G%[\ ]%#',
+              \ "mix_compile_errors_only":
+                \ "%-D**CWD**%f,".
+                \'%-G==\ Compilation error%.%#,'.
+                \'%-Gwarning:%.%#,'.
+                \'%-G%[\ ]%#,'.
+                \'%-G\ %.%#,'.
+                \'%E**\ (%[%^)]%#)\ %f:%l:\ %m',
+              \ "exunit_run":
+                \   '%D**CWD**%f,' .
+                \  '%-G%\\s%#,'.
+                \  '%-GSKIP,'.
+                \  '%-GGenerated\ %.%#\ app,'.
+                \  '%-GIncluding\ tags:%.%#,'.
+                \  '%-GExcluding\ tags:%.%#,'.
+                \  '%-GFinished\ in\ %.%#,'.
+                \  '%-G\ \ \ \ \ stacktrace:,'.
+                \     '**\ (%[A-Z]%\\w%\\+%trror)\ %f:%l:\ %m,'.
+                \  '%+G\ \ \ \ \ %\\w%\\+:\ ,'.
+                \   '%E\ \ %\\d%\\+)\ %m,' .
+                \   '%Z\ \ \ \ \ %f:%l,'.
+                \  '%+G\ \ \ \ \ %\\w%\\+,'.
+                \     '%t\ \ \ \ \ \ %f:%l:\ %m,'.
+                \ ""
+              \ }
+  " }}}
