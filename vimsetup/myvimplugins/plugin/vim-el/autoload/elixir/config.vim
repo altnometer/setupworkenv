@@ -6,7 +6,7 @@ function! elixir#config#ListType() abort
 endfunction
 
 function! elixir#config#ListTypeCommands() abort
-  return get(g:, 'elixir_list_type_commands', {})
+  return get(g:, 'el_list_type_commands', {})
 endfunction
 
 function! elixir#config#ListHeight() abort
