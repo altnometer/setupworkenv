@@ -63,7 +63,7 @@ function! elixir#list#ParseFormat(listtype, errformat, items, title) abort
   " backup users errorformat, will be restored once we are finished
   let old_errorformat = &errorformat
 
-  " parse and populate the location list
+  " parse and populate the quickfix/location list
   let &errorformat = a:errformat
   try
     call elixir#list#Parse(a:listtype, a:items, a:title)
