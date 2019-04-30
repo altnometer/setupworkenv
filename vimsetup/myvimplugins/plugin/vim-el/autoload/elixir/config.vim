@@ -21,3 +21,7 @@ endfunction
 function! elixir#config#HasDebug(flag)
   return index(elixir#config#Debug(), a:flag) >= 0
 endfunction
+
+function! elixir#config#ListAutoclose() abort
+  return get(g:, 'el_list_autoclose', 1)
+endfunction
