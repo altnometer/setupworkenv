@@ -249,14 +249,7 @@ function! elixir#job#Options(args) " {{{
     call win_gotoid(self.winid)
 
     let l:listtype = elixir#list#Type(self.for)
-    if a:exit_status == 0
-      call elixir#list#Clean(l:listtype)
-      call win_gotoid(l:winid)
-      return
-    endif
-
-    let l:listtype = elixir#list#Type(self.for)
-    if len(a:data) == 0
+    if a:exit_status == 0 || len(a:data) == 0
       call elixir#list#Clean(l:listtype)
       call win_gotoid(l:winid)
       return
