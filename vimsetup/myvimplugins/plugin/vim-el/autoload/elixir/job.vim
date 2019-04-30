@@ -277,7 +277,6 @@ function! elixir#job#Options(args) " {{{
 
     if !empty(errors)
       " failed to parse errors, output the original content
-      echomsg "errorformat: " . self.errorformat
       let prefix = '[' . self.statustype . '] '
       call elixir#echo#Error(['[' . self.statustype . '] ' .
             \'FAILED PARSING ERRORS'] + self.messages)
