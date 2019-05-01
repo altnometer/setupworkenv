@@ -1,3 +1,6 @@
+vim-el.txt	vim-el	Elixir learning plugin
+vim-el - TABLE OF CONTENTS                               *vim-el* *vim-el.txt*
+==============================================================================
 
                                                           *'g:el_list_height'*
 
