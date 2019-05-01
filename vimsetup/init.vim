@@ -660,6 +660,7 @@ let g:ale_open_list = 1
 " elixir ------------------------------------------------------------------{{{
 " vim-el {{{2
 " let g:el_debug = ["shell-commands"]
+  let g:el_list_height = 10
 " }}}2
 function! s:run_file_tests(bang, cmd) abort " {{{
   let file = expand('%')
