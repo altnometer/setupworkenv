@@ -26,25 +26,33 @@ endfunction "}}}
 
 " Compile the file to catch errors.
 function! elixir#compile#Build(bang, ...) abort " {{{
-  " Create our command arguments. go build discards any results when it
-  " compiles multiple packages. So we pass the `errors` package just as an
-  " placeholder with the current folder (indicated with '.').
-  let l:args =
-        \ ['mix', 'compile', '--force'] +
-        \ map(copy(a:000), "expand(v:val)")
-  " let l:args = ['echo', 'hello from vim-el']
-  " let l:args = [ 'iex', shellescape(expand('%:p')) ]
-  " let l:args = [ 'iex', expand('%:p') ]
-  let l:project_dir = elixir#compile#findMixDirectory(expand("%:p:h"))
+  let l:mix_project_dir = elixir#compile#findMixDirectory(expand("%:p:h"))
+  if l:mix_project_dir
+    let l:args =
+          \ ['mix', 'compile', '--force'] +
+          \ map(copy(a:000), "expand(v:val)")
+    call s:cmd_job({
+          \ 'cmd': args,
+          \ 'bang': a:bang,
+          \ 'jobdir': l:mix_project_dir,
+          \ 'for': 'ElixirCompile',
+          \ 'statustype': 'compile',
+          \ 'errorformat': s:ERROR_FORMATS['mix_compile']
+          \})
+          " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
+  else
+    " not a mix ploject: run in elixir IEx to catch errors.
+    let l:args = [ 'iex', expand('%:p') ]
+    call s:cmd_job({
+          \ 'cmd': args,
+          \ 'bang': a:bang,
+          \ 'for': 'ElixirCompile',
+          \ 'statustype': 'IEx compile',
+          \ 'errorformat': s:ERROR_FORMATS['iex_compile']
+          \})
+          " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
+  endif
 
-  call s:cmd_job({
-        \ 'cmd': args,
-        \ 'bang': a:bang,
-        \ 'jobdir': l:project_dir,
-        \ 'for': 'ElixirCompile',
-        \ 'statustype': 'compile',
-        \ 'errorformat': s:ERROR_FORMATS['mix_compile']
-        \})
 endfunction " }}}
 
 function! s:cmd_job(args) abort  " {{{
@@ -126,6 +134,13 @@ endfunction " }}}
                 \'%W%>warning:\ %m,'.
                 \'%-C\ \ %f:%l,'.
                 \'%-G==\ Compilation error%.%#,'.
+                \'%-G%[\ ]%#',
+              \ "iex_compile":
+                \'%E**\ (%[A-Z]%[%^)]%#)\ %f:%l:\ %m,'.
+                \'%E**\ (%[%^)]%#)\ %m,'.
+                \'%-C%[\ ]%#(elixir)\ %.%#,'.
+                \'%-C%[\ ]%#%f:%l:%.%#,'.
+                \'%Z%[\ ]%#,'.
                 \'%-G%[\ ]%#',
               \ "mix_compile_errors_only":
                 \ "%-D**CWD**%f,".
