@@ -268,7 +268,7 @@ function! elixir#job#Options(args) " {{{
     endtry
 
 
-    if !empty(errors)
+    if empty(errors)
       " failed to parse errors, output the original content
       let prefix = '[' . self.statustype . '] '
       call elixir#echo#Error(['[' . self.statustype . '] ' .
