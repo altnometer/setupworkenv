@@ -139,6 +139,9 @@ endfunction " }}}
                 \'%-C%[\ ]%#(elixir)\ %.%#,'.
                 \'%-C%[\ ]%#%f:%l:%.%#,'.
                 \'%Z%[\ ]%#,'.
+                \'%-Wwarning: redefining module%.%#,'.
+                \'%W%>warning:\ %m,'.
+                \'%-C\ \ %f:%l,'.
                 \'%-G==\ Compilation error%.%#,'.
                 \'%-G%[\ ]%#',
               \ "mix_compile_errors_only":
