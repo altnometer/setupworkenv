@@ -741,7 +741,7 @@ augroup elixir_cmds
   autocmd FileType elixir nmap <buffer> <leader>dd :ExDef<CR>
   autocmd FileType elixir nmap <buffer> <leader>df :wall!<CR>:silent !mix format  %<CR>
   " autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
-  autocmd FileType elixir nmap <buffer> <leader>b :ElixirCompile<CR>
+  autocmd FileType elixir nmap <buffer> <leader>b :ElixirCompile!<CR>
   autocmd FileType elixir nmap <buffer> <leader>a :ElixirAlternate!<CR>
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-vertical)
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-split)
@@ -750,7 +750,6 @@ augroup elixir_cmds
 " nnoremap <silent> <Plug>(elixir-alternate-vertical) :<C-u>call elixirgo#alternate#Switch(0, "vsplit")<CR>
     " autocmd FileType go nmap <leader>a :GoAlternate<CR>
   " autocmd BufWritePost *.ex,*.exs normal! :copen<CR> :MixCompile<CR>
-  autocmd BufWritePost *.ex,*.exs :MyMixCompile
   " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T clear<CR>
   " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T iex clear<CR>
   autocmd FileType elixir nmap <buffer> <A-c> :T iex clear<CR>
