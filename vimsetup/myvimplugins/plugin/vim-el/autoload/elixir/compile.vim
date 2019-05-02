@@ -39,18 +39,16 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'statustype': 'mix_compile',
           \ 'errorformat': s:ERROR_FORMATS['mix_compile']
           \})
-          " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
   else
-    " not a mix ploject: run in elixir IEx to catch errors.
+    " not a mix ploject: run 'elixirc' to catch errors.
     let l:args = [ 'elixirc', expand('%:p') ]
     call s:cmd_job({
-          \ 'cmd': args,
+          \ 'cmd': l:args,
           \ 'bang': a:bang,
           \ 'for': 'ElixirCompile',
           \ 'statustype': 'elixirc_compile',
           \ 'errorformat': s:ERROR_FORMATS['elixirc_compile']
           \})
-          " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
   endif
 
 endfunction " }}}
