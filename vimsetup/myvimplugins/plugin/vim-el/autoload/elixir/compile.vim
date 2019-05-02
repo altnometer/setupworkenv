@@ -27,7 +27,7 @@ endfunction "}}}
 " Compile the file to catch errors.
 function! elixir#compile#Build(bang, ...) abort " {{{
   let l:mix_project_dir = elixir#compile#findMixDirectory(expand("%:p:h"))
-  if l:mix_project_dir
+  if len(l:mix_project_dir) != 0
     let l:args =
           \ ['mix', 'compile', '--force'] +
           \ map(copy(a:000), "expand(v:val)")
