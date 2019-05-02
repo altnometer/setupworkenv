@@ -5,7 +5,7 @@
 " Otherwise g:el_loclist_height is used.
 " If no len(errors) is given, or it is 0, it closes the window by default.
 " To prevent this, set g:el_list_autoclose = 0
-function! elixir#list#Window(listtype, ...) abort
+function! elixir#list#Window(listtype, ...) abort " {{{
   " we don't use lwindow to close the location list as we need also the
   " ability to resize the window. So, we are going to use lopen and lclose
   " for a better user experience. If the number of errors in a current
@@ -31,20 +31,20 @@ function! elixir#list#Window(listtype, ...) abort
   else
     exe 'copen ' . height
   endif
-endfunction
+endfunction " }}}
 
 
 " Get returns the current items from the list
-function! elixir#list#Get(listtype) abort
+function! elixir#list#Get(listtype) abort " {{{
   if a:listtype == "locationlist"
     return getloclist(0)
   else
     return getqflist()
   endif
-endfunction
+endfunction " }}}
 
 " Populate populate the list with the given items
-function! elixir#list#Populate(listtype, items, title) abort
+function! elixir#list#Populate(listtype, items, title) abort " {{{
   if a:listtype == "locationlist"
     call setloclist(0, a:items, 'r')
 
@@ -55,11 +55,11 @@ function! elixir#list#Populate(listtype, items, title) abort
     call setqflist(a:items, 'r')
     if has("patch-7.4.2200") | call setqflist([], 'a', {'title': a:title}) | endif
   endif
-endfunction
+endfunction " }}}
 
 " Parse parses the given items based on the specified errorformat and
 " populates the list.
-function! elixir#list#ParseFormat(listtype, errformat, items, title) abort
+function! elixir#list#ParseFormat(listtype, errformat, items, title) abort " {{{
   " backup users errorformat, will be restored once we are finished
   let old_errorformat = &errorformat
 
@@ -71,11 +71,11 @@ function! elixir#list#ParseFormat(listtype, errformat, items, title) abort
     "restore back
     let &errorformat = old_errorformat
   endtry
-endfunction
+endfunction " }}}
 
 " Parse parses the given items based on the global errorformat and
 " populates the list.
-function! elixir#list#Parse(listtype, items, title) abort
+function! elixir#list#Parse(listtype, items, title) abort " {{{
   if a:listtype == "locationlist"
     lgetexpr a:items
     if has("patch-7.4.2200") | call setloclist(0, [], 'a', {'title': a:title}) | endif
@@ -83,19 +83,19 @@ function! elixir#list#Parse(listtype, items, title) abort
     cgetexpr a:items
     if has("patch-7.4.2200") | call setqflist([], 'a', {'title': a:title}) | endif
   endif
-endfunction
+endfunction " }}}
 
 " JumpToFirst jumps to the first item in the location list
-function! elixir#list#JumpToFirst(listtype) abort
+function! elixir#list#JumpToFirst(listtype) abort " {{{
   if a:listtype == "locationlist"
     ll 1
   else
     cc 1
   endif
-endfunction
+endfunction " }}}
 
 " Clean cleans and closes the location list
-function! elixir#list#Clean(listtype) abort
+function! elixir#list#Clean(listtype) abort " {{{
   if a:listtype == "locationlist"
     lex []
   else
@@ -103,10 +103,10 @@ function! elixir#list#Clean(listtype) abort
   endif
 
   call elixir#list#Close(a:listtype)
-endfunction
+endfunction " }}}
 
 " Close closes the location list
-function! elixir#list#Close(listtype) abort
+function! elixir#list#Close(listtype) abort " {{{
   let autoclose_window = elixir#config#ListAutoclose()
   if !autoclose_window
     return
@@ -117,19 +117,19 @@ function! elixir#list#Close(listtype) abort
   else
     cclose
   endif
-endfunction
+endfunction " }}}
 
-function! s:listtype(listtype) abort
+function! s:listtype(listtype) abort " {{{
   let listtype = elixir#config#ListType()
   if empty(listtype)
     return a:listtype
   endif
 
   return listtype
-endfunction
+endfunction " }}}
 
-" s:default_list_type_commands is the defaults that will be used for each of
-" the supported commands (see documentation for g:el_list_type_commands). When
+" s:default_list_type_commands is the defaults that will be used for each {{{
+" of the supported commands (see documentation for g:el_list_type_commands). When
 " defining a default, quickfix should be used if the command operates on
 " multiple files, while locationlist should be used if the command operates on a
 " single file or buffer. Keys that begin with an underscore are not supported
@@ -154,8 +154,9 @@ let s:default_list_type_commands = {
       \ "_term":                "locationlist",
       \ "_job":                 "locationlist",
   \ }
+" }}}
 
-function! elixir#list#Type(for) abort
+function! elixir#list#Type(for) abort " {{{
   let l:listtype = s:listtype(get(s:default_list_type_commands, a:for))
   if l:listtype == "0"
     call elixir#util#Error(printf(
@@ -165,4 +166,4 @@ function! elixir#list#Type(for) abort
   endif
 
   return get(elixir#config#ListTypeCommands(), a:for, l:listtype)
-endfunction
+endfunction " }}}
