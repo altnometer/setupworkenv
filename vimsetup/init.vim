@@ -778,7 +778,7 @@ augroup elixir_cmds
 " nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
   " autocmd BufWritePost *.ex,*.exs :silent !mix format % :redraw!
   autocmd BufNewFile,BufRead *.ex,*.exs setlocal autowrite
-  autocmd BufWritePre *.ex,*exs :silent noautocmd update | ElFormat
+  autocmd BufWritePre *.ex,*exs :silent noautocmd update | ElixirFormat
 augroup END
 " }}}
 
