@@ -42,13 +42,13 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
   else
     " not a mix ploject: run in elixir IEx to catch errors.
-    let l:args = [ 'iex', expand('%:p') ]
+    let l:args = [ 'elixirc', expand('%:p') ]
     call s:cmd_job({
           \ 'cmd': args,
           \ 'bang': a:bang,
           \ 'for': 'ElixirCompile',
-          \ 'statustype': 'iex_compile',
-          \ 'errorformat': s:ERROR_FORMATS['iex_compile']
+          \ 'statustype': 'elixirc_compile',
+          \ 'errorformat': s:ERROR_FORMATS['elixirc_compile']
           \})
           " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
   endif
@@ -135,12 +135,13 @@ endfunction " }}}
                 \'%-C\ \ %f:%l,'.
                 \'%-G==\ Compilation error%.%#,'.
                 \'%-G%[\ ]%#',
-              \ "iex_compile":
+              \ "elixirc_compile":
                 \'%E**\ (%[A-Z]%[%^)]%#)\ %f:%l:\ %m,'.
-                \'%E**\ (%[%^)]%#)\ %m,'.
+                \'%E**%>\ (%[%^)]%#)\ %m,'.
                 \'%-C%[\ ]%#(elixir)\ %.%#,'.
                 \'%-C%[\ ]%#%f:%l:%.%#,'.
                 \'%Z%[\ ]%#,'.
+                \'%-G==\ Compilation error%.%#,'.
                 \'%-G%[\ ]%#',
               \ "mix_compile_errors_only":
                 \ "%-D**CWD**%f,".
