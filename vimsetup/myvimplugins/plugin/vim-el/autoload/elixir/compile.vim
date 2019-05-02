@@ -36,7 +36,7 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'bang': a:bang,
           \ 'jobdir': l:mix_project_dir,
           \ 'for': 'ElixirCompile',
-          \ 'statustype': 'compile',
+          \ 'statustype': 'mix_compile',
           \ 'errorformat': s:ERROR_FORMATS['mix_compile']
           \})
           " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
@@ -47,7 +47,7 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'cmd': args,
           \ 'bang': a:bang,
           \ 'for': 'ElixirCompile',
-          \ 'statustype': 'IEx compile',
+          \ 'statustype': 'iex_compile',
           \ 'errorformat': s:ERROR_FORMATS['iex_compile']
           \})
           " \ 'errorformat': s:ERROR_FORMATS['mix_compile_errors_only']
