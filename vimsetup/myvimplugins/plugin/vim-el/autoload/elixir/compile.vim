@@ -41,7 +41,7 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \})
   else
     " not a mix ploject: run 'elixirc' to catch errors.
-    let l:args = [ 'elixirc', expand('%:p') ]
+    let l:args = [ 'elixirc', '--ignore-module-conflict', '--warnings-as-errors',  expand('%:p') ]
     call s:cmd_job({
           \ 'cmd': l:args,
           \ 'bang': a:bang,
