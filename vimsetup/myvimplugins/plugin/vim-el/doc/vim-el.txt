@@ -32,10 +32,9 @@ This example sets the list type for all commands to
 
                                                        *'g:el_list_autoclose'*
 
-Specifies whether the quickfix/location list should be closed automatically
-in the absence of errors.  The default value is 1.
-If you prefer to keep a long running error window open, you can disable
-this by setting the value to 0.
+If set to 1 (default),
+would close the quickfix/location window for an empty error list.
+Set it to 0 to keep the window open.
 >
   let g:el_list_autoclose = 1
 <
