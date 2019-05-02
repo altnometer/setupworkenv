@@ -1,10 +1,10 @@
 " copied from
 " https://github.com/fatih/vim-go/blob/master/autoload/go/list.vim
-" Window opens the list with the given height up to 10 lines maximum.
-" Otherwise g:go_loclist_height is used.
 
-" If no or zero height is given it closes the window by default.
-" To prevent this, set g:go_list_autoclose = 0
+" Window opens the list with the given height up to 10 lines maximum.
+" Otherwise g:el_loclist_height is used.
+" If no len(errors) is given, or it is 0, it closes the window by default.
+" To prevent this, set g:el_list_autoclose = 0
 function! elixir#list#Window(listtype, ...) abort
   " we don't use lwindow to close the location list as we need also the
   " ability to resize the window. So, we are going to use lopen and lclose
@@ -129,11 +129,11 @@ function! s:listtype(listtype) abort
 endfunction
 
 " s:default_list_type_commands is the defaults that will be used for each of
-" the supported commands (see documentation for g:go_list_type_commands). When
+" the supported commands (see documentation for g:el_list_type_commands). When
 " defining a default, quickfix should be used if the command operates on
 " multiple files, while locationlist should be used if the command operates on a
 " single file or buffer. Keys that begin with an underscore are not supported
-" in g:go_list_type_commands.
+" in g:el_list_type_commands.
 let s:default_list_type_commands = {
       \ "ElixirCompile":              "quickfix",
       \ "GoDebug":              "quickfix",
