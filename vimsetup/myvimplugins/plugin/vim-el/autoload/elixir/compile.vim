@@ -37,7 +37,8 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'jobdir': l:mix_project_dir,
           \ 'for': 'ElixirCompile',
           \ 'statustype': 'mix_compile',
-          \ 'errorformat': s:ERROR_FORMATS['mix_compile']
+          \ 'errorformat': s:ERROR_FORMATS['mix_compile'],
+          \ 'complete': function('s:complete_compile'),
           \})
   else
     " not a mix ploject: run 'elixirc' to catch errors.
@@ -47,11 +48,18 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'bang': a:bang,
           \ 'for': 'ElixirCompile',
           \ 'statustype': 'elixirc_compile',
-          \ 'errorformat': s:ERROR_FORMATS['elixirc_compile']
+          \ 'errorformat': s:ERROR_FORMATS['elixirc_compile'],
+          \ 'complete': function('s:complete_compile'),
           \})
   endif
 
 endfunction " }}}
+
+function! s:complete_compile(jobid, exit_status, data)
+  if a:exit_status == 0
+    call elixir#fmt#Format()
+  endif
+endfunction
 
 function! s:cmd_job(args) abort  " {{{
   " autowrite is not enabled for jobs
