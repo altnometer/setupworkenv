@@ -739,7 +739,7 @@ augroup elixir_cmds
   " autocmd FileType elixir nmap <buffer> <leader>b :w<CR>:set ch=5<CR>:make %:p<CR>
   autocmd FileType elixir nmap <buffer> <leader>do :ExDoc<CR>
   autocmd FileType elixir nmap <buffer> <leader>dd :ExDef<CR>
-  autocmd FileType elixir nmap <buffer> <leader>df :wall!<CR>:silent !mix format  %<CR>
+  autocmd FileType elixir nmap <buffer> <leader>df :wall!<CR>:ElixirFormat<CR>
   " autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
   autocmd FileType elixir nmap <buffer> <leader>b :ElixirCompile!<CR>
   autocmd FileType elixir nmap <buffer> <leader>a :ElixirAlternate!<CR>
