@@ -142,7 +142,8 @@ endfunction " }}}
                 \'%W%>warning:\ %m,'.
                 \'%-C\ \ %f:%l,'.
                 \'%-G==\ Compilation error%.%#,'.
-                \'%-G%[\ ]%#',
+                \'%-G%[\ ]%#,'.
+                \'%-G%.%#',
               \ "mix_compile_errors_only":
                 \ "%-D**CWD**%f,".
                 \'%-G==\ Compilation error%.%#,'.
