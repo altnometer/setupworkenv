@@ -11,7 +11,7 @@ if exists('b:loaded_mix_format')
   finish
 endif
 
-function! s:on_stdout_nvim(_job, data, _event) dict abort
+function! s:on_stdout_nvim(_job, data, _event) dict abort " {{{
   if empty(a:data[-1])
     " Second-last item is the last complete line in a:data.
     let self.stdout += self.stdoutbuf + a:data[:-2]
@@ -28,9 +28,9 @@ function! s:on_stdout_nvim(_job, data, _event) dict abort
             \ + a:data[1:]
     endif
   endif
-endfunction
+endfunction " }}}
 
-function! s:on_exit(_job, exitval, ...) dict abort
+function! s:on_exit(_job, exitval, ...) dict abort " {{{
   let source_win_id = win_getid()
   call win_gotoid(self.win_id)
 
@@ -82,11 +82,15 @@ function! s:on_exit(_job, exitval, ...) dict abort
   " attempt to relocate the cursor intelligently: move current line by number
   " of lines changed, as in
   " https://github.com/fatih/vim-go/blob/master/autoload/go/fmt.vim
-  call cursor(line('.') + (line('$') - total_lines_old), column_old)
+  " TODO: silly me, the file has already been changed at this point.
+  " echomsg "old lines: " . total_lines_old
+  " echomsg "new lines: " . line('$')
+  " echomsg "diff lines: " . (line('$') - total_lines_old)
+  " call cursor(line('.') + (line('$') - total_lines_old), column_old)
   return
-endfunction
+endfunction " }}}
 
-function! s:build_cmd(filename) abort
+function! s:build_cmd(filename) abort " {{{
   let options = get(g:, 'mix_format_options', '--check-equivalent')
 
   let dot_formatter = findfile('.formatter.exs', expand('%:p:h').';')
@@ -96,9 +100,9 @@ function! s:build_cmd(filename) abort
   let filename = shellescape(a:filename)
 
   return printf('mix format %s %s', options, filename)
-endfunction
+endfunction " }}}
 
-function! elixir#fmt#Format() abort
+function! elixir#fmt#Format() abort " {{{
   if &modified
     redraw | echohl WarningMsg | echo 'Unsaved buffer. Quitting.' | echohl NONE
     return
@@ -128,6 +132,6 @@ function! elixir#fmt#Format() abort
         \ 'on_stderr': function('s:on_stdout_nvim'),
         \ 'on_exit':   function('s:on_exit'),
         \ }))
-endfunction
+endfunction " }}}
 
 let b:loaded_mix_format = 1
