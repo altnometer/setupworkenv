@@ -68,11 +68,12 @@ function! s:on_exit(_job, exitval, ...) dict abort " {{{
   endif
 
   " Need to keep file properties to restore later.
-  let column_old = col('.')
   let total_lines_old = line('$')
+  let l:view = winsaveview()
 
   let [fdl, sol, ur] = [&foldlevel, &startofline, &undoreload]
   let [&startofline, &undoreload] = [0, 10000]
+  " let &undoreload = 10000
   try
     silent edit!
   finally
@@ -82,11 +83,10 @@ function! s:on_exit(_job, exitval, ...) dict abort " {{{
   " attempt to relocate the cursor intelligently: move current line by number
   " of lines changed, as in
   " https://github.com/fatih/vim-go/blob/master/autoload/go/fmt.vim
-  " TODO: silly me, the file has already been changed at this point.
-  " echomsg "old lines: " . total_lines_old
-  " echomsg "new lines: " . line('$')
-  " echomsg "diff lines: " . (line('$') - total_lines_old)
-  " call cursor(line('.') + (line('$') - total_lines_old), column_old)
+  let l:lines_diff = line('$') - total_lines_old
+
+  let l:view.lnum = l:view.lnum + l:lines_diff
+  call winrestview(l:view)
   return
 endfunction " }}}
 
