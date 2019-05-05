@@ -762,7 +762,7 @@ augroup elixir_cmds
   " autocmd FileType elixir nmap <leader>r :wall!<CR> :terminal iex %<CR>a
   " autocmd FileType elixir nmap <buffer> <leader>r :let g:neoterm_autoinsert=1 <bar> T iex  %<CR>
   autocmd FileType elixir nmap <buffer> <leader>r :let g:neoterm_autoinsert=1 <bar>
-        \ Texec iex Code.compiler_options(ignore_module_conflict: true) clear c("%")<CR>
+        \ Texec iex Code.compiler_options(ignore_module_conflict:\ true) clear c("%")<CR>
   " autocmd FileType elixir nmap <leader>r :wall!<CR>:let g:neoterm_autoinsert=1<CR>:T iex  %<CR>
   " autocmd FileType elixir nmap <buffer> <A-r> :wall!<CR> :terminal elixir %<CR>
   " autocmd FileType elixir imap <buffer> <A-r> <C-c>:wall!<CR> :terminal elixir %<CR>
