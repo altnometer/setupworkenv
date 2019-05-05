@@ -171,6 +171,7 @@ augroup auto_system
     autocmd Filetype vim,neosnippet,html,gohtmltmpl setlocal tabstop=2 shiftwidth=2
     autocmd Filetype text setlocal tabstop=8 softtabstop=4 shiftwidth=4 noexpandtab
     autocmd Filetype vim,neosnippet setlocal keywordprg=:help
+    autocmd Filetype gitcommit setlocal spell spelllang=en_us
     " stop jumping to the next line when the current line goes over the limit.
     autocmd Filetype html,gohtmltmpl,sh,python setlocal textwidth=0
     " Wrap lines in quickfix
