@@ -29,7 +29,8 @@ function! elixir#list#Window(listtype, ...) abort " {{{
   if a:listtype == "locationlist"
     exe 'lopen ' . height
   else
-    exe 'copen ' . height
+    exe 'topleft copen ' . height
+    " exe 'copen ' . height
   endif
 endfunction " }}}
 
