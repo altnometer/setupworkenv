@@ -979,6 +979,7 @@ command! -bang -nargs=? -complete=dir FzfFiles
 " command! -bang -nargs=0 FzfBuffers
 "   \ call fzf#vim#buffers(<q-args>, fzf#vim#with_preview('up:60%'), <bang>0)
 let g:fzf_command_prefix = 'Fzf'
+let g:fzf_layout = {'up': '~40%'}
 nnoremap <leader>fg :FzfFiles<cr>
 nnoremap <A-f> :FzfFiles<cr>
 nnoremap <leader>ff :FzfGFiles<cr>
