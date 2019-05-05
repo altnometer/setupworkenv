@@ -10,6 +10,6 @@ include ~/.local/share/nvim/plugged/vim-snippets/snippets/elixir.snippets
 snippet df "def name(), do: ..."
 	def ${1:name}(${2}), do: ${3}
 
-# snippet fn "fn args -> ... end"
-#   option word
-# 	fn ${1:args} -> ${0} end
+snippet fn "fn args -> ... end"
+options word
+	fn ${1:_} -> ${2} end${0}
