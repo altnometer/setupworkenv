@@ -85,24 +85,6 @@ function! elixir#compile#autowrite() abort " {{{
   endif
 endfunction " }}}
 
-" function! vimelixirexunit#runMixCompileCommand(arg) " {{{
-"     let mixDir = vimelixirexunit#findMixDirectory()
-
-"     let makeprg = 'mix compile'
-"     if a:arg == '!'
-"         let makeprg .= ' --force'
-"     endif
-
-"     let compilerDef = {
-"         \ 'makeprg': makeprg,
-"         \ 'target': 'qfkeep',
-"         \ 'cwd': mixDir,
-"         \ 'errorformat': s:ERROR_FORMATS['mix_compile']
-"         \ }
-
-"     let errors = s:runCompiler(compilerDef)
-" endfunction " }}}
-
 " function! s:runCompiler(options) " {{{
 "     " save options and locale env variables
 "     let old_cwd = getcwd()
