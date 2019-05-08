@@ -168,6 +168,16 @@ function! elixir#job#Options(args) " {{{
   if has_key(a:args, 'complete')
     let state.custom_complete = a:args.complete
   endif
+
+  " this was not in the go-vim, hence, watch out for side effects.
+  if has_key(a:args, 'out_cb')
+    " let state.std_out = a:args.std_out
+    let cbs.out_cb = function(a:args.out_cb, [], state)
+  endif
+  if has_key(a:args, 'err_cb')
+    " let state.err_cb = a:args.err_cb
+    let cbs.err_cb = function(a:args.err_cb, [], state)
+  endif
   " }}}2
 
   function state.complete(job, exit_status, data) " {{{2
