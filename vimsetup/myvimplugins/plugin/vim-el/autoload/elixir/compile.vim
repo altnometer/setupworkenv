@@ -75,6 +75,11 @@ function! s:out_callback(jobid, msg) dict " {{{
     let self.exit_status = 1
     let self.exited = 1
   endif
+  if a:msg =~? "SIGTERM received"
+    let self.exit_status = 1
+    let self.exited = 1
+    call add(self.messages, 'warning: SIGTERM received, possibly jobstop() was called after timeout')
+  endif
 endfunction " }}}
 
 " This is just an example. If it is not defined, then the 'callback'
