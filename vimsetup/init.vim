@@ -778,6 +778,7 @@ augroup elixir_cmds
   autocmd FileType elixir imap <buffer> <A-s> <C-c>:Topen <bar> :TREPLSendLine<CR>a
   autocmd FileType elixir nmap <buffer> <A-t> :RunElixirTests<CR>
   autocmd FileType elixir nmap <buffer> <C-s> :silent noautocmd update <bar> UnifiedElixirCompile<CR>
+  autocmd FileType elixir imap <buffer> <C-s> <Esc>:silent noautocmd update <bar> UnifiedElixirCompile<CR>
   " nnoremap <A-s> :TREPLSendFile<CR>
 " nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 " nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
