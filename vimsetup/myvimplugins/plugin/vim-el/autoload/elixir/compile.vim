@@ -51,6 +51,8 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'statustype': 'elixirc_compile',
           \ 'errorformat': s:ERROR_FORMATS['elixirc_compile'],
           \ 'complete': function('s:complete_compile'),
+          \ 'out_cb': function('s:out_callback'),
+          \ 'err_cb': function('s:err_callback'),
           \})
   endif
 
@@ -60,7 +62,26 @@ function! s:complete_compile(jobid, exit_status, data)
   if a:exit_status == 0
     call elixir#fmt#Format()
   endif
-endfunction
+endfunction " }}}
+
+function! s:out_callback(jobid, msg) dict " {{{
+  call add(self.messages, a:msg)
+  " echomsg "out_callback: " . a:msg
+  " Sometimes, an error msgs are sent to stdout (e.g. when a child process
+  " raises an error, but the parent continue running).
+  " 'SIGTERM received' is sent to stdout and exits with code 0,
+  " but we want it to indicate an error.
+  if a:msg =~? 'error' || a:msg =~? "SIGTERM received"
+    let self.exit_status = 1
+    let self.exited = 1
+  endif
+endfunction " }}}
+
+" This is just an example. If it is not defined, then the 'callback'
+" defined in elixir/jobs.vim is used.
+function! s:err_callback(jobid, msg) dict " {{{
+  call add(self.messages, a:msg)
+endfunction " }}}
 
 function! s:cmd_job(args) abort  " {{{
   " autowrite is not enabled for jobs
