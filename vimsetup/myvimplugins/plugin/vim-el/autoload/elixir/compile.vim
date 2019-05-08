@@ -94,7 +94,7 @@ function! s:cmd_job(args) abort  " {{{
   " TODO: make wait time a setting for the user.
   let wait_res = jobwait([jobid], 500)
   if wait_res[0] != 0 " job already exited
-    " if the job is already exited, an error will be thrown.
+    " if the job has already exited, an error will be thrown.
     try | call jobstop(jobid) | finally | return | endtry
   endif
 endfunction " }}}
