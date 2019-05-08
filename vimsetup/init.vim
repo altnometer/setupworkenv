@@ -696,7 +696,6 @@ function! s:run_file_tests(bang, cmd) abort " {{{
   endif
 endfunction " }}}
 command! -bang RunElixirTests call <SID>run_file_tests(<bang>0, '')
-command! -bang MyMixCompile call <SID>mymix_compile()
 function! s:mymix_compile() abort " {{{
   " if s:mix_file_exist(expand('%:h'))
   if s:mix_file_exist(expand('%'))
@@ -740,11 +739,12 @@ augroup elixir_cmds
   " autocmd FileType elixir setlocal errorformat=%A%t%*[^:]:\ %m,%C%f:%l:\ %m,%C%f:%l,%Z
   " noremap <M-1> :w<CR>:set ch=5<CR>:make -d C:\\dev\\classes %:p<CR>
   " autocmd FileType elixir nmap <buffer> <leader>b :w<CR>:set ch=5<CR>:make %:p<CR>
+  autocmd Filetype elixir command! -buffer UnifiedElixirCompile ElixirCompile
   autocmd FileType elixir nmap <buffer> <leader>do :ExDoc<CR>
   autocmd FileType elixir nmap <buffer> <leader>dd :ExDef<CR>
   autocmd FileType elixir nmap <buffer> <leader>df :wall!<CR>:ElixirFormat<CR>
   " autocmd FileType elixir nmap <buffer> <leader>b :MixCompile<CR> :copen<CR>
-  autocmd FileType elixir nmap <buffer> <leader>b :ElixirCompile!<CR>
+  autocmd FileType elixir nmap <buffer> <leader>b :UnifiedElixirCompile<CR>
   autocmd FileType elixir nmap <buffer> <leader>a :ElixirAlternate!<CR>
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-vertical)
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-split)
@@ -783,7 +783,7 @@ augroup elixir_cmds
   " autocmd BufWritePost *.ex,*.exs :silent !mix format % :redraw!
   autocmd BufNewFile,BufRead *.ex,*.exs setlocal autowrite
   " autocmd BufWritePre *.ex,*exs :silent noautocmd update | ElixirFormat
-  autocmd BufWritePre *.ex,*exs :silent noautocmd update | ElixirCompile!
+  autocmd BufWritePre *.ex,*exs :silent noautocmd update | UnifiedElixirCompile
   " ElixirCompile would jump to error, ElixirCompile would not.
   " autocmd BufWritePost *.ex,*.exs :ElixirCompile!
   " autocmd BufWritePost *.ex,*.exs :ElixirFormat
