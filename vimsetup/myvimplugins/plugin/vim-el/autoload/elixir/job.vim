@@ -431,10 +431,16 @@ function! s:callback(chan, msg) dict
 endfunction
 
 function! s:exit_cb(job, exitval) dict
-  let self.exit_status = a:exitval
-  let self.exited = 1
+  " Do not reset self.exit_status if on_err or on_stdout callbacks
+  " have already set it. on_stdout and on_err are allowed to do this
+  " because, sometimes, errors are sent to stdout (by elixirc). Or, jobstop()
+  " exits with code 0 and ignores previous errors.
+  if self.exited == 0
+    let self.exit_status = a:exitval
+    let self.exited = 1
+  endif
 
-  call self.show_status(a:job, a:exitval)
+  call self.show_status(a:job, self.exit_status)
 
   if self.closed || has('nvim')
     call self.complete(a:job, self.exit_status, self.messages)
