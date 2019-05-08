@@ -777,15 +777,15 @@ augroup elixir_cmds
   autocmd FileType elixir vmap <buffer> <A-s> :<C-u>Topen <bar> :TREPLSendSelection<CR>
   autocmd FileType elixir imap <buffer> <A-s> <C-c>:Topen <bar> :TREPLSendLine<CR>a
   autocmd FileType elixir nmap <buffer> <A-t> :RunElixirTests<CR>
+  autocmd FileType elixir nmap <buffer> <C-s> :silent noautocmd update <bar> UnifiedElixirCompile<CR>
   " nnoremap <A-s> :TREPLSendFile<CR>
 " nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 " nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
   " autocmd BufWritePost *.ex,*.exs :silent !mix format % :redraw!
   autocmd BufNewFile,BufRead *.ex,*.exs setlocal autowrite
   " autocmd BufWritePre *.ex,*exs :silent noautocmd update | ElixirFormat
-  autocmd BufWritePre *.ex,*exs :silent noautocmd update | UnifiedElixirCompile
+  " autocmd BufWritePre *.ex,*exs :silent noautocmd update | UnifiedElixirCompile
   " ElixirCompile would jump to error, ElixirCompile would not.
-  " autocmd BufWritePost *.ex,*.exs :ElixirCompile!
   " autocmd BufWritePost *.ex,*.exs :ElixirFormat
 augroup END
 " }}}
