@@ -71,7 +71,7 @@ function! s:out_callback(jobid, msg) dict " {{{
   " raises an error, but the parent continue running).
   " 'SIGTERM received' is sent to stdout and exits with code 0,
   " but we want it to indicate an error.
-  if a:msg =~? 'error' || a:msg =~? "SIGTERM received"
+  if a:msg =~? 'error'
     let self.exit_status = 1
     let self.exited = 1
   endif
