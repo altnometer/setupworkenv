@@ -58,7 +58,7 @@ function! elixir#compile#Build(bang, ...) abort " {{{
 
 endfunction " }}}
 
-function! s:complete_compile(jobid, exit_status, data)
+function! s:complete_compile(jobid, exit_status, data) " {{{
   if a:exit_status == 0
     call elixir#fmt#Format()
   endif
