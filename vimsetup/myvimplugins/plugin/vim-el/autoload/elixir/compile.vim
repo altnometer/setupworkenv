@@ -97,7 +97,7 @@ function! s:cmd_job(args) abort  " {{{
   " Sometimes, the compiled code would run some process and would not exit.
   " If the job does not exit within a period, we jobstop() it.
   " TODO: make wait time a setting for the user.
-  let wait_res = jobwait([jobid], 500)
+  let wait_res = jobwait([jobid], 1000)
   if wait_res[0] != 0 " job already exited
     " if the job has already exited, an error will be thrown.
     try | call jobstop(jobid) | finally | return | endtry
