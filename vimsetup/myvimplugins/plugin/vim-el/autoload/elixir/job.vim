@@ -449,6 +449,8 @@ function! s:exit_cb(job, exitval) dict
     let self.exit_status = a:exitval
     let self.exited = 1
   endif
+  " echomsg "self.exited: " . self.exited
+  " echomsg "self.exit_status " . self.exit_status
 
   call self.show_status(a:job, self.exit_status)
 
