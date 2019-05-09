@@ -65,6 +65,7 @@ function! s:complete_compile(jobid, exit_status, data) " {{{
 endfunction " }}}
 
 function! s:out_callback(jobid, msg) dict " {{{
+  " echomsg "out_callback: " . string(a:msg)
   call add(self.messages, a:msg)
   " echomsg "out_callback: " . a:msg
   " Sometimes, an error msgs are sent to stdout (e.g. when a child process
@@ -85,6 +86,7 @@ endfunction " }}}
 " This is just an example. If it is not defined, then the 'callback'
 " defined in elixir/jobs.vim is used.
 function! s:err_callback(jobid, msg) dict " {{{
+  " echomsg "err_callback: " . string(a:msg)
   call add(self.messages, a:msg)
 endfunction " }}}
 
