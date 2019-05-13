@@ -668,9 +668,7 @@ let g:ale_open_list = 0
 function! s:run_file_tests(bang, cmd) abort " {{{
   let file = expand('%')
   if empty(file)
-    echohl ErrorMsg
-    echomsg "No buffer name"
-    echohl None
+    echohl ErrorMsg | echomsg "No buffer name" | echohl None
     return
   elseif file =~# '^\f\+_test\.exs$'
     let l:test_file = file
@@ -678,9 +676,7 @@ function! s:run_file_tests(bang, cmd) abort " {{{
     let l:root = split(file, ".ex$")[0]
     let l:test_file = substitute(l:root, 'lib/\([^/]\+/\)*', 'test/', "") . "_test.exs"
   else
-    echohl ErrorMsg
-    echomsg "not an elixir file"
-    echohl None
+    echohl ErrorMsg | echomsg "not an elixir file" | echohl None
     return
   endif
   if !filereadable(test_file) && !bufexists(test_file) && !a:bang
