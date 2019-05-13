@@ -686,9 +686,11 @@ function! s:run_file_tests(bang, cmd) abort " {{{
     return
   elseif empty(a:cmd)
     execute ":Topen | :T mix test " . test_file
+    vertical resize 86
     " execute "normal! :T mix test " .  test_file . "\<cr>"
   else
     execute ":Topen | :T mix test " . test_file
+    vertical resize 86
   endif
 endfunction " }}}
 command! -bang RunElixirTests call <SID>run_file_tests(<bang>0, '')
