@@ -13,3 +13,16 @@ snippet df "def name(), do: ..."
 snippet fn "fn args -> ... end"
 options word
 	fn ${1:_} -> ${2} end${0}
+
+# When compiled, produces an error report by vim elixir plugin.
+# Used for debuging.
+snippet er "IO.puts("error: ...")
+  # $1
+  IO.puts("error: #{__ENV__.file}: # ${1:breakpoint}# inspect: #{${2:inspect(${3\})}}")${0}
+
+# When compiled, produces an error report by vim elixir plugin.
+# The error message is the elirxir code output.
+# Used for debuging.
+snippet ew "IO.writes("error: ...")
+  # $1
+  IO.write("error: #{__ENV__.file}: # ${1:breakpoint}# inspect: ")${0}
