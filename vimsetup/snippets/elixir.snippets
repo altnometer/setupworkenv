@@ -12,7 +12,7 @@ snippet df "def name(), do: ..."
 
 snippet fn "fn args -> ... end"
 options word
-	fn ${1:_} -> ${2} end${0}
+	fn ${1:#:args} -> ${2} end${0}
 
 # When compiled, produces an error report by vim elixir plugin.
 # Used for debuging.
