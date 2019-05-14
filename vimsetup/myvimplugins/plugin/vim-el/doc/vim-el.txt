@@ -48,3 +48,17 @@ Currently accepted values:
 >
       let g:el_debug = []
 <
+                                                      *'g:compile_and_format'*
+
+Format the file if it compiles successfully.
+Do nothing if set to 0 (default).
+>
+      let g:compile_and_format = 0
+>
+                                                      *'g:compile_and_test'*
+
+Run tests if the file compiles successfully.
+Do nothing if set to 0 (default).
+>
+      let g:compile_and_test = 0
+>

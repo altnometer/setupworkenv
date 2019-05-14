@@ -62,7 +62,12 @@ endfunction " }}}
 
 function! s:complete_compile(jobid, exit_status, data) " {{{
   if a:exit_status == 0
-    call elixir#fmt#Format()
+    if get(g:, 'el_compile_and_format', 0)
+      call elixir#fmt#Format()
+    endif
+    if get(g:, 'el_compile_and_test', 0)
+      RunElixirTests
+    endif
   endif
 endfunction " }}}
 
