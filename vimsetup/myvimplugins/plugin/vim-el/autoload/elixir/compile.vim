@@ -179,6 +179,7 @@ endfunction " }}}
                 \'%-C\ \ %f:%l,'.
                 \'%-G==\ Compilation error%.%#,'.
                 \'%-G%[\ ]%#,'.
+                \'error:\ %f:\ %s#\ %m,'.
                 \'%-G%.%#',
               \ "mix_compile_errors_only":
                 \ "%-D**CWD**%f,".
