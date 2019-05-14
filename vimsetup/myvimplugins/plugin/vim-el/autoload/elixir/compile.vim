@@ -37,7 +37,7 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'jobdir': l:mix_project_dir,
           \ 'for': 'ElixirCompile',
           \ 'statustype': 'mix_compile',
-          \ 'errorformat': s:ERROR_FORMATS['mix_compile'],
+          \ 'errorformat': s:ERROR_FORMATS['elixirc_compile'],
           \ 'complete': function('s:complete_compile'),
           \})
   else
