@@ -39,6 +39,8 @@ function! elixir#compile#Build(bang, ...) abort " {{{
           \ 'statustype': 'mix_compile',
           \ 'errorformat': s:ERROR_FORMATS['elixirc_compile'],
           \ 'complete': function('s:complete_compile'),
+          \ 'out_cb': function('s:out_callback'),
+          \ 'err_cb': function('s:err_callback'),
           \})
   else
     " not a mix ploject: run 'elixirc' to catch errors.
