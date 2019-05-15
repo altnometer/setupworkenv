@@ -120,7 +120,7 @@ nnoremap o ox<BS>
 nnoremap O Ox<BS>
 augroup augroup_remove_trailing_whitespaces
   autocmd!
-  autocmd BufWritePre *.html,*.tmpl,*.vim,*.sh :%s/\s\+$//e
+  autocmd BufWritePre *.html,*.tmpl,*.vim,*.sh,*.txt :%s/\s\+$//e
 augroup END
 " Make search case insensitive
 set hlsearch
