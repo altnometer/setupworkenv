@@ -665,35 +665,7 @@ let g:ale_open_list = 0
 " let g:el_debug = ["shell-commands"]
   let g:el_list_height = 10
 " }}}2
-function! s:run_file_tests(bang, cmd) abort " {{{
-  let file = expand('%')
-  if empty(file)
-    echohl ErrorMsg | echomsg "No buffer name" | echohl None
-    return
-  elseif file =~# '^\f\+_test\.exs$'
-    let l:test_file = file
-  elseif file =~# '^\f\+\.ex$'
-    let l:root = split(file, ".ex$")[0]
-    let l:test_file = substitute(l:root, 'lib/\([^/]\+/\)*', 'test/', "") . "_test.exs"
-  else
-    echohl ErrorMsg | echomsg "not an elixir file" | echohl None
-    return
-  endif
-  if !filereadable(test_file) && !bufexists(test_file) && !a:bang
-    echohl ErrorMsg
-    echomsg "couldn't find " . alt_file
-    echohl None
-    return
-  elseif empty(a:cmd)
-    execute ":Topen | :T mix test " . test_file
-    vertical resize 86
-    " execute "normal! :T mix test " .  test_file . "\<cr>"
-  else
-    execute ":Topen | :T mix test " . test_file
-    vertical resize 86
-  endif
-endfunction " }}}
-command! -bang RunElixirTests call <SID>run_file_tests(<bang>0, '')
+
 function! s:mymix_compile() abort " {{{
   " if s:mix_file_exist(expand('%:h'))
   if s:mix_file_exist(expand('%'))
