@@ -5,3 +5,5 @@ command! -bang ElixirAlternate call elixir#alternate#Switch(<bang>0, '')
 command! -buffer -bar ElixirFormat call elixir#fmt#Format()
 
 command! -bang ElixirCompile call elixir#compile#Build(<bang>0, '')
+
+command! -bang RunElixirTests call elixir#test#Run_file_tests(<bang>0, '')
