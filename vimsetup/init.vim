@@ -664,6 +664,8 @@ let g:ale_open_list = 0
 " vim-el {{{2
 " let g:el_debug = ["shell-commands"]
   let g:el_list_height = 10
+  let g:el_compile_and_format = 1
+  let g:el_compile_and_test = 1
 " }}}2
 
 function! s:mymix_compile() abort " {{{
