@@ -30,7 +30,7 @@ function! elixir#alternate#Switch(bang, cmd) abort " {{{
     return
   elseif empty(a:cmd)
     " execute ":" . go#config#AlternateMode() . " " . alt_file
-    execute ":" . "edit" . " " . alt_file
+    execute ":" . "edit" . " " . alt_file | write
   else
     execute ":" . a:cmd . " " . alt_file
     " execute ":" . a:cmd . " " . alt_file
