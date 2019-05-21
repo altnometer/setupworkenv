@@ -47,17 +47,24 @@ Currently accepted values:
 >
       let g:el_debug = []
 <
-                                                      *'g:compile_and_format'*
+                                                   *'g:el_compile_and_format'*
 
 Format the file if it compiles successfully.
 Do nothing if set to 0 (default).
 >
-      let g:compile_and_format = 0
+      let g:el_compile_and_format = 0
 >
-                                                      *'g:compile_and_test'*
+                                                     *'g:el_compile_and_test'*
 
 Run tests if the file compiles successfully.
 Do nothing if set to 0 (default).
 >
-      let g:compile_and_test = 0
+      let g:el_compile_and_test = 0
+>
+                                                    *'g:el_async_job_timeout'*
+
+A jobstop() is called for jobs that exceeded the timeout.
+Defaults to 1000 milliseconds.
+>
+      let g:el_async_job_timeout = 1000
 >
