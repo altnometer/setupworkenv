@@ -925,7 +925,6 @@ let g:deoplete#enable_at_startup = 1
   \ 'auto_complete_delay': 20,
   \ 'smart_case': v:false,
   \ })
-<
 "}}}
 
 " fzf ---------------------------------------------------------------------{{{1
