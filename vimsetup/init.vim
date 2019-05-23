@@ -1059,8 +1059,10 @@ nnoremap <space>gd :Gdiff<CR>
 "nnoremap <space>ge :Gedit<CR>
 nnoremap <space>gr :Gread<CR>
 nnoremap <space>gw :Gwrite<CR><CR>
-"nnoremap <space>gl :silent! Glog<CR>:botright copen<CR>
-"nnoremap <space>gp :Ggrep<Space>
+" nnoremap <space>gl :silent! Glog<CR>:botright copen<CR>
+nnoremap <space>gl :silent! Glog -- %<CR>:botright copen<CR>
+" nnoremap <space>gp :Ggrep<Space>
+nnoremap <space>gp :GlogGrep<Space>
 "nnoremap <space>gm :Gmove<Space>
 "nnoremap <space>gb :Git branch<Space>
 "nnoremap <space>go :Git checkout<Space>
@@ -1069,7 +1071,6 @@ nnoremap <space>gw :Gwrite<CR><CR>
 
 augroup auto_fugitive
     autocmd!
-    "autocmd! BufWritePost * :Gstatus " does not work
     " Auto-clean fugitive bufferes.
     autocmd BufReadPost fugitive://* set bufhidden=delete
     " next maping doesn't work
