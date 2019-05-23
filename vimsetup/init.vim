@@ -668,6 +668,7 @@ let g:ale_open_list = 0
   let g:el_list_height = 10
   let g:el_compile_and_format = 1
   let g:el_compile_and_test = 1
+  let g:el_async_job_timeout = 2000
 " }}}2
 
 function! s:mymix_compile() abort " {{{
