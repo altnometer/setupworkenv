@@ -1039,6 +1039,17 @@ augroup END
 " }}}
 
 " vim-fugitive --------------------------------------------------------------{{{
+" Run :Glog --grep limiting reults to commits that include search pattern
+function! GlogGrep(pattern, ...) abort " {{{2
+  let l:pattern = "--grep=" . a:pattern
+  for l:pat in a:000
+      let l:pattern = l:pattern . " --grep=" . l:pat
+  endfor
+  let l:cmd = "0Glog --all-match -i " . l:pattern . " --"
+  exec l:cmd | copen
+endfunction " }}}2
+
+command! -nargs=+ -complete=tag -bar GlogGrep :silent call GlogGrep(<f-args>)
 " set diffopt+=vertical
 "nnoremap <space>ga :Git add %:p<CR><CR>
 nnoremap <space>gs :Gstatus<CR>
