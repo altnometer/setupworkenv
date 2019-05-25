@@ -1050,7 +1050,7 @@ endfunction " }}}2
 
 command! -nargs=+ -complete=tag -bar GlogGrep :silent call GlogGrep(<f-args>)
 " set diffopt+=vertical
-"nnoremap <space>ga :Git add %:p<CR><CR>
+nnoremap <space>ga :Git add %:p<CR><CR>
 nnoremap <space>gs :Gstatus<CR>
 nnoremap <space>gc :Gcommit -v -q<CR>
 nnoremap <space>gt :Gcommit -v -q %:p<CR>
@@ -1059,7 +1059,7 @@ nnoremap <space>gd :Gdiff<CR>
 nnoremap <space>gr :Gread<CR>
 nnoremap <space>gw :Gwrite<CR><CR>
 " nnoremap <space>gl :silent! Glog<CR>:botright copen<CR>
-nnoremap <space>gl :silent! Glog -- %<CR>:botright copen<CR>
+nnoremap <space>gl :silent! Glog -10 -- %<CR>:botright copen<CR>
 " nnoremap <space>gp :Ggrep<Space>
 nnoremap <space>gp :GlogGrep<Space>
 "nnoremap <space>gm :Gmove<Space>
