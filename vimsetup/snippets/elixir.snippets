@@ -26,3 +26,27 @@ snippet er "IO.puts("error: ...")
 snippet ew "IO.writes("error: ...")
   # $1
   IO.write("error: #{__ENV__.file}: # ${1:breakpoint}# inspect: ")${0}
+
+snippet dfi def init()
+	def init(${1:state}) do
+    ${2:\{:ok, $1\}}
+  end${0}
+
+snippet dfc def handle_call()
+	def handle_call(${1}, _from, ${2:state}) do
+    {:reply, ${3}, $2}
+  end${0}
+
+snippet dft def handle_cast()
+	def handle_cast(${1}, ${2:state}) do
+    ${3:\{:noreply, $2\${4\}\}}
+  end${0}
+
+snippet gsl GenServer.start_link()
+  GenServer.start_link(__MODULE__, ${1::no_args}, ${2:name: @me})${0}
+
+snippet gsc GenServer.call()
+  GenServer.call(${1:@me}, ${2})${0}
+
+snippet gst GenServer.cast()
+  GenServer.cast(${1:@me}, ${2})${0}
