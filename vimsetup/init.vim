@@ -237,7 +237,6 @@ set timeoutlen=1000 ttimeoutlen=0
 nnoremap <bs> X
 " Treat '-' as part of the word rather than a word separator.
 " set iskeyword+=-
-set iskeyword+=
 set encoding=utf-8
 set fileencoding=utf-8
 " Define order of searches for word completion. kspell will add
