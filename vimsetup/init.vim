@@ -763,6 +763,8 @@ augroup elixir_cmds
   " autocmd BufWritePre *.ex,*exs :silent noautocmd update | UnifiedElixirCompile
   " ElixirCompile would jump to error, ElixirCompile would not.
   " autocmd BufWritePost *.ex,*.exs :ElixirFormat
+  " let ':' be a 'word' character. Usefull for elixir/erlang/ruby ':atom' type.
+  autocmd FileType elixir setlocal iskeyword+=:
 augroup END
 " }}}
 
