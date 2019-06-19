@@ -1070,7 +1070,8 @@ nnoremap <space>gp :GlogGrep<Space>
 "nnoremap <space>gpl :Dispatch! git pull<CR>
 
 augroup auto_fugitive
-    autocmd!
+  autocmd!
+  autocmd FileType fugitive nmap <buffer> cc :Gcommit -v -q<CR>
     " Auto-clean fugitive bufferes.
     autocmd BufReadPost fugitive://* set bufhidden=delete
     " next maping doesn't work
