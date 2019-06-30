@@ -723,9 +723,9 @@ augroup elixir_cmds
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-vertical)
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-split)
   " autocmd FileType elixir nmap <buffer> <leader>a <Plug>(elixir-alternate-edit)
-    " autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
-" nnoremap <silent> <Plug>(elixir-alternate-vertical) :<C-u>call elixirgo#alternate#Switch(0, "vsplit")<CR>
-    " autocmd FileType go nmap <leader>a :GoAlternate<CR>
+  " autocmd FileType go nmap <leader>c <Plug>(go-coverage-toggle)
+  " nnoremap <silent> <Plug>(elixir-alternate-vertical) :<C-u>call elixirgo#alternate#Switch(0, "vsplit")<CR>
+  " autocmd FileType go nmap <leader>a :GoAlternate<CR>
   " autocmd BufWritePost *.ex,*.exs normal! :copen<CR> :MixCompile<CR>
   " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T clear<CR>
   " autocmd FileType elixir nmap <buffer> <leader>sc :wall!<CR> :T iex clear<CR>
@@ -755,8 +755,8 @@ augroup elixir_cmds
   autocmd FileType elixir nmap <buffer> <C-s> :silent noautocmd update <bar> UnifiedElixirCompile<CR>
   autocmd FileType elixir imap <buffer> <C-s> <Esc>:silent noautocmd update <bar> UnifiedElixirCompile<CR>
   " nnoremap <A-s> :TREPLSendFile<CR>
-" nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
-" nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
+  " nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
+  " nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
   " autocmd BufWritePost *.ex,*.exs :silent !mix format % :redraw!
   autocmd BufNewFile,BufRead *.ex,*.exs setlocal autowrite
   " autocmd BufWritePre *.ex,*exs :silent noautocmd update | ElixirFormat
