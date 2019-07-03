@@ -27,7 +27,12 @@ snippet ew "IO.writes("error: ...")
   # $1
   IO.write("error: #{__ENV__.file}: # ${1:breakpoint}# inspect: ")${0}
 
-snippet dfi def init()
+snippet dfl def start_link()
+	def start_link(${1:args}) do
+    ${2:GenServer.start_link(__MODULE__, ${3:$1\}${4:, name: @me\})}
+  end${0}
+
+snippet din def init()
 	def init(${1:state}) do
     ${2:\{:ok, $1\}}
   end${0}
