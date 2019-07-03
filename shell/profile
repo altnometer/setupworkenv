@@ -21,10 +21,10 @@ if [ -d "$HOME/bin" ] ; then
 fi
 
 # add elixir binaries if they exist
-ELIXIR_LOCAL_BINARIES="$HOME/.local/share/elixir/bin"
-if [ -d "$ELIXIR_LOCAL_BINARIES" ] ; then
-    PATH="$ELIXIR_LOCAL_BINARIES:$PATH"
-fi
+# ELIXIR_LOCAL_BINARIES="$HOME/.local/share/elixir/bin"
+# if [ -d "$ELIXIR_LOCAL_BINARIES" ] ; then
+    # PATH="$ELIXIR_LOCAL_BINARIES:$PATH"
+# fi
 
 local_bin="${HOME}/.local/bin"
 mkdir -p $local_bin
