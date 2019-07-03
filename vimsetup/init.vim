@@ -746,10 +746,10 @@ augroup elixir_cmds
   " autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> T iex clear<CR>
   autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> T iex -S mix<CR>
   " autocmd FileType elixir nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> T iex  %<CR>
-  autocmd FileType elixir nmap <buffer> <A-s> :Topen <bar> :TREPLSendLine<CR>
+  autocmd FileType elixir nmap <buffer> <A-s> :Topen <bar> vertical resize 86 <bar> TREPLSendLine<CR>
   " autocmd FileType elixir nmap <buffer> <A-s> :Topen <bar> :T iex getline('.')<CR>
-  autocmd FileType elixir vmap <buffer> <A-s> :<C-u>Topen <bar> :TREPLSendSelection<CR>
-  autocmd FileType elixir imap <buffer> <A-s> <C-c>:Topen <bar> :TREPLSendLine<CR>a
+  autocmd FileType elixir vmap <buffer> <A-s> :<C-u>Topen <bar> vertical resize 86 <bar> TREPLSendSelection<CR>
+  autocmd FileType elixir imap <buffer> <A-s> <C-c>:Topen <bar> vertical resize 86 <bar> TREPLSendLine<CR>a
   " autocmd FileType elixir nmap <buffer> <A-t> :RunElixirTests<CR>
   autocmd FileType elixir nmap <buffer> <A-t> :TestSuit<CR>
   autocmd FileType elixir nmap <buffer> <C-s> :silent noautocmd update <bar> UnifiedElixirCompile<CR>
