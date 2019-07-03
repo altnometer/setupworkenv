@@ -23,6 +23,7 @@ if hash ranger 2>/dev/null && [ -d "${CONFIG_DEST_DIR}" ]; then
 else
     echo -e "\n\x1b[33;01m Installing, configuring ranger ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y ranger
+	sudo -u ${SUDO_USER} mkdir -p $CONFIG_DEST_DIR
 fi
 
 # link rc.conf ------------------------------------------------------------{{{
