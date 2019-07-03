@@ -14,7 +14,7 @@ if [ -z ${SUDO_USER} ]; then
     echo -e "\n\x1b[31;01m No \$SUDO_USER available, quiting ... \x1b[39;49;00m\n"
     exit 1
 fi
-
+SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CONFIG_DEST_DIR="${HOME}/.config/qutebrowser"
 
@@ -43,4 +43,5 @@ else
     echo -e "\n\x1b[31;01m $CONF_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
+SCRIPT_DIR=$SCRIPT_DIR_OLD
 # }}}
