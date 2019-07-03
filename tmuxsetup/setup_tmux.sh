@@ -41,9 +41,12 @@ else
     fi
 fi
 echo -e "\n\x1b[33;01m Linking $TMUX_CONFIG_SOURCE to $TMUX_CONFIG_DEST ... \x1b[39;49;00m\n"
-rm $TMUX_CONFIG_DEST
+if [ -f "${TMUX_CONFIG_DEST}" ]; then
+    rm $TMUX_CONFIG_DEST
+fi
 sudo -u ${SUDO_USER} ln -fs ${TMUX_CONFIG_SOURCE} ${TMUX_CONFIG_DEST}
 # }}}
+
 # link TMUX_STATUS_BAR_FILE_NAME ------------------------------------------{{{
 # filename is hardcoded in tmux.conf
 TMUX_STATUS_BAR_FILE_NAME="status_bar_left.sh"
