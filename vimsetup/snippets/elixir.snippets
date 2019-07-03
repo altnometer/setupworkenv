@@ -47,6 +47,11 @@ snippet dct def handle_cast()
     ${3:\{:noreply, $2\${4\}\}}
   end${0}
 
+snippet dinf def handle_info()
+	def handle_info(${1}, ${2:state}) do
+    ${3:\{:noreply, $2\${4\}\}}
+  end${0}
+
 snippet gsl GenServer.start_link()
   GenServer.start_link(__MODULE__, ${1:Map.new()}${2:, name: @me})${0}
 
