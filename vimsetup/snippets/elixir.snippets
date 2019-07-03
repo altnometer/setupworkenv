@@ -34,23 +34,23 @@ snippet dfl def start_link()
 
 snippet din def init()
 	def init(${1:state}) do
-    ${2:\{:ok, $1\}}
+    ${2:\{:ok, ${3:$1\}\}}
   end${0}
 
-snippet dfc def handle_call()
+snippet dcl def handle_call()
 	def handle_call(${1}, _from, ${2:state}) do
-    {:reply, ${3}, $2}
+    {:reply, ${3:$2}, ${4:$2}}
   end${0}
 
-snippet dft def handle_cast()
+snippet dct def handle_cast()
 	def handle_cast(${1}, ${2:state}) do
     ${3:\{:noreply, $2\${4\}\}}
   end${0}
 
 snippet gsl GenServer.start_link()
-  GenServer.start_link(__MODULE__, ${1::no_args}, ${2:name: @me})${0}
+  GenServer.start_link(__MODULE__, ${1:Map.new()}${2:, name: @me})${0}
 
-snippet gsc GenServer.call()
+snippet gcl GenServer.call()
   GenServer.call(${1:@me}, ${2})${0}
 
 snippet gst GenServer.cast()
