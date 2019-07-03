@@ -127,6 +127,10 @@ alias ohmyzsh="vim ~/.oh-my-zsh"
 alias sr="sr -browser=$BROWSERCLI"
 alias surfraw="surfraw -browser=$BROWSER"
 alias vless="~/Repos/neovim/runtime/macros/less.sh"
+function ..(){
+    builtin cd ../
+    ls
+}
 # cd into a dir (disregard the file in the path) and ls.
 function cd(){
     [[ ! -e $argv[-1] ]] || [[ -d $argv[-1] ]] || argv[-1]=${argv[-1]%/*}
