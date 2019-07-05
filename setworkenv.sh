@@ -152,6 +152,13 @@ cd ${DOCKERSETUPDIR}
 source ${DOCKERSETUPFILE}
 # }}}
 
+# elixir ------------------------------------------------------------------{{{
+ELIXIRSETUPDIR=${REDMOO_PROJECT_DIR}/elixir
+ELIXIRSETUPFILE=${ELIXIRSETUPDIR}/setup_elixir.sh
+cd ${ELIXIRSETUPDIR}
+source ${ELIXIRSETUPFILE}
+# }}}
+
 exit
 source ${PROJECT_SETUP_DIR}/iptablessetup/setupnewserveriptables.sh
 setup_iptables_for_newserver
