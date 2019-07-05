@@ -1,6 +1,6 @@
 #!/bin/bash
  set -e
-# This scrip should install docker on debian.
+# This scrip should install elixir on debian.
 
 # vars --------------------------------------------------------------------{{{
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -10,7 +10,6 @@ ELIXIR_LOCAL_PKG_NAME="Precompiled.zip"
 ELIXIR_PKG_PATH="${ELIXIR_DEST_DIR}/${ELIXIR_LOCAL_PKG_NAME}"
 ELIXIR_LOCAL_BIN="${ELIXIR_DEST_DIR}/bin"
 ELIXIR_DEST_BIN="${HOME}/.local/bin"
-VIM_EXEC_FILE_DEST="/usr/local/bin/nvim"
 # }}}
 
 # check if run with sudo -E -----------------------------------------------{{{
@@ -49,6 +48,7 @@ fi
 if hash iex 2>/dev/null; then
     echo -e "\n\x1b[33;01m elixir is installed, not installing. \x1b[39;49;00m\n" && exit 0
 else
+    # apt-get install -y elixir
     echo -e "\n\x1b[33;01m Installing elixir ...  \x1b[39;49;00m\n" && sleep 1
     sudo -u ${SUDO_USER} mkdir -p $ELIXIR_DEST_DIR && cd $_
     sudo -u ${SUDO_USER} curl -Lo $ELIXIR_PKG_PATH --create-dir $ELIXIR_PKG_SOURCE
