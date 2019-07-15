@@ -57,6 +57,34 @@ else
     # rm -f $NVIM_EXEC_FILE_DEST
     # ln -s $NVIM_EXEC_FILE_SOURCE $NVIM_EXEC_FILE_DEST
 fi
+
+if hash pip 2>/dev/null; then
+    echo -e "\n\x1b[33;01m pip is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
+else
+    echo -e "\n\x1b[33;01m installing pip ...\x1b[39;49;00m\n" && sleep 1
+    apt-get install -y python-pip
+fi
+
+if hash pip3 2>/dev/null; then
+    echo -e "\n\x1b[33;01m pip3 is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
+else
+    echo -e "\n\x1b[33;01m installing pip3 ...\x1b[39;49;00m\n" && sleep 1
+    apt-get install -y python3-pip
+fi
+
+if pip show pynvim 1>/dev/null; then
+    echo -e "\n\x1b[33;01m pynvim is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
+else
+    echo -e "\n\x1b[33;01m installing pynvim ...\x1b[39;49;00m\n" && sleep 1
+    pip install pynvim
+fi
+
+if pip3 show pynvim 1>/dev/null; then
+    echo -e "\n\x1b[33;01m pynvim (python3) is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
+else
+    echo -e "\n\x1b[33;01m installing pynvim (python3) ...\x1b[39;49;00m\n" && sleep 1
+    pip3 install pynvim
+fi
 # }}}
 
 # setup junegunn/vim-plug -------------------------------------------------{{{
