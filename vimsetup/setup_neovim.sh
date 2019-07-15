@@ -36,7 +36,7 @@ NVIM_INST_DIR="${HOME}/Repos/neovim"
 # NVIM_EXEC_FILE="${NVIM_INST_DIR}/nvim.appimage"
 NVIM_EXEC_FILE_SOURCE="${NVIM_INST_DIR}/nvim"
 NVIM_EXEC_FILE_DEST="/usr/local/bin/nvim"
-if hash nvim 2>/dev/null; then
+if [ hash nvim 2>/dev/null ] && [ "$1" != "reinstall" ]; then
     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing neovim ...  \x1b[39;49;00m\n" && sleep 1
