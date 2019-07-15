@@ -47,10 +47,16 @@ else
     # sudo -u ${SUDO_USER} mkdir -p $NVIM_INST_DIR
     # sudo -u ${SUDO_USER} curl -Lo $NVIM_EXEC_FILE_SOURCE https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
     if [ ! -d "$NVIM_INST_DIR" ] ; then
+        echo -e "\n\x1b[33;01m git clone https://github.com/neovim/neovim ...\x1b[39;49;00m\n" && sleep 1
         sudo -u ${SUDO_USER} git clone https://github.com/neovim/neovim $NVIM_INST_DIR
+    else
+        echo -e "\n\x1b[33;01m git pull https://github.com/neovim/neovim ...\x1b[39;49;00m\n" && sleep 1
+        cd $NVIM_INST_DIR
+        sudo -u ${SUDO_USER} git pull https://github.com/neovim/neovim
     fi
     cd $NVIM_INST_DIR
-    sudo -u ${SUDO_USER} git checkout v0.3.1
+    sudo -u ${SUDO_USER} git checkout master
+    # sudo -u ${SUDO_USER} git checkout v0.3.1
     # sudo -u ${SUDO_USER} make
     make install
     # chmod u+x $NVIM_EXEC_FILE_SOURCE
