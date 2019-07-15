@@ -103,9 +103,12 @@ fi
 # }}}
 
 # setup JakeBecker/elixir-ls
-if hash mix 2>/dev/null; then
-    ELIXIR_LS_DEST_DIR="${HOME}/.local/share/elixir_ls"
-    rm -r ${ELIXIR_LS_DEST_DIR}
+ELIXIR_LS_DEST_DIR="${HOME}/.local/share/elixir_ls"
+if [ ! -d "$ELIXIR_LS_DEST_DIR" ]; then
+    if hash mix 2>/dev/null; then
+        echo -e "\n\x1b[31;01m Elixir is not installed, not installing JakeBecker/elixir-ls. \x1b[39;49;00m\n" && sleep 1
+    fi
+    rm -f ${ELIXIR_LS_DEST_DIR}
     sudo -u ${SUDO_USER} git clone https://github.com/JakeBecker/elixir-ls $ELIXIR_LS_DEST_DIR
     cd ${ELIXIR_LS_DEST_DIR} && mkdir rel
     sudo -u ${SUDO_USER} mix local.hex local.rebar --force
@@ -114,7 +117,7 @@ if hash mix 2>/dev/null; then
     sudo -u ${SUDO_USER} mix mix compile
     sudo -u ${SUDO_USER} mix elixir_ls.release -o rel
 else
-    echo -e "\n\x1b[31;01m Elixir is not installed, not installing JakeBecker/elixir-ls. \x1b[39;49;00m\n" && sleep 1
+    echo -e "\n\x1b[31;01m JakeBecker/elixir-ls is already installed. \x1b[39;49;00m\n" && sleep 1
 fi
 # }}}
 
