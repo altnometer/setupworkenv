@@ -27,6 +27,11 @@ Plug 'wellle/targets.vim'
 " Plug 'machakann/vim-highlightedyank'
 Plug 'christoomey/vim-tmux-navigator'
 
+" language server protocor {{{2
+" https://github.com/neoclide/coc.nvim
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" }}}2
+
 " go {{{2
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go'}
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
