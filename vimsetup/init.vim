@@ -22,7 +22,9 @@ Plug 'michaeljsmith/vim-indent-object'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'justinmk/vim-sneak'
 Plug 'wellle/targets.vim'
-Plug 'machakann/vim-highlightedyank'
+" stated giving error E802 invalid id: -1
+" replaces with coc.nvim coc-yank
+" Plug 'machakann/vim-highlightedyank'
 Plug 'christoomey/vim-tmux-navigator'
 
 " go {{{2
