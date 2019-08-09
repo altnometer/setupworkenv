@@ -89,6 +89,30 @@ Plug 'slashmili/alchemist.vim'
 Plug 'w0rp/ale'
 " 2}}}
 
+" f# fsharp {{{2
+" Plug 'fsharp/vim-fsharp', {
+      " \ 'for': 'fsharp',
+      " \ 'do':  'make fsautocomplete',
+      " \}
+" }}}2
+
+" elm {{{2
+Plug 'elmcast/elm-vim'
+" }}}2
+"
+" clojure {{{2
+Plug 'tpope/vim-fireplace'
+Plug 'vim-scripts/paredit.vim'
+Plug 'venantius/vim-cljfmt'
+" }}}2
+
+" polyglot should be after elm-vim
+" syntax {{{2
+Plug 'scrooloose/syntastic'
+" 'vim-polyglot' must be after vim-go.
+Plug 'sheerun/vim-polyglot'
+"}}}
+
 Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 " provides insert mode auto-completion for quotes, parens, brackets, etc.
