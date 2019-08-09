@@ -152,6 +152,7 @@ set hlsearch
 set incsearch
 set ignorecase
 set smartcase
+set inccommand=split
 " vim-gitgutter needs reasonably fast updatetime. Default 4s is too slow.
 set updatetime=100
 " program to use for the |K| command, e.g. :Man option will open man page for
