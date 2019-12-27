@@ -1,4 +1,11 @@
+! see your current xmodmap with:
+! xmodmap -pm
+! xmodmap -pke | grep -i Super
+
 remove mod4 = Super_R
+remove mod4 = Hyper_L
+remove mod2 = Num_Lock
+
 add mod3 = Super_R
 
 add mod2 = Hyper_L
