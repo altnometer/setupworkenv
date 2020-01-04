@@ -1,14 +1,16 @@
+
 ! see your current xmodmap with:
 ! xmodmap -pm
 ! xmodmap -pke | grep -i Super
 
-remove mod4 = Super_R
-remove mod4 = Hyper_L
-remove mod2 = Num_Lock
+clear mod4
+add mod4 = Super_L Super_R
 
-add mod3 = Super_R
+! remap cancel key to Hyper_R
+keycode 136 = Hyper_R
 
-add mod2 = Hyper_L
+clear mod3
+add mod3 = Hyper_L Hyper_R
 
 ! reassign F13-F24
 keycode 191 = F13 F13 F13 F13
