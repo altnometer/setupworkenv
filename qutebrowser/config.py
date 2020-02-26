@@ -840,7 +840,9 @@ c.downloads.location.prompt = False
 ## Font used in the completion widget.
 ## Type: Font
 # c.fonts.completion.entry = '10pt monospace'
-c.fonts.completion.entry = '12pt monospace'
+# c.fonts.completion.entry = '12pt monospace'
+# c.fonts.completion.entry = '14pt monospace'
+c.fonts.completion.entry = '18pt Consolas'
 
 ## Font used for the debugging console.
 ## Type: QtFont
@@ -853,7 +855,8 @@ c.fonts.completion.entry = '12pt monospace'
 ## Font used for the hints.
 ## Type: Font
 # c.fonts.hints = 'bold 10pt monospace'
-c.fonts.hints = 'bold 12pt monospace'
+# c.fonts.hints = 'bold 12pt monospace'
+c.fonts.hints = 'bold 16pt monospace'
 
 ## Font used in the keyhint widget.
 ## Type: Font
@@ -883,12 +886,16 @@ c.fonts.hints = 'bold 12pt monospace'
 ## Font used in the statusbar.
 ## Type: Font
 # c.fonts.statusbar = '10pt monospace'
+# c.fonts.statusbar = '18pt monospace'
+# c.fonts.statusbar = '16pt monospace'
+c.fonts.statusbar = '18pt consolas'
+# c.fonts.statusbar = '18pt SFNS Display'
 
 ## Font used in the tab bar.
 ## Type: QtFont
 # c.fonts.tabs = '12pt monospace'
 # c.fonts.tabs = 'bold 12pt SFNS Display'
-c.fonts.tabs = '12pt SFNS Display'
+c.fonts.tabs = '18pt SFNS Display'
 
 ## Font family for cursive fonts.
 ## Type: FontFamily
@@ -1145,6 +1152,7 @@ c.input.forward_unbound_keys = 'all'
 ## this, it's possible to set font sizes and the `zoom.default` setting.
 ## Type: Bool
 # c.qt.highdpi = False
+c.qt.highdpi = True
 
 ## When to use Chromium's low-end device mode. This improves the RAM
 ## usage of renderer processes, at the expense of performance.
