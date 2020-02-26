@@ -160,6 +160,42 @@ function ls(){
     echo
     /bin/ls "$@"
 }
+
+# start emacs with min config
+function minemacs(){
+    rm -r ~/.emacs.d
+    ln -s ~/.local/share/emacs/mini.emacs.d ~/.emacs.d
+    emacs "$@"
+}
+
+# start emacs for trying features
+function temacs(){
+    rm -r ~/.emacs.d
+    ln -s ~/.local/share/emacs/try.emacs.d ~/.emacs.d
+    emacs "$@"
+}
+
+# start my emacs
+function memacs(){
+  rm -r ~/.emacs.d
+  ln -s ~/.local/share/emacs/my.emacs.d ~/.emacs.d
+  emacs "$@"
+}
+
+# start spacemacs emacs
+function semacs(){
+  rm -r ~/.emacs.d
+  ln -s ~/.local/share/emacs/space.emacs.d ~/.emacs.d
+  emacs "$@"
+}
+
+# start doom emacs
+function demacs(){
+  rm -r ~/.emacs.d
+  ln -s ~/.local/share/emacs/doom.emacs.d ~/.emacs.d
+  emacs "$@"
+}
+
 # source ~/.profile
 [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
 
