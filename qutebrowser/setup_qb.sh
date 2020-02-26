@@ -17,11 +17,13 @@ fi
 SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CONFIG_DEST_DIR="${HOME}/.config/qutebrowser"
+DOWNLOAD_DIR="${HOME}/Downloads"
 
 if hash qutebrowser 2>/dev/null && [ -d "${CONFIG_DEST_DIR}" ]; then
     echo -e "\n\x1b[33;01m qutebrowser is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing, configuring qutebrowser ...  \x1b[39;49;00m\n" && sleep 1
+    sudo -u ${SUDO_USER} mkdir -p ${DOWNLOAD_DIR}
     apt-get install -y qutebrowser
 fi
 
