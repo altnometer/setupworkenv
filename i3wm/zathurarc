@@ -1,0 +1,81 @@
+# man zathurarc
+
+## FONT
+set font 'monospace normal 18'
+
+## BACKGROUND COLOR
+set default-bg '#002b36'
+
+## DOCUMENT COLOR
+
+# OceanicNext
+#let s:base00=['#1b2b34', '235']
+#let s:base01=['#343d46', '237']
+#let s:base02=['#4f5b66', '240']
+#let s:base03=['#65737e', '243']
+#let s:base04=['#a7adba', '145']
+#let s:base05=['#c0c5ce', '251']
+#let s:base06=['#cdd3de', '252']
+#let s:base07=['#d8dee9', '253']
+#let s:base08=['#ec5f67', '203']
+#let s:base09=['#f99157', '209']
+#let s:base0A=['#fac863', '221']
+#let s:base0B=['#99c794', '114']
+#let s:base0C=['#62b3b2', '73']
+#let s:base0D=['#6699cc', '68']
+#let s:base0E=['#c594c5', '176']
+#let s:base0F=['#ab7967', '137']
+#let s:base10=['#ffffff', '15']
+set recolor true
+#
+
+## OceanicNext vim colorscheme
+## font color
+## base05
+#set recolor-darkcolor '#c0c5ce'
+## background colorset
+## base00
+#set recolor-lightcolor '#1b2b34'
+
+##let s:base03      = "#002b36"
+##let s:base02      = "#073642"
+##let s:base01      = "#586e75"
+##let s:base00      = "#657b83"
+##let s:base0       = "#839496"
+##let s:base1       = "#93a1a1"
+##let s:base2       = "#eee8d5"
+##let s:base3       = "#fdf6e3"
+##let s:yellow      = "#b58900"
+##let s:orange      = "#cb4b16"
+##let s:red         = "#dc322f"
+##let s:magenta     = "#d33682"
+##let s:violet      = "#6c71c4"
+##let s:blue        = "#268bd2"
+##let s:cyan        = "#2aa198"
+##"let s:green       = "#859900" "original
+##let s:green       = "#719e07" "experimental
+## Solorized color scheme
+## https://en.wikipedia.org/wiki/Solarized_(color_scheme)
+## https://github.com/altercation/solarized
+## https://ethanschoonover.com/solarized/
+## background color
+## base02
+set recolor-lightcolor "#073642"
+## font color
+## base01
+## set recolor-darkcolor "#586e75"
+## base1 high contrast
+#set recolor-darkcolor "#93a1a1"
+## base00
+## set recolor-darkcolor "#657b83"
+## base0 low contrast
+set recolor-darkcolor "#839496"
+
+set window-title-basename "true"
+set selection-clipboard "clipboard"
+
+## Custom keybindings
+# navigation for BEAKL keyboard layout
+map s scroll down
+map r scroll up
+map k rotate

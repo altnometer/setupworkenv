@@ -151,6 +151,27 @@ else
 fi
 # }}}
 
+# link .zathurarc ---------------------------------------------------------{{{
+SOURCE_ZATHURA_CONF_FILE="${SCRIPT_DIR}/zathurarc"
+DEST_ZATHURA_CONF_DIR="${HOME}/.config/zathura"
+DEST_ZATHURA_CONF_FILE="${DEST_ZATHURA_CONF_DIR}/zathurarc"
+if [ -f $SOURCE_ZATHURA_CONF_FILE ];
+then
+    echo -e "\n\x1b[33;01m Linking $SOURCE_ZATHURA_CONF_FILE to $DEST_ZATHURA_CONF_FILE ... \x1b[39;49;00m\n"
+    sudo -u ${SUDO_USER} mkdir -p $DEST_ZATHURA_CONF_DIR
+    if [ -f "$DEST_ZATHURA_CONF_FILE" ]; then
+        rm $DEST_ZATHURA_CONF_FILE
+    fi
+    if [ -h "$DEST_ZATHURA_CONF_FILE" ]; then # -h, true if file exist and a symbolic link.
+        rm $DEST_ZATHURA_CONF_FILE
+    fi
+	sudo -u ${SUDO_USER} ln -s $SOURCE_ZATHURA_CONF_FILE $DEST_ZATHURA_CONF_FILE
+else
+    echo -e "\n\x1b[31;01m ${SOURCE_ZATHURA_CONF_FILE} does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+# }}}
+
 # setup color theme
 COLOR_THEME_DEST=${HOME}/.Xresources.d/colors
 sudo -u ${SUDO_USER} wget -P $COLOR_THEME_DEST https://raw.githubusercontent.com/solarized/xresources/master/Xresources.dark
