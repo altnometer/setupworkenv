@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This scrip should set up neovim
+# This scrip should set up st terminal emulator
 if [[ $EUID -ne 0 ]]; then
     echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
     exit 1
@@ -14,12 +14,17 @@ if [ -z ${SUDO_USER} ]; then
     exit 1
 fi
 
+# !!! Font size:
+# is set in  ~/redmoo/setupworkenv/i3wm/config_beakl.conf
+# with line:
+# bindsym $mod+Return exec /usr/local/bin/st -f "consolas:size=18:autohint=true:atialias=true"
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ST_INSTALL_DIR=${HOME}/.local/share/
 ST_DIR=${ST_INSTALL_DIR}/st
 
 # git clone and install the 'st' terminal emulator
-if [ ! -d "$ST_DIR" ];
+if [ ! -d "$ST_DIR" ] || [ "$1" == "reinstall" ];
 then
     apt-get -y install libx11-dev libxft-dev
     sudo -u ${SUDO_USER} mkdir -p $ST_INSTALL_DIR
