@@ -64,9 +64,9 @@ Plug 'Shougo/neomru.vim'
 " 2}}}
 
 " deoplete {{{2
-Plug 'Shougo/deoplete.nvim'
+" Plug 'Shougo/deoplete.nvim'
 " adds suggestions from running sessions
-Plug 'wellle/tmux-complete.vim'
+" Plug 'wellle/tmux-complete.vim'
 "  2}}}
 
 " neosnippet recommended {{{2
@@ -102,8 +102,20 @@ Plug 'elmcast/elm-vim'
 "
 " clojure {{{2
 Plug 'tpope/vim-fireplace'
-Plug 'vim-scripts/paredit.vim'
+" to enable all vim-fileplace features install cider-nrepl
+Plug 'clojure-emacs/cider-nrepl'
+" Plug 'vim-scripts/paredit.vim'
 Plug 'venantius/vim-cljfmt'
+" Plug 'bhurlow/vim-parinfer'
+" Plug 'eraserhd/parinfer-rust'
+Plug 'eraserhd/parinfer-rust', {'do':
+        \  'cargo build --release'}
+" completion for coc.nvim
+Plug 'clojure-vim/async-clj-omni'
+Plug 'guns/vim-sexp'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'aclaimant/syntastic-joker'
 " }}}2
 
 " polyglot should be after elm-vim
@@ -229,8 +241,9 @@ if (has("termguicolors"))
  set termguicolors
 endif
 syntax enable
+" not using relative nums lately. Need abs nums to read error outputs.
+" set relativenumber  " show line numbers
 " Showing line numbers and length
-set relativenumber  " show line numbers
 set number  " show line numbers
 set tw=79   " width of document (used by gd)
 " set nowrap  " don't automatically wrap on load
@@ -274,8 +287,9 @@ colorscheme OceanicNext
 augroup CursorLineOnlyInActiveWindow
   autocmd!
   " set cursorline, cursorcolumn only in active buffer
-  autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline cursorcolumn
+  autocmd WinEnter,BufWinEnter * setlocal cursorline cursorcolumn
   autocmd WinLeave * setlocal nocursorline nocursorcolumn
+  " ,FocusLost does't work
 augroup END
 " Default Colors for CursorLine
 " highlight  CursorLine ctermbg=Yellow ctermfg=None
@@ -338,7 +352,9 @@ set diffexpr=""
 " it is next to ``m`` and ``n`` which I use for navigating between tabs.
 let mapleader = ","
 " shadowing '/' for search slows it down.
-" let maplocalleader = "/"
+let maplocalleader = "/"
+" map '//' to '/', because a single '/' is slowed down by localleader '/'
+nnoremap // /
 " use this to search in visually selected region.
 vnoremap <A-/> <esc>/\%V
 " open all folds in the fold and put the cursor to the center.
@@ -623,7 +639,12 @@ nmap <C-c><C-c> <Plug>CommentaryLine
 nmap <C-c>u <Plug>Commentary<Plug>Commentary
 " }}}
 
-" custom plugins ----------------------------------------------------------{{{
+" other plugins and mappings ----------------------------------------------{{{
+
+" mappings {{{2
+  " remap surround plugin mapping to surround "word" in double quotes.
+  nmap <C-u> ysiw"
+" }}}2
 
 " quote {{{2
 imap <C-u> <Plug>(QuoteToTheLeft)
@@ -640,7 +661,53 @@ nmap <A-e> <plug>(TogglePrevNChars)
 "
 " }}}
 
-" ale ---------- ----------------------------------------------------------{{{
+" coc.nvim ----------------------------------------------------------------{{{
+  " :help coc-nvim
+  function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+  endfunction
+
+  " Map <tab> to confirm completion.
+  inoremap <silent><expr> <TAB> pumvisible() ? "\<C-y>" : "\<TAB>"
+
+  " Map <tab> to trigger completion and navigate to the next item: >
+  " inoremap <silent><expr> <TAB>
+  "   \ pumvisible() ? "\<C-n>" :
+  "   \ <SID>check_back_space() ? "\<TAB>" :
+  "   \ coc#refresh()
+
+  " Map <c-space> to trigger completion:
+  " inoremap <silent><expr> <c-space> coc#refresh()
+
+  " <CR> to confirm completion, use:
+  " if you dont want selection, you have to press <cr> twice
+	" inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<CR>"
+  " <space> to confirm completion, use:
+  " when insert line with <c-x><c-l> and you need <space> in search, it does
+  " not work.
+	" inoremap <expr> <space> pumvisible() ? "\<C-y> " : "\<space>"
+	" inoremap <expr> <space> pumvisible() ? "\<C-y>" : "\<space>"
+
+  " To make <CR> auto-select the first completion item and notify coc.nvim to
+  " format on enter, use:
+	" inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+	" 			\: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+  " " Map <tab> for trigger completion, completion confirm, snippet expand and jump
+  " " like VSCode.
+	" inoremap <silent><expr> <TAB>
+	"   \ pumvisible() ? coc#_select_confirm() :
+	"   \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+	"   \ <SID>check_back_space() ? "\<TAB>" :
+	"   \ coc#refresh()
+
+	let g:coc_snippet_next = '<tab>'
+  " coc-yank
+  " let g:yank.highlight.duration=1000
+" }}}
+
+" ale ---------------------------------------------------------------------{{{
 let g:ale_elixir_elixir_ls_release = '/home/puppy/.local/share/elixir-ls/rel'
 set completeopt=menu,menuone,preview,noselect,noinsert
 " let g:ale_completion_enabled = 1
@@ -660,10 +727,14 @@ augroup ale_elixir
   " nmap <silent> <leader>aj :ALENext<cr>
   " nmap <silent> <leader>ak :ALEPrevious<cr>
 augroup END
+augroup ale_fsharp
+  autocmd!
+  autocmd FileType fsharp let b:ale_lint_on_insert_leave = 0
+augroup END
 " When set to `1`, only the linters from |g:ale_linters| and |b:ale_linters|
 let g:ale_linters_explicit = 1
-let g:ale_linters = {}
-let g:ale_linters.elixir = ['credo']
+let g:ale_linters = {'clojure': ['clj-kondo', 'joker']}
+" let g:ale_linters.elixir = ['credo']
 " let g:ale_linters.elixir = ['elixir-ls', 'credo']
 
 let g:ale_fixers = {'*': ['remove_trailing_lines', 'trim_whitespace']}
@@ -690,10 +761,12 @@ let g:ale_open_list = 0
 " elixir ------------------------------------------------------------------{{{
 " vim-el {{{2
 " let g:el_debug = ["shell-commands"]
-  let g:el_list_height = 10
+  " let g:el_list_height = 10
+  let g:el_list_height = 4
   let g:el_compile_and_format = 1
   let g:el_compile_and_test = 1
   let g:el_async_job_timeout = 2000
+  let g:el_list_autoclose = 0
 " }}}2
 
 function! s:mymix_compile() abort " {{{
@@ -785,6 +858,9 @@ augroup elixir_cmds
   " nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
   " autocmd BufWritePost *.ex,*.exs :silent !mix format % :redraw!
   autocmd BufNewFile,BufRead *.ex,*.exs setlocal autowrite
+  " autocmd BufNewFile,BufRead *.ex,*.exs :copen g:el_list_height
+  autocmd BufNewFile,BufRead *.ex,*.exs exe "copen " . g:el_list_height . " | wincmd k"
+  " autocmd FileType elixir execute copen 10 <bar> wincmd j
   " autocmd BufWritePre *.ex,*exs :silent noautocmd update | ElixirFormat
   " autocmd BufWritePre *.ex,*exs :silent noautocmd update | UnifiedElixirCompile
   " ElixirCompile would jump to error, ElixirCompile would not.
@@ -794,6 +870,252 @@ augroup elixir_cmds
 augroup END
 " }}}
 
+" elm ---------------------------------------------------------------------{{{
+  " g:elm_format_autosave=0 enable, g:elm_format_autosave=1 disable,
+  autocmd FileType elm  let g:elm_format_autosave=1
+  autocmd FileType elm  let g:elm_format_fail_silently=1
+  " deoplete_disable_auto_complete is not working for this case.
+  " autocmd FileType elm  let b:deoplete_disable_auto_complete = 1
+  " autocmd FileType elm  call deoplete#disable()
+  " autocmd FileType elm nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1 <BAR> T iex -S mix<CR>
+  autocmd FileType elm nmap <buffer> <silent> <leader>so :let g:neoterm_autoinsert=0
+    \<bar> Topen <bar> vertical resize 86 <bar> T elm repl --no-colors<CR>
+  " autocmd FileType elm nmap <buffer> <leader>r :let g:neoterm_autoinsert=1 <bar>
+  " autocmd FileType elm nmap <buffer> <leader>r Texec `elm repl` <bar> TREPLSendLine<CR>
+  autocmd FileType elm nmap <buffer> <A-r> :Topen <bar> TREPLSendFile<CR> autocmd FileType elm imap <buffer> <A-r> <C-c>:Topen <bar> :TREPLSendFile<CR>a
+  autocmd FileType elm nmap <buffer> <A-s> :Topen <bar> vertical resize 86 <bar> TREPLSendLine<CR>
+  autocmd FileType elm vmap <buffer> <A-s> :<C-u>Topen <bar> vertical resize 86 <bar> TREPLSendSelection<CR>
+  autocmd FileType elm imap <buffer> <A-s> <C-c>:Topen <bar> vertical resize 86 <bar> TREPLSendLine<CR>a
+" }}}
+
+" clojure -----------------------------------------------------------------{{{
+function! s:GetClojureSourceAndTestNs() abort " {{{2
+  let file = expand('%')
+  if empty(file)
+    echohl ErrorMsg
+    echomsg "No buffer name"
+    echohl None
+    return []
+  elseif file =~# '^\f\+_test\.clj$'
+    let l:test_ns = substitute(join(split(expand('%:r'), '/')[-2:], '.'), '_', '-', "")
+    let l:source_ns = split(join(split(expand('%:r'), '/')[-2:], '.'), "_test")[0]
+  elseif file =~# '^\f\+\.clj$'
+    let l:source_ns = join(split(expand('%:r'), '/')[-2:], '.')
+    let l:test_ns = l:source_ns . "-test"
+  else
+    echohl ErrorMsg
+    echomsg "not a clojure file"
+    echohl None
+    return []
+  endif
+  return [l:source_ns, l:test_ns]
+endfunction " }}}2
+
+function! s:RequireSourceAndTestNs() abort " {{{2
+  let l:namespaces = s:GetClojureSourceAndTestNs()
+  if len(l:namespaces) != 2
+    echohl ErrorMsg
+    echomsg "Could not get source and test namespaces"
+    echohl None
+    return
+  else
+    let [l:source_ns, l:test_ns] = l:namespaces
+  endif
+  exe "normal! :Require " . l:source_ns . "\r"
+  exe "normal! :Require " . l:test_ns . "\r"
+endfunction
+" }}}2
+
+function! s:AlternateSourceAndTestFile(bang, cmd) abort " {{{2
+  let file = expand('%')
+  if empty(file)
+    echohl ErrorMsg
+    echomsg "No buffer name"
+    echohl None
+    return
+  elseif file =~# '^\f\+_test\.clj$'
+    let l:root = split(file, '_test.clj$')[0]
+    let l:lib_path = substitute(expand('%:h'), "test", "src", "")
+    let l:source_file = split(expand('%:t'), '_test.clj')[0] . ".clj"
+    let l:alt_file = globpath(l:lib_path, "**/" . l:source_file)
+    " let l:alt_file = substitute(l:root, 'test', 'lib', "") . ".ex"
+  elseif file =~# '^\f\+\.clj$'
+    let l:root = split(file, ".clj$")[0]
+    " let l:alt_file = substitute(l:root, 'src/\([^/]\+/\)*', 'test/', "") . "_test.exs"
+    let l:alt_file = substitute(l:root, 'src/', 'test/', "") . "_test.clj"
+  else
+    echohl ErrorMsg
+    echomsg "not clojure file"
+    echohl None
+    return
+  endif
+  if !filereadable(alt_file) && !bufexists(alt_file) && !a:bang
+    echohl ErrorMsg
+    echomsg "couldn't find " . alt_file
+    echohl None
+    return
+  elseif empty(a:cmd)
+    " execute ":" . go#config#AlternateMode() . " " . alt_file
+    execute ":" . "edit" . " " . alt_file | write
+  else
+    execute ":" . a:cmd . " " . alt_file
+    " execute ":" . a:cmd . " " . alt_file
+  endif
+endfunction " }}}2
+
+" run test for the namespace even if the current buffer is not a test file.
+function! s:RunClojureTests() abort " {{{2
+  set nocursorline
+  set nocursorcolumn
+  " has the quickfix list changed? use this var to find out.
+  " set markers used to keep the current line in its original place while
+  " opening quickfix window.
+  " exe "normal! mcHmh"
+  let l:file = expand('%')
+  let l:namespaces = s:GetClojureSourceAndTestNs()
+  if len(l:namespaces) != 2
+    echohl ErrorMsg
+    echomsg "Could not get source and test namespaces"
+    echohl None
+    return
+  else
+    let [l:source_ns, l:test_ns] = l:namespaces
+  endif
+  try
+    exe "normal! :Require " . l:source_ns " | Require " . l:test_ns . "\r"
+  catch /.*/
+    " we want to clear previous 'echo' output in the command line.
+    redraw!
+    echohl ErrorMsg | echo v:exception | echohl None
+    exe "normal! 'hzt`c"
+    set cursorline
+    set cursorcolumn
+    return
+  endtry
+  " exe "normal! :RunTests " . l:source_ns . " " . l:test_ns . "\r"
+  " stop highlighting "jumping" line when qf is opened
+  exe "normal! :RunTests " . l:test_ns . "\r"
+  " when a quickfix window is opened, the current line is moved to accomodate
+  " the qf window. To stop that, marks are set befor executing this functions
+  " and the current line is restored to its original location using there marks.
+  " However, it only works after a pause, hense, the 'sleep' command here:
+  " echom printf("winid: %s", getqflist({'winid':0}).winid)
+  " if l:changedtick != getqflist({'changedtick':0})
+    " quickfix list has changed, wait for quickfix window to populate fully
+  " endif
+  sleep 100m
+  exe "normal! 'hzt`c"
+  set cursorcolumn
+  set cursorline
+endfunction " }}}2
+
+function! s:SwitchToTxtFile() abort " {{{2
+  " let file = expand('%')
+  let l:b_all = filter(range(1, bufnr("$")), 'bufexists(v:val)')
+  let l:txt_all = filter(copy(l:b_all), 'match(bufname(v:val), ''\.txt$'') != -1')
+  if len(l:txt_all) > 0
+    execute ":buffer" . " " . l:txt_all[0]
+  else
+    echohl ErrorMsg
+    echomsg "couldn't find any .txt file"
+    echohl None
+  endif
+endfunction " }}}2
+
+command! -bang ClojureAlternate call <SID>AlternateSourceAndTestFile(<bang>0, '')
+  " fireplace:
+  " autocmd BufWritePost *.clj :Require
+  " venantius/vim-cljfmt
+" nnoremap <expr> <Plug>(SendToClojueREPL) ':let g:neoterm_autoinsert=0 <bar> TcloseAll!<cr>'
+
+" vim-sexp
+let g:sexp_filetypes = 'clojure,scheme,lisp,timl,txt'
+
+nnoremap <silent> <Plug>SendToClojueREPL :exe <SID>CljSendToREPL()<CR>
+function! s:CljSendToREPL(...) abort "{{{2
+  echo "fine so far"
+  " echo a:form
+  " let str = join(a:000, " ")
+  " echomsg str
+ execute "normal :Eval"
+endfunction " }}}2
+" Test results open quickfix window which displaces the current line. To
+" restore the original line position, use marks (h - top, c - current)
+" nnoremap <Plug>(RunClojureTests) :set nocursorline<CR>mcHmh
+"       \:<C-u>call <SID>RunClojureTests()<CR>'hzt`c<CR>:set cursorline<CR>
+nnoremap <Plug>(RunClojureTests) :set nocursorcolumn <BAR>
+      \:set nocursorline<CR>
+      \mcHmh
+      \:<C-u>call <SID>RunClojureTests()<CR>
+
+      " \:<C-u>call <SID>RunClojureTests()<CR>:exe "normal! 'hzt`c"<CR>:set cursorline<CR>
+let g:clj_fmt_autosave = 0
+augroup clojure_cmds " {{{2
+  " autocmd FileType clojure nmap <buffer> <A-r> :Require<CR>
+  autocmd FileType clojure nmap <buffer> <A-r> :call <SID>RequireSourceAndTestNs()<CR>
+  " remap "fireplace"
+  " evaluate
+  " autocmd FileType clojure nmap <A-s> cpp
+  " run tests
+  " autocmd FileType clojure nmap <A-t> cpr
+  autocmd FileType clojure nmap <A-t> <Plug>(RunClojureTests)
+  " remap "vim-sexp"
+  autocmd FileType clojure nmap <A-s> mq<Plug>FireplacePrint<Plug>(sexp_outer_top_list)`q
+  autocmd FileType text call fireplace#activate()
+  autocmd FileType text nmap <A-s> mq<Plug>FireplacePrint<Plug>(sexp_outer_top_list)`q
+  autocmd FileType clojure nmap <A-S> mq<Plug>FireplacePrint<Plug>(sexp_outer_list)`q
+  " autocmd FileType clojure nmap <A-s> <Plug>SendToClojueREPL<Plug>(sexp_outer_list)
+  " autocmd FileType clojure nmap <A-s> <Plug>SendToClojueREPL<Plug>(sexp_inner_element)
+  autocmd FileType clojure nmap <A-R> <Plug>FireplacePrint<Plug>(sexp_inner_element)
+        " nmap <Leader>f <Plug>FireplacePrint<Plug>(sexp_outer_list)``
+        " nmap <Leader>e <Plug>FireplacePrint<Plug>(sexp_inner_element)``
+  autocmd FileType clojure nmap <buffer> <leader>a :ClojureAlternate!<CR>
+  autocmd FileType clojure nmap <buffer> <leader>x :call <SID>SwitchToTxtFile()<CR>
+  " set markers for the current line and top line
+  " autocmd QuickFixCmdPre * :exe "normal! mcHmh"
+  " autocmd QuickFixCmdPost :cexpr :exe "normal! <c-w>k'hzt`c"
+  " reset the current line to its original position after qf opened.
+  " autocmd BufWinEnter quickfix normal! <C-w>k | exe "normal! 'hzt`c"
+  " autocmd BufWinEnter quickfix normal! <C-w>k | echomsg 'bufwinenter'
+  " autocmd BufWinEnter * if &buftype == 'quickfix' | echomsg 'winenter' | endif
+  " autocmd BufWinEnter quickfix normal! `q
+        " autocmd FileType man
+        "     \ call man#show_toc() |
+        "     \ setlocal laststatus=0 nonumber norelativenumber |
+        "     \ nnoremap <buffer> l <Enter> |
+        "     \ wincmd H |
+        "     \ vert resize 35 |
+        "     \ wincmd p
+  " autocmd BufNewFile,BufRead *.ex,*.exs exe "copen " . g:el_list_height . " | wincmd k"
+  " autocmd BufWinLeave quickfix :exe "normal! 'hzt`q"
+  " autocmd BufWinLeave quickfix echomsg 'bufwinleaving'
+  " autocmd WinLeave * echomsg 'bufwinleaving'
+  " autocmd WinLeave * echomsg normal! `q
+  " autocmd WinEnter * if &buftype == 'quickfix' | echomsg 'winenter' | endif
+  " autocmd WinLeave * if &buftype == 'quickfix' | echomsg 'winleave' | endif
+  " normal! 'hzt`c
+  " 'h - jump to mark h (previosly set to the first visble line)
+  " zt - set currect line as the first viible line
+  " `c - jump to the mark c (previosly set as the current position)
+  " autocmd WinEnter *.clj exe "normal! 'hzt`c" | delmarks hc
+  " autocmd WinEnter *.clj redraw | sleep 100 | exe "normal! 'hzt`c"
+  " autocmd WinLeave *.clj exe "normal! 'hzt`c" | normal! zz
+  " autocmd WinLeave *.clj exe "normal! mcHmc"
+  autocmd FileType clojure setlocal iskeyword+=:,-,#
+  " remove trailing white spaces while preserving the cursor position
+  autocmd BufWritePre *.clj :exe "normal! mq" | %s/\s\+$//e | exe "normal! `q"
+  autocmd VimEnter *.clj RainbowParenthesesToggle
+  autocmd Syntax clojure RainbowParenthesesLoadRound
+  autocmd Syntax clojure RainbowParenthesesLoadSquare
+  autocmd Syntax clojure RainbowParenthesesLoadBraces
+augroup END " }}}2
+
+" paredit -----------------------------------------------------------------{{{2
+"let g:paredit_electric_return=1
+let g:paredit_smartjump=1
+" }}}2
+" }}}
+"
 " emmet-vim ---------------------------------------------------------------{{{
 " Filters                |emmet-filters-list|
 " Customize              |emmet-customize|
@@ -828,6 +1150,23 @@ let g:user_emmet_settings = {
 \     'extends': 'html',
 \  },
 \}
+" }}}
+
+" f# - fsharp -------------------------------------------------------------{{{
+  autocmd FileType fsharp  let b:ale_enabled=1
+  autocmd FileType fsharp  nmap <buffer> <silent> <leader>so :let g:neoterm_autoinsert=0
+    \<bar> Topen <bar> vertical resize 87 <bar> T fsharpi<CR>
+  autocmd FileType fsharp  nmap <buffer> <silent> <leader>sO :let g:neoterm_autoinsert=1
+    \<bar> Topen <bar> vertical resize 87 <bar> T fsharpi<CR>
+
+  " autocmd FileType fsharp  nmap <buffer> <leader>r :let g:neoterm_autoinsert=1 <bar>
+  " autocmd FileType fsharp  nmap <buffer> <leader>r Texec `elm repl` <bar> TREPLSendLine<CR>
+
+  autocmd FileType fsharp  nmap <buffer> <A-r> :Topen <bar> TREPLSendFile<CR>
+  autocmd FileType fsharp  imap <buffer> <A-r> <C-c>:Topen <bar> :TREPLSendFile<CR>a
+  autocmd FileType fsharp  nmap <buffer> <A-s> :Topen <bar> vertical resize 87 <bar> TREPLSendLine<CR>
+  autocmd FileType fsharp  vmap <buffer> <A-s> :<C-u>Topen <bar> vertical resize 87 <bar> TREPLSendSelection<CR>
+  autocmd FileType fsharp  imap <buffer> <A-s> <C-c>:Topen <bar> vertical resize 87 <bar> TREPLSendLine<CR>a
 " }}}
 
 " neosnippet ----------------------------------------------------------------{{{
@@ -866,13 +1205,11 @@ nnoremap <leader>sO :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 nnoremap <leader>sV :let g:neoterm_autoinsert=1 <bar> vertical Topen<cr>
 nnoremap <A-o> :let g:neoterm_autoinsert=1 <bar> Topen<cr>
 nnoremap <leader>sc :Tclear<cr>
-" vnoremap <A-s> :<C-u>TREPLSetTerm 1 <bar> TREPLSendSelection<CR>
-" nnoremap <A-s> :TREPLSetTerm 1 <bar> TREPLSendLine<CR>
 " nnoremap <A-s> :TREPLSendLine<CR>
 " nnoremap <A-s> :TREPLSendFile<CR>
 " vnoremap <A-s> :<C-u>TREPLSendSelection<CR>
 " inoremap <A-s> <C-c>:TREPLSendLine<CR>a
-" let neoterm_autoinsert = 1
+let neoterm_autoinsert = 1
 let neoterm_autoscroll = 1
 " }}}
 
@@ -943,15 +1280,22 @@ command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-h
 " deoplete ------------------------------------------------------------------{{{
 " <TAB>: completion.
 " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-let g:deoplete#enable_at_startup = 1
+" let g:deoplete#enable_at_startup = 1
 " let g:deoplete#enable_debug = 1
 " call deoplete#enable_logging('DEBUG', 'deoplete.log')
 " call deoplete#custom#source('go', 'is_debug_enabled', 1)
   " Pass a dictionary to set multiple options
-  call deoplete#custom#option({
-  \ 'auto_complete_delay': 20,
-  \ 'smart_case': v:false,
-  \ })
+  " call deoplete#custom#option({
+  " \ 'auto_complete_delay': 20,
+  " \ 'smart_case': v:false,
+  " \ })
+
+  " go
+  " let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
+  " let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
+  " let g:deoplete#sources#go#pointer = 1
+" incredibly slow
+" let g:deoplete#sources#go#source_importer = 1
 "}}}
 
 " fzf ---------------------------------------------------------------------{{{1
@@ -1038,6 +1382,8 @@ let g:syntastic_mode_map = { 'mode': 'active',
 " !!! Install 'sudo pip flake8' to enable python checking
 "let g:syntastic_python_checkers = ['pep8']
 let g:syntastic_python_checkers = ['flake8']
+" let g:syntastic_clojure_checkers = ['eastwood']
+let g:syntastic_clojure_checkers = ['joker']
 "let g:syntastic_python_checkers = ['pyflakes']
 "let g:syntastic_python_checkers = ['pylint']
 "let g:syntastic_python_flake8_args = '--ignore="E501,E302,E261,E701,E241,E126,E127,E128,W801"'
@@ -1071,8 +1417,11 @@ function! GlogGrep(pattern, ...) abort " {{{2
   for l:pat in a:000
       let l:pattern = l:pattern . " --grep=" . l:pat
   endfor
-  let l:cmd = "0Glog --all-match -i " . l:pattern . " --"
-  exec l:cmd | copen
+  " 0Glog will load the whole file at the revision.
+  " let l:cmd = "0Glog --all-match -i " . l:pattern . " --"
+  " Glog will load only the diff
+  let l:cmd = "Glog --all-match -i " . l:pattern . " --"
+  exe l:cmd | copen
 endfunction " }}}2
 
 command! -nargs=+ -complete=tag -bar GlogGrep :silent call GlogGrep(<f-args>)
@@ -1255,7 +1604,7 @@ let g:go_fold_enable = ['block', 'import', 'varconst', 'package_comment', 'comme
 " }}}
 
 " vim-polyglot ------------------------------------------------------------{{{
-let g:polyglot_disabled = ['go']
+let g:polyglot_disabled = ['go', 'elm']
 " }}}
 
 " vim-sneak -----------------------------------------------------------------{{{
@@ -1263,6 +1612,7 @@ let g:polyglot_disabled = ['go']
 let g:sneak#s_next = 1
 " 1 : Case sensitivity is determined by 'ignorecase' and 'smartcase'.
 let g:sneak#use_ic_scs = 1
+nmap <localleader>s <Plug>Sneak_s
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
 map t <Plug>Sneak_t
@@ -1290,7 +1640,7 @@ nmap <silent> <leader>tn :TestNearest<CR>
 nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>ts :TestSuite<CR>
 nmap <silent> <leader>tl :T clear<CR> <bar> :TestLast<CR>
-nmap <silent> <A-t> :T clear<CR> <bar> :TestLast<CR>
+" nmap <silent> <A-t> :T clear<CR> <bar> :TestLast<CR>
 " go back to the tests file.
 nmap <silent> <leader>tv :TestVisit<CR>
 nmap <silent> <leader>te <Plug>(CloseAllNeoterms)
