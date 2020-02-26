@@ -238,7 +238,33 @@ if [ -d "$NODEJS_LOCAL_BINARIES" ] ; then
    export PATH=$NODEJS_LOCAL_BINARIES:$PATH
 fi
 
+############nvm####################
+# node version manager
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+############npm####################
+# set
+NPM_PACKAGES="${HOME}/.npm-packages"
+# run
+# npm config set prefix "${NPM_PACKAGES}"
+export PATH="$NPM_PACKAGES/bin:$PATH"
+
+# Unset manpath so we can inherit from /etc/manpath via the `manpath` command
+unset MANPATH # delete if you already modified MANPATH elsewhere in your config
+export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+
 ############erlang#################
 # persist IEx and erland interactive shell history
 # and increase its size from default 512KB to 1MB
 export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_file_bytes 1024000"
+
+export PATH="$HOME/.cargo/bin:$PATH"
+
+############rust###################
+CARGO_BINARIES="$HOME/.cargo/bin"
+if [ -d "$CARGO_BINARIES" ] ; then
+   export PATH=$CARGO_BINARIES:$PATH
+fi
+eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
