@@ -3,8 +3,8 @@
 
 " limit the quoted chars to the first '[', '(', '{', '<'.
 " on the left.
-if !exists("g:deletere")
-  let g:quote_delemeter = '\v[^\[({< ]+'
+if !exists("g:delimiter")
+  let g:quote_delimiter = '\v[^\[({< ]+'
 endif
 
 if !exists("g:quote_char")
@@ -41,7 +41,7 @@ endfunction " }}}
 
 function! s:Quote() abort " {{{
   let l:save_pos = getcurpos()
-  call searchpos(g:quote_delemeter, 'b', line('.'))
+  call searchpos(g:quote_delimiter, 'b', line('.'))
   " exe "normal! i" . g:quote_char . "\<c-c>"
   exe "normal! i" . g:quote_char
   let l:save_pos[2] += 1
