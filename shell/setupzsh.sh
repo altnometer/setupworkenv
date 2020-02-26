@@ -4,10 +4,22 @@ set -e
 
 # cd to the folder before running
 #https://github.com/altercation/solarized
+
+
+if [[ $EUID -ne 0 ]]; then
+    echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
+    exit 1
+fi
+if [ $HOME  = '/root' ]; then
+    echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
+    exit 1
+fi
+
 if [ -z ${SUDO_USER} ]; then
     echo -e "\n\x1b[31;01m No \$SUDO_USER available, quiting ... \x1b[39;49;00m\n"
     exit 1
 fi
+SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ZSH_CUSTOM_PLUG_DIR=${HOME}/.oh-my-zsh/custom/plugins
 if hash zsh 2>/dev/null;
@@ -56,3 +68,5 @@ ZSH_CUSTOM_THEME_DEST=${HOME}/.oh-my-zsh/custom/themes
 sudo -u ${SUDO_USER} mkdir -p $ZSH_CUSTOM_THEME_DEST
 echo -e "\n\x1b[33;01m linking ${ZSH_CUSTOM_THEME_SOURCE} to ${ZSH_CUSTOM_THEME_DEST}\x1b[39;49;00m\n" && sleep 1
 sudo -u ${SUDO_USER} ln -fs ${ZSH_CUSTOM_THEME_SOURCE} ${ZSH_CUSTOM_THEME_DEST}
+
+SCRIPT_DIR=$SCRIPT_DIR_OLD
