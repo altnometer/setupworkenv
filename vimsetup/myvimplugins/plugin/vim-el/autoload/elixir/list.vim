@@ -29,8 +29,8 @@ function! elixir#list#Window(listtype, ...) abort " {{{
   if a:listtype == "locationlist"
     exe 'lopen ' . height
   else
-    exe 'topleft copen ' . height
-    " exe 'copen ' . height
+    " exe 'topleft copen ' . height
+    exe 'copen ' . height
   endif
 endfunction " }}}
 
@@ -110,6 +110,8 @@ endfunction " }}}
 function! elixir#list#Close(listtype) abort " {{{
   let autoclose_window = elixir#config#ListAutoclose()
   if !autoclose_window
+    " clear the quickfix list and/or get rid of the highlighted line.
+    call setqflist([])
     return
   endif
 
