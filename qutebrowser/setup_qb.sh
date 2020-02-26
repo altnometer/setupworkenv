@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This scrip should set up ranger.
+# This scrip should set up qutebrowser.
 
 if [[ $EUID -ne 0 ]]; then
     echo -e "\n\x1b[31;01m Run this script with 'sudo -E' \x1b[39;49;00m\n"
