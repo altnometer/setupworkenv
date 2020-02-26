@@ -1847,7 +1847,7 @@ config.bind('k', 'reload')
 ## Bindings custom
 config.bind(',v', 'spawn mpv {url}')
 # config.bind(',v', 'spawn vlc {url}')
-# 
+
 config.bind('<Ctrl-Shift-y>', 'hint links spawn --detach mpv --force-window yes {hint-url}')
 # config.bind('<Ctrl-Shift-y>', 'hint links spawn vlc {hint-url}')
 # config.bind('<Ctrl-Shift-y>', 'hint links spawn cvlc -Idummy {hint-url}')
