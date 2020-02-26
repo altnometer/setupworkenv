@@ -7,7 +7,8 @@
  */
 /* static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true"; */
 //static char *font = "LiberationMono-Regular:pixelsize=16:antialias=true:autohint=true";
-static char *font = "pragmatapro:pixelsize=17:antialias=true:autohint=true";
+/* static char *font = "pragmatapro:pixelsize=17:antialias=true:autohint=true"; */
+static char *font = "pragmatapro:pixelsize=20:antialias=true:autohint=true";
 static int borderpx = 2;
 
 /*
