@@ -24,6 +24,8 @@ if hash emacs 2>/dev/null && [ -d "${EMACS_DEST_DIR}" ]; then
 else
     echo -e "\n\x1b[33;01m Installing, configuring emacs ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y emacs
+    # documentation is in non-free repository, inlcude these repositories to install docs.
+    apt-get install -y emacs-common-non-dfsg
 fi
 
 # link conf files ---------------------------------------------------------{{{
