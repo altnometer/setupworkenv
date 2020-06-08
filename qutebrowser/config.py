@@ -1055,6 +1055,7 @@ c.input.forward_unbound_keys = 'all'
 ## cleared after this time.
 ## Type: Int
 # c.input.partial_timeout = 5000
+c.input.partial_timeout = 10000
 
 ## Enable Opera-like mouse rocker gestures. This disables the context
 ## menu.
@@ -1089,6 +1090,7 @@ c.input.forward_unbound_keys = 'all'
 ## to 0 to never clear messages.
 ## Type: Int
 # c.messages.timeout = 2000
+c.messages.timeout = 15000
 
 ## How to open links in an existing instance if a new one is launched.
 ## This happens when e.g. opening a link from a terminal. See
