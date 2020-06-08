@@ -485,7 +485,6 @@ c.completion.cmd_history_max_items = 2000
 ## http://webkit.org/blog/427/webkit-page-cache-i-the-basics/
 ## Type: Int
 # c.content.cache.maximum_pages = 0
-c.content.cache.maximum_pages = 10
 
 ## Size (in bytes) of the HTTP network cache. Null to use the default
 ## value. With QtWebEngine, the maximum supported value is 2147483647 (~2
