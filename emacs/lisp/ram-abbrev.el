@@ -2,141 +2,82 @@
 
 ;; credit to http://ergoemacs.org/emacs/emacs_abbrev_mode.html
 
+;;* global
+(set-default 'abbrev-mode t)
+
+(setq save-abbrevs nil)
 (clear-abbrev-table global-abbrev-table)
 
 (define-abbrev-table 'global-abbrev-table
   '(
     ;; net addrev
-    ("ca" "calculate")
-    ("cad" "calculated")
-    ("cag" "calculating")
-    ("cas" "calculates")
-    ("bn" "between")
+    ("1t" "first")
+    ("2t" "second")
+    ("3t" "third")
     ("ty" "thank you")
-    ("dft" "different")
-    ("dfc" "difference")))
+    ("br" "breadcrumbs")))
 
+;;* clojure
 (when (boundp 'clojure-mode-abbrev-table)
   (clear-abbrev-table clojure-mode-abbrev-table))
 
-(define-abbrev-table 'clojure-mode-abbrev-table
-  '(
-    ("df" "defn")
-    ("dm" "defmacro")
-    ("dt" "deftest")
-    ("ts" "testing")
-    ("me" "macroexpand-1")
-    ("pr" "println")
-    ))
+(when (boundp 'cider-repl-mode-abbrev-table)
+  (clear-abbrev-table cider-repl-mode-abbrev-table))
 
+(setq clojure-abbrevs
+      '(
+        ("df" "defn")
+        ("dm" "defmacro")
+        ("dt" "deftest")
+        ("me" "macroexpand-1")
+        ("pl" "println")
+        ("re" "require")))
+
+(define-abbrev-table 'clojure-mode-abbrev-table
+  clojure-abbrevs)
+
+(define-abbrev-table 'cider-repl-mode-abbrev-table
+  clojure-abbrevs)
+
+;;* racket
+(when (boundp 'racket-repl-mode-abbrev-table)
+  (clear-abbrev-table racket-repl-mode-abbrev-table))
+
+(when (boundp 'racket-mode-abbrev-table)
+  (clear-abbrev-table racket-mode-abbrev-table))
+
+(setq racket-abbrevs
+      '(
+        ("be" "begin")
+        ("usquare" "⃞")
+        ("ca" "call-with-current-continuation")
+        ("df" "define")
+        ("di" "display")
+        ("la" "lambda")
+        ("lam" "lambda")
+        ("pr" "procedure?")))
+
+(define-abbrev-table 'racket-mode-abbrev-table
+  racket-abbrevs)
+
+(define-abbrev-table 'racket-repl-mode-abbrev-table
+  racket-abbrevs)
+
+;;* org
 (when (boundp 'org-mode-abbrev-table)
   (clear-abbrev-table org-mode-abbrev-table))
 
+(setq org-abbrevs
+      '(
+        ("bc" "because")
+        ("con" "continuation")
+        ("com" "computation")
+        ("eva" "evaluate")
+        ("evn" "evaluation")
+        ("evt" "evaluation")
+        ("exp" "expression")
+        ("pr" "procedure")
+        ("und" "understand")))
+
 (define-abbrev-table 'org-mode-abbrev-table
-  '(
-    ("1t" "first")
-    ("2d" "second")
-    ("3d" "third")
-    ("ap" "application")
-    ("aps" "applications")
-    ("al" "algorithm")
-    ("ar" "argument")
-    ("ars" "arguments")
-
-    ("ch" "chapter")
-    ("chs" "chapters")
-    ("bc" "because")
-    ("bh" "behavior")
-    ("cj" "Clojure")
-    ("cjs" "ClojureScript")
-    ("cl" "collection")
-    ("cls" "collections")
-    ("co" "computation")
-    ("df" "different")
-    ("dfc" "difference")
-    ("dfl" "differently")
-    ("dft" "differentiate")
-    ("dt" "difficult")
-    ("dty" "difficulty")
-    ("ex" "expression")
-    ("exs" "expressions")
-    ("el" "example")
-    ("els" "examples")
-    ("ev" "evaluate")
-    ("evs" "evaluates")
-    ("evd" "evaluated")
-    ("evg" "evaluating")
-    ("evn" "evaluation")
-    ("et" "element")
-    ("ets" "elements")
-    ("fn" "function")
-    ("fns" "functions")
-    ("fnl" "functional")
-    ("fnt" "functionality")
-    ("lg" "language")
-    ("lgs" "languages")
-    ("id" "identity")
-    ("imm" "immutable")
-    ("immy" "immutability")
-    ("imd" "implemented")
-    ("img" "implementing")
-    ("imp" "implementation")
-    ("imps" "implementations")
-    ("imt" "implement")
-    ("ims" "implements")
-    ("js" "JavaScript")
-    ("kw" "keyword")
-    ("kws" "keywords")
-    ("ma" "macros")
-    ("me" "mechanism")
-    ("mes" "mechanisms")
-    ("min" "minimum")
-    ("mu" "mutation")
-    ("ns" "namespace")
-    ("nss" "namespaces")
-    ("ob" "object")
-    ("obs" "objects")
-    ("oo" "object-oriented")
-    ("par" "parameter")
-    ("pars" "parameters")
-    ("pg" "program")
-    ("pgs" "programs")
-    ("pgg" "programming")
-    ("pr" "previous")
-    ("prl" "previously")
-    ("pp" "property")
-    ("pps" "properties")
-    ("pt" "persistent")
-    ("ptl" "persistently")
-    ("ptc" "persistence")
-    ("re" "represent")
-    ("red" "represented")
-    ("reg" "representing")
-    ("ret" "representation")
-    ("rets" "representations")
-    ("rn" "return")
-    ("rnd" "returned")
-    ("rng" "returning")
-    ("rns" "returns")
-    ("sd" "should")
-    ("sdt" "shouldn't")
-    ("sq" "sequence")
-    ("sql" "sequential")
-    ("sqls" "sequentials")
-    ("sqs" "sequences")
-    ("sl" "symbol")
-    ("sls" "symbols")
-    ("sp" "specific")
-    ("st" "structure")
-    ("stl" "structural")
-    ("sts" "structures")
-    ("un" "understand")
-    ("ung" "understanding")
-    ("ur" "you are")
-    ("uv" "you've")))
-;; => nil
-
-
-(set-default 'abbrev-mode t)
-
-(setq save-abbrevs nil)
+  (nconc racket-abbrevs org-abbrevs))
