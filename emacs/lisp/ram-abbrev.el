@@ -48,7 +48,7 @@
 
 (setq racket-abbrevs
       '(
-        ("be" "begin")
+        ;; ("be" "begin")
         ("usquare" "⃞")
         ("ca" "call-with-current-continuation")
         ("df" "define")
@@ -69,14 +69,37 @@
 
 (setq org-abbrevs
       '(
+        ("~c" "~cons~")
+        ("ab" "abstraction")
+        ("ag" "argument")
+        ("app" "application")
         ("bc" "because")
+        ("bf" "before")
+        ("bh" "behavior")
+        ("bn" "between")
         ("con" "continuation")
+        ("cm" "computer")
         ("com" "computation")
+        ("df" "different")
+        ("ev" "evaluate")
         ("eva" "evaluate")
         ("evn" "evaluation")
         ("evt" "evaluation")
         ("exp" "expression")
+        ("exl" "example")
+        ("lg" "language")
+        ("mec" "mechanism")
+        ("nm" "number")
+        ("par" "parentheses")
+        ("pg" "program")
+        ("pgg" "programming")
         ("pr" "procedure")
+        ("pri" "principle")
+        ("prm" "problem")
+        ("rn" "return")
+        ("sm" "symbol")
+        ("st" "structure")
+        ("tq" "technique")
         ("und" "understand")))
 
 (define-abbrev-table 'org-mode-abbrev-table
