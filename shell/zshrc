@@ -273,3 +273,14 @@ vg() {
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=grey'
 # diable auto correct
 unsetopt correct_all
+
+# https://stackoverflow.com/a/19872708
+if [[ "$TERM" == "dumb" ]]
+then
+    unsetopt zle
+    unsetopt prompt_cr
+    unsetopt prompt_subst
+    unfunction precmd
+    unfunction preexec
+    PS1='$ '
+fi
