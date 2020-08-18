@@ -35,30 +35,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; Add the following to your .emacs file:
-;; (require 'highlight-sexps)
-;;
-;; Enable `highlight-sexps-mode'.
-;;
-;; Or also add one or both of the following your .emacs file:
-;; (add-hook 'lisp-mode-hook 'highlight-sexps-mode)
-;; (add-hook 'emacs-lisp-mode-hook 'highlight-sexps-mode)
-;;
-;; highlight-sexps-mode supports customization. You will likely find
-;; it most useful to customize the hl-sexp-background-colors
-;; variable. The number of nexted s-expressions highlighted is
+;; The number of nested s-expressions highlighted is
 ;; determined by the number of colors defined.
 ;;
-;;; Change Log:
-;;
-;; 2012-01-31 (0.9.1)
-;;    lisp-mode namespace collision fixed (but probably not The Right
-;;    Way)
-;;
-;; 2012-01-31 (0.9)
-;;    Initial Release.
-;;
 ;;; Code:
+
+;;; vars for highlighting inner and outer sexps
 
 (eval-when-compile (require 'cl))
 
