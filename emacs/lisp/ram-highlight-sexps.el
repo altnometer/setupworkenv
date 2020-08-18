@@ -283,12 +283,13 @@ Color attributes might be overriden by
 (defvar hl-sexp-mask-whitespace-overlays nil)
 (make-variable-buffer-local 'hl-sexp-mask-whitespace-overlays)
 
-(defcustom hl-sexp-mask-leading-space-background-color
-  "#282c34"
-  "*Background overlay face color to mask leading spaces."
-  :type '(repeat color)
-  :set 'hl-sexp-set
-  :group 'highlight-sexps)
+(defvar hl-sexp-mask-leading-space-background-color
+  (let ((bg (face-background 'default)))
+    (if (or (not (stringp bg))
+            (string-match "\\`unspecified-" bg))
+        "#000000"
+      bg))
+  "*Background overlay face color to mask leading spaces.")
 
 (defface hl-sexp-mask-leading-space-face nil
   "*Face used for covering whitespace modified by other overlays.
