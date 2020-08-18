@@ -144,7 +144,7 @@ Color attributes might be overriden by `breadcrumbs-right-foreground-color' and
     (setq breadcrumbs--previous-place (point-marker))
     (setq breadcrumbs--previous-window (selected-window)))
 
-   ;; this is how we detect when some windows/buffers close
+   ;; this is how we detect when some windows/buffers change
    ((not (equal (current-buffer) (window-buffer breadcrumbs--previous-window)))
     (breadcrumbs-start))
 
@@ -152,6 +152,7 @@ Color attributes might be overriden by `breadcrumbs-right-foreground-color' and
    ((not (equal (marker-buffer breadcrumbs--previous-place)
                 (current-buffer)))
     (breadcrumbs-start))
+
    ;; when switching windows
    ((not (equal breadcrumbs--previous-window (selected-window)))
     (breadcrumbs-start))))
@@ -184,7 +185,9 @@ Color attributes might be overriden by `breadcrumbs-right-foreground-color' and
         (add-hook 'pre-command-hook 'breadcrumbs--record-vars nil nil)
         (add-hook 'post-command-hook 'breadcrumbs--post-command nil nil))
     (delete-overlay breadcrumbs-left-overlay)
+    (delete-overlay breadcrumbs-right-overlay)
     (kill-local-variable 'breadcrumbs-left-overlay)
+    (kill-local-variable 'breadcrumbs-right-overlay)
     (remove-hook 'pre-command-hook 'breadcrumbs--record-vars nil)
     (remove-hook 'post-command-hook 'breadcrumbs--post-command nil)))
 
@@ -214,7 +217,7 @@ Color attributes might be overriden by `breadcrumbs-right-foreground-color' and
                                 'face `(:background ,breadcrumbs-right-background-color) 'cursor 1000))))))))))
 
 (defun breadcrumbs-remove (selected-win)
-  "Leave a visual clue where the cursor was."
+  "Remove the visual clue."
   (breadcrumbs-put (list selected-win))
   (with-current-buffer (window-buffer selected-win)
     (when (and breadcrumbs-left-overlay
