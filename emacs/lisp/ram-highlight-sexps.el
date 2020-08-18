@@ -64,9 +64,17 @@ The list starts with the the inside sexp and moves outwards."
   :set 'hl-sexp-set
   :group 'highlight-sexps)
 
-(defcustom hl-sexp-background-colors
-  ;; '("#36454f" "#51484f")
-  '("#21242b" "#3f444a")                ; #3f444a is doom-one-theme base4
+
+(defun ram-change-color (color by-n)
+  "Return color changed by BY-N."
+  (let ((color-ls (color-values color)))
+    (if (< (color-distance "black" color)
+           (color-distance "white" color))
+        (apply #'format "#%04x%04x%04x"
+               (mapcar (lambda (c) (+ c by-n)) color-ls))
+      (apply #'format "#%04x%04x%04x"
+             (mapcar (lambda (c) (- c by-n)) color-ls)))))
+
   "*List of colors for highlighted sexps backgrounds.
 The list starts with the the inside parentheses and moves
 outwards."
