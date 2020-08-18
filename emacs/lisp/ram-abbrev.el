@@ -80,23 +80,47 @@
         ("con" "continuation")
         ("cm" "computer")
         ("com" "computation")
+        ("def" "definition")
         ("df" "different")
+
+        ("el" "element")
+        ("env" "environment")
         ("ev" "evaluate")
         ("eva" "evaluate")
         ("evn" "evaluation")
         ("evt" "evaluation")
         ("exp" "expression")
         ("exl" "example")
+
+        ("fn" "function")
+
         ("lg" "language")
+
+        ("imp" "implementation")
+        ("impt" "implement")
+
+        ("mt" "manipulate")
+        ("mtg" "manipulating")
         ("mec" "mechanism")
+
         ("nm" "number")
+
+        ("ob" "object")
+
         ("par" "parentheses")
         ("pg" "program")
         ("pgg" "programming")
         ("pr" "procedure")
+        ("prd" "predicate")
         ("pri" "principle")
-        ("prm" "problem")
+        ("prm" "parameter")
+        ("prms" "parameters")
+
+        ("rep" "represent")
+        ("repn" "representation")
+        ("repg" "representing")
         ("rn" "return")
+        ("rns" "returns")
         ("sm" "symbol")
         ("st" "structure")
         ("tq" "technique")
