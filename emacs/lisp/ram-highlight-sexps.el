@@ -136,19 +136,10 @@ The list starts with the the inside sexp and moves outwards."
 ;; (fg '("#bbc2cf" "#bfbfbf" "brightwhite"))
 ;; (fg-alt '("#5B6268" "#2d2d2d" "white"))
 
-(defcustom hl-sexp-background-colors-when-at-del
-  ;; '("#21242b" "#3f444a")
-  ;; '("#21242b" "#2f4f4f")
-  ;; '("#21242b" "#353839")
-  ;; '("#1c1f24" "#353839")
-  ;; '("#36454f" "#51484f")
-  '("#23272e" "#36454f")
+(defvar hl-sexp-background-colors-when-at-del
+  (ram-make-highlight-color (face-background 'default) 2000 4000)
   "*List of colors for highlighted sexps backgrounds.
-The list starts with the the inside parentheses and moves
-outwards."
-  :type '(repeat color)
-  :set 'hl-sexp-set
-  :group 'highlight-sexps)
+The list starts with the inside parentheses and moves outwards.")
 
 (defcustom hl-sexp-siblings-number
   20
