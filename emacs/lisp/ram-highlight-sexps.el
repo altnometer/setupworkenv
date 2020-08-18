@@ -471,6 +471,13 @@ repeating highlighting the same sexps in the same context.")
       (decf num))))
 
 (defun hl-sexp-color-update ()
+  (setq hl-sexp-background-colors-when-at-del
+        (ram-make-highlight-color (face-background 'default) 2000 4000))
+  (setq hl-sexp-background-colors
+        (ram-make-highlight-color (face-background 'default) 0 8000))
+  (setq hl-sexp-mask-leading-space-background-color
+        (face-background 'default))
+
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
       (when hl-sexp-overlays
@@ -496,6 +503,11 @@ repeating highlighting the same sexps in the same context.")
         (setq hl-sexp-paren-siblings-overlays nil)
 
         (hl-sexp-create-overlays)
+        (hl-sexp-create-overlays-when-at-del)
+        (hl-sexp-create-overlays-masking-leading-space (* 2 hl-sexp-masking-overlays-number))
+        (hl-sexp-create-paren-overlays)
+        (hl-sexp-create-paren-when-at-del-overlays)
+        (hl-sexp-create-paren-sibling-overlays)
         (let ((hl-sexps-last-point -1)
               (hl-sexps-last-max-point -1))
           (hl-sexp-highlight))))))
