@@ -80,12 +80,12 @@ The list starts with the the inside sexp and moves outwards."
   (list (ram-change-color base-color adjust-by-1)
         (ram-change-color base-color adjust-by-2)))
 
+  ;; '("#36454F" "#51484F")
+  ;; '("#21242b" "#3f444a")                ; #3f444a is doom-one-theme base4
+(defvar hl-sexp-background-colors
+  (ram-make-highlight-color (face-background 'default) 0 8000)
   "*List of colors for highlighted sexps backgrounds.
-The list starts with the the inside parentheses and moves
-outwards."
-  :type '(repeat color)
-  :set 'hl-sexp-set
-  :group 'highlight-sexps)
+The list starts with the inside parentheses and moves outwards.")
 
 (defcustom hl-sexp-colors-when-at-del
   nil
