@@ -75,6 +75,11 @@ The list starts with the the inside sexp and moves outwards."
       (apply #'format "#%04x%04x%04x"
              (mapcar (lambda (c) (- c by-n)) color-ls)))))
 
+(defun ram-make-highlight-color (base-color adjust-by-1 adjust-by-2)
+  "Return a list of two colors derived from BASE-COLOR changed by adjust-by-1, adjust-by-2."
+  (list (ram-change-color base-color adjust-by-1)
+        (ram-change-color base-color adjust-by-2)))
+
   "*List of colors for highlighted sexps backgrounds.
 The list starts with the the inside parentheses and moves
 outwards."
