@@ -207,7 +207,8 @@ Color attributes might be overriden by `hl-sexp-colors' and
 (make-variable-buffer-local 'hl-sexp-paren-overlays)
 
 (defcustom hl-sexp-paren-colors
-  '("cyan" "cyan" "red4" "red4" "OrangeRed4" "OrangeRed4")
+  ;; '("cyan" "cyan" "red4" "red4" "OrangeRed4" "OrangeRed4")
+  '("cyan" "cyan" "red1" "red2" "OrangeRed1" "OrangeRed2")
   ;; '("firebrick1" "firebrick1" "green2" "green2")
   "*List of colors for highlighting pairs of parentheses.
 The list starts with the pair for the inside parentheses and
@@ -217,7 +218,8 @@ moves outwards."
   :group 'highlight-sexps)
 
 (defcustom hl-sexp-paren-background-colors
-  '("purple1" "purple1" "DodgerBlue1" "DodgerBlue1" "aquamarine3" "aquamarine3")
+  ;; '("purple1" "purple1" "DodgerBlue1" "DodgerBlue1" "aquamarine3" "aquamarine3")
+  '("MediumOrchid2" "orchid1" "DodgerBlue3" "SkyBlue1" "aquamarine4" "aquamarine3")
   "*List of background colors for highlighting pairs of parentheses.
 The list starts with the pair for the inside parentheses and
 moves outwards."
@@ -226,7 +228,8 @@ moves outwards."
   :group 'highlight-sexps)
 
 (defcustom hl-sexp-paren-attributes
-  '((:weight extra-bold) (:weight extra-bold) (:weight extra-bold) (:weight extra-bold))
+  ;; '((:weight extra-bold) (:weight extra-bold) (:weight extra-bold) (:weight extra-bold))
+  '((:weight normal) (:weight normal) (:weight normal) (:weight normal))
   "*List of attributes for highlighting pairs of parentheses.
 The list starts with the pair for the inside parentheses and
 moves outwards."
