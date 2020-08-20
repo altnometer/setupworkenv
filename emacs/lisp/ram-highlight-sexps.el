@@ -319,6 +319,10 @@ This is used in tandem with `hl-sexps-last-point' to prevent
 repeating highlighting the same sexps in the same context.")
 (make-variable-buffer-local 'hl-sexps-last-max-point)
 
+(defvar last-at-opening-paren-p nil
+  "True if last delimiter visited was an opening one.")
+(make-variable-buffer-local 'last-at-opening-paren-p)
+
 (defun hl-sexp-highlight ()
   "Highlight the nested s-expressions around point"
   (when (not (and
@@ -344,7 +348,8 @@ repeating highlighting the same sexps in the same context.")
            (sexps-siblings (if (caadr sexps-for-parens)
                                (hl-sexp-get-siblings-end-points (1+ (caadr sexps-for-parens)) hl-sexp-siblings-number)))
            pos1
-           pos2)
+           pos2
+           at-opening-paren-p)
       (condition-case err
           (while (and (car overlays-sexp) sexp-list)
             (let* ((overlay (pop (car overlays-sexp)))
@@ -362,8 +367,22 @@ repeating highlighting the same sexps in the same context.")
                  (sexp (pop sexps-for-parens))
                  (pos1 (car sexp))
                  (pos2 (cadr sexp)))
-            (move-overlay overlay-1 pos1 (1+ pos1))
-            (move-overlay overlay-2 (1- pos2) pos2))))
+            ;; highlight parens next to cursor in different color
+            (if (or at-opening-paren-p
+                    (and (not at-delimiter-p)
+                         last-at-opening-paren-p)
+                    (and at-delimiter-p
+                         (or (= pos1 p) (= (1+ pos1) p))))
+                (progn
+                  (setq at-opening-paren-p t)
+                  (setq last-at-opening-paren-p t)
+                  (move-overlay overlay-1 pos1 (1+ pos1))
+                  (move-overlay overlay-2 (1- pos2) pos2))
+              (progn
+                (setq at-opening-paren-p nil)
+                (setq last-at-opening-paren-p nil)
+                (move-overlay overlay-2 pos1 (1+ pos1))
+                (move-overlay overlay-1 (1- pos2) pos2))))))
       (when sexps-siblings
         (while (and overlays-siblings sexps-siblings)
           (let* ((overlay-1 (pop overlays-siblings))
@@ -371,8 +390,11 @@ repeating highlighting the same sexps in the same context.")
                  (sexp (pop sexps-siblings))
                  (pos1 (car sexp))
                  (pos2 (cadr sexp)))
-            (move-overlay overlay-1 pos1 (1+ pos1))
-            (move-overlay overlay-2 (1- pos2) pos2))))
+            (if at-opening-paren-p
+                (progn (move-overlay overlay-1 pos1 (1+ pos1))
+                       (move-overlay overlay-2 (1- pos2) pos2))
+              (progn (move-overlay overlay-2 pos1 (1+ pos1))
+                     (move-overlay overlay-1 (1- pos2) pos2))))))
       (dolist (ov (car overlays-sexp))
         (move-overlay ov 1 1))
       (dolist (ov (cadr overlays-sexp))
@@ -404,6 +426,7 @@ repeating highlighting the same sexps in the same context.")
 
   (kill-local-variable 'hl-sexps-last-point)
   (kill-local-variable 'hl-sexps-last-max-point)
+  (kill-local-variable 'last-at-opening-paren-p)
   (remove-hook 'post-command-hook 'hl-sexp-highlight t)
   (when (and ram-highlight-sexps-mode
              (not (eq major-mode 'messages-buffer-mode))
@@ -471,9 +494,15 @@ repeating highlighting the same sexps in the same context.")
     (while (> num 0)
       (setq attributes (face-attr-construct 'hl-sexp-face))
       (when fg
-        (setq attributes (plist-put attributes :foreground fg)))
+        (setq attributes (plist-put attributes :foreground
+                                    (if (evenp num)
+                                        (car fg)
+                                      (cadr fg)))))
       (when bg
-        (setq attributes (plist-put attributes :background bg)))
+        (setq attributes (plist-put attributes :background
+                                    (if (evenp num)
+                                        (car bg)
+                                      (cadr bg)))))
       (push (make-overlay 0 0) hl-sexp-paren-siblings-overlays)
       (overlay-put (car hl-sexp-paren-siblings-overlays) 'face attributes)
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
@@ -520,7 +549,8 @@ repeating highlighting the same sexps in the same context.")
         (hl-sexp-create-paren-when-at-del-overlays)
         (hl-sexp-create-paren-sibling-overlays)
         (let ((hl-sexps-last-point -1)
-              (hl-sexps-last-max-point -1))
+              (hl-sexps-last-max-point -1)
+              (last-at-opening-paren-p nil))
           (hl-sexp-highlight))))))
 
 (defun hl-sexp-start-of-sexp (pt)
