@@ -148,21 +148,24 @@ The list starts with the inside parentheses and moves outwards.")
   :group 'highlight-sexps)
 
 (defcustom hl-sexp-colors-siblings
-  "yellow1"
+  ;; '("wheat4" "yellow1")
+  '("wheat4" "wheat4")
   "*List of colors for highlighting sibling sexps."
   :type '(repeat color)
   :set 'hl-sexp-set
   :group 'highlight-sexps)
 
 (defcustom hl-sexp-background-siblings
-  "wheat4"
+  ;; '("wheat2" "wheat4")
+  '("wheat2" "DarkGoldenrod3")
   "*List of colors for highlighting sibling sexps backgrounds."
   :type '(repeat color)
   :set 'hl-sexp-set
   :group 'highlight-sexps)
 
 (defcustom hl-sexp-paren-siblings-attributes
-  '(:weight extra-bold)
+  ;; '((:weight extra-bold) (:weight extra-bold))
+  '((:weight normal) (:weight normal))
   "*Face attributes for highlighting sibling parentheses."
   :type '(plist)
   :set 'hl-sexp-set
