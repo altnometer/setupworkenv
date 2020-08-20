@@ -247,7 +247,8 @@ Color attributes might be overriden by `hl-sexp-paren-colors'."
 (make-variable-buffer-local 'hl-sexp-paren-when-at-del-overlays)
 
 (defcustom hl-sexp-paren-when-at-del-colors
-  '("cyan" "cyan" "red4" "red4" "OrangeRed4" "OrangeRed4")
+  ;; '("cyan" "cyan" "red4" "red4" "OrangeRed4" "OrangeRed4")
+  '("cyan" "cyan" "red1" "red2" "OrangeRed1" "OrangeRed2")
   "*List of colors for highlighting pairs of parentheses when the point is next to them.
 The list starts with the pair for the inside parentheses and
 moves outwards."
@@ -257,7 +258,8 @@ moves outwards."
 
 ;; (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'face '(:background "dodger blue" :foreground "red4" :weight extra-bold))
 (defcustom hl-sexp-paren-when-at-del-background-colors
-  '("purple1" "purple1" "DodgerBlue1" "DodgerBlue1" "aquamarine3" "aquamarine3")
+  ;; '("purple1" "purple1" "DodgerBlue1" "DodgerBlue1" "aquamarine3" "aquamarine3")
+  '("MediumOrchid2" "orchid1" "DodgerBlue3" "SkyBlue1" "aquamarine4" "aquamarine3")
   "*List of background colors for highlighting pairs of parentheses when the point is next to them.
 The list starts with the pair for the inside parentheses and
 moves outwards."
@@ -266,9 +268,12 @@ moves outwards."
   :group 'highlight-sexps)
 
 (defcustom hl-sexp-paren-when-at-del-attributes
-  '((:weight extra-bold) (:weight extra-bold)
-    (:weight extra-bold) (:weight extra-bold)
-    (:weight extra-bold) (:weight extra-bold))
+  ;; '((:weight extra-bold) (:weight extra-bold)
+  ;;   (:weight extra-bold) (:weight extra-bold)
+  ;;   (:weight extra-bold) (:weight extra-bold))
+  '((:weight normal) (:weight normal)
+    (:weight normal) (:weight normal)
+    (:weight normal) (:weight normal))
   "*List of attributes for highlighting pairs of parentheses when the point is next to them.
 The list starts with the pair for the inside parentheses and
 moves outwards."
