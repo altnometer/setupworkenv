@@ -1511,10 +1511,10 @@ c.qt.highdpi = True
 ## `:open google qutebrowser`.
 ## Type: Dict
 c.url.searchengines = {
-    'DEFAULT': 'https://duckduckgo.com/?q={}',
-    'g': 'https://www.google.com/search?hl=en&q={}',
-    'wa': 'https://wiki.archlinux.org/?search={}',
-    'gh': 'https://github.com/search?q={}',
+    'd': 'https://duckduckgo.com/?q={}',
+    'DEFAULT': 'https://www.google.com/search?hl=en&q={}',
+    'w': 'https://wiki.archlinux.org/?search={}',
+    'g': 'https://github.com/search?q={}',
 }
 ## Page(s) to open at the start.
 ## Type: List of FuzzyUrl, or FuzzyUrl
