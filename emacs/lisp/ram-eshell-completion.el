@@ -71,6 +71,16 @@
         (end-of-line))
     (ram-eshell-completion-mode)))
 
+;;** predicates
+
+(defun ram-eshell--delete-backward-char-p ()
+    "Test if `this-command' can be interpreted as `delete-backward-char'.
+
+with test for relevance to `ram-eshell-completion-mode'."
+    (and (or (eq this-command 'delete-backward-char)
+          (eq this-command 'lispy-delete-backward))
+      (not (string-empty-p (car search-substrings)))))
+
 ;;* pre functions
 
 (defun ram-eshell--completion-pre ()
@@ -86,10 +96,8 @@
     ;; (funcall this-command)
     )
    ;; handle <backspace>
-   ((and (or (eq this-command 'delete-backward-char)
-             (eq this-command 'lispy-delete-backward))
-         (not (string-empty-p (car search-substrings))))
-    (message "**** delete-backward-char")
+   ((ram-eshell--delete-backward-char-p)
+    (message "\n**** pre: delete-backward-char")
     (when (not (string= "" (car search-substrings)))
       (setcar search-substrings
               (substring (car search-substrings)
@@ -117,6 +125,8 @@
           (if (eq this-command 'self-insert-command)
               (this-command-keys))))
     (cond
+     ((ram-eshell--delete-backward-char-p)
+      (ram-eshell--insert-candidate))
      ((not (or (string= inserted-char " ")
                (null inserted-char)))
       (ram-eshell--handle-ins-non-spc inserted-char))
