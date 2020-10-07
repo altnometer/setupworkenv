@@ -82,6 +82,17 @@ with additional tests for relevance to
           (eq this-command 'lispy-delete-backward))
       (not (string-empty-p (car search-substrings)))))
 
+(defun ram-eshell--backward-kill-word-p ()
+  "Test if `this-command' can be interpreted as `backward-kill-word'
+
+with additional tests for relevance to
+`ram-eshell-completion-mode'."
+  (and (or (eq this-command 'ram-eshell-backward-kill-word)
+           (eq this-command 'kill-region)
+           (eq this-command 'backward-kill-word)
+           (eq this-command 'lispy-backward-kill-word))
+       (car search-substrings)))
+
 ;;* pre functions
 
 (defun ram-eshell--completion-pre ()
@@ -108,15 +119,14 @@ with additional tests for relevance to
                               (delete-dups
                                (ring-elements eshell-history-ring))))
     (message (format "**** search substr: %s" search-substrings)))
-   ;; handle "<M-backspace>"
-   ((and (or (eq this-command 'ram-eshell-backward-kill-word)
-             (eq this-command 'kill-region)
-             (eq this-command 'backward-kill-word)
-             (eq this-command 'lispy-backward-kill-word))
-         (car search-substrings))
+   ((ram-eshell--backward-kill-word-p)
     (message "\n**** backward-kill-word")
     (setq search-substrings (cons "" (cdr search-substrings)))
-    (message (format "**** search substr: %s" search-substrings)))
+    (message (format "**** search substr: %s" search-substrings))
+    (setq ram-eshell-history (orderless-filter
+                              (string-join search-substrings " ")
+                              (delete-dups
+                               (ring-elements eshell-history-ring)))))
    ;; ((and (eq this-command 'self-insert-command)
    ;;       (not (or (string= (this-command-keys) " ")
    ;;                (null (this-command-keys)))))
@@ -132,6 +142,9 @@ with additional tests for relevance to
     (cond
      ((ram-eshell--delete-backward-char-p)
       (ram-eshell--insert-candidate))
+     ((ram-eshell--backward-kill-word-p)
+      (ram-eshell--insert-candidate)
+      (forward-word))
      ((not (or (string= inserted-char " ")
                (null inserted-char)))
       (ram-eshell--handle-ins-non-spc inserted-char))
