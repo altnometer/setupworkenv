@@ -49,7 +49,7 @@
       (setq search-substrings (cons "" (split-string input " " t "[[:space:]]+")))
       (setq ram-eshell-history (orderless-filter (string-join search-substrings " ") ram-eshell-history))
       (ram-eshell--insert-candidate))
-     (t (setq search-substrings '())))))
+     (t (setq search-substrings '(""))))))
 
 (defun ram-eshell-completion--delete-vars ()
   "Delete ram-eshell-completion-mode variables."
