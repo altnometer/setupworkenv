@@ -74,9 +74,10 @@
 ;;** predicates
 
 (defun ram-eshell--delete-backward-char-p ()
-    "Test if `this-command' can be interpreted as `delete-backward-char'.
+    "Test if `this-command' can be interpreted as `delete-backward-char'
 
-with test for relevance to `ram-eshell-completion-mode'."
+with additional tests for relevance to
+`ram-eshell-completion-mode'."
     (and (or (eq this-command 'delete-backward-char)
           (eq this-command 'lispy-delete-backward))
       (not (string-empty-p (car search-substrings)))))
