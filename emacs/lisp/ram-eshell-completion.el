@@ -102,6 +102,10 @@ with test for relevance to `ram-eshell-completion-mode'."
       (setcar search-substrings
               (substring (car search-substrings)
                          0 (1- (length (car search-substrings))))))
+    (setq ram-eshell-history (orderless-filter
+                              (string-join search-substrings " ")
+                              (delete-dups
+                               (ring-elements eshell-history-ring))))
     (message (format "**** search substr: %s" search-substrings)))
    ;; handle "<M-backspace>"
    ((and (or (eq this-command 'ram-eshell-backward-kill-word)
