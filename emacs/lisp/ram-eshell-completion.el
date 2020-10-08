@@ -120,7 +120,13 @@ with additional tests for relevance to
     (message "\n**** pre: delete-backward-char")
     (let ((s (car search-substrings))
           new-s)
-      (when (not (string= "" s))
+      (cond
+       ((and (string= "" s) (not (null (cdr search-substrings))))
+        (setq search-substrings
+              (cons (substring (cadr search-substrings)
+                               0 (1- (length (cadr search-substrings))))
+                    (cddr search-substrings))))
+       ((not (string= "" s))
         (setq new-s (substring s 0 (1- (length s))))
         (if (not (string= "" new-s))
             (setq search-substrings (cons new-s (cdr search-substrings)))
