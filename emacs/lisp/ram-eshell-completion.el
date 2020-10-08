@@ -178,10 +178,13 @@ with additional tests for relevance to
   "Handle insertion of candidates."
   (eshell-bol)
   (delete-region (point) (point-at-eol))
-  (if (car ram-eshell-history)
-      (progn (insert (format "%s (%s)" (car ram-eshell-history) (seq-length ram-eshell-history)))
-             (ram-eshell--completion-highligth-matches ovs search-substrings)
-             (re-search-forward (car search-substrings) (point-at-eol) t 1))
+  (if (and (car ram-eshell-history)
+           (not (and (string= "" (car search-substrings))
+                     (null (cdr search-substrings)))))
+      (progn
+        (insert (format "%s (%s)" (car ram-eshell-history) (seq-length ram-eshell-history)))
+        (ram-eshell--completion-highligth-matches ovs search-substrings)
+        (re-search-forward (car search-substrings) (point-at-eol) t 1))
     (insert (string-join (reverse search-substrings) " "))
     (end-of-line)
     (setq ram-eshell-history (delete-dups
