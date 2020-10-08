@@ -121,7 +121,9 @@ with additional tests for relevance to
     (message (format "**** search substr: %s" search-substrings)))
    ((ram-eshell--backward-kill-word-p)
     (message "\n**** backward-kill-word")
-    (setq search-substrings (cons "" (cdr search-substrings)))
+    (if (string= "" (car search-substrings))
+        (setq search-substrings (cons "" (cddr search-substrings)))
+      (setq search-substrings (cons "" (cdr search-substrings))))
     (message (format "**** search substr: %s" search-substrings))
     (setq ram-eshell-history (orderless-filter
                               (string-join search-substrings " ")
