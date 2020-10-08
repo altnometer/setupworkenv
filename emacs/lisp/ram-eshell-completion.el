@@ -104,10 +104,7 @@ with additional tests for relevance to
     )
    ;; handle "C-c C-c" key press
    ((eq this-command 'eshell-interrupt-process)
-    (ram-eshell-completion-mode -1)
-    ;; (funcall this-command)
-    )
-   ;; handle <backspace>
+    (ram-eshell-completion-mode -1))
    ((ram-eshell--delete-backward-char-p)
     (message "\n**** pre: delete-backward-char")
     (let ((s (car search-substrings))
