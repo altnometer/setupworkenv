@@ -133,10 +133,10 @@ with additional tests for relevance to
           (if (not (null (cdr search-substrings)))
               (setq search-substrings (cdr search-substrings))
             (setq search-substrings '(""))))))
-    (ram-eshell-reset-candidates (orderless-filter
-                                  (string-join search-substrings " ")
-                                  (delete-dups
-                                   (ring-elements eshell-history-ring))))
+      (ram-eshell-reset-candidates (orderless-filter
+                                    (string-join search-substrings " ")
+                                    (delete-dups
+                                     (ring-elements eshell-history-ring)))))
     (message (format "**** search substr: %s" search-substrings)))
    ((ram-eshell--backward-kill-word-p)
     (message "\n**** backward-kill-word")
