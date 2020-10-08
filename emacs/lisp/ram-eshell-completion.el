@@ -16,6 +16,10 @@
   "A list of substrings to match an eshell history.")
 (make-variable-buffer-local 'ram-eshell-history)
 
+(defvar ram-eshell-displayed-candidate nil
+  "Indicate the number of the currently displayed candidate.")
+(make-variable-buffer-local 'ram-eshell-displayed-candidate)
+
 ;;* secondary functions
 
 (defun ram-eshell-backward-kill-word (arg)
@@ -25,6 +29,12 @@
     (if (= bol (point))
         (message "Cannot `backward-kill-word' when at `eshell-bol'")
       (backward-kill-word arg))))
+
+(defun ram-eshell-reset-candidates (candidates)
+  "Set `ram-eshell-history' to CANDIDATES."
+  (setq ram-eshell-history candidates)
+  (setq ram-eshell-displayed-candidate 0))
+
 
 (defun ram-eshell-completion--set-vars ()
   "Set ram-eshell-completion-mode variables."
@@ -38,8 +48,9 @@
                     (make-overlay 1 1) (make-overlay 1 1)))
     (dolist (ov ovs)
       (overlay-put ov 'face '((:foreground "green")))))
-  (setq ram-eshell-history (delete-dups
-                            (ring-elements eshell-history-ring)))
+  (ram-eshell-reset-candidates (delete-dups
+                                (ring-elements eshell-history-ring)))
+  (setq ram-eshell-displayed-candidate 0)
   (let ((input (buffer-substring-no-properties
                 (save-excursion (eshell-bol) (point)) (point-at-eol))))
     (cond
@@ -47,7 +58,8 @@
       (setq search-substrings (list input)))
      ((> (seq-length input) 1)
       (setq search-substrings (cons "" (split-string input " " t "[[:space:]]+")))
-      (setq ram-eshell-history (orderless-filter (string-join search-substrings " ") ram-eshell-history))
+      (ram-eshell-reset-candidates
+       (orderless-filter (string-join search-substrings " ") ram-eshell-history))
       (ram-eshell--insert-candidate))
      (t (setq search-substrings '(""))))))
 
@@ -116,10 +128,10 @@ with additional tests for relevance to
           (if (not (null (cdr search-substrings)))
               (setq search-substrings (cdr search-substrings))
             (setq search-substrings '(""))))))
-    (setq ram-eshell-history (orderless-filter
-                              (string-join search-substrings " ")
-                              (delete-dups
-                               (ring-elements eshell-history-ring))))
+    (ram-eshell-reset-candidates (orderless-filter
+                                  (string-join search-substrings " ")
+                                  (delete-dups
+                                   (ring-elements eshell-history-ring))))
     (message (format "**** search substr: %s" search-substrings)))
    ((ram-eshell--backward-kill-word-p)
     (message "\n**** backward-kill-word")
@@ -127,10 +139,10 @@ with additional tests for relevance to
         (setq search-substrings (cons "" (cddr search-substrings)))
       (setq search-substrings (cons "" (cdr search-substrings))))
     (message (format "**** search substr: %s" search-substrings))
-    (setq ram-eshell-history (orderless-filter
-                              (string-join search-substrings " ")
-                              (delete-dups
-                               (ring-elements eshell-history-ring)))))
+    (ram-eshell-reset-candidates (orderless-filter
+                                  (string-join search-substrings " ")
+                                  (delete-dups
+                                   (ring-elements eshell-history-ring)))))
    ;; ((and (eq this-command 'self-insert-command)
    ;;       (not (or (string= (this-command-keys) " ")
    ;;                (null (this-command-keys)))))
@@ -191,8 +203,8 @@ with additional tests for relevance to
           (re-search-forward (car search-substrings) (point-at-eol) t 1))
       (insert (string-join (reverse search-substrings) " "))
       (end-of-line)
-      (setq ram-eshell-history (delete-dups
-                                (ring-elements eshell-history-ring))))))
+      (ram-eshell-reset-candidates (delete-dups
+                                    (ring-elements eshell-history-ring))))))
 
 (defun ram-eshell--handle-ins-spc ()
   (message ">>>> empty space")
@@ -220,7 +232,8 @@ with additional tests for relevance to
   ;; (when (not (null candidates)) (setq candidates nil))
   (setcar search-substrings (concat (car search-substrings) char))
   (message (format "**** search substr: %s" search-substrings))
-  (setq ram-eshell-history (orderless-filter (string-join search-substrings " ") ram-eshell-history))
+  (ram-eshell-reset-candidates (orderless-filter
+                                (string-join search-substrings " ") ram-eshell-history))
   (when (or (not (null (cdr search-substrings)))
             (>= (seq-length (car search-substrings)) 2))
     (ram-eshell--insert-candidate))
