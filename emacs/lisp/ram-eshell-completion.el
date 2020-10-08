@@ -197,13 +197,19 @@ with additional tests for relevance to
   "Insert Nth candidate."
   (eshell-bol)
   (delete-region (point) (point-at-eol))
-  (let* ((n (or n 0))
+  (let* ((scrolling-candidates-p (not (null n)))
+         (n (or n 0))
          (candidate (nth n ram-eshell-history)))
     (if (and candidate
              (not (and (string= "" (car search-substrings))
                        (null (cdr search-substrings)))))
         (progn
-          (insert (format "%s (%s)" candidate (seq-length ram-eshell-history)))
+          (insert (if scrolling-candidates-p
+                      (format "%s (%s of %s)" candidate
+                              (1+ ram-eshell-displayed-candidate)
+                              (seq-length ram-eshell-history))
+                    (format "%s (%s)" candidate
+                            (seq-length ram-eshell-history))))
           (ram-eshell--completion-highligth-matches ovs search-substrings)
           (re-search-forward (car search-substrings) (point-at-eol) t 1))
       (insert (string-join (reverse search-substrings) " "))
