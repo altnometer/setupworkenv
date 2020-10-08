@@ -253,12 +253,43 @@ with additional tests for relevance to
   ;;   (ram-eshell--insert-candidate candidates))
   )
 
+;;* keymap
+
+;;** keymap: bindings
+
+(defvar ram-eshell-completion-mode-map nil
+  "Keymap for `ram-eshell-completion-mode'")
+
+(progn
+  (setq ram-eshell-completion-mode-map (make-sparse-keymap))
+
+  (define-key ram-eshell-completion-mode-map (kbd "M-p") #'ram-eshell-completion-prev)
+  (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next))
+
+;;** keymap|bindings: functions
+
+(defun ram-eshell-completion-prev ()
+  "Insert previous history candidate."
+  (interactive)
+  (setq ram-eshell-displayed-candidate
+        (% (1+ ram-eshell-displayed-candidate) (seq-length ram-eshell-history)))
+  (ram-eshell--insert-candidate ram-eshell-displayed-candidate))
+
+(defun ram-eshell-completion-next ()
+  "Insert next history candidate."
+  (interactive)
+  (let ((n ram-eshell-displayed-candidate))
+    (if (<= n 0)
+        (setq ram-eshell-displayed-candidate (1- (seq-length ram-eshell-history)))
+        (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate))))
+  (ram-eshell--insert-candidate ram-eshell-displayed-candidate))
+
 ;;* minor-mode definition
 
 ;;;###autoload
 (define-minor-mode ram-eshell-completion-mode
   "Minor mode for eshell history completion."
-  nil " ram-eshell-completion-mode" nil
+  nil " ram-eshell-completion-mode" ram-eshell-completion-mode-map
   (if ram-eshell-completion-mode
       (progn
         (ram-eshell-completion--set-vars)
