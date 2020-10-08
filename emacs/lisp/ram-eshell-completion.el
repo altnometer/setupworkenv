@@ -179,21 +179,23 @@ with additional tests for relevance to
                   ovs)))
       (ram-eshell--completion-highligth-matches ovs* (cdr search-substrings)))))
 
-(defun ram-eshell--insert-candidate ()
-  "Handle insertion of candidates."
+(defun ram-eshell--insert-candidate (&optional n)
+  "Insert Nth candidate."
   (eshell-bol)
   (delete-region (point) (point-at-eol))
-  (if (and (car ram-eshell-history)
-           (not (and (string= "" (car search-substrings))
-                     (null (cdr search-substrings)))))
-      (progn
-        (insert (format "%s (%s)" (car ram-eshell-history) (seq-length ram-eshell-history)))
-        (ram-eshell--completion-highligth-matches ovs search-substrings)
-        (re-search-forward (car search-substrings) (point-at-eol) t 1))
-    (insert (string-join (reverse search-substrings) " "))
-    (end-of-line)
-    (setq ram-eshell-history (delete-dups
-                              (ring-elements eshell-history-ring)))))
+  (let* ((n (or n 0))
+         (candidate (nth n ram-eshell-history)))
+    (if (and candidate
+             (not (and (string= "" (car search-substrings))
+                       (null (cdr search-substrings)))))
+        (progn
+          (insert (format "%s (%s)" candidate (seq-length ram-eshell-history)))
+          (ram-eshell--completion-highligth-matches ovs search-substrings)
+          (re-search-forward (car search-substrings) (point-at-eol) t 1))
+      (insert (string-join (reverse search-substrings) " "))
+      (end-of-line)
+      (setq ram-eshell-history (delete-dups
+                                (ring-elements eshell-history-ring))))))
 
 (defun ram-eshell--handle-ins-spc ()
   (message ">>>> empty space")
