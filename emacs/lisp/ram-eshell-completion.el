@@ -110,10 +110,15 @@ with additional tests for relevance to
    ;; handle <backspace>
    ((ram-eshell--delete-backward-char-p)
     (message "\n**** pre: delete-backward-char")
-    (when (not (string= "" (car search-substrings)))
-      (setcar search-substrings
-              (substring (car search-substrings)
-                         0 (1- (length (car search-substrings))))))
+    (let ((s (car search-substrings))
+          new-s)
+      (when (not (string= "" s))
+        (setq new-s (substring s 0 (1- (length s))))
+        (if (not (string= "" new-s))
+            (setq search-substrings (cons new-s (cdr search-substrings)))
+          (if (not (null (cdr search-substrings)))
+              (setq search-substrings (cdr search-substrings))
+            (setq search-substrings '(""))))))
     (setq ram-eshell-history (orderless-filter
                               (string-join search-substrings " ")
                               (delete-dups
