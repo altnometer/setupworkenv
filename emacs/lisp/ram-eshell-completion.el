@@ -85,14 +85,6 @@
 
 ;;** predicates
 
-(defun ram-eshell--delete-backward-char-p ()
-  "Test if `this-command' can be interpreted as `delete-backward-char'
-
-with additional tests for relevance to
-`ram-eshell-completion-mode'."
-  (and (or (eq this-command 'delete-backward-char)
-           (eq this-command 'lispy-delete-backward))))
-
 (defun ram-eshell--backward-kill-word-p ()
   "Test if `this-command' can be interpreted as `backward-kill-word'
 
@@ -111,28 +103,6 @@ with additional tests for relevance to
    ;; handle "C-c C-c" key press
    ((eq this-command 'eshell-interrupt-process)
     (ram-eshell-completion-mode -1))
-   ((ram-eshell--delete-backward-char-p)
-    (message "\n**** pre: delete-backward-char")
-    (let ((s (car search-substrings))
-          new-s)
-      (cond
-       ((and (string= "" s) (not (null (cdr search-substrings))))
-        (setq search-substrings
-              (cons (substring (cadr search-substrings)
-                               0 (1- (length (cadr search-substrings))))
-                    (cddr search-substrings))))
-       ((not (string= "" s))
-        (setq new-s (substring s 0 (1- (length s))))
-        (if (not (string= "" new-s))
-            (setq search-substrings (cons new-s (cdr search-substrings)))
-          (if (not (null (cdr search-substrings)))
-              (setq search-substrings (cdr search-substrings))
-            (setq search-substrings '(""))))))
-      (ram-eshell-reset-candidates (orderless-filter
-                                    (string-join search-substrings " ")
-                                    (delete-dups
-                                     (ring-elements eshell-history-ring)))))
-    (message (format "**** search substr: %s" search-substrings)))
    ((ram-eshell--backward-kill-word-p)
     (message "\n**** backward-kill-word")
     (if (string= "" (car search-substrings))
@@ -156,8 +126,6 @@ with additional tests for relevance to
           (if (eq this-command 'self-insert-command)
               (this-command-keys))))
     (cond
-     ((ram-eshell--delete-backward-char-p)
-      (ram-eshell--insert-candidate))
      ((ram-eshell--backward-kill-word-p)
       (ram-eshell--insert-candidate)
       (forward-word))
@@ -260,7 +228,8 @@ with additional tests for relevance to
 
   (define-key ram-eshell-completion-mode-map (kbd "M-p") #'ram-eshell-completion-prev)
   (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next)
-  (define-key ram-eshell-completion-mode-map (kbd "<return>") #'ram-eshell-completion-send-input))
+  (define-key ram-eshell-completion-mode-map (kbd "<return>") #'ram-eshell-completion-send-input)
+  (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-delete-backward-char))
 
 ;;** keymap|bindings: functions
 
@@ -293,6 +262,32 @@ with additional tests for relevance to
     (eshell-send-input)
     (ram-eshell-completion--set-vars)
     ))
+
+(defun ram-eshell-completion-delete-backward-char ()
+  "Delete char in `search-substrings'."
+  (interactive)
+    (message "\n**** pre: delete-backward-char")
+    (let ((s (car search-substrings))
+          new-s)
+      (cond
+       ((and (string= "" s) (not (null (cdr search-substrings))))
+        (setq search-substrings
+              (cons (substring (cadr search-substrings)
+                               0 (1- (length (cadr search-substrings))))
+                    (cddr search-substrings))))
+       ((not (string= "" s))
+        (setq new-s (substring s 0 (1- (length s))))
+        (if (not (string= "" new-s))
+            (setq search-substrings (cons new-s (cdr search-substrings)))
+          (if (not (null (cdr search-substrings)))
+              (setq search-substrings (cdr search-substrings))
+            (setq search-substrings '(""))))))
+      (ram-eshell-reset-candidates (orderless-filter
+                                    (string-join search-substrings " ")
+                                    (delete-dups
+                                     (ring-elements eshell-history-ring)))))
+    (message (format "**** search substr: %s" search-substrings))
+    (ram-eshell--insert-candidate))
 
 ;;* minor-mode definition
 
