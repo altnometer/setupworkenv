@@ -108,11 +108,6 @@ with additional tests for relevance to
 
 (defun ram-eshell--completion-pre ()
   (cond
-   ;; handle <return> key press
-   ((eq this-command 'eshell-send-input)
-    (ram-eshell-completion-mode -1)
-    ;; (funcall this-command)
-    )
    ;; handle "C-c C-c" key press
    ((eq this-command 'eshell-interrupt-process)
     (ram-eshell-completion-mode -1))
@@ -264,7 +259,8 @@ with additional tests for relevance to
   (setq ram-eshell-completion-mode-map (make-sparse-keymap))
 
   (define-key ram-eshell-completion-mode-map (kbd "M-p") #'ram-eshell-completion-prev)
-  (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next))
+  (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next)
+  (define-key ram-eshell-completion-mode-map (kbd "<return>") #'ram-eshell-completion-send-input))
 
 ;;** keymap|bindings: functions
 
@@ -283,6 +279,20 @@ with additional tests for relevance to
         (setq ram-eshell-displayed-candidate (1- (seq-length ram-eshell-history)))
         (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate))))
   (ram-eshell--insert-candidate ram-eshell-displayed-candidate))
+
+(defun ram-eshell-completion-send-input ()
+  "Run `eshell-send-input' after additional logic."
+  (interactive)
+  (let ((input (buffer-substring-no-properties
+                eshell-last-output-end (point-at-eol))))
+    (eshell-bol)
+    (delete-region (point) (point-at-eol))
+    (insert (string-trim-right
+             input
+             "[[:space:]]*\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"))
+    (eshell-send-input)
+    (ram-eshell-completion--set-vars)
+    ))
 
 ;;* minor-mode definition
 
