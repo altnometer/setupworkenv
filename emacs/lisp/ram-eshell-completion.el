@@ -260,7 +260,9 @@ with additional tests for relevance to
              input
              "[[:space:]]*\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"))
     (eshell-send-input)
-    (ram-eshell-completion--set-vars)
+    (if ram-eshell-completion-mode
+        (ram-eshell-completion--set-vars)
+      (ram-eshell-completion-mode 1))
     ))
 
 (defun ram-eshell-completion-delete-backward-char ()
