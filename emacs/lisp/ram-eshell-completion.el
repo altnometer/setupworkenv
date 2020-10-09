@@ -22,14 +22,6 @@
 
 ;;* secondary functions
 
-(defun ram-eshell-backward-kill-word (arg)
-  "Execute `backward-kill-word' only if not at `eshell-bol'."
-  (interactive "p")
-  (let ((bol (save-excursion (eshell-bol) (point))))
-    (if (= bol (point))
-        (message "Cannot `backward-kill-word' when at `eshell-bol'")
-      (backward-kill-word arg))))
-
 (defun ram-eshell-reset-candidates (candidates)
   "Set `ram-eshell-history' to CANDIDATES."
   (setq ram-eshell-history candidates)
@@ -83,19 +75,6 @@
         (end-of-line))
     (ram-eshell-completion-mode)))
 
-;;** predicates
-
-(defun ram-eshell--backward-kill-word-p ()
-  "Test if `this-command' can be interpreted as `backward-kill-word'
-
-with additional tests for relevance to
-`ram-eshell-completion-mode'."
-  (and (or (eq this-command 'ram-eshell-backward-kill-word)
-           (eq this-command 'kill-region)
-           (eq this-command 'backward-kill-word)
-           (eq this-command 'lispy-backward-kill-word))
-       (car search-substrings)))
-
 ;;* pre functions
 
 (defun ram-eshell--completion-pre ()
@@ -103,16 +82,6 @@ with additional tests for relevance to
    ;; handle "C-c C-c" key press
    ((eq this-command 'eshell-interrupt-process)
     (ram-eshell-completion-mode -1))
-   ((ram-eshell--backward-kill-word-p)
-    (message "\n**** backward-kill-word")
-    (if (string= "" (car search-substrings))
-        (setq search-substrings (cons "" (cddr search-substrings)))
-      (setq search-substrings (cons "" (cdr search-substrings))))
-    (message (format "**** search substr: %s" search-substrings))
-    (ram-eshell-reset-candidates (orderless-filter
-                                  (string-join search-substrings " ")
-                                  (delete-dups
-                                   (ring-elements eshell-history-ring)))))
    ;; ((and (eq this-command 'self-insert-command)
    ;;       (not (or (string= (this-command-keys) " ")
    ;;                (null (this-command-keys)))))
@@ -126,9 +95,6 @@ with additional tests for relevance to
           (if (eq this-command 'self-insert-command)
               (this-command-keys))))
     (cond
-     ((ram-eshell--backward-kill-word-p)
-      (ram-eshell--insert-candidate)
-      (forward-word))
      ((not (or (string= inserted-char " ")
                (null inserted-char)))
       (ram-eshell--handle-ins-non-spc inserted-char))
@@ -229,7 +195,8 @@ with additional tests for relevance to
   (define-key ram-eshell-completion-mode-map (kbd "M-p") #'ram-eshell-completion-prev)
   (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next)
   (define-key ram-eshell-completion-mode-map (kbd "<return>") #'ram-eshell-completion-send-input)
-  (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-delete-backward-char))
+  (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-delete-backward-char)
+  (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-backward-kill-word))
 
 ;;** keymap|bindings: functions
 
@@ -291,6 +258,21 @@ with additional tests for relevance to
     (message (format "**** search substr: %s" search-substrings))
     (ram-eshell--insert-candidate))
 
+(defun ram-eshell-completion-backward-kill-word ()
+  "Remove element in `search-substrings'."
+  (interactive)
+  (message "\n**** backward-kill-word")
+  (if (string= "" (car search-substrings))
+      (setq search-substrings (cons "" (cddr search-substrings)))
+    (setq search-substrings (cons "" (cdr search-substrings))))
+  (message (format "**** search substr: %s" search-substrings))
+  (ram-eshell-reset-candidates (orderless-filter
+                                (string-join search-substrings " ")
+                                (delete-dups
+                                 (ring-elements eshell-history-ring))))
+  (ram-eshell--insert-candidate)
+  (forward-word))
+
 ;;* minor-mode definition
 
 ;;;###autoload
@@ -301,7 +283,6 @@ with additional tests for relevance to
       (progn
         (ram-eshell-completion--set-vars)
         ;; (local-set-key (kbd "<C-tab>") #'ram-eshell--completion-post)
-        (local-set-key (kbd "<M-backspace>") #'ram-eshell-backward-kill-word)
         ;; (add-hook 'pre-command-hook 'breadcrumbs--record-vars nil nil)
         (add-hook 'pre-command-hook 'ram-eshell--completion-pre nil t)
         (add-hook 'post-command-hook 'ram-eshell--completion-post nil t))
