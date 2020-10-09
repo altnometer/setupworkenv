@@ -235,28 +235,28 @@
 (defun ram-eshell-completion-delete-backward-char ()
   "Delete char in `search-substrings'."
   (interactive)
-    (message "\n**** pre: delete-backward-char")
-    (let ((s (car search-substrings))
-          new-s)
-      (cond
-       ((and (string= "" s) (not (null (cdr search-substrings))))
-        (setq search-substrings
-              (cons (substring (cadr search-substrings)
-                               0 (1- (length (cadr search-substrings))))
-                    (cddr search-substrings))))
-       ((not (string= "" s))
-        (setq new-s (substring s 0 (1- (length s))))
-        (if (not (string= "" new-s))
-            (setq search-substrings (cons new-s (cdr search-substrings)))
-          (if (not (null (cdr search-substrings)))
-              (setq search-substrings (cdr search-substrings))
-            (setq search-substrings '(""))))))
-      (ram-eshell-reset-candidates (orderless-filter
-                                    (string-join search-substrings " ")
-                                    (delete-dups
-                                     (ring-elements eshell-history-ring)))))
-    (message (format "**** search substr: %s" search-substrings))
-    (ram-eshell--insert-candidate))
+  (message "\n**** pre: delete-backward-char")
+  (let ((s (car search-substrings))
+        new-s)
+    (cond
+     ((and (string= "" s) (not (null (cdr search-substrings))))
+      (setq search-substrings
+            (cons (substring (cadr search-substrings)
+                             0 (1- (length (cadr search-substrings))))
+                  (cddr search-substrings))))
+     ((not (string= "" s))
+      (setq new-s (substring s 0 (1- (length s))))
+      (if (not (string= "" new-s))
+          (setq search-substrings (cons new-s (cdr search-substrings)))
+        (if (not (null (cdr search-substrings)))
+            (setq search-substrings (cdr search-substrings))
+          (setq search-substrings '(""))))))
+    (ram-eshell-reset-candidates (orderless-filter
+                                  (string-join search-substrings " ")
+                                  (delete-dups
+                                   (ring-elements eshell-history-ring)))))
+  (message (format "**** search substr: %s" search-substrings))
+  (ram-eshell--insert-candidate))
 
 (defun ram-eshell-completion-backward-kill-word ()
   "Remove element in `search-substrings'."
