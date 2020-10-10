@@ -153,8 +153,15 @@
                             (seq-length ram-eshell-history))))
           (ram-eshell--completion-highligth-matches ovs search-substrings)
           (re-search-forward (car search-substrings) (point-at-eol) t 1))
-      (insert (string-join (reverse search-substrings) " "))
-      (end-of-line)
+      (when (not (and (string= "" (car search-substrings))
+                      (null (cdr search-substrings))))
+        (insert (format "%s (%s)"
+                        (string-join (reverse search-substrings) " ")
+                        (propertize "No matches" 'face '((:foreground "red")))))
+        (beginning-of-line)
+        (re-search-forward (car search-substrings) (point-at-eol) t)
+        (ram-eshell-reset-candidates (orderless-filter
+                                      (string-join search-substrings " ") ram-eshell-history)))
       (ram-eshell-reset-candidates (delete-dups
                                     (ring-elements eshell-history-ring))))))
 
