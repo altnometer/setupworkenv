@@ -212,7 +212,9 @@
   (define-key ram-eshell-completion-mode-map (kbd "C-f") #'ram-eshell-completion-forward-char)
   (define-key ram-eshell-completion-mode-map (kbd "C-b") #'ram-eshell-completion-backward-char)
   (define-key ram-eshell-completion-mode-map (kbd "M-f") #'ram-eshell-completion-forward-word)
-  (define-key ram-eshell-completion-mode-map (kbd "M-b") #'ram-eshell-completion-backward-word))
+  (define-key ram-eshell-completion-mode-map (kbd "M-b") #'ram-eshell-completion-backward-word)
+  (define-key ram-eshell-completion-mode-map (kbd "C-a") #'ram-eshell-completion-beginning-of-line)
+  (define-key ram-eshell-completion-mode-map (kbd "C-e") #'ram-eshell-completion-end-of-line))
 
 ;;** keymap|bindings: functions
 
@@ -309,6 +311,20 @@
   (ram-eshell-completion--trim-input-right)
   (ram-eshell-completion-mode -1)
   (backward-word))
+
+(defun ram-eshell-completion-beginning-of-line ()
+  "Run `eshell-bol' after disabling `ram-eshell-completion-mode'."
+  (interactive)
+  (ram-eshell-completion--trim-input-right)
+  (ram-eshell-completion-mode -1)
+  (eshell-bol))
+
+(defun ram-eshell-completion-beginning-of-line ()
+  "Run `move-end-of-line' after disabling `ram-eshell-completion-mode'."
+  (interactive)
+  (ram-eshell-completion--trim-input-right)
+  (ram-eshell-completion-mode -1)
+  (move-end-of-line))
 
 ;;* minor-mode definition
 
