@@ -53,7 +53,7 @@
       (ram-eshell-reset-candidates
        (orderless-filter (string-join search-substrings " ") ram-eshell-history))
       (ram-eshell--insert-candidate))
-     (t (setq search-substrings '(""))))))
+     (t (setq search-substrings (list ""))))))
 
 (defun ram-eshell-completion--trim-input-right ()
   "Replace input with removed counters of candidates."
