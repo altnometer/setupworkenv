@@ -208,7 +208,11 @@
   (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next)
   (define-key ram-eshell-completion-mode-map (kbd "<return>") #'ram-eshell-completion-send-input)
   (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-delete-backward-char)
-  (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-backward-kill-word))
+  (define-key ram-eshell-completion-mode-map (kbd "<M-backspace>") #'ram-eshell-completion-backward-kill-word)
+  (define-key ram-eshell-completion-mode-map (kbd "C-f") #'ram-eshell-completion-forward-char)
+  (define-key ram-eshell-completion-mode-map (kbd "C-b") #'ram-eshell-completion-backward-char)
+  (define-key ram-eshell-completion-mode-map (kbd "M-f") #'ram-eshell-completion-forward-word)
+  (define-key ram-eshell-completion-mode-map (kbd "M-b") #'ram-eshell-completion-backward-word))
 
 ;;** keymap|bindings: functions
 
@@ -277,6 +281,34 @@
                                  (ring-elements eshell-history-ring))))
   (ram-eshell--insert-candidate)
   (forward-word))
+
+(defun ram-eshell-completion-forward-char ()
+  "Run `forward-char' after disabling `ram-eshell-completion-mode'."
+  (interactive)
+  (ram-eshell-completion--trim-input-right)
+  (ram-eshell-completion-mode -1)
+  (forward-char))
+
+(defun ram-eshell-completion-backward-char ()
+  "Run `backward-char' after disabling `ram-eshell-completion-mode'."
+  (interactive)
+  (ram-eshell-completion--trim-input-right)
+  (ram-eshell-completion-mode -1)
+  (backward-char))
+
+(defun ram-eshell-completion-forward-word ()
+  "Run `forward-word' after disabling `ram-eshell-completion-mode'."
+  (interactive)
+  (ram-eshell-completion--trim-input-right)
+  (ram-eshell-completion-mode -1)
+  (forward-word))
+
+(defun ram-eshell-completion-backward-word ()
+  "Run `backward-word' after disabling `ram-eshell-completion-mode'."
+  (interactive)
+  (ram-eshell-completion--trim-input-right)
+  (ram-eshell-completion-mode -1)
+  (backward-word))
 
 ;;* minor-mode definition
 
