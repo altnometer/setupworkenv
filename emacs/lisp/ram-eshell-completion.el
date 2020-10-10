@@ -44,7 +44,7 @@
                                 (ring-elements eshell-history-ring)))
   (setq ram-eshell-displayed-candidate 0)
   (let ((input (buffer-substring-no-properties
-                (save-excursion (eshell-bol) (point)) (point-at-eol))))
+                eshell-last-output-end (point-at-eol))))
     (cond
      ((= (seq-length input) 1)
       (setq search-substrings (list input)))
@@ -137,7 +137,7 @@
 (defun ram-eshell--insert-candidate (&optional n)
   "Insert Nth candidate."
   (eshell-bol)
-  (delete-region (point) (point-at-eol))
+  (delete-region eshell-last-output-end (point-at-eol))
   (let* ((scrolling-candidates-p (not (null n)))
          (n (or n 0))
          (candidate (nth n ram-eshell-history)))
