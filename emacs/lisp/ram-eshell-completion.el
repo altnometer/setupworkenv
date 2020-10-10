@@ -55,6 +55,18 @@
       (ram-eshell--insert-candidate))
      (t (setq search-substrings '(""))))))
 
+(defun ram-eshell-completion--trim-input-right ()
+  "Replace input with removed counters of candidates."
+  (let ((point (point))
+        (input (buffer-substring-no-properties
+                eshell-last-output-end (point-at-eol))))
+    (eshell-bol)
+    (delete-region (point) (point-at-eol))
+    (insert (string-trim-right
+             input
+             "[[:space:]]*\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"))
+    (goto-char point)))
+
 (defun ram-eshell-completion--delete-vars ()
   "Delete ram-eshell-completion-mode variables."
   (dolist (ov ovs)
@@ -219,18 +231,11 @@
 (defun ram-eshell-completion-send-input ()
   "Run `eshell-send-input' after additional logic."
   (interactive)
-  (let ((input (buffer-substring-no-properties
-                eshell-last-output-end (point-at-eol))))
-    (eshell-bol)
-    (delete-region (point) (point-at-eol))
-    (insert (string-trim-right
-             input
-             "[[:space:]]*\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"))
-    (eshell-send-input)
-    (if ram-eshell-completion-mode
-        (ram-eshell-completion--set-vars)
-      (ram-eshell-completion-mode 1))
-    ))
+  (ram-eshell-completion--trim-input-right)
+  (eshell-send-input)
+  (if ram-eshell-completion-mode
+      (ram-eshell-completion--set-vars)
+    (ram-eshell-completion-mode 1)))
 
 (defun ram-eshell-completion-delete-backward-char ()
   "Delete char in `search-substrings'."
