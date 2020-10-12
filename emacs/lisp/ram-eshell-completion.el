@@ -94,16 +94,7 @@
 
 ;;* pre functions
 
-(defun ram-eshell--completion-pre ()
-  (cond
-   ;; handle "C-c C-c" key press
-   ((eq this-command 'eshell-interrupt-process)
-    (ram-eshell-completion-mode -1))
-   ;; ((and (eq this-command 'self-insert-command)
-   ;;       (not (or (string= (this-command-keys) " ")
-   ;;                (null (this-command-keys)))))
-   ;;  (message (format "????? typed in char is: %s" (this-command-keys))))
-   ))
+(defun ram-eshell--completion-pre ())
 
 ;;* post functions
 
@@ -117,6 +108,9 @@
       (ram-eshell--handle-ins-non-spc inserted-char))
      ((string= inserted-char " ")
       (ram-eshell--handle-ins-spc))
+     ((eq this-command 'eshell-interrupt-process)
+      ;; (delete-region (eshell-bol) (point-at-eol))
+      (ram-eshell-completion--set-vars))
      (t "message: unaccounted condition"))))
 
 ;;** post secondary functions
