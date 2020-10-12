@@ -1,6 +1,4 @@
-;; packages.el --- Package configuration
-
-(require 'use-package)
+;; packages.el --- Package configuration -*- lexical-binding: t -*-
 
 ;;* Leader Key
 ;;** Definition
@@ -22,247 +20,1387 @@
 (define-key global-map (kbd "<SunProps>") ram-leader-map-tap)
 (define-key global-map (kbd "<cancel>") ram-leader-map-hold)
 
-;;** Bindings
-(define-key global-map (kbd "H-o") 'other-window)
-(define-key global-map (kbd "H-O") (lambda () (interactive) (other-window -1)))
+;;* bindings
+
+;;** bindings: buffer
+
+(define-key global-map (kbd "s-b") #'switch-to-buffer)
+(define-key global-map (kbd "s-B") #'switch-to-buffer-other-window)
+(define-key global-map (kbd "C-s-b") 'display-buffer)
+(define-key global-map (kbd "<M-f3>") #'ibuffer)
+
+;;** bindings: file
+
+(define-key global-map (kbd "C-s-f") #'find-file)
+(define-key global-map (kbd "C-S-s-f") #'find-file-other-window)
+
 (define-key ram-leader-map-tap (kbd "n") 'comint-dynamic-complete-filename)
-(define-key ram-leader-map-tap (kbd "w") 'delete-other-windows)
-(define-key ram-leader-map-tap (kbd "W") 'delete-window)
-(define-key ram-leader-map-tap (kbd "a") (lambda () (interactive) (find-file "~/.emacs.d/lisp/ram-abbrev.el")))
-(define-key ram-leader-map-tap (kbd "i") 'completion-at-point)
 
-(defun ram-switch-to-previous-buffer ()
+(defun ram-edit-abbrev-file ()
+  "Open ram-abbrev.el file. If it is current, close it."
   (interactive)
-  (switch-to-buffer (other-buffer (current-buffer) 1)))
+  (if (string= "ram-abbrev.el" (buffer-name (window-buffer (selected-window))))
+      (if (= 1 (count-windows nil))
+          (switch-to-prev-buffer)
+        (delete-window))
+    (find-file "~/.emacs.d/lisp/ram-abbrev.el")))
 
-(define-key ram-leader-map-tap (kbd "p") 'ram-switch-to-previous-buffer)
+(define-key ram-leader-map-tap (kbd "a") #'ram-edit-abbrev-file)
+(define-key ram-leader-map-tap (kbd "i") 'completion-at-point)
+(define-key ram-leader-map-tap (kbd "w") #'widen)
 
+(define-key global-map (kbd "C-x D") 'dired-other-window)
+
+(define-key global-map (kbd "C-h C-k") #'describe-keymap)
+
+;;** bindings: general
+
+;; default "M-a" #'backward-sentence, only with #'push-mark
+(define-key global-map (kbd "M-a") (lambda () (interactive) (push-mark) (backward-sentence)))
+;; "M-(" was originally bound to #'insert-parentheses
+(global-unset-key (kbd "M-("))
+(define-key global-map (kbd "C-%") #'repeat)
+
+;;** bindings: narrow
+
+(define-key global-map (kbd "<M-f8>") #'narrow-to-defun)
+
+
+;;** bindings: up-list
+
+(defun ram-up-list (universal-arg)
+  "Ignore strings when calling `up-list'."
+  (interactive "p")
+  (condition-case nil
+      (let ((inside-str (nth 3 (syntax-ppss))))
+        (if inside-str
+            (up-list (+ 1 universal-arg) t t)
+          (let ((space-between-closing-parens?
+                 (save-excursion
+                   (and (looking-at-p ")")
+                        (progn
+                          (backward-char)
+                          (looking-at-p " "))
+                        (progn
+                          (backward-char)
+                          (looking-at-p ")"))))))
+            (if space-between-closing-parens?
+                (progn (delete-char -1)
+                       (message "feature working?")))
+            (up-list universal-arg t t))
+          (let ((between-closing-parens?
+                 (save-excursion
+                   (and (looking-at-p ")")
+                        (progn
+                          (backward-char)
+                          (looking-at-p ")"))))))
+            (if between-closing-parens?
+                (insert ? )))))
+    (error nil)))
+
+(defun ram-up-list-backward (universal-arg)
+  "Backward `up-list' that ignores strings."
+  (interactive "p")
+  (condition-case nil
+      (let ((inside-str (nth 3 (syntax-ppss))))
+        (if inside-str
+            (up-list (- (+ 1 universal-arg)) t t)
+          (up-list (- universal-arg) t t))
+        ;; insert space
+        (insert ? ))
+
+    (error nil)))
+
+(define-key global-map (kbd "s-t") 'ram-up-list)
+(define-key global-map (kbd "s-c") 'ram-up-list-backward)
+
+;;* company
+
+(straight-use-package
+ '(company :type git :flavor melpa :host github :repo "company-mode/company-mode"))
+
+(add-hook 'after-init-hook 'global-company-mode)
+(setq company-minimum-prefix-length 0)
+;; upper case, lower case ignore when searching.
+(setq completion-ignore-case nil)
+(setq company-dabbrev-ignore-case nil)
+;; do not downcase (lower case) the candidates (if upper case exist)
+(setq company-dabbrev-downcase nil)
+
+(setq company-idle-delay nil)
+
+(with-eval-after-load 'company
+  ;; (define-key global-map (kbd "s-c") 'company-complete)
+  (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+  (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+  (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+
+  (define-key company-active-map (kbd "M-n") nil)
+  (define-key company-active-map (kbd "M-p") nil)
+  (define-key company-active-map (kbd "C-n") #'company-select-next)
+  (define-key company-active-map (kbd "C-p") #'company-select-previous)
+
+  (setq company-backends
+        '(
+          (company-capf company-dabbrev)
+          (
+           company-files
+           company-dabbrev
+           company-gtags
+           company-etags
+           company-keywords
+           company-capf
+           company-yasnippet)
+          (company-abbrev company-dabbrev)))
+
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends)
+                   (list '(company-capf :with company-dabbrev)
+                         (car company-backends)))))
+
+  (add-hook 'clojure-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends)
+                   (list '(company-capf)))))
+
+  ;; (add-hook 'emacs-lisp-mode-hook
+  ;;         (lambda ()
+  ;;           (set (make-local-variable 'company-backends)
+  ;;                (list
+  ;;                 (cons '(company-capf :with company-dabbrev)
+  ;;                       (car company-backends))))))
+
+  ;; ;; if you want to append to the end of the list.
+  ;; (append (car company-backends)
+  ;;         (list 'company-elisp))
+
+  ;; (with-eval-after-load 'company
+  ;;   (add-hook 'emacs-lisp-mode 'company-mode)
+  ;;   (add-hook 'cider-repl-mode-hook 'company-mode)
+  ;;   (add-hook 'cider-mode-hook 'company-mode))
+
+  ;; (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+  ;; (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+  )
+
+
+;;* emacs-lisp elisp
+
+(add-hook 'emacs-lisp-mode-hook (lambda () (outline-hide-sublevels 1)))
+
+
+;;* eshell
+
+;;** eshell: completion
+
+;; (add-hook 'shell-mode-hook #'company-mode)
+;; (add-hook 'eshell-mode-hook
+;;           (lambda () (define-key eshell-mode-map (kbd "<C-tab>") #'company-manual-begin)))
+
+(add-hook 'eshell-mode-hook
+          (lambda () (define-key eshell-mode-map (kbd "<tab>") #'completion-at-point)))
+
+;;** eshell: terminal, default shell
+
+(defvar my-term-shell "/usr/bin/zsh")
+(defadvice ansi-term (before force-bash)
+  (interactive (list my-term-shell)))
+(ad-activate 'ansi-term)
+
+;;** eshell: bindings
+
+(defun ram-open-shell (universal-arg)
+  "Switch to shell buffer open a new one."
+  (interactive "p")
+  (let ((shell-buffers
+         (sort
+          (seq-filter (lambda (b) (s-starts-with-p "*eshell*" (buffer-name b))) (buffer-list))
+          (lambda (s1 s2) (string-lessp (buffer-name s1) (buffer-name s2))))))
+    (if shell-buffers
+        (pop-to-buffer-same-window
+         (nth (min (1- (length shell-buffers)) (max (1- universal-arg) 0))
+              shell-buffers))
+      (eshell))))
+
+(define-key global-map (kbd "s-e") #'ram-open-shell)
+
+;;** eshell: history
+
+(setq eshell-history-size 10000)
+(setq eshell-hist-ignoredups t)
+(setq eshell-input-filter
+      (lambda (input)
+        (not (or (string-prefix-p "[[:space:]]+" input)
+                 (< (seq-length input) 2)))))
+
+;;*** eshell/history: ram-eshell-completion-mode
+
+(autoload 'ram-eshell-completion-mode "ram-eshell-completion")
+
+(with-eval-after-load "esh-mode"
+  (add-hook 'eshell-mode-hook 'ram-eshell-completion-mode))
+
+(autoload 'ram-eshell-completion-toggle-mode "ram-eshell-completion")
+(autoload 'ram-eshell-completion-send-input "ram-eshell-completion")
+
+(with-eval-after-load "esh-mode"
+  (define-key eshell-mode-map (kbd "S-SPC") #'ram-eshell-completion-toggle-mode)
+  (define-key eshell-mode-map (kbd "<return>") #'ram-eshell-completion-send-input))
 
 ;;* magit
-(use-package magit
-  :bind (("C-c g" . 'magit-file-dispatch)
-         ("C-c C-g" . 'magit-dispatch))
-  :config
-  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-  (setq magit-save-repository-buffers 'dontask))
+(straight-use-package
+ '(magit :type git :flavor melpa :files ("lisp/magit"
+                                         "lisp/magit*.el"
+                                         "lisp/git-rebase.el"
+                                         "Documentation/magit.texi"
+                                         "Documentation/AUTHORS.md"
+                                         "LICENSE"
+                                         (:exclude "lisp/magit-libgit.el")
+                                         "magit-pkg.el")
+         :host github :repo "magit/magit"))
+
+(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+(setq magit-save-repository-buffers 'dontask)
+(setq magit-diff-refine-hunk 'all)
 
 (define-key global-map (kbd "s-m") 'magit-status)
+(define-key global-map (kbd "C-c g") 'magit-file-dispatch)
+(define-key global-map (kbd "C-c C-g") 'magit-dispatch)
 
-;;* Windows, Buffers
-;;** General Window Settings
+;;* minibuffer
+
+;;** minibuffer: settings
+
+(setq completion-category-defaults nil)
+(setq completion-cycle-threshold 3)
+(setq completion-flex-nospace nil)
+(setq completion-pcm-complete-word-inserts-delimiters t)
+(setq completion-pcm-word-delimiters "-_./:| ")
+(setq completion-show-help nil)
+(setq completion-ignore-case t)
+(setq minibuffer-eldef-shorten-default 1)
+(setq minibuffer-default-prompt-format " [%s]")
+(setq read-buffer-completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
+(setq completions-format 'vertical)
+(setq enable-recursive-minibuffers t)
+(setq read-answer-short t)
+(setq resize-mini-windows 'grow-only)
+
+(file-name-shadow-mode 1)
+(minibuffer-depth-indicate-mode 1)
+;; (minibuffer-electric-default-mode 1)
+
+;; (with-eval-after-load "minibuf-eldef"
+;;   (setq-default minibuffer-default-in-prompt-regexps
+;;                 '(("\\( (default .*)\\): *" 1)
+;;                   ("\\( \\[.*\\]\\):? *\\'" 1))))
+
+(with-eval-after-load "minibuf-eldef"
+  (setq-default minibuffer-default-in-prompt-regexps
+                '(("\\( \\[.*]\\): *" 1)
+                  ("\\( (default\\(?: is\\)? \\(.*\\))\\):? \\'" 1 " [\\2]")
+                  ("([^(]+?\\(, default\\(?: is\\)? \\(.*\\)\\)):? \\'" 1)
+                  ("\\( \\[.*\\]\\):? *\\'" 1))))
+
+;;** minibuffer: functions
+
+;;*** minibuffer/functions: supporting functions
+
+(defmacro ram-add-to-history-cmd (name history)
+  `(defun ,name ()
+     ,(format "Add search string entered in minibuffer to `%s'." (eval history))
+     (interactive)
+     (let ((search-str (buffer-substring
+                        (line-beginning-position) (line-end-position 1))))
+       (if (< 3 (length search-str))
+           (progn
+             (add-to-history ,history search-str))))
+     (minibuffer-force-complete-and-exit)))
+
+;;*** minibuffer/functions: ram-describe-variable
+
+(defvar ram-describe-variable-history nil
+  "`ram-describe-variable' history list.")
+(put 'ram-describe-variable-history 'history-length 100)
+
+(defun ram-describe-variable (variable &optional swap-history-p)
+  "Describe variable and store the search string and input to history."
+  (interactive
+   (let ((v (variable-at-point))
+         (enable-recursive-minibuffers t)
+         (orig-buffer (current-buffer))
+         ;; (default-history-add-val history-add-new-input)
+         (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+         (hist-item (car ram-describe-variable-history))
+         val)
+     ;; (setq history-add-new-input nil)
+
+     (define-key minibuffer-local-completion-map (kbd "<return>")
+       (ram-add-to-history-cmd ram-add-to-describe-variable-history 'ram-describe-variable-history))
+
+     (setq val (completing-read
+                (if (symbolp v)
+                    (format-prompt
+                     "Describe variable" v)
+                  (if (car ram-describe-variable-history)
+                      (format-prompt "Describe variable" (car ram-describe-variable-history))
+                    (format-prompt "Describe variable" nil)))
+                #'help--symbol-completion-table
+                (lambda (vv)
+                  ;; In case the variable only exists in the buffer
+                  ;; the command we switch back to that buffer before
+                  ;; we examine the variable.
+                  (with-current-buffer orig-buffer
+                    (or (get vv 'variable-documentation)
+                        (and (boundp vv) (not (keywordp vv))))))
+                t nil 'ram-describe-variable-history
+                (if (symbolp v)
+                    (symbol-name v)
+                  ram-describe-variable-history)))
+
+     (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
+
+     ;; (setq history-add-new-input default-history-add-val)
+     (list (if (equal val "")
+               v (intern val))
+           ;; if two items are inserted, swap them so that the search str is first
+           (let ((third-element (caddr ram-describe-variable-history))
+                 (second-element (cadr ram-describe-variable-history)))
+             (and second-element (equal hist-item third-element))))))
+
+  (when swap-history-p
+      (setq ram-describe-variable-history
+            (cons (cadr ram-describe-variable-history)
+                  (cons (car ram-describe-variable-history)
+                        (cddr ram-describe-variable-history)))))
+
+  (let ((default history-add-new-input))
+    (setq history-add-new-input nil)
+    (describe-variable variable)
+    (setq history-add-new-input default)))
+
+(define-key global-map (kbd "C-h v") #'ram-describe-variable)
+
+(defun prot/focus-minibuffer ()
+    "Focus the active minibuffer.
+
+Bind this to `completion-list-mode-map' to M-v to easily jump
+between the list of candidates present in the \\*Completions\\*
+buffer and the minibuffer (because by default M-v switches to the
+completions if invoked from inside the minibuffer."
+    (interactive)
+    (let ((mini (active-minibuffer-window)))
+      (when mini
+        (select-window mini))))
+
+(defun prot/focus-minibuffer-or-completions ()
+  "Focus the active minibuffer or the \\*Completions\\*.
+
+If both the minibuffer and the Completions are present, this
+command will first move per invocation to the former, then the
+latter, and then continue to switch between the two.
+
+The continuous switch is essentially the same as running
+`prot/focus-minibuffer' and `switch-to-completions' in
+succession."
+  (interactive)
+  (let* ((mini (active-minibuffer-window))
+         (completions (get-buffer-window "*Completions*")))
+    (cond ((and mini
+                (not (minibufferp)))
+           (select-window mini nil))
+          ((and completions
+                (not (eq (selected-window)
+                         completions)))
+           (select-window completions nil)))))
+
+;;*** minibuffer/functions: ram-describe-function
+
+(defvar ram-describe-function-history nil
+  "`ram-describe-function' history list.")
+(put 'ram-describe-function-history 'history-length 100)
+
+(defun ram-describe-function (function &optional swap-history-p)
+  "Describe function and store the search string and input to history."
+  (interactive
+   (let ((fn (function-called-at-point))
+         (enable-recursive-minibuffers t)
+         (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+         (hist-item (car ram-describe-function-history))
+         val)
+
+     (define-key minibuffer-local-completion-map (kbd "<return>")
+       (ram-add-to-history-cmd ram-add-to-describe-function-history 'ram-describe-function-history))
+
+     (setq val (completing-read
+                (if (and fn (symbol-name fn))
+                    (format-prompt "Describe function" fn)
+                  (if (car ram-describe-function-history)
+                      (format-prompt "Describe function" (car ram-describe-function-history))
+                    (format-prompt "Describe function" nil)))
+                #'help--symbol-completion-table
+                (lambda (f) (or (fboundp f) (get f 'function-documentation)))
+                t nil 'ram-describe-function-history
+                (if fn
+                    (symbol-name fn)
+                  ram-describe-function-history)))
+
+     (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
+
+     ;; (setq history-add-new-input default-history-add-val)
+     (unless (equal val "")
+       (setq fn (intern val)))
+     (unless (and fn (symbolp fn))
+       (user-error "You didn't specify a function symbol"))
+     (unless (or (fboundp fn) (get fn 'function-documentation))
+       (user-error "Symbol's function definition is void: %s" fn))
+     (list fn
+           ;; if two items are inserted, swap them so that the search str is first
+           (let ((third-element (caddr ram-describe-function-history))
+                 (second-element (cadr ram-describe-function-history)))
+             (and second-element (equal hist-item third-element))))))
+
+  ;; reorder history so that the search string is fist and the input is second.
+  (when swap-history-p
+      (setq ram-describe-function-history
+            (cons (cadr ram-describe-function-history)
+                  (cons (car ram-describe-function-history)
+                        (cddr ram-describe-function-history)))))
+
+  (let ((default history-add-new-input))
+    (setq history-add-new-input nil)
+    (describe-function function)
+    (setq history-add-new-input default)))
+
+;; (define-key ram-leader-map-tap "v" #'ram-describe-function)
+(define-key global-map (kbd "C-h f") #'ram-describe-function)
+
+;;*** minibuffer/functions: ram-jump-to-outline
+
+(defvar ram-jump-to-outline-history nil "History for outlines to jump to.")
+(put 'ram-jump-to-outline-history 'history-length 20)
+
+(defun ram-jump-to-outline (outline &optional swap-history-p)
+  "Jump to outline."
+  (interactive
+   (let ((headlines '())
+         (headline-regex
+          ;; TODO: use 'outline-regexp and copy the line
+          (if (eq major-mode 'org-mode)
+              "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$"
+            "^;;\\(?:;\\(;[^#]\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$"))
+         (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+         (hist-item (car ram-jump-to-outline-history)))
+     (define-key minibuffer-local-completion-map (kbd "<return>")
+       (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-outline-history))
+     (save-excursion
+       (goto-char (point-min))
+       (while (re-search-forward headline-regex nil t)
+         (cl-pushnew (match-string 3) headlines)))
+     (setq val (completing-read
+                (format-prompt
+                 "Find heading" (car ram-jump-to-outline-history))
+                headlines
+                nil t nil
+                'ram-jump-to-outline-history
+                (car ram-jump-to-outline-history)))
+     (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
+     (list val
+           ;; if two items are inserted, swap them so that the search str is first
+           (let ((third-element (caddr ram-jump-to-outline-history))
+                 (second-element (cadr ram-jump-to-outline-history)))
+             (and second-element (equal hist-item third-element))))))
+
+  ;; reorder history so that the search string is fist and the input is second.
+  (when swap-history-p
+    (setq ram-jump-to-outline-history
+          (cons (cadr ram-jump-to-outline-history)
+                (cons (car ram-jump-to-outline-history)
+                      (cddr ram-jump-to-outline-history)))))
+  (let ((default case-fold-search)
+        (case-fold-search nil))
+    (when (save-excursion
+            (goto-char (point-min))
+            (re-search-forward (format "^[^\r\n[:alpha:]]+%s$" outline) nil t))
+      (push-mark)
+      (goto-char (match-beginning 0))
+      (outline-show-entry)
+      (outline-show-branches))
+    (setq case-fold-search default)))
+
+(eval-after-load "org"
+  '(define-key org-mode-map (kbd "<M-f5>") 'ram-jump-to-outline))
+(define-key emacs-lisp-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+
+;;*** minibuffer/functions: ram-jump-to-def
+
+(defvar ram-jump-to-def-history nil "History for definitions to jump to.")
+(put 'ram-jump-to-def-history 'history-length 10)
+
+(defun ram-jump-to-def-get-regexs (major-mode name-regex)
+  "Return regex to capture definitions for MAJOR-MODE."
+  (cond
+   ((eq major-mode 'emacs-lisp-mode)
+    (format "^(\\(def\\(?:un\\|var\\|ine-minor-mode\\) +%s\\)" name-regex))
+   (t (message (format "%s is not supported, add regex to `ram-jump-to-def'") major-mode))))
+
+(defun ram-jump-to-def (outline &optional swap-history-p)
+  "Jump to def."
+  (interactive
+   (let ((defs '())
+         (def-regex (ram-jump-to-def-get-regexs major-mode "\\([-[:alnum:]]+\\)"))
+         (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+         (hist-item (car ram-jump-to-def-history))
+         (s (thing-at-point 'symbol)))
+     (define-key minibuffer-local-completion-map (kbd "<return>")
+       (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-def-history))
+     (save-excursion
+       (goto-char (point-min))
+       (while (re-search-forward def-regex nil t)
+         (cl-pushnew (match-string 1) defs)))
+     (setq val (icomplete-vertical-do ()
+                 (completing-read
+                  (if s
+                      (format-prompt "Jump to def" s)
+                    (format-prompt "Jump to def" nil))
+                 defs
+                 nil t nil
+                 'ram-jump-to-def-history
+                 s
+                 ;; (car ram-jump-to-def-history)
+                 )))
+     (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
+     (list val
+           ;; if two items are inserted, swap them so that the search str is first
+           (let ((third-element (caddr ram-jump-to-def-history))
+                 (second-element (cadr ram-jump-to-def-history)))
+             (and second-element (equal hist-item third-element))))))
+
+  ;; reorder history so that the search string is fist and the input is second.
+  (when swap-history-p
+    (setq ram-jump-to-def-history
+          (cons (cadr ram-jump-to-def-history)
+                (cons (car ram-jump-to-def-history)
+                      (cddr ram-jump-to-def-history)))))
+  (let ((default case-fold-search)
+        (def-regex (format "^[^\r\n[:alpha:]]+%s" outline))
+        (case-fold-search nil))
+    (when (save-excursion
+            (goto-char (point-min))
+            (re-search-forward def-regex nil t))
+      (push-mark)
+      (goto-char (match-beginning 0))
+      (recenter))
+    (setq case-fold-search default)))
+
+(define-key emacs-lisp-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
+
+;;** minibuffer: bindings
+
+(define-key minibuffer-local-completion-map (kbd "M-n")
+  (lambda (arg) (interactive "p")
+    (next-history-element arg)
+    (move-end-of-line 1)))
+
+(define-key minibuffer-local-completion-map (kbd "M-p")
+  (lambda (arg) (interactive "p")
+    (previous-history-element arg)
+    (move-end-of-line 1)))
+
+(define-key minibuffer-local-completion-map (kbd "?")
+  (lambda () (interactive)
+    "Call `minibuffer-completion-help' and select *Completions* window. "
+    (minibuffer-completion-help)
+    (let ((completions (get-buffer-window "*Completions*")))
+      (if (and completions
+               (not (eq (selected-window)
+                        completions)))
+          (select-window completions nil)))))
+
+;; force input unconditionally
+(define-key minibuffer-local-completion-map (kbd "C-j") #'exit-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "<return>") #'minibuffer-force-complete-and-exit)
+
+;; Space should never complete
+(define-key minibuffer-local-completion-map (kbd "SPC") nil)
+
+;;** minibuffer: completion
+
+;;*** minibuffer/completion: icomplete
+
+;;**** minibuffer/completion/icomplete: settings
+
+;; credit to:
+;; https://gitlab.com/protesilaos/dotfiles/-/blob/master/emacs/.emacs.d/emacs-init.org
+
+(fido-mode -1)                        ; Emacs 27.1
+(icomplete-mode 1)
+
+(setq icomplete-delay-completions-threshold 100)
+(setq icomplete-max-delay-chars 2)
+(setq icomplete-compute-delay 0.2)
+(setq icomplete-show-matches-on-no-input t)
+(setq icomplete-hide-common-prefix nil)
+(setq icomplete-prospects-height 1)
+;; (setq icomplete-separator (propertize " · " 'face 'shadow))
+(setq icomplete-separator (propertize " · " 'face '((:foreground "green3"))))
+(setq icomplete-with-completion-tables t)
+(setq icomplete-tidy-shadowed-file-names t)
+
+;;**** minibuffer/completion/icomplete: icomplete-vertical
+
+(straight-use-package
+ '(icomplete-vertical :type git :flavor melpa :host github :repo "oantolin/icomplete-vertical"))
+(setq icomplete-vertical-prospects-height (/ (frame-height) 6))
+(icomplete-vertical-mode -1)
+
+;; credit to https://gitlab.com/protesilaos/dotfiles/-/blob/e8d6268866fb77c0aec6a6b68c9e7183daa65347/emacs/.emacs.d/emacs-init.org
+
+(defun prot/kill-ring-yank-complete ()
+    "Insert the selected `kill-ring' item directly at point.
+When region is active, `delete-region'.
+
+Sorting of the `kill-ring' is disabled.  Items appear as they
+normally would when calling `yank' followed by `yank-pop'."
+    (interactive)
+    (let ((kills                    ; do not sort items
+           (lambda (string pred action)
+             (if (eq action 'metadata)
+                 '(metadata (display-sort-function . identity)
+                            (cycle-sort-function . identity))
+               (complete-with-action
+                action kill-ring string pred)))))
+      (icomplete-vertical-do
+          (:separator 'dotted-line :height (/ (frame-height) 4))
+        (when (use-region-p)
+          (delete-region (region-beginning) (region-end)))
+        (insert
+         (completing-read "Yank from kill ring: " kills nil t)))))
+
+(define-key global-map (kbd "C-s-y") #'prot/kill-ring-yank-complete)
+(define-key icomplete-minibuffer-map (kbd "C-v") #'icomplete-vertical-toggle)
+
+;;**** minibuffer/completion/icomplete: minibuffer actions
+
+;; check Omar Antolín Camarena's "embark"
+;; library: https://github.com/oantolin/embark for more
+
+(defmacro prot/minibuffer-completion-act (name doc &rest body)
+  `(defun ,name ()
+     ,doc
+     (interactive)
+     (let ((candidate (car completion-all-sorted-completions)))
+       (when (and (minibufferp)
+                  (bound-and-true-p icomplete-mode))
+         ,@body))))
+
+(prot/minibuffer-completion-act
+ prot/minibuffer-kill-completion
+ "Place minibuffer candidate to the top of the `kill-ring'."
+ (kill-new `,candidate)
+ (message "Copied %s to kill-ring" (propertize `,candidate 'face 'success)))
+
+(prot/minibuffer-completion-act
+ prot/minibuffer-insert-completion
+ "Insert minibuffer candidate in last active window."
+ (with-minibuffer-selected-window (insert `,candidate)))
+
+(prot/minibuffer-completion-act
+ prot/minibuffer-insert-completion-exit
+ "Like `prot/minibuffer-insert-completion' but exit minibuffer."
+ (prot/minibuffer-insert-completion)
+ (top-level))
+
+;;**** minibuffer/completion/icomplete: bindings
+
+(define-prefix-command 'prot/minibuffer-completion-map)
+
+(define-key prot/minibuffer-completion-map (kbd "w") 'prot/minibuffer-kill-completion)
+(define-key prot/minibuffer-completion-map (kbd "i") 'prot/minibuffer-insert-completion)
+(define-key prot/minibuffer-completion-map (kbd "j") 'prot/minibuffer-insert-completion-exit)
+
+(define-key minibuffer-local-completion-map (kbd "M-o") prot/minibuffer-completion-map)
+
+(define-key icomplete-minibuffer-map (kbd "<tab>") #'icomplete-force-complete)
+;; exit with completion
+;; (define-key icomplete-minibuffer-map (kbd "<return>") #'icomplete-force-complete-and-exit)
+
+;; force input unconditionally
+(define-key icomplete-minibuffer-map (kbd "C-j") #'exit-minibuffer)
+(define-key icomplete-minibuffer-map (kbd "C-n") #'icomplete-forward-completions)
+(define-key icomplete-minibuffer-map (kbd "<right>") #'icomplete-forward-completions)
+(define-key icomplete-minibuffer-map (kbd "<down>") #'icomplete-forward-completions)
+(define-key icomplete-minibuffer-map (kbd "C-p") #'icomplete-backward-completions)
+(define-key icomplete-minibuffer-map (kbd "<left>") #'icomplete-backward-completions)
+(define-key icomplete-minibuffer-map (kbd "<up>") #'icomplete-backward-completions)
+;; this command is from Emacs 27.1
+(define-key icomplete-minibuffer-map (kbd "<C-backspace>") #'icomplete-fido-backward-updir)
+
+;;**** minibuffer/completion/icomplete: functions
+
+(defun prot/icomplete-minibuffer-truncate ()
+  "Truncate minibuffer lines in `icomplete-mode'.
+This should only affect the horizontal layout and is meant to
+enforce `icomplete-prospects-height' being set to 1, which is
+what I always want.
+
+Hook it to `icomplete-minibuffer-setup-hook'."
+  (when (and (minibufferp)
+             (bound-and-true-p icomplete-mode))
+    (setq truncate-lines t)))
+
+(add-hook 'icomplete-minibuffer-setup-hook #'prot/icomplete-minibuffer-truncate)
+
+;;*** minibuffer/completion: buffer actions
+
+(defun prot/completions-kill-save-symbol ()
+  "Add symbol-at-point to the kill ring.
+
+Intended for use in the \\*Completions\\* buffer.  Bind this to a
+key in `completion-list-mode-map'."
+  (interactive)
+  (kill-new (thing-at-point 'symbol)))
+
+(defmacro prot/completions-buffer-act (name doc &rest body)
+  `(defun ,name ()
+     ,doc
+     (interactive)
+     (let ((completions-window (get-buffer-window "*Completions*"))
+           (completions-buffer (get-buffer "*Completions*"))
+           (symbol (thing-at-point 'symbol)))
+       (if (window-live-p completions-window)
+           (with-current-buffer completions-buffer
+             ,@body)
+         (user-error "No live window with Completions")))))
+
+(prot/completions-buffer-act
+ prot/completions-kill-symbol-at-point
+ "Add \"Completions\" buffer symbol-at-point to the kill ring."
+ (kill-new `,symbol)
+ (message "Copied %s to kill-ring"
+          (propertize `,symbol 'face 'success)))
+
+(prot/completions-buffer-act
+ prot/completions-insert-symbol-at-point
+ "Add \"Completions\" buffer symbol-at-point to active window."
+ (let ((window (window-buffer (get-mru-window))))
+   (with-current-buffer window
+     (insert `,symbol)
+     (message "Inserted %s"
+              (propertize `,symbol 'face 'success)))))
+
+(prot/completions-buffer-act
+ prot/completions-insert-symbol-at-point-exit
+ "Like `prot/completions-insert-symbol-at-point' plus exit."
+ (prot/completions-insert-symbol-at-point)
+ (top-level))
+
+  ;; Technically, this is not specific to the minibuffer, but I define
+  ;; it here so that you can see how it is also used from inside the
+  ;; "Completions" buffer
+(defun prot/describe-symbol-at-point (&optional arg)
+  "Get help (documentation) for the symbol at point.
+
+With a prefix argument, switch to the *Help* window.  If that is
+already focused, switch to the most recently used window
+instead."
+  (interactive "P")
+  (let ((symbol (symbol-at-point)))
+    (when symbol
+      (describe-symbol symbol)))
+  (when arg
+    (let ((help (get-buffer-window "*Help*")))
+      (when help
+        (if (not (eq (selected-window) help))
+            (select-window help)
+          (select-window (get-mru-window)))))))
+
+(define-key global-map (kbd "s-l") #'prot/focus-minibuffer-or-completions)
+
+(define-key completion-list-mode-map (kbd "h") #'prot/describe-symbol-at-point)
+(define-key completion-list-mode-map (kbd "w") #'prot/completions-kill-symbol-at-point)
+(define-key completion-list-mode-map (kbd "i") #'prot/completions-insert-symbol-at-point)
+(define-key completion-list-mode-map (kbd "j") #'prot/completions-insert-symbol-at-point-exit)
+(define-key completion-list-mode-map (kbd "n") #'next-line)
+(define-key completion-list-mode-map (kbd "p") #'previous-line)
+(define-key completion-list-mode-map (kbd "b") #'previous-completion)
+(define-key completion-list-mode-map (kbd "M-v") #'prot/focus-minibuffer)
+
+;;*** minibuffer/completion: styles
+
+(setq completion-styles
+      '(orderless))
+;; (setq completion-styles
+;;       '(basic partial-completion substring))
+
+;;**** minibuffer/completion/styles: orderless
+
+(straight-use-package
+ '(orderless :type git :flavor melpa :host github :repo "oantolin/orderless"))
+
+(with-eval-after-load 'orderless
+  (setq orderless-regexp-separator "[/\s_-]+")
+  ;; (setq orderless-matching-styles
+  ;;       '(orderless-strict-leading-initialism
+  ;;         orderless-regexp
+  ;;         orderless-prefixes
+  ;;         orderless-literal))
+  (setq orderless-matching-styles
+        '(orderless-regexp
+          ;; orderless-initialism
+          ))
+
+  (defun prot/orderless-literal-dispatcher (pattern _index _total)
+    (when (string-suffix-p "=" pattern)
+      `(orderless-literal . ,(substring pattern 0 -1))))
+
+  (defun prot/orderless-initialism-dispatcher (pattern _index _total)
+    (when (string-suffix-p "," pattern)
+      `(orderless-strict-leading-initialism . ,(substring pattern 0 -1))))
+
+  (setq orderless-style-dispatchers
+        '(prot/orderless-literal-dispatcher
+          prot/orderless-initialism-dispatcher)))
+
+;;* windows, buffers, sentences
+
+;;** windows
+
+;;*** windows: delete
+
+(defun ram-quit-other-windows ()
+  "Quit `ram-info-buffer-p' buffers first.
+Then, quit other window."
+  (interactive)
+  (let* ((win-list (window-list-1 nil 'nomini 'A))
+         (win-info-buf-list (seq-filter (lambda (w) (ram-info-buffer-p (window-buffer w) nil)) win-list))
+         (win-interactive-buf-list (seq-filter (lambda (w) (ram-interactive-buffer-p (window-buffer w) nil)) win-list)))
+    (cond
+     ((car win-interactive-buf-list) (quit-window nil (car win-interactive-buf-list)))
+     ((car win-info-buf-list) (quit-window nil (car win-info-buf-list)))
+     ((cadr win-list) (quit-window nil (cadr win-list))))))
+
+(define-key global-map (kbd "<M-f15>") 'other-window)
+(define-key global-map (kbd "s-o") 'other-window)
+(define-key global-map (kbd "<M-S-f15>") (lambda () (interactive) (other-window -1)))
+(define-key global-map (kbd "<M-XF86Copy>") 'delete-other-windows)
+(define-key global-map (kbd "<M-S-XF86Copy>") 'delete-window)
+(define-key global-map (kbd "s-w") 'ram-quit-other-windows)
+(define-key global-map (kbd "s-W") 'delete-window)
+
+;;*** windows: general settings
 ;; used for splitting windows sensibly, default width 160, height 80
 ;; nil values would forbid splitting
 (setq split-width-threshold 150)
 (setq split-height-threshold 180)
 
-;;** Inital Window Split
-;; https://www.simplify.ba/articles/2016/01/25/display-buffer-alist/
-;; https://www.reddit.com/r/emacs/comments/cpdr6m/any_additional_docstutorials_on_displaybuffer_and/
-(defun ram-init-win-splits ()
-  "Split an initial frame window into convinient configuration."
+(setq switch-to-buffer-preserve-window-point t)
+(setq switch-to-buffer-obey-display-actions t)
+
+;;*** windows: swap, move left and right
+
+;; credit to https://www.emacswiki.org/emacs/buffer-move.el
+(require 'windmove)
+
+(defun buf-move-left ()
+"Swap the current buffer and the buffer on the left of the split.
+If there is no split, ie now window on the left of the current
+one, an error is signaled."
   (interactive)
-  (if (> (window-width) 300)
-      (progn
-        ;; 107 columns wide, makes last(of 3) win 2 col narrower
-        ;; (split-window (selected-window) 107 "right")
-        (split-window (selected-window) 159 "right")
-        ;; Go to next window
-        ;; (other-window 1)
-        ;; (split-window (selected-window) 107 "righ")
-        ;; Start eshell in current window
-        ;; (eshell)
-        ;; Go to previous window
-        ;; (other-window -1)
-        ;; never open any buffer in window with shell
-        ;; (set-window-dedicated-p (nth 1 (window-list)) t)
-        )))
+  (let* ((other-win (windmove-find-other-window 'left))
+	 (buf-this-buf (window-buffer (selected-window))))
+    (if (null other-win)
+        (error "No left split")
+      ;; swap top with this one
+      (set-window-buffer (selected-window) (window-buffer other-win))
+      ;; move this one to top
+      (set-window-buffer other-win buf-this-buf)
+      (select-window other-win))))
 
-(ram-init-win-splits)
+(defun buf-move-right ()
+"Swap the current buffer and the buffer on the right of the split.
+If there is no split, ie now window on the right of the current
+one, an error is signaled."
+  (interactive)
+  (let* ((other-win (windmove-find-other-window 'right))
+	 (buf-this-buf (window-buffer (selected-window))))
+    (if (null other-win)
+        (error "No right split")
+      ;; swap top with this one
+      (set-window-buffer (selected-window) (window-buffer other-win))
+      ;; move this one to top
+      (set-window-buffer other-win buf-this-buf)
+      (select-window other-win))))
 
-;;** Displaying Info Buffers
-;; Modes
-(defvar ram-info-modes '(lisp-interaction-mode
-                         occur-mode
+(define-key global-map (kbd "C-s-c") #'buf-move-left)
+(define-key global-map (kbd "C-s-t") #'buf-move-right)
+
+;;*** windows: winner-mode
+
+;; undo and redo changes in window configuration
+(when (fboundp 'winner-mode)
+  (winner-mode 1)
+  (define-key global-map (kbd "C-s-p") 'winner-undo)
+  (define-key global-map (kbd "C-s-n") 'winner-redo))
+
+;;** buffers
+
+(global-auto-revert-mode nil)
+
+;;*** buffers: no prompt kill
+
+(defun ram-kill-curr-buffer ()
+  (interactive)
+  ;; do not save buffers that strat with "*"
+  (if (or (string-match "^\\*.*$" (buffer-name (current-buffer)))
+          (ram-info-buffer-p (current-buffer) nil)
+          (ram-interactive-buffer-p (current-buffer) nil))
+      (kill-buffer (current-buffer))
+    (save-buffer (current-buffer))))
+(global-set-key (kbd "C-x k") #'ram-kill-curr-buffer)
+
+;;*** buffers: switch
+
+(defun ram-switch-to-previous-buffer ()
+  (interactive)
+  (switch-to-buffer (other-buffer (current-buffer) 1)))
+
+(define-key global-map (kbd "s-p") #'switch-to-prev-buffer)
+(define-key global-map (kbd "s-n") #'switch-to-next-buffer)
+
+;;*** buffers: display
+
+;;**** buffers/display: interactive
+
+(defvar ram-interactive-modes
+  '(cider-repl-mode
+    dired-mode
+    racket-repl-mode))
+
+(defvar ram-interactive-buffer-names '("*eshell*"))
+
+(defun ram-interactive-buffer-p (buf act)
+  "Check if BUF belongs to interactive buffers."
+  (or
+   (with-current-buffer buf
+     (cond ((memq major-mode ram-interactive-modes))
+           ((derived-mode-p ram-interactive-modes))))
+   (let* ((buffer-name (if (stringp buf) buf (buffer-name buf)))
+          (names ram-interactive-buffer-names))
+     ;; credit to https://emacs.stackexchange.com/a/28689
+     (while (and names (not (string-match (car names) buffer-name)))
+       (setq names (cdr names)))
+     names)))
+
+;;**** buffers/display: information
+(defvar ram-info-modes '(apropos-mode
+                         debugger-mode
                          diff-mode
-                         magit-diff-mode
                          helpful-mode
                          help-mode
-                         Man-mode
-                         woman-mode
                          Info-mode
+                         ivy-occur-mode
+                         ivy-occur-grep-mode
+                         lisp-interaction-mode
+                         ;; magit-diff-mode
+                         messages-buffer-mode
+                         Man-mode
+                         occur-mode
                          pydoc-mode
-                         eww-mode       ;eww is used for python docs
-                         pylookup-mode))
-;; Buffers
+                         pylookup-mode
+                         rg-mode
+                         woman-mode))
+
 (defvar ram-info-buffers '("*ob-ipython-inspect*"
-                           "*Ivy Help*"))
+                           "*Ivy Help*"
+                           "*scratch*"
+                           "*Backtrace*"
+                           "*info*"))
 
 (defun ram-info-buffer-p (buf act)
-  "Check if BUF belongs to help buffers."
-  (or (member (buffer-local-value 'major-mode  (get-buffer buf)) ram-info-modes)
-      (member (if (stringp buf) buf (buffer-name buf)) ram-info-buffers)))
+  "Check if BUF belongs to a custom info group."
+  (or ;; (member (buffer-local-value 'major-mode  (get-buffer buf)) ram-info-modes)
+   (with-current-buffer buf
+     (cond ((memq major-mode ram-info-modes))
+           ((derived-mode-p ram-info-modes))))
+   (let* ((buffer-name (if (stringp buf) buf (buffer-name buf)))
+          (names ram-info-buffers))
+     ;; credit to https://emacs.stackexchange.com/a/28689
+     (while (and names (not (string-match (car names) buffer-name)))
+       (setq names (cdr names)))
+     names)))
 
-(defun ram-display-buffer-common-window (buffer action)
+;;**** buffers/display: action functions
+
+(defun ram-display-buffer-split-right (buffer alist)
+  "Display buffer in a split window to the right."
+  (let ((window (split-window-no-error (window-main-window) nil t)))
+    (when window
+      (setq window (window--display-buffer buffer window 'window alist))
+      (balance-windows-area)
+      window)))
+
+(defun ram-display-buffer-reuse-right-window (buffer alist)
+  "Display buffer in a right window if it exists."
+  (let ((inhibit-same-window (cdr (assq 'inhibit-same-window alist)))
+        right-window)
+    (walk-window-tree
+     (lambda (window)
+       (cond
+        ((and (not right-window)
+              (not (and inhibit-same-window (not (eq (window-main-window) window))))
+              (window-in-direction 'right window))
+         (setq right-window (window-in-direction 'right window)))))
+     nil nil 'nomini)
+    (when right-window
+      (window--display-buffer buffer right-window 'reuse alist))))
+
+(defun ram-display-buffer-in-info-window (buf alist)
+  "Display buffer in window with `ram-info-buffer-p' buffer."
+  (let (info-windows)
+    (dolist (window (window-list-1 nil 'nomini 'A))
+      (when (ram-info-buffer-p (window-buffer window) nil)
+        (push window info-windows)))
+    ;; (set-window-buffer (car info-windows) buf)
+    (when info-windows
+      (window--display-buffer buf (car info-windows) 'reuse alist))))
+
+(defun ram-display-buffer-in-interactive-window (buf alist)
+  "Display buffer in window with `ram-interactive-buffer-p' buffer."
+  (let (interactive-windows)
+    (dolist (window (window-list-1 nil 'nomini 'A))
+      (when (ram-interactive-buffer-p (window-buffer window) nil)
+        (push window interactive-windows)))
+    ;; (set-window-buffer (car interactive-windows) buf)
+    (when interactive-windows
+      (window--display-buffer buf (car interactive-windows) 'reuse alist))))
+
+(defun ram-display-buffer-common-window (buf alist)
   "Display buffer in a common window"
-  (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
-    (if (member mode ram-info-modes)
-        (progn
-          (let ((window (car (remove-if-not
-                              (lambda (w) (member
-                                           (buffer-local-value 'major-mode (window-buffer w)) ram-info-modes))
-                              (window-list)))))
-            (when window (set-window-buffer window buffer))
-            window)))))
+  (when (not (or (cdr (assq 'inhibit-same-window alist))
+                 (window-minibuffer-p)
+                 (window-dedicated-p)))
+    (let ((buf-name (if (stringp buf) buf (buffer-name buf)))
+          (buf-mode (with-current-buffer buf major-mode))
+          same-name
+          same-mode)
+      (dolist (window (window-list-1 nil 'nomini 'A))
+        (let ((name? (with-current-buffer (window-buffer window)
+                       (cond ((equal buf-name (buffer-name)) 'same))))
+              (mode? (with-current-buffer (window-buffer window)
+                       (cond ((eq major-mode buf-mode) 'same)))))
+          (push window (cond
+                        ((eq name? 'same) same-name)
+                        ((eq mode? 'same) same-mode)
+                        ((eq mode? 'derived) derived-mode)))))
+      (let* ((windows (nconc ;; (reverse same-name)
+                             (reverse same-mode)))
+             (window (car windows)))
+        (when (window-live-p window)
+          (window--display-buffer buf window 'reuse alist))))))
+
+;;**** buffers/display: add to 'display-buffer-alist
 
 (add-to-list 'display-buffer-alist
-             `(ram-info-buffer-p        ;predicate
-               (;; display-buffer-reuse-window
+             `((lambda (buf alist)
+                 (with-current-buffer buf (or (eq major-mode 'emacs-lisp-mode)
+                                              (eq major-mode 'clojure-mode))))
+               (ram-display-buffer-common-window
+                ram-display-buffer-in-info-window
+                ram-display-buffer-in-interactive-window
+                ram-display-buffer-reuse-right-window
+                ram-display-buffer-split-right)
+               ;; (lambda (buf alist)
+               ;;   (let ((win (next-window (frame-first-window) -1 'A)))
+               ;;     (set-window-buffer win buf)
+               ;;     win))
+               ))
+
+(add-to-list 'display-buffer-alist
+             `(ram-info-buffer-p
+               (
+                ;; (lambda (buf alist)
+                ;;   (progn (message (format "*************************** buf name: %s, mode: %s"
+                ;;                           buf
+                ;;                           (with-current-buffer buf major-mode))) nil))
                 ram-display-buffer-common-window
-                display-buffer-reuse-mode-window
+                ram-display-buffer-in-info-window
+                ram-display-buffer-reuse-right-window
+                ;; display-buffer-reuse-mode-window
                 ;; display-buffer-use-some-window
-                display-buffer-in-side-window) ;functions to try
-               (side . right)
-               (window-width . 0.5)
-               (mode . ,ram-info-modes)
-               (inhibit-same-window . nil)))
+                ;; display-buffer-in-side-window
+                ram-display-buffer-split-right)))
 
 (add-to-list 'display-buffer-alist
-             `("^.*\\.clj$"
-               (display-buffer-reuse-window
-                display-buffer-same-window)
-               (inhibit-same-window . nil)))
+             `(ram-interactive-buffer-p
+               (
+                ;; (lambda (buf alist)
+                ;;   (progn (print (format "################ buf name: %s, mode: %s"
+                ;;                         buf
+                ;;                         (with-current-buffer buf major-mode))) nil))
+                ram-display-buffer-common-window
+                ram-display-buffer-in-info-window
+                ram-display-buffer-in-interactive-window
+                ram-display-buffer-split-right)))
 
-;;** Display Auxiliary Buffers
-;; Modes
-;; (defvar my/subcode-modes '(inferior-python-mode
-;;                            compilation-mode
-;;                            shell-mode
-;;                            eshell-mode
-;;                            occur-mode
-;;                            navi-mode
-;;                            flycheck-error-list-mode))
-;; (add-to-list 'display-buffer-alist
-;;              `(,(lambda (buf act)
-;;                   (member (buffer-mode buf) my/subcode-modes))
-;;                (display-buffer--maybe-same-window
-;;                 display-buffer-reuse-window
-;;                 display-buffer-reuse-mode-window
-;;                 display-buffer-at-bottom)
-;;                (side . bottom)
-;;                (mode . ,my/subcode-modes)
-;;                (window-height . 0.25)
-;;                (quit-restore ('window 'window nil nil))))
+;; display 'dired-mode buffers, must be added after #'ram-interactive-buffer-p
+(add-to-list 'display-buffer-alist
+             `((lambda (buf alist)
+                 (with-current-buffer buf
+                   (eq major-mode 'dired-mode)))
+               (ram-display-buffer-in-info-window
+                (lambda (buf alist)
+                  (let* ((sel-win (selected-window))
+                         (win (next-window sel-win -1 'A)))
+                    (if (and (window-live-p win)
+                             (not (eq sel-win win)))
+                        (window--display-buffer buf win 'reuse alist)
+                      nil)))
+                ram-display-buffer-split-right)))
 
 ;; (add-to-list 'display-buffer-alist
-;;              '("\\*help"
-;;                (display-buffer-reuse-window display-buffer-use-some-window display-buffer-in-side-window)
-;;                (side . right)
-;;                (inhibit-same-window . t)
-;;                (window-width . 0.5)))
+;;              `("*"
+;;                ((lambda (buf alist) (progn (print
+;;                                             (format "################ any buffer type : buf name: %s, mode: %s" buf
+;;                                                     (with-current-buffer buf major-mode))) nil)))))
+
+;;*** buffers: breadcrumbs
+
+;; (require 'breadcrumbs)
+
+(autoload 'global-breadcrumbs-mode "breadcrumbs")
+
+(global-breadcrumbs-mode 1)
+
+;;** sentences
+(setq sentence-end-double-space nil)
 
 ;;* org-mode
-;;** org-mode bindings
-(bind-key "C-h a" 'apropos)
+
+(straight-use-package
+ '(org :type git :repo "https://code.orgmode.org/bzg/org-mode.git" :local-repo "org"))
+
+;;** org-mode: functions
+
+(defun ram-hide-block-toggle ()
+  "Toggle visibility from anywhere in the block."
+  (interactive)
+  (cond
+   ((org-at-block-p) (org-hide-block-toggle))
+   ((org-in-src-block-p)
+    (org-previous-block 1)
+    (org-hide-block-toggle))
+   (t (org-hide-block-toggle))))
+
+(with-eval-after-load "org"
+  (define-key org-mode-map (kbd "<C-tab>") #'ram-hide-block-toggle))
+
+
+;;** org-mode: bindings
+
+(define-key global-map (kbd "C-h a") 'apropos)
 
 (defun ram-org-hide-block-toggle-all ()
   "interactive org-hide-block-toggle-all"
   (interactive)
   (org-hide-block-toggle-all))
 
-(define-key org-mode-map (kbd "H-s") 'org-next-visible-heading)
-(define-key org-mode-map (kbd "H-S") 'org-forward-heading-same-level)
-(define-key org-mode-map (kbd "H-r") 'org-previous-visible-heading)
-(define-key org-mode-map (kbd "H-R") 'org-backward-heading-same-level)
-(define-key org-mode-map (kbd "C-H-S") 'org-next-block)
-(define-key org-mode-map (kbd "C-H-R") 'org-previous-block)
-(define-key org-mode-map (kbd "C-c z") 'ram-org-hide-block-toggle-all)
+(defun ram-push-mark-for-none-consecutive-cmd (&optional arg cmd)
+  "Push mark only if `this-command' is different from `last-command'."
+  (interactive "p")
+  (unless (eq this-command last-command)
+    (push-mark))
+  (funcall cmd arg))
+
+(with-eval-after-load "org"
+  ;; originally, C-' runs the command org-cycle-agenda-files
+  (define-key org-mode-map (kbd "C-'") nil)
+
+  (define-key org-mode-map (kbd "<M-f19>") (lambda (arg) (interactive "p")
+                                         (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)))
+  (define-key org-mode-map (kbd "C-c M-f") (lambda (arg) (interactive "p")
+                                             (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)))
+  (define-key org-mode-map (kbd "<M-f20>") (lambda (arg) (interactive "p")
+                                         (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)))
+  (define-key org-mode-map (kbd "C-c M-b") (lambda (arg) (interactive "p")
+                                             (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)))
+
+  (define-key org-mode-map (kbd "C-c C-p") (lambda (arg) (interactive "p")
+                                             (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-visible-heading)))
+  (define-key org-mode-map (kbd "C-c C-n") (lambda (arg) (interactive "p")
+                                             (ram-push-mark-for-none-consecutive-cmd arg #'org-next-visible-heading)))
+
+  (define-key org-mode-map (kbd "<M-f6") 'org-previous-visible-heading)
+  (define-key org-mode-map (kbd "<M-S-f6") 'org-backward-heading-same-level)
+
+  (define-key org-mode-map (kbd "C-c z") 'ram-org-hide-block-toggle-all)
+  ;; originally bound to 'org-table-copy-down
+  (define-key org-mode-map (kbd "<S-return>") 'newline-and-indent)
+  (define-key org-mode-map (kbd "M-h") (lambda () (interactive) (push-mark) (org-mark-element))))
 
 ;;** org-mode common settings
+
 (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
-;; export org file as html
-(use-package htmlize)
-(require 'htmlize)
+(add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
+
 ;; modify org-emphasis-regexp-components, 3rd entry, to include char to emphasis markup
 ;; https://emacs.stackexchange.com/questions/13820/inline-verbatim-and-code-with-quotes-in-org-mode
-(setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n,\"")
+(with-eval-after-load "org"
+  (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n,\""))
+
 (setq org-hide-emphasis-markers t)
-(setq org-descriptive-links nil)
+;; setting this to nil "unhides" the emphasis markers
+;; (setq org-descriptive-links nil)
 (setq org-src-window-setup 'current-window)
 (setq org-hide-leading-stars nil)
 (setq org-confirm-babel-evaluate nil
       org-src-fontify-natively t
       org-src-tab-acts-natively t
       org-return-follows-link t)
-
+(setq org-imenu-depth 7)
 ;;** org-mode snippets
-(add-to-list 'org-structure-template-alist
-             '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist
-             '("cl" "#+BEGIN_SRC clojure\n?\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist
-             '("cls" "#+BEGIN_SRC clojurescript\n?\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist
-             '("n" "#+NAME: ?"))
-(add-to-list 'org-structure-template-alist
-             '("he" "#+HEADER: ?"))
+
+(eval-after-load "org"
+  '(progn (add-to-list 'org-structure-template-alist
+                       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+          (add-to-list 'org-structure-template-alist
+                       '("cl" "#+BEGIN_SRC clojure\n?\n#+END_SRC"))
+          (add-to-list 'org-structure-template-alist
+                       '("cls" "#+BEGIN_SRC clojurescript\n?\n#+END_SRC"))
+          (add-to-list 'org-structure-template-alist
+                       '("qt" "#+BEGIN_QUOTE\n?\n#+END_QUOTE"))
+          (add-to-list 'org-structure-template-alist
+                       '("rac" "#+BEGIN_SRC racket :lang racket/base :results output \n?\n#+END_SRC"))
+          (add-to-list 'org-structure-template-alist
+                       '("n" "#+NAME: ?"))
+          (add-to-list 'org-structure-template-alist
+                       '("he" "#+HEADER: ?"))))
 
 ;;** org-babel
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((shell . t)
-   (js . t)
-   (emacs-lisp . t)
-   (clojure . t)
-   (python . t)
-   (css . t)))
+
+(with-eval-after-load "org"
+  (autoload 'ob-racket "ob-racket")
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)
+     (js . t)
+     (emacs-lisp . t)
+     (clojure . t)
+     (python . t)
+     (racket . t)
+     ;; (scribble . t)
+     (css . t))))
+
+;; ;;* git-gutter
+;; ;; https://github.com/syohex/emacs-git-gutter
+;; ;; https://github.com/nschum/fringe-helper.el
+;; ;; https://github.com/syohex/emacs-git-gutter-fringe
+;; (use-package git-gutter-fringe
+;;   :defer 0.1
+;;   :load-path "site-lisp/emacs-git-gutter-fringe"
+;;   :diminish git-gutter
+;;   :config
+;;   (global-git-gutter-mode t)
+;;   ;; (remove-hook 'git-gutter:update-hooks 'magit-refresh-buffer-hook)
+;;   ;; (advice-add #'select-window :after (lambda () (git-gutter t)))
+;;   ;;(git-gutter:linum-setup)
+;;   (custom-set-variables
+;;    '(git-gutter:update-interval 1)
+;;    ;; don't ask y/n before staging/reverting
+;;    '(git-gutter:ask-p nil)
+;;    ;; don't log/message
+;;    '(git-gutter:verbosity 0)
+;;    ;; count unstaged hunks in the current buffer
+;;    '(git-gutter:buffer-hunks 1)
+;;    '(git-gutter:statistic 1)))
 
 
-;; https://github.com/winterTTr/ace-jump-mode
-(use-package ace-jump-mode
-  :load-path "site-lisp/ace-jump-mode"
-  :diminish
-  :bind ("C-c <SPC>" . ace-jump-word-mode)
-  :init
-  (setq ace-jump-mode-move-keys '(?0 ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)))
+;;* outline
 
+;;** outline: setup
+(straight-use-package
+ '(bicycle :type git :flavor melpa :host github :repo "tarsius/bicycle"))
 
-;;* git-gutter
-;; https://github.com/syohex/emacs-git-gutter
-;; https://github.com/nschum/fringe-helper.el
-;; https://github.com/syohex/emacs-git-gutter-fringe
-(use-package git-gutter-fringe
-  :defer 0.5
-  :load-path "site-lisp/emacs-git-gutter-fringe"
-  :diminish git-gutter
-  :config
-  (global-git-gutter-mode t)
-  ;; (remove-hook 'git-gutter:update-hooks 'magit-refresh-buffer-hook)
-  ;; (advice-add #'select-window :after (lambda () (git-gutter t)))
-  ;;(git-gutter:linum-setup)
-  (custom-set-variables
-   '(git-gutter:update-interval 1)
-   ;; don't ask y/n before staging/reverting
-   '(git-gutter:ask-p nil)
-   ;; don't log/message
-   '(git-gutter:verbosity 0)
-   ;; count unstaged hunks in the current buffer
-   '(git-gutter:buffer-hunks 1)
-   '(git-gutter:statistic 1)))
-        ;; '(git-gutter:disabled-modes image-mode)
+;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
+(outline-minor-mode t)
 
-     ;; (set-face-background 'git-gutter-fr:modified "purple")
-     ;; (set-face-foreground 'git-gutter-fr:added "green")
-     ;; (set-face-foreground 'git-gutter-fr:deleted "red")
+(with-eval-after-load "outline"
+  (require 'foldout))
+
+;;** outline: functions
+
+(defun ram-outline-hide-all ()
+    "Hide all `outline-mode' subtrees."
+    (interactive)
+    (outline-map-region 'outline-hide-subtree (point-min) (point-max))
+    (move-beginning-of-line 1))
+
+(defun ram-toggle-narrow-to-subtree (arg)
+  "Toggle narrow and widen from anywhere in subtree."
+  (interactive "p")
+  (if (buffer-narrowed-p)
+      (foldout-exit-fold arg)
+    (when (not (outline-on-heading-p))
+      (outline-next-visible-heading (- 1)))
+    (foldout-zoom-subtree)))
+
+(defun prot/bicycle-cycle-tab-dwim ()
+    "Convenience wrapper for TAB key in `outline-mode'."
+    (interactive)
+    (if (outline-on-heading-p)
+        (bicycle-cycle)
+      (indent-for-tab-command)))
+
+(defun prot/outline-down-heading ()
+    "Move to the next `outline-mode' subtree."
+    (interactive)
+    ;; Hacky, but it kinda works.
+    (outline-up-heading 1 t)
+    (outline-forward-same-level 1))
+
+;;** outline: bindings
+
+(define-key ram-leader-map-tap (kbd "n") #'outline-next-visible-heading)
+(define-key ram-leader-map-tap (kbd "p") #'outline-previous-visible-heading)
+(define-key ram-leader-map-tap (kbd "f") #'outline-forward-same-level)
+(define-key ram-leader-map-tap (kbd "b") #'outline-backward-same-level)
+(define-key ram-leader-map-tap (kbd "o") #'outline-show-all)
+(define-key ram-leader-map-tap (kbd "q") #'ram-outline-hide-all)
+(define-key ram-leader-map-tap (kbd "u") #'outline-up-heading)
+(define-key ram-leader-map-tap (kbd "d") #'prot/outline-down-heading)
+(define-key ram-leader-map-tap (kbd "z") #'ram-toggle-narrow-to-subtree)
+(define-key prog-mode-map (kbd "<tab>") #'prot/bicycle-cycle-tab-dwim)
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "<tab>") #'prot/bicycle-cycle-tab-dwim))
+;; (define-key global-map (kbd "<C-tab>") #'bicycle-cycle)
+;; (define-key global-map (kbd "<S-iso-lefttab>") #'bicycle-cycle-global)
+
+;;* emacs-git-gutter-fringe
+
+(straight-use-package
+ '(git-gutter-fringe :type git :flavor melpa :host github :repo "syohex/emacs-git-gutter-fringe"))
+(global-git-gutter-mode t)
+(with-eval-after-load 'emacs-git-gutter-fringe
+  (setq git-gutter:update-interval 1)
+  ;; don't ask y/n before staging/reverting
+  (setq git-gutter:ask-p nil)
+  ;; don't log/message
+  (setq git-gutter:verbosity 0)
+  ;; count unstaged hunks in the current buffer
+  (setq git-gutter:buffer-hunks 1)
+  (setq git-gutter:statistic 1))
 
 
 ;;* hydra
-(use-package hydra)
+(straight-use-package
+ '(hydra :type git :flavor melpa :files (:defaults (:exclude "lv.el") "hydra-pkg.el") :host github :repo "abo-abo/hydra"))
+
 ;; https://github.com/abo-abo/hydra#foreign-keys
 
 ;;** hydra-window
-;; f11 is bound toggle-frame-full-screen by default
-(global-unset-key (kbd "<f11>"))
 
 (defhydra hydra-window (
                         :exit nil
@@ -298,29 +1436,49 @@
   ("SPC" dired-jump "dired")
   ("<escape>" nil "quit" :exit t)
   ("q" nil "quit" :exit t))
-(global-set-key (kbd "<f11>") 'hydra-window/body)
 
 ;;** hydra-git-gutter
+
+(defun ram-git-gutter-make-hunk-visible ()
+  "Make whole hunk visible in window."
+  (let ((point (point))
+        (win-end (save-excursion (goto-char (window-end)) (previous-line 5) (point)))
+        (hunk-end (save-excursion (git-gutter:end-of-hunk) (point))))
+    (when (> hunk-end win-end)
+      (recenter))))
 
 (defhydra hydra-git-gutter (
                             :columns 4
                             :exit nil
                             :foreign-keys nil)
   "git-gutter"
-  ("n" git-gutter:next-hunk "next")
-  ("p" git-gutter:previous-hunk "prev")
+  ("n" (lambda ()
+         (interactive)
+         (outline-show-all)
+         (git-gutter:next-hunk 1)
+         (ram-git-gutter-make-hunk-visible))
+   "next")
+  ("p" (lambda ()
+         (interactive)
+         (outline-show-all)
+         (git-gutter:previous-hunk 1))
+   "prev")
   ("f" (lambda ()
          (interactive)
-         (progn
-           (goto-char (point-min))      ;move to first line
-           (git-gutter:next-hunk 1)))
+         (goto-char (point-min))        ;move to first line
+         (git-gutter:next-hunk 1)
+         (ram-git-gutter-make-hunk-visible))
    "first")
   ("c" (lambda ()
-         (interactive
-          (progn
-            (save-buffer)
-            (if (get-buffer-window "*git-gutter:diff*") (delete-window (get-buffer-window "*git-gutter:diff*")))
-            (magit-commit-create))))
+         (interactive)
+         (progn
+           (save-buffer)
+           (let ((diff-win (car (seq-filter
+                                 (lambda (w) (equal "*git-gutter:diff*" (buffer-name (window-buffer w))))
+                                 (window-list-1 nil 'nomini 'A)))))
+             (when diff-win
+               (quit-window nil diff-win)))
+           (magit-status)))
    "commit" :exit t)
   ("N" git-gutter:end-of-hunk "end")
   ("m" git-gutter:mark-hunk "mark")
@@ -331,19 +1489,24 @@
   ("q" nil "quit" :exit t))
 
 (define-key ram-leader-map-tap (kbd "h") 'hydra-git-gutter/body)
+(define-key global-map (kbd "<f5>") 'hydra-git-gutter/body)
 
 ;;** hydra-multicursor
 
 ;; based on: https://github.com/abo-abo/hydra/wiki/multiple-cursors
-(defhydra hydra-multiple-cursors (
-                             ;; https://stackoverflow.com/questions/53798055/hydra-disable-interpretation-of-prefix-argument
-                             ;; only C-u starts a universal prefix, 0..9, -, self-insert
-                             :base-map (make-sparse-keymap)
-                             :exit nil
-                             :foreign-keys nil
-                             :hint nil)
+(defhydra hydra-multiple-cursors
+  (
+   ;; https://stackoverflow.com/questions/53798055/hydra-disable-interpretation-of-prefix-argument
+   ;; only C-u starts a universal prefix, 0..9, -, self-insert
+   :base-map (make-sparse-keymap)
+   :exit nil
+   :foreign-keys nil
+   :hint nil)
+  ;; (mc/num-cursors) causes (void-function mc/num-cursors)
+  ;; TODO: sort loading multiple-cursors to avoid the error
+  ;; Next          Prev                 % 2(mc/num-cursors) selected
   "
-   Next          Prev                 % 2(mc/num-cursors) selected
+   Next          Prev
 ------------------------------------------------------------------
    _n_:            _p_:
    _N_: skip       _P_: skip
@@ -363,9 +1526,11 @@
 (global-set-key (kbd "<f9>") 'hydra-multiple-cursors/body)
 
 ;;* cider
-(setq package-check-signature nil)
-(use-package cider
-  :config
+;; (setq package-check-signature nil)
+
+(straight-use-package
+ '(cider :type git :flavor melpa :files ("*.el" (:exclude ".dir-locals.el") "cider-pkg.el") :host github :repo "clojure-emacs/cider"))
+(with-eval-after-load 'cider
   (add-hook 'clojure-mode-hook #'cider-mode)
   (cider-auto-test-mode 1) ;; run test on buffer load
   ;; (cider-fringe-good-face ((t (:foreground ,green-l))))
@@ -381,10 +1546,28 @@
         :width ultra-expanded
         :weight bold))
    'face-defface-spec))
-  ;; (unbind-key "M-s" cider-repl-mode-map)
-  ;; :pin melpa-stable
 
+;;** cider: repl
 
+(with-eval-after-load "cider"
+  (define-key cider-repl-mode-map (kbd "<f2>") #'cider-repl-return))
+
+;;* racket
+
+;; (add-hook 'racket-mode-hook #'racket-unicode-input-method-enable)
+
+;;** racket: repl
+
+(with-eval-after-load "racket-repl"
+  (define-key racket-repl-mode-map (kbd "<f2>") #'racket-repl-submit))
+
+(straight-use-package
+ '(racket-mode :type git :flavor melpa :files
+               (:defaults "*.rkt"
+                          ("racket" "racket/*")
+                          (:exclude "racket/example/*" "racket/test/*")
+                          "racket-mode-pkg.el")
+               :host github :repo "greghendershott/racket-mode"))
 ;;* lispy
 (straight-use-package 'lispy)
 
@@ -397,27 +1580,27 @@
 (add-hook 'clojure-mode-hook (lambda () (lispy-mode 1)))
 (add-hook 'cider-repl-mode-hook (lambda () (lispy-mode 1)))
 (add-hook 'minibuffer-setup-hook 'conditionally-enable-lispy)
+(add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
+(add-hook 'racket-repl-mode-hook (lambda () (lispy-mode 1)))
 
 ;;** lispy settings
-(eval-after-load "lispy"
-  `(progn
-     (setq lispy-avy-keys '(?s ?a ?r ?e ?t ?d ?n ?u ?o ?p ?l ?m ?f))
-     (setq lispy-eval-display-style 'overlay)
-     ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-style
-     ;; (setq lispy-avy-style-char 'at-full)
-     (setq lispy-avy-style-char 'at)
-     (setq lispy-avy-style-paren 'at-full)
-     (setq lispy-avy-style-symbol 'at-full)
 
-     ;; replace a global binding with own function
-     ;; (define-key lispy-mode-map (kbd "C-e") 'my-custom-eol)
-     ;; replace a global binding with major-mode's default
-     ;; (define-key lispy-mode-map (kbd "C-j") nil)
-     ;; replace a local binding
-     ;; (lispy-define-key lispy-mode-map "s" 'lispy-down)
-     ))
+(with-eval-after-load "lispy"
+  (setq lispy-avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d))
+  (setq lispy-eval-display-style 'overlay)
+  ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-style
+  ;; (setq lispy-avy-style-char 'at-full)
+  (setq lispy-avy-style-char 'at-full)
+  (setq lispy-avy-style-paren 'at-full)
+  (setq lispy-avy-style-symbol 'at-full)
 
-;;** fix outline hide/expand cycling
+  (setq lispy-compat '(edebug cider))
+
+  ;; do not recenter when navigating with #'lispy-ace-* commands
+  (fset 'lispy--recenter-bounds (lambda (bnds) ())))
+
+;;** lispy: fix outline hide/expand cycling
+
 (defun my-org-show-children (&optional level)
   "Show all direct subheadings of this heading.
 Prefix arg LEVEL is how many levels below the current level
@@ -462,175 +1645,445 @@ heading to appear."
 (add-hook 'lispy-mode-hook (lambda () (advice-add #'org-show-children :override #'my-org-show-children)))
 
 ;; https://github.com/abo-abo/lispy/issues/57
-;;*** lispy-mode-map-special
+;;** lispy: lispy-mode-map-special
+
 ;; my custom lispy-mode-map-special to modify for BEAKL layout
 ;; (eval-after-load 'lispy )
-(require 'lispy)
-(setq lispy-mode-map-special
-  (let ((map (make-sparse-keymap)))
-    ;; navigation
-    (lispy-define-key map "t" 'lispy-right)
-    (lispy-define-key map "c" 'lispy-left)
-    (lispy-define-key map "f" 'lispy-flow)
-    (lispy-define-key map "s" 'lispy-down)
-    (lispy-define-key map "r" 'lispy-up)
-    (lispy-define-key map "d" 'lispy-different)
-    (lispy-define-key map "o" 'lispy-other-mode)
-    (lispy-define-key map "p" 'lispy-eval-other-window)
-    (lispy-define-key map "P" 'lispy-paste)
-    (lispy-define-key map "y" 'lispy-occur)
-    (lispy-define-key map "z" 'lh-knight/body)
-    ;; outline
-    (lispy-define-key map "S" 'lispy-outline-next)
-    (lispy-define-key map "R" 'lispy-outline-prev)
-    (lispy-define-key map "T" 'lispy-outline-goto-child)
-    ;; Paredit transformations
-    (lispy-define-key map ">" 'lispy-slurp)
-    (lispy-define-key map "<" 'lispy-barf)
-    (lispy-define-key map "/" 'lispy-splice)
-    (lispy-define-key map "k" 'lispy-raise)
-    (lispy-define-key map "K" 'lispy-raise-some)
-    (lispy-define-key map "+" 'lispy-join)
-    ;; more transformations
-    (lispy-define-key map "C" 'lispy-convolute)
-    (lispy-define-key map "X" 'lispy-convolute-left)
-    (lispy-define-key map "w" 'lispy-move-up)
-    (lispy-define-key map "j" 'lispy-move-down)
-    (lispy-define-key map "O" 'lispy-oneline)
-    (lispy-define-key map "M" 'lispy-alt-multiline)
-    (lispy-define-key map "J" 'lispy-stringify)
-    ;; marking
-    (lispy-define-key map "a" 'lispy-ace-symbol
-      :override '(cond ((looking-at lispy-outline)
-                        (lispy-meta-return))))
-    (lispy-define-key map "L" 'lispy-ace-symbol-replace)
-    (lispy-define-key map "m" 'lispy-mark-list)
-    ;; dialect-specific
-    (lispy-define-key map "e" 'lispy-eval)
-    (lispy-define-key map "E" 'lispy-eval-and-insert)
-    (lispy-define-key map "G" 'lispy-goto-local)
-    (lispy-define-key map "g" 'lispy-goto)
-    (lispy-define-key map "F" 'lispy-follow t)
-    (lispy-define-key map "D" 'pop-tag-mark)
-    (lispy-define-key map "A" 'lispy-beginning-of-defun)
-    (lispy-define-key map "_" 'lispy-underscore)
-    ;; miscellanea
-    (define-key map (kbd "SPC") 'lispy-space)
-    (lispy-define-key map "i" 'lispy-tab)
-    (lispy-define-key map "I" 'lispy-shifttab)
-    (lispy-define-key map "N" 'lispy-narrow)
-    (lispy-define-key map "W" 'lispy-widen)
-    (lispy-define-key map "l" 'lispy-clone)
-    (lispy-define-key map "u" 'lispy-undo)
-    (lispy-define-key map "q" 'lispy-ace-paren
-      :override '(cond ((bound-and-true-p view-mode)
-                        (View-quit))))
-    (lispy-define-key map "Q" 'lispy-ace-char)
-    (lispy-define-key map "v" 'lispy-view)
-    (lispy-define-key map "h" 'lispy-teleport
-      :override '(cond ((looking-at lispy-outline)
-                        (end-of-line))))
-    (lispy-define-key map "n" 'lispy-new-copy)
-    (lispy-define-key map "b" 'lispy-back)
-    (lispy-define-key map "B" 'lispy-ediff-regions)
-    (lispy-define-key map "x" 'lispy-x)
-    (lispy-define-key map "Z" 'lispy-edebug-stop)
-    (lispy-define-key map "V" 'lispy-visit)
-    (lispy-define-key map "-" 'lispy-ace-subword)
-    (lispy-define-key map "." 'lispy-repeat)
-    (lispy-define-key map "~" 'lispy-tilde)
-    ;; digit argument
-    (mapc (lambda (x) (lispy-define-key map (format "%d" x) 'digit-argument))
-          (number-sequence 0 9))
-    map))
-(lispy-set-key-theme '(special lispy c-digits))
+
+;; (require 'lispy)
+
+(autoload 'lispy-mode "lispy")
+
+(eval-after-load "lispy"
+  '(setq lispy-mode-map-special
+       (let ((map (make-sparse-keymap)))
+         ;; navigation
+         (lispy-define-key map "t" 'lispy-right)
+         (lispy-define-key map "c" 'lispy-left)
+         (lispy-define-key map "f" 'lispy-flow)
+         (lispy-define-key map "s" 'lispy-down)
+         (lispy-define-key map "r" 'lispy-up)
+         (lispy-define-key map "d" 'lispy-different)
+         (lispy-define-key map "o" 'lispy-other-mode)
+         (lispy-define-key map "p" 'lispy-eval-other-window)
+         (lispy-define-key map "P" 'lispy-paste)
+         (lispy-define-key map "y" 'lispy-occur)
+         (lispy-define-key map "z" 'lh-knight/body)
+         ;; outline
+         (lispy-define-key map "S" 'lispy-outline-next)
+         (lispy-define-key map "R" 'lispy-outline-prev)
+         (lispy-define-key map "T" 'lispy-outline-goto-child)
+         ;; Paredit transformations
+         (lispy-define-key map ">" 'lispy-slurp)
+         (lispy-define-key map "<" 'lispy-barf)
+         (lispy-define-key map "/" 'lispy-splice)
+         (lispy-define-key map "k" 'lispy-raise)
+         (lispy-define-key map "K" 'lispy-raise-some)
+         (lispy-define-key map "+" 'lispy-join)
+         ;; more transformations
+         (lispy-define-key map "C" 'lispy-convolute)
+         (lispy-define-key map "X" 'lispy-convolute-left)
+         (lispy-define-key map "w" 'lispy-move-up)
+         (lispy-define-key map "j" 'lispy-move-down)
+         (lispy-define-key map "O" 'lispy-oneline)
+         (lispy-define-key map "M" 'lispy-alt-multiline)
+         (lispy-define-key map "J" 'lispy-stringify)
+         ;; marking
+         (lispy-define-key map "a" 'lispy-ace-symbol
+           :override '(cond ((looking-at lispy-outline)
+                             (lispy-meta-return))))
+         (lispy-define-key map "L" 'lispy-ace-symbol-replace)
+         (lispy-define-key map "m" 'lispy-mark-list)
+         ;; dialect-specific
+         (lispy-define-key map "e" 'lispy-eval)
+         (lispy-define-key map "E" 'lispy-eval-and-insert)
+         (lispy-define-key map "G" 'lispy-goto-local)
+         (lispy-define-key map "g" 'lispy-goto)
+         (lispy-define-key map "F" 'lispy-follow t)
+         (lispy-define-key map "D" 'pop-tag-mark)
+         (lispy-define-key map "A" 'lispy-beginning-of-defun)
+         (lispy-define-key map "_" 'lispy-underscore)
+         ;; miscellanea
+         (define-key map (kbd "SPC") 'lispy-space)
+         (lispy-define-key map "i" 'lispy-tab)
+         (lispy-define-key map "I" 'lispy-shifttab)
+         (lispy-define-key map "N" 'lispy-narrow)
+         (lispy-define-key map "W" 'lispy-widen)
+         (lispy-define-key map "l" 'lispy-clone)
+         (lispy-define-key map "u" 'lispy-undo)
+         (lispy-define-key map "q" 'lispy-ace-paren
+           :override '(cond ((bound-and-true-p view-mode)
+                             (View-quit))))
+         (lispy-define-key map "Q" 'lispy-ace-char)
+         (lispy-define-key map "v" 'lispy-view)
+         (lispy-define-key map "h" 'lispy-teleport
+           :override '(cond ((looking-at lispy-outline)
+                             (end-of-line))))
+         (lispy-define-key map "n" 'lispy-new-copy)
+         (lispy-define-key map "b" 'lispy-back)
+         (lispy-define-key map "B" 'lispy-ediff-regions)
+         (lispy-define-key map "x" 'lispy-x)
+         (lispy-define-key map "Z" 'lispy-edebug-stop)
+         (lispy-define-key map "V" 'lispy-visit)
+         (lispy-define-key map "-" 'lispy-ace-subword)
+         (lispy-define-key map "." 'lispy-repeat)
+         (lispy-define-key map "~" 'lispy-tilde)
+         ;; digit argument
+         (mapc (lambda (x) (lispy-define-key map (format "%d" x) 'digit-argument))
+               (number-sequence 0 9))
+         map)))
+
+(defun ram-lispy-ampersand ()
+  "Insert &."
+  (interactive)
+  (lispy--space-unless "\\s-\\|\\s(\\|[:?]\\|\\\\")
+  (insert "& "))
+
+(defun ram-lispy-persent ()
+  "Insert %."
+  (interactive)
+  (lispy--space-unless "\\s-\\|\\s(\\|[:?]\\|\\\\")
+  (insert "%"))
+
+(eval-after-load "lispy"
+  '(setq lispy-mode-map-lispy
+       (let ((map (copy-keymap lispy-mode-map-base)))
+         ;; navigation
+         (define-key map (kbd "]") 'lispy-forward)
+         (define-key map (kbd "[") 'lispy-backward)
+         (define-key map (kbd ")") 'lispy-right-nostring)
+         ;; kill-related
+         (define-key map (kbd "C-y") 'lispy-yank)
+         (define-key map (kbd "C-d") 'lispy-delete)
+         (define-key map (kbd "DEL") 'lispy-delete-backward)
+         (define-key map (kbd "M-k") 'lispy-kill-sentence)
+         (define-key map (kbd "M-m") 'lispy-mark-symbol)
+         (define-key map (kbd "C-,") 'lispy-kill-at-point)
+         (define-key map (kbd "C-M-,") 'lispy-mark)
+         ;; pairs
+         (define-key map (kbd "{") 'lispy-braces)
+         (define-key map (kbd "}") 'lispy-brackets)
+         (define-key map (kbd "\"") 'lispy-quotes)
+         ;; insert
+         (define-key map (kbd ":") 'lispy-colon)
+         (define-key map (kbd "^") 'lispy-hat)
+         (define-key map (kbd "@") 'lispy-at)
+         ;; (define-key map (kbd "'") 'lispy-tick)
+         (define-key map (kbd "'") nil)
+         (define-key map (kbd "`") 'lispy-backtick)
+         (define-key map (kbd "#") 'lispy-hash)
+         (define-key map (kbd "M-j") 'lispy-split)
+         (define-key map (kbd "M-J") 'lispy-join)
+         (define-key map (kbd "<C-return>") 'lispy-open-line)
+         (define-key map (kbd "<M-return>") 'lispy-meta-return)
+         (define-key map (kbd "<return>") 'lispy-alt-line)
+         (define-key map (kbd "M-RET") 'lispy-meta-return)
+         ;; misc
+         (define-key map (kbd "M-o") 'lispy-string-oneline)
+         (define-key map (kbd "M-i") 'lispy-iedit)
+         (define-key map (kbd "<backtab>") 'lispy-shifttab)
+         ;; outline
+         (define-key map (kbd "M-<left>") 'lispy-outline-demote)
+         (define-key map (kbd "M-<right>") 'lispy-outline-promote)
+         (define-key map (kbd "&") 'ram-lispy-ampersand)
+         (define-key map (kbd "%") 'ram-lispy-persent)
+         map)))
+
+(eval-after-load "lispy"
+  '(lispy-set-key-theme '(special lispy c-digits)))
+
 ;;** lispy bindings
 (define-key ram-leader-map-tap (kbd "e") 'lispy-eval-and-comment)
 
+(with-eval-after-load "lispy"
+  (define-key lispy-mode-map
+    (kbd "(")
+    (lambda () (interactive) (expand-abbrev) (lispy-parens current-prefix-arg) ())))
+
 ;;* avy
 
-(use-package avy
-  :config
-  ;; apply avy to all windows?
+;; (use-package avy
+;;   :defer t
+;;   :config
+;;   ;; apply avy to all windows?
+;;   (setq avy-all-windows nil)
+;;   ;; avy-lead-face-0
+;;   ;; Dim all windows when displaying overlay for targets
+;;   (setq avy-background t)
+;;   (setq avy-timeout-seconds 0.4)
+;;   ;; (setq highlight-first t)
+;;   ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-keys-alist#avy-keys
+;;   (setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d))
+;;   ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-style
+;;   (setq avy-style 'at-full)
+;;   (setq avy-styles-alist '(
+;;                            ;; (avy-goto-char-2 . post)
+;;                            (avy-goto-word-1 . at-full)
+;;                            ;; (avy-goto-char-2 . pre)
+;;                            (avy-goto-char-2 . at-full)
+;;                            (avy-goto-char-timer . at-full)
+;;                            (ram-avy-goto-subword-2 . at-full)
+;;                            (ram-avy-goto-paragraph-start . post)))
+;;   ;; (setq avy-keys (nconc
+;;   ;;                     (number-sequence ?1 ?9)
+;;   ;;                     '(?0)))
+;;   (setq avy-orders-alist
+;;         '((avy-goto-char . avy-order-closest)
+;;           (avy-goto-char-2 . avy-order-closest)
+;;           (avy-goto-word-1 . avy-order-closest)
+;;           (lispy-ace-paren . ram-avy-order-furthest)
+;;           (lispy-ace-char . avy-order-closest)
+;;           (lispy-ace-symbol . avy-order-closest)
+;;           (lispy-ace-subword . avy-order-closest)
+;;           (ram-avy-goto-subword-2 . avy-order-closest)
+;;           (ram-avy-goto-paragraph-start . ram-avy-order-furthest)))
+;;   (setq avy-dispatch-alist
+;;         '((?- . avy-action-kill-move)
+;;           (?! . avy-action-kill-stay)
+;;           (?\' . avy-action-teleport)
+;;           (?` . avy-action-mark)
+;;           (?/ . avy-action-copy)
+;;           (?? . avy-action-yank)
+;;           (?. . avy-action-ispell)
+;;           (?# . avy-action-zap-to-char))))
+
+(straight-use-package
+ '(avy :type git :flavor melpa :host github :repo "abo-abo/avy"))
+
+(with-eval-after-load 'avy
   (setq avy-all-windows nil)
   ;; avy-lead-face-0
   ;; Dim all windows when displaying overlay for targets
   (setq avy-background t)
   (setq avy-timeout-seconds 0.4)
-  ;; (setq avy-highlight-first t)
+  ;; (setq highlight-first t)
   ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-keys-alist#avy-keys
-  (setq avy-keys '(?s ?a ?r ?e ?t ?d ?n ?u ?o ?p ?l ?m ?f))
+  (setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d))
   ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-style
-  (setq avy-styles-alist '(;; (avy-goto-char-2 . post)
+  (setq avy-style 'at-full)
+  (setq avy-styles-alist '(
+                           ;; (avy-goto-char-2 . post)
+                           (avy-goto-word-1 . at-full)
                            ;; (avy-goto-char-2 . pre)
                            (avy-goto-char-2 . at-full)
-                           (avy-goto-char-timer . at-full)))
+                           (avy-goto-char-timer . at-full)
+                           (ram-avy-goto-subword-2 . at-full)
+                           (ram-avy-goto-paragraph-start . post)))
+
   ;; (setq avy-keys (nconc
   ;;                     (number-sequence ?1 ?9)
   ;;                     '(?0)))
-  )
+
+  (setq avy-orders-alist
+        '((avy-goto-char . avy-order-closest)
+          (avy-goto-char-2 . avy-order-closest)
+          (avy-goto-word-1 . avy-order-closest)
+          (lispy-ace-paren . ram-avy-order-furthest)
+          (lispy-ace-char . avy-order-closest)
+          (lispy-ace-symbol . avy-order-closest)
+          (lispy-ace-subword . avy-order-closest)
+          (ram-avy-goto-subword-2 . avy-order-closest)
+          (ram-avy-goto-paragraph-start . ram-avy-order-furthest)))
+
+  (setq avy-dispatch-alist
+        '((?- . avy-action-kill-move)
+          (?! . avy-action-kill-stay)
+          (?\' . avy-action-teleport)
+          (?` . avy-action-mark)
+          (?/ . avy-action-copy)
+          (?? . avy-action-yank)
+          (?. . avy-action-ispell)
+          (?# . avy-action-zap-to-char))))
+
+;;** avy custom commands
+;; https://github.com/abo-abo/avy/wiki/custom-commands
+(eval-after-load "avy"
+  '(progn
+     (defvar ram-avy--overlays-back nil
+       "Hold dimmed background overlays enabled before avy-goto-* commands.")
+
+     (defun ram-avy-order-furthest (x)
+       "The furthest from the point gets the lowest value. Works
+only for the selected window."
+       (- (max (abs (- (point) (window-start))) (abs (- (point) (window-end))))
+          (abs (- (caar x) (point)))))
+
+     (defun ram-avy--done ()
+       "Clean up overlays."
+       (mapc #'delete-overlay ram-avy--overlays-back)
+       (setq ram-avy--overlays-back nil)
+       ;; (avy--remove-leading-chars)
+       )
+
+     (defun ram-avy--keyboard-advice (fn &rest args)
+       (unwind-protect
+           (apply fn args)
+         (when ram-avy--overlays-back
+           (ram-avy--done))))
+
+     (advice-add 'keyboard-quit :around #'ram-avy--keyboard-advice)
+     ;; (advice-add 'minibuffer-keyboard-quit :before #'ram-avy--done)
+
+     (defun ram-avy--make-backgrounds ()
+       "Create dim a background overlay for selected window"
+       (when avy-background
+         (setq ram-avy--overlays-back
+               (mapcar (lambda (w)
+                         (let ((ol (make-overlay
+                                    (window-start w)
+                                    (window-end w)
+                                    (window-buffer w))))
+                           (overlay-put ol 'face 'avy-background-face)
+                           (overlay-put ol 'window w)
+                           ol))
+                       (list (selected-window))))))
+
+     (defun ram-avy-goto-subword-2 (char1 char2 &optional arg)
+       "Jump to the currently visible CHAR at a subword start.
+The window scope is determined by `avy-all-windows' (ARG negates it)."
+       (interactive (list (read-char "char 1: " t)
+                          (read-char "char 2: " t)
+                          current-prefix-arg))
+       (avy-with ram-avy-goto-subword-2
+         (let ((char1 (downcase char1))
+               (char2 (downcase char2)))
+           (avy-goto-subword-0
+            arg (lambda ()
+                  (and (char-after)
+                       (eq (downcase (char-after)) char1)
+                       (if (eq char2 ?*)
+                           t
+                         (save-excursion (forward-char) (eq (downcase (char-after)) char2)))))))))
+     ;; (add-to-list 'avy-styles-alist '(ram-avy-goto-subword-2 . at-full))
+     ;; (add-to-list 'avy-orders-alist '(ram-avy-goto-subword-2 . avy-orders-closest))
+
+     (defun avy-goto-top-paren ()
+       (interactive)
+       (avy--generic-jump "^(" nil))
+
+     (defun avy-goto-paragraph-start ()
+       (interactive)
+       (avy--generic-jump "\n\n[ \t]*[[:graph:]]" nil))
+
+     (defun ram-avy-goto-paragraph-start ()
+       (interactive)
+       (ram-avy--make-backgrounds)
+       (avy-with ram-avy-goto-paragraph-start
+         (avy-goto-paragraph-start)
+         (re-search-forward "[[:graph:]]" nil t 1)
+         (backward-char))
+       (ram-avy--done))
+     (add-to-list 'avy-styles-alist '(ram-avy-goto-paragraph-start . post))
+     (add-to-list 'avy-orders-alist '(ram-avy-goto-paragraph-start . ram-avy-order-furthest))
+
+     (defun ram-with-backgound ()
+       (interactive)
+       (ram-avy--make-backgrounds)
+       (ram-avy-goto-subword-2))))
+
+;;** avy keybindings
+
+(defun ram-avy-goto-subword-2-dim ()
+  "Dim window before Invoking `ram-avy-goto-subword-2'."
+  (interactive)
+  (ram-avy--make-backgrounds)
+  (call-interactively #'ram-avy-goto-subword-2)
+  (ram-avy--done))
 
 (eval-after-load "avy"
   '(progn
-     ;; (define-key global-map (kbd "s-s") 'avy-goto-word-1-below)
-     (define-key global-map (kbd "s-s") 'avy-goto-char-2-below)
-     ;; (define-key global-map (kbd "s-r") 'avy-goto-word-1-above)
-     (define-key global-map (kbd "s-r") 'avy-goto-char-2-above)
-     (define-key global-map (kbd "s-d") 'avy-goto-char-in-line)
-     (define-key global-map (kbd "s-S") 'avy-goto-line-below)
-     (define-key global-map (kbd "s-R") 'avy-goto-line-above)
+     ;; (define-key global-map (kbd "s-s") (lambda () (interactive)
+     ;;                                      (ram-avy--make-backgrounds)
+     ;;                                      (avy-goto-word-or-subword-1)
+     ;;                                      (ram-avy--done)))
+     (define-key global-map (kbd "s-s") #'ram-avy-goto-subword-2-dim)
+
+     ;; (define-key global-map (kbd "s-s") 'avy-goto-char-2)
+     (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
+     ;; (define-key global-map (kbd "s-d") 'avy-goto-char-in-line)
      (define-key global-map (kbd "s-N") 'avy-resume)
-     (define-key global-map (kbd "s-n") 'avy-next)
-     (define-key global-map (kbd "s-p") 'avy-prev)))
+     ))
 
 ;;* projectile
 
-(use-package projectile
-  :diminish t
-  :config
-  (projectile-mode 1)
+(straight-use-package
+ '(projectile :type git :flavor melpa :files ("projectile.el" "projectile-pkg.el") :host github :repo "bbatsov/projectile"))
+(projectile-mode 1)
+(with-eval-after-load 'projectile
   (setq projectile-completion-system 'ivy)
   (define-key projectile-mode-map (kbd "<f12>") 'projectile-command-map)
   ;; <f7> because it is same place as 't' which the default binding for this command
-  (define-key projectile-mode-map (kbd "<f12> <f7>") 'projectile-toggle-between-implementation-and-test)
-  )
+  (define-key projectile-mode-map (kbd "<f12> <f7>") 'projectile-toggle-between-implementation-and-test))
 
 ;;* multiple-cursors
 
-(use-package multiple-cursors
-  :config
-  ;; (bind-key "C->" 'mc/mark-next-like-this)
-  ;; (define-prefix-command 'ram/multiple-cursors-map)
-  ;; (global-set-key (kbd "<f9>") 'ram/multiple-cursors-map)
-  ;; (define-key ram/multiple-cursors-map (kbd "s") 'mc/mark-next-like-this)
-  ;; (define-key ram/multiple-cursors-map (kbd "S") 'mc/unmark-next-like-this)
-  ;; (define-key ram/multiple-cursors-map (kbd "r") 'mc/mark-previous-like-this)
-  ;; (define-key ram/multiple-cursors-map (kbd "R") 'mc/unmark-previous-like-this)
-  )
+(straight-use-package
+ '(multiple-cursors :type git :flavor melpa :host github :repo "magnars/multiple-cursors.el"))
+;; will make <return> insert a newline; multiple-cursors-mode can still be disabled with C-g
+(eval-after-load "multiple-cursors"
+  '(define-key mc/keymap (kbd "<return>") nil))
 
-;;* Linters
 
+;;* brackets, parentheses, parens
+
+;;** ram-highlight-sexps
+
+(autoload 'ram-highlight-sexps-mode "ram-highlight-sexps")
+
+(setq hl-sexp-highlight-adjacent t)
+(add-hook 'emacs-lisp-mode-hook #'ram-highlight-sexps-mode)
+(add-hook 'lisp-interactive-mode #'ram-highlight-sexps-mode)
+(add-hook 'clojure-mode-hook #'ram-highlight-sexps-mode)
+(add-hook 'cider-repl-mode-hook #'ram-highlight-sexps-mode)
+(add-hook 'racket-mode-hook #'ram-highlight-sexps-mode)
+(add-hook 'racket-repl-mode-hook #'ram-highlight-sexps-mode)
+
+(with-eval-after-load "ram-highlight-sexps"
+  (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
+
+;;* linters
+
+;;* linters: flycheck-clj-kondo
 ;; First install the package:
-(use-package flycheck-clj-kondo)
+(straight-use-package
+ '(flycheck-clj-kondo :type git :flavor melpa :host github :repo "borkdude/flycheck-clj-kondo"))
 
-;;* Clojure Mode
+;;* clojure mode
 
-;; then install the checker as soon as `clojure-mode' is loaded
-(use-package clojure-mode
-  :config
+(straight-use-package
+ '(clojure-mode :type git :flavor melpa
+                :files ("clojure-mode.el" "clojure-mode-pkg.el")
+                :host github :repo "clojure-emacs/clojure-mode"))
+(with-eval-after-load 'clojure-mode
+  (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+  (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   (require 'flycheck-clj-kondo))
 
-
-
 ;;* super-save
-(use-package super-save
-  :config
+
+;; (use-package super-save
+;;   :config
+;;   ;; save on find-file
+;;   (add-to-list 'super-save-hook-triggers 'find-file-hook)
+;;   (add-to-list 'super-save-triggers 'switch-to-prev-buffer)
+;;   (add-to-list 'super-save-triggers 'switch-to-next-buffer)
+;;   (add-to-list 'super-save-triggers 'winner-undo)
+;;   (add-to-list 'super-save-triggers 'winner-redo)
+;;   (add-to-list 'super-save-triggers 'counsel-M-x)
+;;   (super-save-mode 1))
+
+(straight-use-package
+ '(super-save :type git :flavor melpa :host github :repo "bbatsov/super-save"))
+(run-with-idle-timer 1 nil #'super-save-mode)
+(with-eval-after-load 'super-save
+  (add-hook 'after-init-hook 'super-save-mode)
   ;; save on find-file
   (add-to-list 'super-save-hook-triggers 'find-file-hook)
-  (super-save-mode 1))
-
-;;* View key presses and commans
-(use-package command-log-mode)
+  (add-to-list 'super-save-triggers 'switch-to-prev-buffer)
+  (add-to-list 'super-save-triggers 'switch-to-next-buffer)
+  (add-to-list 'super-save-triggers 'winner-undo)
+  (add-to-list 'super-save-triggers 'winner-redo)
+  (add-to-list 'super-save-triggers 'counsel-M-x))
 
 ;;* ivy, swiper, counsel:
 ;; https://oremacs.com/swiper/
@@ -638,8 +2091,10 @@ heading to appear."
 (straight-use-package
  '(counsel :type git :flavor melpa :files ("counsel.el" "counsel-pkg.el") :host github :repo "abo-abo/swiper"))
 ;;** ivy
+;;*** ivy bindings
+
 ;;*** ivy Settings
-(ivy-mode 1)
+;; (ivy-mode 1)
 (setq ivy-use-virtual-buffers t)
 (setq enable-recursive-minibuffers t)
 ;; credit to https://gitlab.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/emacs-init.org
@@ -651,83 +2106,51 @@ heading to appear."
 (setq ivy-use-selectable-prompt t)
 (setq ivy-fixed-height-minibuffer nil)
 
-(ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-(ivy-set-occur 'swiper 'swiper-occur)
-(ivy-set-occur 'swiper-isearch 'swiper-occur)
-(ivy-set-occur 'swiper-multi 'swiper-occur) ; TODO does not work
+(with-eval-after-load 'ivy
 
-(add-hook 'ivy-occur-mode #'hl-line-mode)
+  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+  (ivy-set-occur 'swiper 'swiper-occur)
+  (ivy-set-occur 'swiper-isearch 'swiper-occur)
+  (ivy-set-occur 'swiper-multi 'swiper-occur) ; TODO does not work
 
-(define-key ram-leader-map-tap (kbd "<up>") 'ivy-push-view)
-(define-key ram-leader-map-tap (kbd "<down>") 'ivy-switch-view)
-(define-key global-map (kbd "C-S-r") 'ivy-resume)
+  (add-hook 'ivy-occur-mode #'hl-line-mode)
 
-(define-key ivy-occur-mode-map  (kbd "f") 'forward-char)
-(define-key ivy-occur-mode-map  (kbd "b") 'backward-char)
-(define-key ivy-occur-mode-map  (kbd "n") 'ivy-occur-next-line)
-(define-key ivy-occur-mode-map  (kbd "p") 'ivy-occur-previous-line)
-(define-key ivy-occur-mode-map  (kbd "<C-return>") 'ivy-occur-press)
+  (define-key ram-leader-map-tap (kbd "<up>") 'ivy-push-view)
+  (define-key ram-leader-map-tap (kbd "<down>") 'ivy-switch-view)
+  (define-key global-map (kbd "C-S-r") 'ivy-resume)
+
+  (define-key ivy-occur-mode-map  (kbd "f") 'forward-char)
+  (define-key ivy-occur-mode-map  (kbd "b") 'backward-char)
+  (define-key ivy-occur-mode-map  (kbd "n") 'ivy-occur-next-line)
+  (define-key ivy-occur-mode-map  (kbd "p") 'ivy-occur-previous-line)
+  (define-key ivy-occur-mode-map  (kbd "<C-return>") 'ivy-occur-press))
 
 (define-key global-map (kbd "C-c C-r") 'ivy-resume)
 
-;;*** ivy Extentions
-;; credit to:  https://github.com/jkitchin/scimax
-;; TODO: ivy-org-jump-to-headline, ivy-lispy-jump-to-headline: change name, make one function
-(defun ivy-org-jump-to-headline ()
-  "Jump to heading in the current buffer."
-  (interactive)
-  (let ((headlines '()))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward
-	      ;; this matches org headings in elisp too.
-	      "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$"  nil t)
-	(cl-pushnew (list
-		     (format "%-80s"
-			     (match-string 0))
-		     (cons 'position (match-beginning 0)))
-		    headlines)))
-    (ivy-read "Headline: "
-	      (reverse headlines)
-	      :action (lambda (candidate)
-			(org-mark-ring-push)
-			(goto-char (cdr (assoc 'position candidate)))
-			(outline-show-entry)))))
+;;*** ivy packages
 
-(defun ivy-lispy-jump-to-headline ()
-  "Jump to heading in the current buffer."
-  (interactive)
-  (let ((headlines '()))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward
-	      ;; this matches org headings in elisp too.
-	      "^;;\\(?:;\\(;[^#]\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$"  nil t)
-	(cl-pushnew (list
-		     (format "%-80s"
-			     (match-string 0))
-		     (cons 'position (match-beginning 0)))
-		    headlines)))
-    (ivy-read "Headline: "
-	      (reverse headlines)
-	      :action (lambda (candidate)
-			(org-mark-ring-push)
-			(goto-char (cdr (assoc 'position candidate)))
-			(outline-show-entry)))))
+;;**** ivy: ivy-dired-history
 
-(define-key org-mode-map (kbd "H-h") 'ivy-org-jump-to-headline)
-(define-key clojure-mode-map (kbd "H-h") 'ivy-lispy-jump-to-headline)
-(define-key emacs-lisp-mode-map (kbd "H-h") 'ivy-lispy-jump-to-headline)
+;; (straight-use-package
+;;  '(ivy-dired-history :type git :flavor melpa :host github :repo "jixiuf/ivy-dired-history"))
 
-;;*** ivy Packages
-;; ivy-rich
-(straight-use-package
- '(ivy-rich :type git :flavor melpa :files ("*.el" "ivy-rich-pkg.el") :host github :repo "Yevgnen/ivy-rich"))
-(setcdr (assq t ivy-format-functions-alist)
-        #'ivy-format-function-line)
-(ivy-rich-mode 1)
+;; (with-eval-after-load 'dired
+;;   (require 'ivy-dired-history)
+;;   ;; if you are using ido,you'd better disable ido for dired
+;;   ;; (define-key (cdr ido-minor-mode-map-entry) [remap dired] nil) ;in ido-setup-hook
+;;   (define-key dired-mode-map "," 'dired))
 
-;; ivy-posframe
+;;**** ivy: ivy-rich
+
+;; (straight-use-package
+;;  '(ivy-rich :type git :flavor melpa :files ("*.el" "ivy-rich-pkg.el") :host github :repo "Yevgnen/ivy-rich"))
+;; (setcdr (assq t ivy-format-functions-alist)
+;;         #'ivy-format-function-line)
+;; (ivy-rich-mode 1)
+;; (add-hook 'after-init-hook 'ivy-rich-mode)
+
+;;**** ivy: ivy-posframe
+
 (straight-use-package
  '(ivy-posframe :type git :flavor melpa :host github :repo "tumashu/ivy-posframe"))
 (setq ivy-posframe-height-alist
@@ -737,53 +2160,67 @@ heading to appear."
 (setq ivy-posframe-display-functions-alist
       '((complete-symbol . ivy-posframe-display-at-point)
         (swiper . nil)
+        (ivy-switch-buffer-other-window . ivy-posframe-display-at-frame-center)
+        (ivy-switch-buffer . ivy-posframe-display-at-frame-center)
+        (counsel-describe-variable . ivy-posframe-display-at-frame-center)
+        (counsel-describe-function . ivy-posframe-display-at-frame-center)
+        (counsel-find-file . ivy-posframe-display-at-frame-center)
+        (counsel-M-x . ivy-posframe-display-at-frame-center)
+        (describe-symbol . ivy-posframe-display-at-frame-center)
+        (display-buffer . ivy-posframe-display-at-frame-center)
         ;; (swiper-isearch . nil)
-        (t . ivy-posframe-display-at-frame-center)))
+        ;; (t . ivy-posframe-display-at-frame-center)
+        (t . nil)))
 
 (setq ivy-posframe-parameters
       '((width . 90)))
 
 (ivy-posframe-mode 1)
 
-;; prescient
-(use-package prescient
-  :after (counsel)
-  :custom
-  (prescient-history-length 50)
-  (prescient-save-file "~/.emacs.d/prescient-items")
-  (prescient-filter-method '(fuzzy initialism regexp))
-  :config
+;;**** ivy: prescient
+
+(straight-use-package
+ '(prescient :type git :flavor melpa :files ("prescient.el" "prescient-pkg.el") :host github :repo "raxod502/prescient.el"))
+
+(with-eval-after-load 'counsel
+  (require 'prescient))
+
+(with-eval-after-load "prescient"
+  (setq prescient-history-length 50)
+  (setq prescient-save-file "~/.emacs.d/prescient-items")
+  ;; (setq prescient-filter-method '(literal regexp fuzzy))
+  (setq prescient-filter-method '(literal regexp initialism))
   (prescient-persist-mode 1))
 
-(use-package ivy-prescient
-  :after (prescient ivy)
-  :custom
-  (ivy-prescient-sort-commands
-   '(:not swiper ivy-switch-buffer counsel-switch-buffer))
-  (ivy-prescient-retain-classic-highlighting t)
-  (ivy-prescient-enable-filtering t)
-  (ivy-prescient-enable-sorting t)
-  :config
-  (defun prot/ivy-prescient-filters (str)
-    "Specify an exception for `prescient-filter-method'.
+(straight-use-package
+ '(ivy-prescient :type git :flavor melpa :files ("ivy-prescient.el" "ivy-prescient-pkg.el") :host github :repo "raxod502/prescient.el"))
+(ivy-prescient-mode 1)
 
+(with-eval-after-load 'prescient
+  (with-eval-after-load 'counsel
+    (with-eval-after-load 'ivy
+      (defun prot/ivy-prescient-filters (str)
+        "Specify an exception for `prescient-filter-method'.
 This new rule can be used to tailor the results of individual
 Ivy-powered commands, using `ivy-prescient-re-builder'."
-    (let ((prescient-filter-method '(literal regexp)))
-      (ivy-prescient-re-builder str)))
-
-  (setq ivy-re-builders-alist
-        '((counsel-rg . prot/ivy-prescient-filters)
-          (counsel-grep . prot/ivy-prescient-filters)
-          (counsel-yank-pop . prot/ivy-prescient-filters)
-          (swiper . prot/ivy-prescient-filters)
-          (swiper-isearch . prot/ivy-prescient-filters)
-          (swiper-all . prot/ivy-prescient-filters)
-          (ivy-org-jump-to-headline . prot/ivy-prescient-filters)
-          (ivy-lispy-jump-to-headline . prot/ivy-prescient-filters)
-          (ivy-switch-buffer . prot/ivy-prescient-filters)
-          (t . ivy-prescient-re-builder)))
-  (ivy-prescient-mode 1))
+        (let ((prescient-filter-method '(literal regexp)))
+          (ivy-prescient-re-builder str)))
+      (setq ivy-re-builders-alist
+            '((counsel-rg . prot/ivy-prescient-filters)
+              (counsel-grep . prot/ivy-prescient-filters)
+              (counsel-yank-pop . prot/ivy-prescient-filters)
+              (swiper . prot/ivy-prescient-filters)
+              (swiper-isearch . prot/ivy-prescient-filters)
+              (swiper-all . prot/ivy-prescient-filters)
+              (ivy-org-jump-to-headline . prot/ivy-prescient-filters)
+              (ram-jump-to-outline . prot/ivy-prescient-filters)
+              (ivy-switch-buffer . prot/ivy-prescient-filters)
+              (t . ivy-prescient-re-builder)))
+      (setq ivy-prescient-sort-commands
+            '(:not swiper ivy-switch-buffer counsel-switch-buffer))
+      (setq ivy-prescient-retain-classic-highlighting t)
+      (setq ivy-prescient-enable-filtering t)
+      (setq ivy-prescient-enable-sorting t))))
 
 ;;** swiper
 
@@ -793,21 +2230,12 @@ Ivy-powered commands, using `ivy-prescient-re-builder'."
      (setq swiper-goto-start-of-match t)
      (setq swiper-include-line-number-in-search t)
      (define-key global-map (kbd "C-S-s") 'swiper)
-     (define-key global-map (kbd "M-s s") 'swiper-multi)
-     (define-key global-map (kbd "M-s w") 'swiper-thing-at-point)))
+     (define-key global-map (kbd "M-s-s") 'swiper-multi)
+     (define-key global-map (kbd "M-s-w") 'swiper-thing-at-point)))
 
 ;;** counsel
 
-(use-package counsel
-  :after ivy
-  :custom
-  (counsel-yank-pop-preselect-last t)
-  (counsel-yank-pop-separator "\n—————————\n")
-  (counsel-rg-base-command
-   "rg -SHn --no-heading --color never --no-follow --hidden %s")
-  (counsel-find-file-occur-cmd          ; TODO Simplify this
-   "ls -a | grep -i -E '%s' | tr '\\n' '\\0' | xargs -0 ls -d --group-directories-first")
-  :config
+(with-eval-after-load "ivy"
   (defun prot/counsel-fzf-rg-files (&optional input dir)
     "Run `fzf' in tandem with `ripgrep' to find files in the
 present directory.  If invoked from inside a version-controlled
@@ -867,36 +2295,55 @@ repository, then the corresponding root is used instead."
   ;; Remove commands that only work with key bindings
   (put 'counsel-find-symbol 'no-counsel-M-x t))
 
-(define-key global-map (kbd "M-x") 'counsel-M-x)
-(define-key global-map (kbd "C-x f") 'counsel-find-file)
-(define-key global-map (kbd "C-x C-f") 'counsel-find-file)
-(define-key global-map (kbd "C-x d") 'counsel-dired)
+(setq counsel-yank-pop-preselect-last t)
+(setq counsel-yank-pop-separator "\n—————————\n")
+(setq counsel-rg-base-command
+ "rg -SHn --no-heading --color never --no-follow --hidden %s")
+(setq counsel-find-file-occur-cmd            ; TODO Simplify this
+ "ls -a | grep -i -E '%s' | tr '\\n' '\\0' | xargs -0 ls -d --group-directories-first")
 
-(define-key global-map (kbd "C-x b") 'counsel-switch-buffer)
-(define-key global-map (kbd "C-x B") 'counsel-switch-buffer-other-window)
+;;*** counsel: bindings
 
-(define-key global-map (kbd "C-x C-r") 'counsel-recentf)
-(define-key global-map (kbd "C-h f") 'counsel-describe-function)
-(define-key global-map (kbd "C-h v") 'counsel-describe-variable)
+;; (progn
 
-(define-key global-map (kbd "s-f") 'counsel-find-file)
-(define-key global-map (kbd "s-F") 'find-file-other-window)
+;;   (define-key global-map (kbd "M-x") 'counsel-M-x)
+;;   (define-key global-map (kbd "C-x f") 'counsel-find-file)
+;;   (define-key global-map (kbd "C-x C-f") 'counsel-find-file)
+;;   (define-key global-map (kbd "C-x d") 'counsel-dired)
 
-(define-key global-map (kbd "s-b") 'counsel-switch-buffer)
-(define-key global-map (kbd "s-B") 'counsel-switch-buffer-other-window)
+;;   (define-key global-map (kbd "C-x b") 'counsel-switch-buffer)
+;;   (define-key global-map (kbd "C-x B") 'counsel-switch-buffer-other-window)
 
-(define-key ram-leader-map-tap (kbd "y") 'counsel-yank-pop)
+;;   (define-key global-map (kbd "C-x C-r") 'counsel-recentf)
+;;   (define-key global-map (kbd "C-h f") 'counsel-describe-function)
+;;   (define-key global-map (kbd "C-h v") 'counsel-describe-variable)
 
-(define-key global-map (kbd "s-l") 'counsel-dired)
-(define-key global-map (kbd "s-L") 'dired-other-window)
-;; (define-key global-map (kbd "s-r") 'counsel-recentf)
-;; (define-key global-map (kbd "s-M-z") 'prot/counsel-fzf-rg-files)
-;; (define-key global-map (kbd "s-M-r") 'counsel-rg)
-(define-key global-map (kbd "s-M-g") 'counsel-git-grep)
+;;   (define-key global-map (kbd "s-f") 'counsel-find-file)
+;;   (define-key global-map (kbd "s-F") 'find-file-other-window)
 
-(define-key ivy-minibuffer-map (kbd "C-r") 'counsel-minibuffer-history)
-(define-key ivy-minibuffer-map (kbd "s-y") 'ivy-next-line)        ; Avoid 2× `counsel-yank-pop'
-(define-key ivy-minibuffer-map (kbd "C-SPC") 'ivy-restrict-to-matches)
+;;   ;; the preview of the buffer slows down the 'counsel-switch-buffer
+;;   ;; (define-key global-map (kbd "s-b") 'counsel-switch-buffer)
+
+;;   (define-key global-map (kbd "s-b") 'ivy-switch-buffer)
+;;   ;; seems like my custom open buffers messed up 'counsel-switch-buffer-other-window
+;;   ;; buffer preview functionality: it opens it in a new frame.
+;;   ;; (define-key global-map (kbd "s-B") 'counsel-switch-buffer-other-window)
+;;   (define-key global-map (kbd "s-B") 'ivy-switch-buffer-other-window)
+;;   (define-key global-map (kbd "C-s-b") 'display-buffer)
+
+;;   (define-key ram-leader-map-tap (kbd "y") 'counsel-yank-pop)
+
+;;   ;; counsel-dired does not include prescient entries
+;;   (define-key global-map (kbd "s-l") 'dired)
+;;   (define-key global-map (kbd "s-L") 'dired-other-window)
+;;   ;; (define-key global-map (kbd "s-r") 'counsel-recentf)
+;;   ;; (define-key global-map (kbd "s-M-z") 'prot/counsel-fzf-rg-files)
+;;   ;; (define-key global-map (kbd "s-M-r") 'counsel-rg)
+;;   (define-key global-map (kbd "s-M-g") 'counsel-git-grep)
+
+;;   (define-key ivy-minibuffer-map (kbd "C-r") 'counsel-minibuffer-history)
+;;   (define-key ivy-minibuffer-map (kbd "s-y") 'ivy-next-line) ; Avoid 2× `counsel-yank-pop'
+;;   (define-key ivy-minibuffer-map (kbd "C-SPC") 'ivy-restrict-to-matches))
 
 ;; (define-key global-map (kbd "<f1> l") 'counsel-find-library)
 ;; (define-key global-map (kbd "<f2> u") 'counsel-unicode-char)
@@ -904,8 +2351,8 @@ repository, then the corresponding root is used instead."
 ;; (define-key global-map (kbd "C-c j") 'counsel-git-grep)
 ;; (define-key global-map (kbd "C-c k") 'counsel-ag)
 
-;;* Modeline
-;;** Define faces
+;;* modeline
+;;** modeline faces
 
 (defface my/mode:vc-added
   `(
@@ -919,58 +2366,52 @@ version-control."
 
 (defface my/mode:vc-edited
   `(
-     (  ((class color))
-        (:background "#F05B80"  :foreground "black")  )   ; "#F04040" maybe?
-     (  t
-        (:weight bold :underline t)  )
-   )
+    (((class color))
+     (:background "#F05B80" :foreground "black")) ; "#F04040" maybe?
+    (t
+     (:weight bold :underline t)))
   "VC status tag face for files that are under version control
 but which have been edited."
   :group 'MY/mode)
 
 (defface my/mode:vc-in-sync
   `(
-     (  ((class color))
-        (:background "#60CC60"  :foreground "black")  )
-     (  t
-        (:weight bold :underline t)  )
-   )
+    (((class color))
+     (:background "#60CC60" :foreground "black"))
+    (t
+     (:weight bold :underline t)))
   "VC status tag face for files that are under version control
 and which are in sync with the respository."
   :group 'MY/mode)
 
 (defface my/mode:vc-none
   `(
-     (  ((class color))
-        (:background "#70A0D0"  :foreground "black")  )
-     (  t
-        (:weight bold :underline t)  )
-   )
+    (((class color))
+     (:background "#70A0D0" :foreground "black"))
+    (t
+     (:weight bold :underline t)))
   "VC status tag face for files that are not under version
 control"
   :group 'MY/mode)
 
 (defface my/mode:vc-unknown
   `(
-     (  ((class color))
-        (:background "#FF0000"  :foreground "white")  )
-     (  t
-        (:weight bold :underline t)  )
-   )
+    (((class color))
+     (:background "#FF0000" :foreground "white"))
+    (t
+     (:weight bold :underline t)))
   "VC status tag face for files whose version-control status
 cannot be determined."
   :group 'MY/mode)
 
-;;** Define functions
+;;** modeline functions
 (defvar my-vc-mode-attrs
-  '((""  . (" NoVC "  my/mode:vc-none))
-    ("-" . (" VC = "  my/mode:vc-in-sync))
-    (":" . (" VC > "  my/mode:vc-edited))
-    ("@" . (" VC + "  my/mode:vc-added))
-    ("?" . (" ?VC? "  my/mode:vc-unknown))
-    )
-  "Lookup table to translate vc-mode character into another string/face."
-)
+  '(("" . (" NoVC " my/mode:vc-none))
+    ("-" . (" VC = " my/mode:vc-in-sync))
+    (":" . (" VC > " my/mode:vc-edited))
+    ("@" . (" VC + " my/mode:vc-added))
+    ("?" . (" ?VC? " my/mode:vc-unknown)))
+  "Lookup table to translate vc-mode character into another string/face.")
 
 ;; This function helps me understand the version-control status.
 (defun my-mode-line-vc-info ()
@@ -1005,7 +2446,7 @@ been modified since its last check-in."
          (branch
           (if (member class '("-" ":" "@"))
               (concat " " (match-string-no-properties 2 vc-mode))
-            ""))
+            " NoVC"))
 
          ;; Fetch properties list for the class character above
          (props (cdr (assoc class my-vc-mode-attrs))))
@@ -1017,52 +2458,121 @@ been modified since its last check-in."
 
 (setq-default mode-line-format
               '(
-                ;; %, * or hyphen for read only, changed, saved
-                " %*%*%* "
+                (:eval (if (buffer-narrowed-p)
+                           (propertize "%n " 'face '((:background "green")))))
+                "[" "%@" "]"
                 ;; mode-line-modified
+                ;; %, * or - for read only, changed, saved
+                " %*%*%* "
+                ;; mode-line-buffer-identification
                 (:eval (propertize "%b " 'face font-lock-keyword-face
                                    'help-echo (buffer-file-name)))
-                (:eval (if (boundp 'git-gutter-mode) (propertize (format "+%s " (car (git-gutter:statistic))) 'face '((:foreground "chartreuse3")))))
-                (:eval (if (boundp 'git-gutter-mode) (propertize (format "-%s " (cdr (git-gutter:statistic))) 'face '((:foreground "chocolate")))))
+                (:eval (if (boundp 'git-gutter-mode)
+                           (propertize (format "+%s " (car (git-gutter:statistic)))
+                                       'face '((:foreground "chartreuse3")))))
+                (:eval (if (boundp 'git-gutter-mode)
+                           (propertize (format "-%s " (cdr (git-gutter:statistic)))
+                                       'face '((:foreground "chocolate")))))
                 (:eval (my-mode-line-vc-info))
                 ;; (:eval (propertize vc-mode 'face '((:foreground "DarkGoldenrod2"))))
                 ;; line and column
                 " ("
-                "%02l" "," "%01c"
+                "%02l" "," "%01c" "," "%01P%"
                 ") "
                 ;; value of `mode-name'
+                "%["
                 (:eval (propertize " %m " 'face '((:foreground "plum3"))))
+                "%]"
+                mode-line-process
+                ;; mode-line-modes
                 ;; "-- user: "
                 ;; value of user
                 ;; (getenv "USER")
-                ))
+                " -- "))
 
-                ;;   (setq evil-normal-state-tag   (propertize " <N> " 'face '((:background "DarkGoldenrod2" :foreground "black")))
-                ;;       evil-emacs-state-tag    (propertize " <E> " 'face '((:background "SkyBlue2"       :foreground "black")))
-                ;;       evil-insert-state-tag   (propertize " <I> " 'face '((:background "chartreuse3"    :foreground "black")))
-                ;;       evil-replace-state-tag  (propertize " <R> " 'face '((:background "chocolate"      :foreground "black")))
-                ;;       evil-motion-state-tag   (propertize " <M> " 'face '((:background "plum3"          :foreground "black")))
-                ;;       evil-visual-state-tag   (propertize " <V> " 'face '((:background "gray"           :foreground "black")))
-                ;;       evil-operator-state-tag (propertize " <O> " 'face '((:background "sandy brown"    :foreground "black"))))a
-;; (remove-hook 'magit-refresh-buffer-hook (lambda () (message "MAGIT REFRESH BUFFER IS CALLED!")))
-;; (remove-hook 'magit-refresh-buffer-hook 'revert-buffer)
-;; (remove-hook 'magit-refresh-buffer-hook 'force-mode-line-update)
+;;* themes
 
-;;* Doom Theme
-(straight-use-package
-   '(doom-themes :type git :flavor melpa :files (:defaults "themes/*.el" "doom-themes-pkg.el") :host github :repo "hlissner/emacs-doom-themes"))
+(defvar after-load-theme-hook nil
+    "Hook run after a color theme is loaded using `load-theme'.")
+
+(defadvice load-theme (after run-after-load-theme-hook activate)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
+
+;;* themes: doom
+;; (straight-use-package
+;;  '(doom-themes :type git :flavor melpa :files (:defaults "themes/*.el" "doom-themes-pkg.el") :host github :repo "hlissner/emacs-doom-themes"))
 ;; Global settings (defaults)
-(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-      doom-themes-enable-italic t) ; if nil, italics is universally disabled
-(load-theme 'doom-one t)
-
-;; Enable flashing mode-line on errors
-(doom-themes-visual-bell-config)
+;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;       doom-themes-enable-italic t)
+                                        ; if nil, italics is universally disabled
+;; (load-theme 'doom-one t)
 
 ;; Corrects (and improves) org-mode's native fontification.
-(doom-themes-org-config)
+;; (doom-themes-org-config)
 
-;;* Isearch
+;; Enable flashing mode-line on errors
+;; (doom-themes-visual-bell-config)
+
+;;* themes: sanityinc-tomorrow-night
+;; check enabled themes in custom-enabled-themes
+(straight-use-package
+ '(color-theme-sanityinc-tomorrow :type git :flavor melpa :host github :repo "purcell/color-theme-sanityinc-tomorrow"))
+;; (load-theme 'sanityinc-tomorrow-night t nil)
+;; (load-theme 'sanityinc-tomorrow-day t)
+
+;;* themes: modus-vivendi-theme
+(straight-use-package
+ '(modus-operandi-theme :type git :flavor melpa :files
+                       ("modus-operandi-theme.el" "modus-operandi-theme-pkg.el") :host gitlab :repo "protesilaos/modus-themes"))
+
+;; (load-theme 'modus-vivendi t)
+(progn
+  ;; (setq modus-operandi-theme-diffs nil)
+  (setq modus-operandi-theme-diffs 'desaturated)
+  ;; (setq modus-operandi-theme-diffs 'fg-only)
+ (load-theme 'modus-operandi t))
+
+;;* search
+
+;;** search: functions
+
+(defun prot/find-file-vc-or-dir (&optional arg)
+    "Find file by name that belongs to the current project or dir.
+With \\[universal-argument] match files by contents.  This
+requires the command-line executable called 'rg' or 'ripgrep'."
+    (interactive "P")
+    (let* ((default-directory (file-name-directory
+                               (or (locate-dominating-file "." ".git" )
+                                   default-directory))))
+      (if arg
+          (let* ((regexp (read-regexp
+                          (concat "File contents matching REGEXP in "
+                                  (propertize default-directory 'face 'bold)
+                                  ": ")))
+                 (results (process-lines "rg" "-l" "--hidden" "-m" "1" "-M" "120" regexp)))
+            (find-file
+             (icomplete-vertical-do ()
+               (completing-read (concat
+                                 "Files with contents matching "
+                                 (propertize regexp 'face 'success)
+                                 (format " (%s)" (length results))
+                                 ": ")
+                                results nil t))))
+        (let* ((filenames-all (directory-files-recursively default-directory ".*" nil t))
+               (filenames (cl-remove-if (lambda (x)
+                                          (string-match-p "\\.git" x))
+                                        filenames-all)))
+          (icomplete-vertical-do ()
+            (find-file
+             (completing-read "Find file recursively: " filenames nil t)))))))
+
+(define-key global-map (kbd "M-s f") #'prot/find-file-vc-or-dir)
+
+;;* isearch
+
+;;** isearch: settings
+
 ;; always exit isearch when <RET> is pressed.
 ;; even if the search string is empty
 (setq search-nonincremental-instead nil)
@@ -1074,6 +2584,9 @@ been modified since its last check-in."
 (setq search-whitespace-regexp ".*?")
 (setq isearch-lax-whitespace t)
 (setq isearch-regexp-lax-whitespace nil)
+
+;;** isearch: functions
+
 (defun prot/isearch-mark-and-exit ()
   "Marks the current search string.  Can be used as a building
 block for a more complex chain, such as to kill a region, or
@@ -1118,17 +2631,300 @@ confines of word boundaries (e.g. multiple words)."
   (funcall #'isearch-done nopush edit)
   (when isearch-other-end (goto-char isearch-other-end)))
 
-(bind-key (kbd "M-s M-o") 'multi-occur global-map)
-(bind-key (kbd "C-SPC")  'prot/isearch-mark-and-exit isearch-mode-map)
-(bind-key (kbd "DEL")  'contrib/isearchp-remove-failed-part-or-last-char isearch-mode-map)
-(bind-key (kbd "<C-return>")  'contrib/isearch-done-opposite-end  isearch-mode-map)
-;;* Miscellaneous
-(straight-use-package 'iedit)
+(define-key global-map (kbd "M-s M-o") 'multi-occur)
+(define-key isearch-mode-map (kbd "C-SPC")  'prot/isearch-mark-and-exit)
+(define-key isearch-mode-map (kbd "DEL")  'contrib/isearchp-remove-failed-part-or-last-char)
+(define-key isearch-mode-map (kbd "<C-return>")  'contrib/isearch-done-opposite-end )
+
+;; Prevents issue where you have to press backspace twice when
+;; trying to remove the first character that fails a search
+;; credit to https://stackoverflow.com/a/36707038/9913235
+(define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
+
+(defadvice isearch-search (after isearch-no-fail activate)
+  (unless isearch-success
+    (ad-disable-advice 'isearch-search 'after 'isearch-no-fail)
+    (ad-activate 'isearch-search)
+    (isearch-repeat (if isearch-forward 'forward))
+    (ad-enable-advice 'isearch-search 'after 'isearch-no-fail)
+    (ad-activate 'isearch-search)))
+
+;;*** isearch/functions: ram-isearch-done-to-open/close-paren
+
+(defun ram-isearch-done-to-open-paren (&optional nopush edit)
+  "End current search at open parens that wrap the match."
+  (interactive)
+  (funcall #'isearch-done nopush edit)
+  (if (and
+    ;; depth in parens is greater than 0
+    (> (nth 0 (syntax-ppss)) 0)
+    ;; not in string
+    (not (nth 3 (syntax-ppss))))
+      (backward-up-list 1)))
+
+(defun ram-isearch-done-to-close-paren (&optional nopush edit)
+  "End current search at open parens that wrap the match."
+  (interactive)
+  (funcall #'isearch-done nopush edit)
+  (if (and
+    ;; depth in parens is greater than 0
+    (> (nth 0 (syntax-ppss)) 0)
+    ;; not in string
+    (not (nth 3 (syntax-ppss))))
+      (backward-up-list -1)))
+
+(define-key isearch-mode-map (kbd "[") #'ram-isearch-done-to-open-paren)
+(define-key isearch-mode-map (kbd "]") #'ram-isearch-done-to-close-paren)
+
+;;* packages
+
+
+;;** packages: diff
+
+;; credit to https://gitlab.com/protesilaos/dotfiles/-/tree/master
+;; (autoload 'dired-mode "dired")
+(defun prot/diff-buffer-with-file (&optional arg)
+    "Compare buffer to its file, else run `vc-diff'.
+With \\[universal-argument] also enable highlighting of word-wise
+changes, local to the current buffer."
+    (interactive "P")
+    (let ((buf nil))   ; this method will "fail" if multi diff buffers
+      (if (buffer-modified-p)
+          (progn
+            (diff-buffer-with-file (current-buffer))
+            (setq buf "*Diff*"))
+        (vc-diff)
+        (setq buf "*vc-diff*"))
+      (when arg
+        (with-current-buffer (get-buffer buf)
+          (setq-local diff-refine 'font-lock)))))
+
+;; `prot/diff-buffer-with-file' replaces the default for `vc-diff'
+;; (which I bind to another key---see VC section).
+(define-key global-map (kbd "C-x v =") #'prot/diff-buffer-with-file)
+
+(with-eval-after-load 'diff
+  (setq diff-default-read-only t)
+  (setq diff-advance-after-apply-hunk t)
+  (setq diff-update-on-the-fly t)
+  ;; The following are from Emacs 27.1
+  (setq diff-refine nil)                ; I do it on demand
+  (setq diff-font-lock-prettify nil)    ; better for patches
+  (setq diff-font-lock-syntax nil)      ; good for accessibility
+
+
+
+  (defun prot/diff-refine-buffer ()
+    "Produce word-wise, 'refined' diffs in `diff-mode' buffer.
+Also see `prot/diff-refine-hunk-or-buf' that is a wrapper for the
+current command."
+    (interactive)
+    (let ((position (point)))
+      (when (derived-mode-p 'diff-mode)
+        (setq-local diff-refine 'font-lock)
+        (font-lock-flush (point-min) (point-max))
+        (goto-char position))))
+
+  (defun prot/diff-refine-hunk-or-buf (&optional arg)
+    "Apply word-wise, 'refined' diffs to hunk or buffer.
+With prefix ARG (\\[universal-argument]), refine the entire
+buffer, else the diff hunk at point.
+
+This is a wrapper around `prot/diff-refine-buffer' and
+`diff-refine-hunk', meant to economise on key bindings."
+    (interactive "P")
+    (if arg
+        (prot/diff-refine-buffer)
+      (diff-refine-hunk)))
+
+  (defun prot/diff-restrict-view-dwim (&optional arg)
+    "Use `diff-restrict-view', or widen when already narrowed.
+By default the narrowing effect applies to the focused diff hunk.
+With \\[universal-argument] do it for the current file instead."
+    (interactive "P")
+    (when (derived-mode-p 'diff-mode)
+      (if (buffer-narrowed-p)
+          (progn
+            (widen)
+            (message "Widened the view"))
+        (if arg
+            (progn
+              (diff-restrict-view arg)
+              (message "Narrowed to file"))
+          (diff-restrict-view)
+          (message "Narrowed to diff hunk")))))
+
+
+  (define-key diff-mode-map (kbd "C-c C-b") #'prot/diff-refine-hunk-or-buf) ; replace `diff-refine-hunk'
+  (define-key diff-mode-map (kbd "C-c C-n") #'prot/diff-restrict-view-dwim))
+
+;;** packages: esup
+(straight-use-package
+ '(esup :type git :flavor melpa :host github :repo "jschaf/esup"))
+
+;;** packages: expand-region
+(straight-use-package
+ '(expand-region :type git :flavor melpa :host github :repo "magnars/expand-region.el"))
+(define-key global-map (kbd "C-'") #'er/expand-region)
+
+;;** packages: flycheck
+(straight-use-package
+ '(flycheck :type git :flavor melpa :host github :repo "flycheck/flycheck"))
+(add-hook 'clojure-mode-hook #'flycheck-mode)
+
+;;** packages: iedit
+(straight-use-package
+ '(iedit :type git :flavor melpa :host github :repo "victorhge/iedit"))
+
+
+;;** packages: iy-go-to-char
+
+(straight-use-package
+ '(iy-go-to-char :type git :flavor melpa :host github :repo "doitian/iy-go-to-char"))
+
+(define-key global-map (kbd "s-d") #'iy-go-up-to-char)
+(define-key global-map (kbd "s-D") #'iy-go-to-char-backward)
+(define-key global-map (kbd "C-s-d") #'iy-go-to-or-up-to-continue)
+(define-key global-map (kbd "M-s-d") #'iy-go-to-or-up-to-continue-backward)
+
+;;** packages: keycast
+
+(straight-use-package
+ '(keycast :type git :flavor melpa :host github :repo "tarsius/keycast"))
+(setq keycast-insert-after " -- ")
+(setq keycast-remove-tail-elements nil)
+(setq keycast-separator-width 2)
+(keycast-mode)
+
+;;** packages: recentf
+
+(setq recentf-auto-cleanup 'never) ;; disable before we start recentf!
+(recentf-mode 1)
+(setq recentf-max-saved-items 2000)
+(run-at-time nil (* 5 60) 'recentf-save-list)
+
+;;*** packages/recentf: functions
+
+;;**** packages/recentf/functions: add dired to recentf
+
+;; credit to https://www.emacswiki.org/emacs/RecentFiles
+;; directories visited through dired buffers will also be put to recentf. – vibrys.
+(defun recentd-track-opened-file ()
+  "Insert the name of the directory just opened into the recent list."
+  (and (derived-mode-p 'dired-mode) default-directory
+       (recentf-add-file default-directory))
+  ;; Must return nil because it is run from `write-file-functions'.
+  nil)
+
+(defun recentd-track-closed-file ()
+  "Update the recent list when a dired buffer is killed.
+That is, remove a non kept dired from the recent list."
+  (and (derived-mode-p 'dired-mode) default-directory
+       (recentf-remove-if-non-kept default-directory)))
+
+(add-hook 'dired-after-readin-hook 'recentd-track-opened-file)
+(add-hook 'kill-buffer-hook 'recentd-track-closed-file)
+
+;;**** packages/recentf/functions: update recentf on dired rename
+
+;; Magic advice to rename entries in recentf when moving files in
+;; dired.
+(defun rjs/recentf-rename-notify (oldname newname &rest args)
+  (if (file-directory-p newname)
+      (rjs/recentf-rename-directory oldname newname)
+    (rjs/recentf-rename-file oldname newname)))
+
+(defun rjs/recentf-rename-file (oldname newname)
+  (setq recentf-list
+        (mapcar (lambda (name)
+                  (if (string-equal name oldname)
+                      newname
+                    oldname))
+                recentf-list)))
+
+(defun rjs/recentf-rename-directory (oldname newname)
+  ;; oldname, newname and all entries of recentf-list should already
+  ;; be absolute and normalised so I think this can just test whether
+  ;; oldname is a prefix of the element.
+  (setq recentf-list
+        (mapcar (lambda (name)
+                  (if (string-prefix-p oldname name)
+                      (concat newname (substring name (length oldname)))
+                    name))
+                recentf-list)))
+
+(advice-add 'dired-rename-file :after #'rjs/recentf-rename-notify)
+
+;;**** packages/recentf/functions: use completion for recentf
+
+;; based on https://stackoverflow.com/a/6995886/9913235
+(defun ram-choose-from-recentf (arg)
+  "Select a recently opened file from the `recentf-list'."
+  (interactive "P")
+  (let ((f (icomplete-vertical-do ()
+             (completing-read "Recent files: "
+                              recentf-list nil t))))
+    (if arg
+        (progn
+          (find-file-other-window f))
+      (find-file f))))
+
+(define-key global-map (kbd "s-f") #'ram-choose-from-recentf)
+
+;;** packages: rg
+
+(straight-use-package
+ '(rg :type git :flavor melpa :host github :repo "dajva/rg.el"))
+
+(define-key global-map (kbd "M-s g") #'prot/grep-vc-or-dir)
+(with-eval-after-load 'rg
+  (setq rg-group-result t)
+  (setq rg-hide-command t)
+  (setq rg-show-columns nil)
+  (setq rg-custom-type-aliases nil)
+  (setq rg-default-alias-fallback "all")
+  (setq rg-show-header t)
+  ;; credit to https://www.youtube.com/watch?v=4qLD4oHOrlc&t=1s
+
+  (rg-define-search prot/grep-vc-or-dir
+    :query ask
+    :format regexp
+    :files "everything"
+    :dir (let ((vc (vc-root-dir)))
+           (if vc
+               vc                   ; search root project dir
+             default-directory))   ; or from the current dir
+    :confirm prefix
+    :flags ("--hidden --glob=!.git --glob=!savehist --no-ignore-vcs"))
+
+  (defun prot/rg-save-search-as-name ()
+    "Save `rg' search results."
+    (interactive)
+    (let ((pattern (car rg-pattern-history)))
+      (rg-save-search-as-name (concat "<<" pattern ">>"))))
+
+  (define-key rg-mode-map (kbd "s") #'prot/rg-save-search-as-name)
+  (define-key rg-mode-map (kbd "C-n") #'next-line)
+  (define-key rg-mode-map (kbd "C-p") #'previous-line)
+  (define-key rg-mode-map (kbd "M-n") #'rg-next-file)
+  (define-key rg-mode-map (kbd "M-p") #'rg-prev-file))
+
+
+;;** packages: sudo-edit
+(straight-use-package
+ '(sudo-edit :type git :flavor melpa :host github :repo "nflath/sudo-edit"))
+
+;;** packages: which-key
+(straight-use-package
+ '(which-key :type git :flavor melpa :host github :repo "justbur/emacs-which-key"))
+(run-with-idle-timer 1 nil (lambda () (which-key-mode t)))
 
 ;;* Spelling
+
 ;;** flycheck
 
-;;** flycheck settings
+;;*** flycheck settings
+
 ;; credit to https://joelkuiper.eu/spellcheck_emacs
 (dolist (hook '(text-mode-hook
                 org-mode))
@@ -1148,14 +2944,19 @@ confines of word boundaries (e.g. multiple words)."
   (flyspell-goto-next-error)
   (ispell-word))
 
-;;** flycheck bindings
-(define-key global-map (kbd "s-M-c") 'ispell-word)
+;;*** flycheck bindings
 
-(define-key global-map (kbd "s-M-C") 'flyspell-check-next-highlighted-word)
+(with-eval-after-load "flyspell"
+  (define-key flyspell-mode-map (kbd "C-,") nil)
+  (define-key global-map (kbd "s-M-c") 'ispell-word)
 
-(define-key global-map (kbd "H-e") 'flycheck-next-error)
-(define-key global-map (kbd "H-E") 'flycheck-previous-error)
-;;** flyspell-goto-previous-error
+  (define-key global-map (kbd "s-M-C") 'flyspell-check-next-highlighted-word)
+
+  (define-key global-map (kbd "C-H-e") 'flycheck-next-error)
+  (define-key global-map (kbd "C-H-E") 'flycheck-previous-error))
+
+;;*** flyspell-goto-previous-error
+
 ;; move point to previous error
 ;; based on code by hatschipuh at
 ;; http://emacs.stackexchange.com/a/14912/2017
@@ -1197,9 +2998,250 @@ confines of word boundaries (e.g. multiple words)."
             (setq arg 0))
         (forward-word)))))
 
-;; bind-key* form would override all minor modes
-(bind-key* (kbd "C-,") 'flyspell-goto-previous-error)
-(define-key global-map (kbd "H--") 'flyspell-goto-previous-error)
+(define-key global-map (kbd "<M-f11>") 'flyspell-goto-previous-error)
+
+;;* System
+
+;;** system: comments
+
+(defun ram-next-comment (num)
+  "Jump comment beginnings and ends."
+  (interactive "p")
+  (comment-normalize-vars t)
+  (dotimes (_ num)
+    (move-end-of-line 1)
+    ;; if not in comment go to next comment
+    ;; if in comment go to the last comment in this block
+    (if (not (nth 4 (syntax-ppss)))
+        (goto-char (or (comment-search-forward (point-max) t) (point)))
+      (move-end-of-line 2)
+      (if (not (nth 4 (syntax-ppss)))
+          (goto-char (or (comment-search-forward (point-max) t) (point)))
+        (while (nth 4 (syntax-ppss))
+          (move-end-of-line 2))
+        (goto-char (or (comment-search-backward (point-min) t) (point)))))))
+
+(defun ram-previous-comment (num)
+  "Jump to comment ends and beginnings."
+  (interactive "p")
+  (comment-normalize-vars t)
+  ;; if not in comment go to previous comment
+  ;; if in comment go to the first comment in this block
+  (dotimes (_ num)
+    (move-end-of-line 1)
+    (if (not (nth 4 (syntax-ppss)))
+       (goto-char (or (comment-search-backward (point-min) t) (point)))
+     (move-end-of-line 0)
+     (if (not (nth 4 (syntax-ppss)))
+         (goto-char (or (comment-search-backward (point-min) t) (point)))
+       (while (nth 4 (syntax-ppss))
+         (move-end-of-line 0))
+       (goto-char (or (comment-search-forward (point-max) t) (point)))))))
+
+(define-key global-map (kbd "s-v") #'ram-next-comment)
+(define-key global-map (kbd "s-k") #'ram-previous-comment)
+
+;;** system: cursor
+
+(set-default 'cursor-type 'box)
+(defun ram-change-cursor-color ()
+  (let* ((bg (face-background 'default))
+         (curs-color (if (< (color-distance "black" bg)
+                            (color-distance "white" bg))
+                         "yellow"
+                       "#ff0000")))
+    ;; (add-to-list 'default-frame-alist `(cursor-color . ,curs-color))
+    (set-cursor-color curs-color)))
+
+(run-with-idle-timer 2 nil 'ram-change-cursor-color)
+
+(add-hook 'after-load-theme-hook #'ram-change-cursor-color)
+
+(setq blink-cursor-mode nil)
+(setq blink-cursor-blinks 1)
+
+;;** system: faces, fonts
+
+;; "C-u C-x =" shortcut for what-cursor-position command gives you the font info
+
+;; does not look nice above 25 points???
+;; (set-face-attribute 'default nil :font "-PfEd-Terminus (TTF)-normal-normal-normal-*-25-*-*-*-m-0-iso10646-1")
+
+;; (set-face-attribute 'default nil :font  "-ADBO-Source Code Pro-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
+
+;; (set-face-attribute 'default nil :font "-PfEd-Inconsolata-normal-normal-normal-*-25-*-*-*-m-0-iso10646-1")
+
+;; (set-face-attribute 'default nil :font "-MS  -Consolas-normal-normal-normal-*-23-*-*-*-m-0-iso10646-1")
+
+;; (set-face-attribute 'default nil :font "ApercuMono-20")
+
+(set-face-attribute 'default nil :font "FiraCode-19")
+
+;; (set-face-attribute 'default nil :font "Menlo-20")
+
+;; (set-face-attribute 'default nil :font "AnonymousPro-20")
+
+;; (set-face-attribute 'fixed-pitch nil :font "-PfEd-Terminus (TTF)-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
+;; (set-face-attribute 'fixed-pitch nil :font "-MS  -Consolas-normal-normal-normal-*-23-*-*-*-m-0-iso10646-1")
+;; (set-face-attribute 'fixed-pitch nil :font "-PfEd-Inconsolata-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
+
+;; (set-face-attribute 'fixed-pitch nil :font  "-ADBO-Source Code Pro-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
+
+(set-face-attribute 'fixed-pitch nil :font "FiraCode-18")
+
+;; (set-face-attribute 'variable-pitch nil :font "FiraGo-18")
+
+;; (set-face-attribute 'variable-pitch nil :font "Calibri-20")
+(set-face-attribute 'variable-pitch nil :font "Verdana-19")
+
+(with-eval-after-load "org"
+  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
+  (with-eval-after-load 'org-indent-mode
+    (set-face-attribute 'org-indent nil :inherit 'fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch))
+
+;;** system: general settings
+
+;; (when (display-graphic-p)
+;;   (desktop-save-mode 1);; is x window
+;;   ())
+
+;; Add variables to desktop saving
+(add-to-list 'desktop-globals-to-save 'register-alist)
+
+(setq confirm-kill-emacs 'y-or-n-p)
+
+(setq large-file-warning-threshold nil)
+(setq debug-on-error t)
+(run-with-idle-timer 2 nil (lambda () (fringe-mode '(20 . 20))))
+;; use "y", "n" for confirmations requiring "yes", "no"
+(defalias 'yes-or-no-p 'y-or-n-p)
+(when tool-bar-mode (tool-bar-mode -1))
+(when menu-bar-mode (menu-bar-mode -1))
+;; (when scroll-bar-mode (scroll-bar-mode -1))
+(scroll-bar-mode -1)
+
+;; (global-linum-mode t)
+(setq inhibit-startup-message t)
+
+(delete-selection-mode t)
+
+;;*** system/general settings: scroll
+
+(setq find-function-recenter-line nil)
+(setq scroll-preserve-screen-position nil)
+;; https://stackoverflow.com/questions/18386824/emacs-how-do-you-disable-auto-recentering
+;; stop auto scrolling
+(setq scroll-step 0)
+;; (setq scroll-conservatively 10000)
+(setq scroll-conservatively 0)
+(setq auto-window-vscroll nil)
+
+;; (setq nlinum-highlight-current-line t)
+;; (setq-default display-line-numbers t)
+;; highlght the current line only in gui.
+;; (when window-system (global-hl-line-mode t))
+
+;; (global-hl-line-mode)
+
+;; do not create backup files
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+;; highlights matching parens
+;; disable in favor of mic-paren
+
+;; (show-paren-mode 1)
+(setq show-paren-delay 0)
+(setq show-paren-style 'expression)
+(setq show-paren-style 'parenthesis)
+(set-face-background 'show-paren-match "#42444a")
+
+;; (set-face-attribute 'show-paren-match nil
+;;                     :foreground nil
+;;                     :weight 'normal :underline nil :overline nil :slant 'normal)
+
+;; Default Browser
+(setq browse-url-browser-function 'browse-url-generic
+    browse-url-generic-program "qutebrowser")
+;; kill line and newline char
+(setq kill-whole-line t)
+
+;;*** system/general settings: ring-bell
+
+(setq visible-bell nil)
+(setq ring-bell-function #'ignore)
+
+;;*** system/general settings: language
+
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+
+;;** system: savehist
+
+(setq savehist-file "~/.emacs.d/savehist")
+(setq history-length 200)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history 1)
+(setq savehist-additional-variables
+             '(kill-ring
+               search-ring
+               regexp-search-ring))
+;; (run-with-idle-timer 1 nil #'savehist-mode)
+(savehist-mode t)
+
+;;** system: hooks
+
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+
+;;** system: indent
+
+(setq-default indent-tabs-mode nil)
+(add-hook 'clojure-mode-hook
+          (lambda () (setq-local evil-shift-width 2)))
+(add-hook 'emacs-lisp-mode-hook
+          (lambda () (setq-local evil-shift-width 2)))
+(add-hook 'lisp-interaction-mode-hook
+          (lambda () (setq-local evil-shift-width 2)))
+
+;;** system: syntax
+
+;; treat "_", "-" as part of the word
+;; https://emacs.stackexchange.com/questions/9583/how-to-treat-underscore-as-part-of-the-word/9584
+;; (defadvice evil-inner-word (around underscore-as-word activate)
+;;   (let ((table (copy-syntax-table (syntax-table))))
+;;     (modify-syntax-entry ?_ "w" table)
+;;     (modify-syntax-entry ?- "w" table)
+;;     (with-syntax-table table
+;;       ad-do-it)))
+(modify-syntax-entry ?_ "w" emacs-lisp-mode-syntax-table)
+;; (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)
+
+
+;; does not seem to call modify-syntax-entry for clojure???
+;; doing so by hand, works
+;; modify-syntax-entry for clojure ?# char causes an error for lispy-tab, lispy-multiline commands
+;; (add-hook 'clojure-mode-hook (lambda () (
+;;                                          (progn
+;;                                            (modify-syntax-entry ?# "w" clojure-mode-syntax-table)))))
+(add-hook 'python-mode-hook (lambda () (
+                                        (progn
+                                          (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+                                          ;; (modify-syntax-entry ?- "w" python-mode-syntax-table)
+                                          ))))
+
+;;** system: whitespace
+
+(setq-default
+ show-trailing-whitespace t)
+(add-hook 'cider-test-report-mode-hook '(lambda () (setq-default show-trailing-whitespace nil)))
+(add-hook 'buffer-menu-mode-hook '(lambda () (setq-default show-trailing-whitespace nil)))
+(add-hook 'minibuffer-setup-hook '(lambda () (setq-default show-trailing-whitespace nil)))
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;* Navigate marks
 
@@ -1219,8 +3261,13 @@ confines of word boundaries (e.g. multiple words)."
         (setq mark-ring (nbutlast mark-ring))
         (goto-char (marker-position (car (last mark-ring))))))
 
+;; f11 is bound toggle-frame-full-screen by default
+(global-unset-key (kbd "<f11>"))
+
 (define-key ram-leader-map-tap (kbd "-") 'my-pop-local-mark-ring)
+(define-key global-map (kbd "<f11>") 'my-pop-local-mark-ring)
 (define-key ram-leader-map-tap (kbd ".") 'unpop-to-mark-command)
+(define-key global-map (kbd "<f21>") 'unpop-to-mark-command)
 
 
 ;;* Open a new line
@@ -1240,8 +3287,9 @@ confines of word boundaries (e.g. multiple words)."
   (forward-line -1)
   (indent-according-to-mode))
 
-(define-key ram-leader-map-tap (kbd "SPC") 'smart-open-line)
-(define-key ram-leader-map-tap (kbd "S-SPC") 'smart-open-line-above)
+(define-key global-map (kbd "<s-return>") 'smart-open-line)
+(define-key global-map (kbd "<S-s-return>") 'smart-open-line-above)
+(define-key global-map (kbd "<S-return>") 'newline-and-indent)
 
 ;;* xah-fly-keys
 
@@ -1273,7 +3321,10 @@ confines of word boundaries (e.g. multiple words)."
 
 ;;* dired
 
-(require 'dired)
+;; (require 'dired)
+
+(autoload 'dired-mode "dired")
+
 ;;** dired settings
 
 ;; use the other dired window at the paste/move target
@@ -1291,10 +3342,10 @@ confines of word boundaries (e.g. multiple words)."
 
 ;; default behavior would create a new buffer for each visited dir, change it with the following:
 ;; was dired-advertised-find-file
-(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+;; (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
 
 ;; was dired-up-directory
-(define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))
+;; (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))
 
 (global-set-key (kbd "C-c j") 'dired-jump)
 
@@ -1306,22 +3357,129 @@ confines of word boundaries (e.g. multiple words)."
                                       try-expand-dabbrev-visible
                                       try-expand-dabbrev-all-buffers
                                       try-expand-dabbrev
-                                      try-expand-file-name-partially
-                                      try-expand-file-name
-                                      try-expand-lisp-symbol-partially
-                                      try-expand-lisp-symbol
+                                      try-complete-file-name-partially
+                                      try-complete-file-name
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol
                                       try-expand-line) t))
 
-(define-key org-mode-map (kbd "M-/") (make-hippie-expand-function
-                                    '(
-                                      ;; try-expand-all-abbrevs
-                                      try-expand-dabbrev-visible
-                                      try-expand-dabbrev-all-buffers
-                                      try-expand-dabbrev
-                                      try-expand-file-name-partially
-                                      try-expand-file-name
-                                      try-expand-line) t))
+(eval-after-load "org"
+  '(define-key org-mode-map (kbd "M-/") (make-hippie-expand-function
+                                       '(
+                                         try-expand-all-abbrevs
+                                         try-expand-dabbrev-visible
+                                         try-expand-dabbrev-all-buffers
+                                         try-expand-dabbrev
+                                         try-complete-file-name-partially
+                                         try-complete-file-name
+                                         try-expand-line) t)))
 
 ;; (
 ;;  try-expand-list
 ;;  ;;  try-expand-dabbrev-from-kill
+;;* custom
+
+;;** custom: copy
+
+;;*** custom/copy: line
+
+;; credit to https://www.emacswiki.org/emacs/CopyingWholeLines
+;; see the link for more #'copy-line commands
+
+(defun copy-line (arg)
+    "Copy lines (as many as prefix argument) in the kill ring.
+      Ease of use features:
+      - Move to start of next line.
+      - Appends the copy on sequential calls.
+      - Use newline as last char even on the last line of the buffer.
+      - If region is active, copy its lines."
+    (interactive "p")
+    (let ((beg (line-beginning-position))
+          (end (line-end-position arg)))
+      (when mark-active
+        (if (> (point) (mark))
+            (setq beg (save-excursion (goto-char (mark)) (line-beginning-position)))
+          (setq end (save-excursion (goto-char (mark)) (line-end-position)))))
+      (if (eq last-command 'copy-line)
+          (kill-append (buffer-substring beg end) (< end beg))
+        (kill-ring-save beg end)))
+    (kill-append "\n" nil)
+    (beginning-of-line (or (and arg (1+ arg)) 2))
+    (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
+
+(define-key global-map (kbd "<M-f16>") #'copy-line)
+;;** custom: ram-cursor-mode
+(autoload 'global-ram-cursor-mode "ram-cursor")
+(global-ram-cursor-mode 1)
+
+;;** custom: replace-or-delete-pair
+
+;; credit to https://emacs.stackexchange.com/a/37648
+(defun yf/replace-or-delete-pair (open)
+  "Replace pair at point by OPEN and its corresponding closing character.
+The closing character is lookup in the syntax table or asked to
+the user if not found."
+  (interactive
+   (list
+    (read-char
+     (format "Replacing pair %c%c by (or hit RET to delete pair):"
+             (char-after)
+             (save-excursion
+               (forward-sexp 1)
+               (char-before))))))
+  (if (memq open '(?\n ?\r))
+      (delete-pair)
+    (let ((close (cdr (aref (syntax-table) open))))
+      (when (not close)
+        (setq close
+              (read-char
+               (format "Don't know how to close character %s (#%d) ; please provide a closing character: "
+                       (single-key-description open 'no-angles)
+                       open))))
+      (yf/replace-pair open close))))
+
+(defun yf/replace-pair (open close)
+  "Replace pair at point by respective chars OPEN and CLOSE.
+If CLOSE is nil, lookup the syntax table. If that fails, signal
+an error."
+  (let ((close (or close
+                   (cdr-safe (aref (syntax-table) open))
+                   (error "No matching closing char for character %s (#%d)"
+                          (single-key-description open t)
+                          open)))
+        (parens-require-spaces))
+    (insert-pair 1 open close))
+  (delete-pair)
+  (backward-char 1))
+
+(define-key ram-leader-map-tap (kbd "/") 'yf/replace-or-delete-pair)
+
+;;** custom: jump to the end of top level sexp
+
+(defun ram-jump-to-last-bracket (&optional direction)
+  "Jump to the end of top level sexp."
+  (interactive)
+  (let* ((p (point))
+         (direction (or direction 1))
+         (beginning-of-defun-p (save-excursion
+                                 (end-of-defun -1)
+                                 (beginning-of-defun -1)
+                                 (= p (point)))))
+    (condition-case nil
+        (cond
+         ((and (= -1 direction) beginning-of-defun-p) (beginning-of-defun) (forward-sexp))
+         (beginning-of-defun-p (forward-sexp))
+         ((= -1 direction) (beginning-of-defun 2) (forward-sexp))
+         (t
+          (beginning-of-defun)
+          (forward-sexp)
+          (when (>= p (point))
+            (beginning-of-defun -1)
+            (forward-sexp))))
+      (error nil))))
+
+;; "C-M-e" bound to end-of-defun by default
+(define-key global-map (kbd "<M-f2>") (lambda () (interactive) (push-mark) (ram-jump-to-last-bracket)))
+(define-key global-map (kbd "<M-S-f2>") (lambda () (interactive) (push-mark) (ram-jump-to-last-bracket -1)))
+(define-key global-map (kbd "<M-f1>") (lambda () (interactive) (push-mark) (beginning-of-defun)))
+(define-key global-map (kbd "<M-S-f1>") (lambda () (interactive) (push-mark) (beginning-of-defun -1)))
