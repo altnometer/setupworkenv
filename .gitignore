@@ -107,6 +107,7 @@ python-*-docs-html
 /recentf
 .mc-lists.el
 transient/
+racket-mode/
 
 # Private directory
 private/
