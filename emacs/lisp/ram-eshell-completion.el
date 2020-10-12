@@ -67,6 +67,11 @@
              "[[:space:]]*\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"))
     (goto-char point)))
 
+(defun ram-eshell-completion--continues-p ()
+  "True if we are in the middle of searching for a completion candidate."
+  (not (and (string= "" (car search-substrings))
+            (null (cdr search-substrings)))))
+
 (defun ram-eshell-completion--delete-vars ()
   "Delete ram-eshell-completion-mode variables."
   (dolist (ov ovs)
@@ -141,9 +146,7 @@
   (let* ((scrolling-candidates-p (not (null n)))
          (n (or n 0))
          (candidate (nth n ram-eshell-history)))
-    (if (and candidate
-             (not (and (string= "" (car search-substrings))
-                       (null (cdr search-substrings)))))
+    (if (and candidate (ram-eshell-completion--continues-p))
         (progn
           (insert (if scrolling-candidates-p
                       (format "%s (%s of %s)" candidate
@@ -153,8 +156,7 @@
                             (seq-length ram-eshell-history))))
           (ram-eshell--completion-highligth-matches ovs search-substrings)
           (re-search-forward (car search-substrings) (point-at-eol) t 1))
-      (when (not (and (string= "" (car search-substrings))
-                      (null (cdr search-substrings))))
+      (when (ram-eshell-completion--continues-p)
         (insert (format "%s (%s)"
                         (string-join (reverse search-substrings) " ")
                         (propertize "No matches" 'face '((:foreground "red")))))
@@ -228,15 +230,21 @@
 (defun ram-eshell-completion-prev ()
   "Insert previous history candidate."
   (interactive)
-  (setq ram-eshell-displayed-candidate
-        (% (1+ ram-eshell-displayed-candidate) (seq-length ram-eshell-history)))
-  (ram-eshell--insert-candidate ram-eshell-displayed-candidate))
+  (if (not (ram-eshell-completion--continues-p))
+      (progn (setq this-command 'eshell-previous-matching-input-from-input)
+             (eshell-previous-matching-input-from-input 1))
+    (setq ram-eshell-displayed-candidate
+          (% (1+ ram-eshell-displayed-candidate) (seq-length ram-eshell-history)))
+    (ram-eshell--insert-candidate ram-eshell-displayed-candidate)))
 
 (defun ram-eshell-completion-next ()
   "Insert next history candidate."
   (interactive)
-  (let ((n ram-eshell-displayed-candidate))
-    (if (<= n 0)
+  (if (not (ram-eshell-completion--continues-p))
+      ;; (eshell-next-matching-input-from-input 1)
+      (progn (setq this-command 'eshell-next-matching-input-from-input)
+             (eshell-next-matching-input-from-input 1))
+    (if (<= ram-eshell-displayed-candidate 0)
         (setq ram-eshell-displayed-candidate (1- (seq-length ram-eshell-history)))
         (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate))))
   (ram-eshell--insert-candidate ram-eshell-displayed-candidate))
