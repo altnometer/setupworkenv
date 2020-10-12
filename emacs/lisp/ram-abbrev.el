@@ -39,6 +39,19 @@
 (define-abbrev-table 'cider-repl-mode-abbrev-table
   clojure-abbrevs)
 
+;;* emacs-lisp
+(when (boundp 'emacs-lisp-mode-abbrev-table)
+  (clear-abbrev-table emacs-lisp-mode-abbrev-table))
+
+(setq emacs-lisp-abbrevs
+      '(
+        ("df" "defun")
+        ("la" "lambda")
+        ("lam" "lambda")))
+
+(define-abbrev-table 'emacs-lisp-mode-abbrev-table
+  emacs-lisp-abbrevs)
+
 ;;* racket
 (when (boundp 'racket-repl-mode-abbrev-table)
   (clear-abbrev-table racket-repl-mode-abbrev-table))
