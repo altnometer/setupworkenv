@@ -241,8 +241,9 @@
         (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate))))
   (ram-eshell--insert-candidate ram-eshell-displayed-candidate))
 
+;;;###autoload
 (defun ram-eshell-completion-send-input ()
-  "Run `eshell-send-input' after additional logic."
+  "Clean input, enable `ram-eshell-completion-mode' and run `eshell-send-input'."
   (interactive)
   (ram-eshell-completion--trim-input-right)
   (eshell-send-input)
