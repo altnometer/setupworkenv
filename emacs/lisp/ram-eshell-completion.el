@@ -207,7 +207,6 @@
 
   (define-key ram-eshell-completion-mode-map (kbd "M-p") #'ram-eshell-completion-prev)
   (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next)
-  (define-key ram-eshell-completion-mode-map (kbd "<return>") #'ram-eshell-completion-send-input)
   (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-delete-backward-char)
   (define-key ram-eshell-completion-mode-map (kbd "<M-backspace>") #'ram-eshell-completion-backward-kill-word)
   (define-key ram-eshell-completion-mode-map (kbd "C-f") #'ram-eshell-completion-forward-char)
