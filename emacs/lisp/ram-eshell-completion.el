@@ -238,8 +238,8 @@
              (eshell-next-matching-input-from-input 1))
     (if (<= ram-eshell-displayed-candidate 0)
         (setq ram-eshell-displayed-candidate (1- (seq-length ram-eshell-history)))
-        (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate))))
-  (ram-eshell--insert-candidate ram-eshell-displayed-candidate))
+      (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate)))
+    (ram-eshell--insert-candidate ram-eshell-displayed-candidate)))
 
 ;;;###autoload
 (defun ram-eshell-completion-send-input ()
