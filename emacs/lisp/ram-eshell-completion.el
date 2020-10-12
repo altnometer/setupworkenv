@@ -44,7 +44,7 @@
                                 (ring-elements eshell-history-ring)))
   (setq ram-eshell-displayed-candidate 0)
   (let ((input (buffer-substring-no-properties
-                eshell-last-output-end (point-at-eol))))
+                (save-excursion (eshell-bol) (point)) (point-at-eol))))
     (cond
      ((= (seq-length input) 1)
       (setq search-substrings (list input)))
@@ -59,9 +59,8 @@
   "Replace input with removed counters of candidates."
   (let ((point (point))
         (input (buffer-substring-no-properties
-                eshell-last-output-end (point-at-eol))))
-    (eshell-bol)
-    (delete-region (point) (point-at-eol))
+                (eshell-bol) (point-at-eol))))
+    (delete-region (eshell-bol) (point-at-eol))
     (insert (string-trim-right
              input
              "[[:space:]]*\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"))
@@ -135,8 +134,7 @@
 
 (defun ram-eshell--insert-candidate (&optional n)
   "Insert Nth candidate."
-  (eshell-bol)
-  (delete-region eshell-last-output-end (point-at-eol))
+  (delete-region (eshell-bol) (point-at-eol))
   (let* ((scrolling-candidates-p (not (null n)))
          (n (or n 0))
          (candidate (nth n ram-eshell-history)))
