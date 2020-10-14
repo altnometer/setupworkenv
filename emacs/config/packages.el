@@ -210,20 +210,20 @@
 
 ;;** eshell: bindings
 
-(defun ram-open-shell (universal-arg)
-  "Switch to shell buffer open a new one."
+(defun ram-open-eshell (arg)
+  "Switch to eshell buffer or open a new one."
   (interactive "p")
-  (let ((shell-buffers
-         (sort
-          (seq-filter (lambda (b) (s-starts-with-p "*eshell*" (buffer-name b))) (buffer-list))
-          (lambda (s1 s2) (string-lessp (buffer-name s1) (buffer-name s2))))))
-    (if shell-buffers
-        (pop-to-buffer-same-window
-         (nth (min (1- (length shell-buffers)) (max (1- universal-arg) 0))
-              shell-buffers))
-      (eshell))))
+  (let ((eshell-buffer
+         (nth (max (1- arg) 0)
+              (sort
+               (seq-filter (lambda (b) (s-starts-with-p "*eshell*" (buffer-name b))) (buffer-list))
+               (lambda (s1 s2) (string-lessp (buffer-name s1) (buffer-name s2)))))))
+    (if eshell-buffer
+        (switch-to-buffer eshell-buffer)
+      ;; (pop-to-buffer-same-window eshell-buffer)
+      (eshell arg))))
 
-(define-key global-map (kbd "s-e") #'ram-open-shell)
+(define-key global-map (kbd "s-e") #'ram-open-eshell)
 
 ;;** eshell: history
 
