@@ -1101,6 +1101,21 @@ one, an error is signaled."
         (when (window-live-p window)
           (window--display-buffer buf window 'reuse alist))))))
 
+(defun ram-display-buffer-in-other-window (buf alist)
+  "Display buffer in any other window if it exists."
+  (let (windows)
+    (dolist (window (window-list-1 nil 'nomini 'A))
+      (when (not (eq window (selected-window)))
+        (push window windows)))
+    (when windows
+      (window--display-buffer buf (car windows) 'reuse alist))))
+
+(defun ram-display-buffer-in-same-window (buf alist)
+  "Display buffer in any other window if it exists."
+  (let ((buffer-window (get-buffer-window buf 'A)))
+    (when buffer-window
+      (window--display-buffer buf buffer-window 'reuse alist))))
+
 ;;**** buffers/display: add to 'display-buffer-alist
 
 (add-to-list 'display-buffer-alist
@@ -1158,6 +1173,22 @@ one, an error is signaled."
                              (not (eq sel-win win)))
                         (window--display-buffer buf win 'reuse alist)
                       nil)))
+                ram-display-buffer-split-right)))
+
+(add-to-list 'display-buffer-alist
+             `((lambda (buf alist)
+                 (with-current-buffer buf
+                   (eq major-mode 'dired-mode))
+                 (string-prefix-p "*eshell*" (if (stringp buf) buf (buffer-name buf))))
+               (
+                ;; (lambda (buf alist)
+                ;;   (message (format "################ buf name: %s, mode: %s"
+                ;;                    buf
+                ;;                    (with-current-buffer buf major-mode)))
+                ;;   nil)
+                ram-display-buffer-in-same-window
+                ram-display-buffer-in-info-window
+                ram-display-buffer-in-other-window
                 ram-display-buffer-split-right)))
 
 ;; (add-to-list 'display-buffer-alist
