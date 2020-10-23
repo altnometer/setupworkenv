@@ -2088,6 +2088,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 (with-eval-after-load 'clojure-mode
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
+  (define-key clojure-mode-map (kbd "<M-f8>") #'narrow-to-defun)
   (require 'flycheck-clj-kondo))
 
 ;;* super-save
