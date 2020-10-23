@@ -244,6 +244,14 @@
   (define-key eshell-mode-map (kbd "S-SPC") #'ram-eshell-completion-toggle-mode)
   (define-key eshell-mode-map (kbd "<return>") #'ram-eshell-completion-send-input))
 
+;;** eshell: settings
+
+(setq eshell-scroll-to-bottom-on-input nil)
+(setq eshell-scroll-to-bottom-on-output nil)
+;; the previous settings do not seem to work, hence the following two lines:
+(remove-hook 'eshell-output-filter-functions 'eshell-postoutput-scroll-to-bottom)
+(remove-hook 'eshell-output-filter-functions 'eshell-preinput-scroll-to-bottom)
+
 ;;* magit
 (straight-use-package
  '(magit :type git :flavor melpa :files ("lisp/magit"
