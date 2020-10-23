@@ -11,13 +11,13 @@
 ;; shift leader hold
 (define-key global-map (kbd "<find>") nil)
 
-(defvar ram-leader-map-tap (make-sparse-keymap)
+(defvar ram-leader-map-tap-global (make-sparse-keymap)
   "Keymap for \"leader tap key\" shortcuts.")
 
 (defvar ram-leader-map-hold (make-sparse-keymap)
   "Keymap for \"leader hold key\" shortcuts.")
 
-(define-key global-map (kbd "<SunProps>") ram-leader-map-tap)
+(define-key global-map (kbd "<SunProps>") ram-leader-map-tap-global)
 (define-key global-map (kbd "<cancel>") ram-leader-map-hold)
 
 ;;* bindings
@@ -34,7 +34,7 @@
 (define-key global-map (kbd "C-s-f") #'find-file)
 (define-key global-map (kbd "C-S-s-f") #'find-file-other-window)
 
-(define-key ram-leader-map-tap (kbd "n") 'comint-dynamic-complete-filename)
+(define-key ram-leader-map-tap-global (kbd "n") 'comint-dynamic-complete-filename)
 
 (defun ram-edit-abbrev-file ()
   "Open ram-abbrev.el file. If it is current, close it."
@@ -45,9 +45,9 @@
         (delete-window))
     (find-file "~/.emacs.d/lisp/ram-abbrev.el")))
 
-(define-key ram-leader-map-tap (kbd "a") #'ram-edit-abbrev-file)
-(define-key ram-leader-map-tap (kbd "i") 'completion-at-point)
-(define-key ram-leader-map-tap (kbd "w") #'widen)
+(define-key ram-leader-map-tap-global (kbd "a") #'ram-edit-abbrev-file)
+(define-key ram-leader-map-tap-global (kbd "i") 'completion-at-point)
+(define-key ram-leader-map-tap-global (kbd "w") #'widen)
 
 (define-key global-map (kbd "C-x D") 'dired-other-window)
 
@@ -478,7 +478,7 @@ succession."
     (describe-function function)
     (setq history-add-new-input default)))
 
-;; (define-key ram-leader-map-tap "v" #'ram-describe-function)
+;; (define-key ram-leader-map-tap-global "v" #'ram-describe-function)
 (define-key global-map (kbd "C-h f") #'ram-describe-function)
 
 ;;*** minibuffer/functions: ram-jump-to-outline
@@ -1411,15 +1411,15 @@ one, an error is signaled."
 
 ;;** outline: bindings
 
-(define-key ram-leader-map-tap (kbd "n") #'outline-next-visible-heading)
-(define-key ram-leader-map-tap (kbd "p") #'outline-previous-visible-heading)
-(define-key ram-leader-map-tap (kbd "f") #'outline-forward-same-level)
-(define-key ram-leader-map-tap (kbd "b") #'outline-backward-same-level)
-(define-key ram-leader-map-tap (kbd "o") #'outline-show-all)
-(define-key ram-leader-map-tap (kbd "q") #'ram-outline-hide-all)
-(define-key ram-leader-map-tap (kbd "u") #'outline-up-heading)
-(define-key ram-leader-map-tap (kbd "d") #'prot/outline-down-heading)
-(define-key ram-leader-map-tap (kbd "z") #'ram-toggle-narrow-to-subtree)
+(define-key ram-leader-map-tap-global (kbd "n") #'outline-next-visible-heading)
+(define-key ram-leader-map-tap-global (kbd "p") #'outline-previous-visible-heading)
+(define-key ram-leader-map-tap-global (kbd "f") #'outline-forward-same-level)
+(define-key ram-leader-map-tap-global (kbd "b") #'outline-backward-same-level)
+(define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
+(define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
+(define-key ram-leader-map-tap-global (kbd "u") #'outline-up-heading)
+(define-key ram-leader-map-tap-global (kbd "d") #'prot/outline-down-heading)
+(define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-to-subtree)
 (define-key prog-mode-map (kbd "<tab>") #'prot/bicycle-cycle-tab-dwim)
 (with-eval-after-load 'org
   (define-key org-mode-map (kbd "<tab>") #'prot/bicycle-cycle-tab-dwim))
@@ -1536,7 +1536,7 @@ one, an error is signaled."
   ("SPC" nil "quit" :exit t)
   ("q" nil "quit" :exit t))
 
-(define-key ram-leader-map-tap (kbd "h") 'hydra-git-gutter/body)
+(define-key ram-leader-map-tap-global (kbd "h") 'hydra-git-gutter/body)
 (define-key global-map (kbd "<f5>") 'hydra-git-gutter/body)
 
 ;;** hydra-multicursor
@@ -1843,7 +1843,7 @@ heading to appear."
   '(lispy-set-key-theme '(special lispy c-digits)))
 
 ;;** lispy bindings
-(define-key ram-leader-map-tap (kbd "e") 'lispy-eval-and-comment)
+(define-key ram-leader-map-tap-global (kbd "e") 'lispy-eval-and-comment)
 
 (with-eval-after-load "lispy"
   (define-key lispy-mode-map
@@ -2166,8 +2166,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
   (add-hook 'ivy-occur-mode #'hl-line-mode)
 
-  (define-key ram-leader-map-tap (kbd "<up>") 'ivy-push-view)
-  (define-key ram-leader-map-tap (kbd "<down>") 'ivy-switch-view)
+  (define-key ram-leader-map-tap-global (kbd "<up>") 'ivy-push-view)
+  (define-key ram-leader-map-tap-global (kbd "<down>") 'ivy-switch-view)
   (define-key global-map (kbd "C-S-r") 'ivy-resume)
 
   (define-key ivy-occur-mode-map  (kbd "f") 'forward-char)
@@ -2382,7 +2382,7 @@ repository, then the corresponding root is used instead."
 ;;   (define-key global-map (kbd "s-B") 'ivy-switch-buffer-other-window)
 ;;   (define-key global-map (kbd "C-s-b") 'display-buffer)
 
-;;   (define-key ram-leader-map-tap (kbd "y") 'counsel-yank-pop)
+;;   (define-key ram-leader-map-tap-global (kbd "y") 'counsel-yank-pop)
 
 ;;   ;; counsel-dired does not include prescient entries
 ;;   (define-key global-map (kbd "s-l") 'dired)
@@ -3315,9 +3315,9 @@ That is, remove a non kept dired from the recent list."
 ;; f11 is bound toggle-frame-full-screen by default
 (global-unset-key (kbd "<f11>"))
 
-(define-key ram-leader-map-tap (kbd "-") 'my-pop-local-mark-ring)
+(define-key ram-leader-map-tap-global (kbd "-") 'my-pop-local-mark-ring)
 (define-key global-map (kbd "<f11>") 'my-pop-local-mark-ring)
-(define-key ram-leader-map-tap (kbd ".") 'unpop-to-mark-command)
+(define-key ram-leader-map-tap-global (kbd ".") 'unpop-to-mark-command)
 (define-key global-map (kbd "<f21>") 'unpop-to-mark-command)
 
 
@@ -3503,7 +3503,7 @@ an error."
   (delete-pair)
   (backward-char 1))
 
-(define-key ram-leader-map-tap (kbd "/") 'yf/replace-or-delete-pair)
+(define-key ram-leader-map-tap-global (kbd "/") 'yf/replace-or-delete-pair)
 
 ;;** custom: jump to the end of top level sexp
 
