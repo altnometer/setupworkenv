@@ -183,6 +183,7 @@
 ;;* emacs-lisp elisp
 
 (add-hook 'emacs-lisp-mode-hook (lambda () (outline-hide-sublevels 1)))
+(define-key emacs-lisp-mode-map (kbd "<M-f8>") #'narrow-to-defun)
 
 
 ;;* eshell
@@ -1581,6 +1582,8 @@ one, an error is signaled."
 ;;* racket
 
 ;; (add-hook 'racket-mode-hook #'racket-unicode-input-method-enable)
+(with-eval-after-load 'racket-mode
+  (define-key racket-mode-map (kbd "<M-f8>") #'narrow-to-defun))
 
 ;;** racket: repl
 
