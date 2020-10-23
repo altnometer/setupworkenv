@@ -61,11 +61,6 @@
 (global-unset-key (kbd "M-("))
 (define-key global-map (kbd "C-%") #'repeat)
 
-;;** bindings: narrow
-
-(define-key global-map (kbd "<M-f8>") #'narrow-to-defun)
-
-
 ;;** bindings: up-list
 
 (defun ram-up-list (universal-arg)
