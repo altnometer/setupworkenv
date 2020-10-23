@@ -1314,7 +1314,7 @@ one, an error is signaled."
           (add-to-list 'org-structure-template-alist
                        '("he" "#+HEADER: ?"))))
 
-;;** org-babel
+;;** org-mode: org-babel
 
 (with-eval-after-load "org"
   (autoload 'ob-racket "ob-racket")
@@ -1328,6 +1328,19 @@ one, an error is signaled."
      (racket . t)
      ;; (scribble . t)
      (css . t))))
+
+;;*** org-mode/org-babel: org-babel-eval-in-repl
+
+(straight-use-package
+ '(org-babel-eval-in-repl :type git :flavor melpa :host github :repo "diadochos/org-babel-eval-in-repl"))
+
+;; (with-eval-after-load "ob"
+;;   (require 'org-babel-eval-in-repl)
+;;   (define-key org-mode-map (kbd "C-<return>") 'ober-eval-in-repl)
+;;   (define-key org-mode-map (kbd "M-<return>") 'ober-eval-block-in-repl))
+
+(with-eval-after-load "eval-in-repl"
+  (setq eir-jump-after-eval nil))
 
 ;; ;;* git-gutter
 ;; ;; https://github.com/syohex/emacs-git-gutter
