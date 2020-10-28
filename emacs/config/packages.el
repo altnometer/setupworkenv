@@ -1267,8 +1267,8 @@ one, an error is signaled."
   (define-key org-mode-map (kbd "C-c C-n") (lambda (arg) (interactive "p")
                                              (ram-push-mark-for-none-consecutive-cmd arg #'org-next-visible-heading)))
 
-  (define-key org-mode-map (kbd "<M-f6") 'org-previous-visible-heading)
-  (define-key org-mode-map (kbd "<M-S-f6") 'org-backward-heading-same-level)
+  (define-key org-mode-map (kbd "<M-f6>") 'org-previous-visible-heading)
+  (define-key org-mode-map (kbd "<M-S-f6>") 'org-backward-heading-same-level)
 
   (define-key org-mode-map (kbd "C-c z") 'ram-org-hide-block-toggle-all)
   ;; originally bound to 'org-table-copy-down
