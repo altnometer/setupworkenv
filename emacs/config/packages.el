@@ -12,13 +12,23 @@
 (define-key global-map (kbd "<find>") nil)
 
 (defvar ram-leader-map-tap-global (make-sparse-keymap)
-  "Keymap for \"leader tap key\" shortcuts.")
+  "Keymap for \"leader tap key\" shortcuts in `global-map'.")
+
+(defvar ram-leader-map-tap-prog (make-sparse-keymap)
+  "Keymap for \"leader tap key\" shortcuts in `prog-mode-map'.")
 
 (defvar ram-leader-map-hold (make-sparse-keymap)
   "Keymap for \"leader hold key\" shortcuts.")
 
 (define-key global-map (kbd "<SunProps>") ram-leader-map-tap-global)
+
 (define-key global-map (kbd "<cancel>") ram-leader-map-hold)
+(define-key prog-mode-map (kbd "<SunProps>") ram-leader-map-tap-prog)
+
+(with-eval-after-load "org"
+  (defvar ram-leader-map-tap-org (make-sparse-keymap)
+    "Keymap for \"leader tap key\" shortcuts in `org-mode-map'.")
+  (define-key org-mode-map (kbd "<SunProps>") ram-leader-map-tap-org))
 
 ;;* bindings
 
@@ -1334,10 +1344,11 @@ one, an error is signaled."
 (straight-use-package
  '(org-babel-eval-in-repl :type git :flavor melpa :host github :repo "diadochos/org-babel-eval-in-repl"))
 
-;; (with-eval-after-load "ob"
-;;   (require 'org-babel-eval-in-repl)
-;;   (define-key org-mode-map (kbd "C-<return>") 'ober-eval-in-repl)
-;;   (define-key org-mode-map (kbd "M-<return>") 'ober-eval-block-in-repl))
+(with-eval-after-load "ob"
+  (require 'org-babel-eval-in-repl)
+  (define-key ram-leader-map-tap-org (kbd "e") 'ober-eval-in-repl)
+  (define-key ram-leader-map-tap-org (kbd "E") 'ober-eval-block-in-repl)
+  )
 
 (with-eval-after-load "eval-in-repl"
   (setq eir-jump-after-eval nil))
@@ -1843,7 +1854,7 @@ heading to appear."
   '(lispy-set-key-theme '(special lispy c-digits)))
 
 ;;** lispy bindings
-(define-key ram-leader-map-tap-global (kbd "e") 'lispy-eval-and-comment)
+(define-key ram-leader-map-tap-prog (kbd "e") 'lispy-eval-and-comment)
 
 (with-eval-after-load "lispy"
   (define-key lispy-mode-map
