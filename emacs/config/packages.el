@@ -1698,7 +1698,6 @@ heading to appear."
 	    (setq past-first-child t))
 	  (outline-flag-region
 	   (line-end-position 0) (line-end-position) nil))))))
-(add-hook 'lispy-mode-hook (lambda () (advice-add #'org-show-children :override #'my-org-show-children)))
 
 ;; https://github.com/abo-abo/lispy/issues/57
 ;;** lispy: lispy-mode-map-special
