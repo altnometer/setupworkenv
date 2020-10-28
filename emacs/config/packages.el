@@ -1431,11 +1431,6 @@ one, an error is signaled."
 (define-key ram-leader-map-tap-global (kbd "u") #'outline-up-heading)
 (define-key ram-leader-map-tap-global (kbd "d") #'prot/outline-down-heading)
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-to-subtree)
-(define-key prog-mode-map (kbd "<tab>") #'prot/bicycle-cycle-tab-dwim)
-(with-eval-after-load 'org
-  (define-key org-mode-map (kbd "<tab>") #'prot/bicycle-cycle-tab-dwim))
-;; (define-key global-map (kbd "<C-tab>") #'bicycle-cycle)
-;; (define-key global-map (kbd "<S-iso-lefttab>") #'bicycle-cycle-global)
 
 ;;* emacs-git-gutter-fringe
 
