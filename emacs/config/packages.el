@@ -1306,7 +1306,10 @@ one, an error is signaled."
       org-src-tab-acts-natively t
       org-return-follows-link t)
 (setq org-imenu-depth 7)
-;;** org-mode snippets
+
+;;** org-mode: structure-templates
+
+;; https://orgmode.org/manual/Structure-Templates.html
 
 (eval-after-load "org"
   '(progn (add-to-list 'org-structure-template-alist
