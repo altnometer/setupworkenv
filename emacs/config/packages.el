@@ -3143,13 +3143,13 @@ That is, remove a non kept dired from the recent list."
          (curs-color (if (< (color-distance "black" bg)
                             (color-distance "white" bg))
                          "yellow"
-                       "#ff0000")))
+                       "black")))
     ;; (add-to-list 'default-frame-alist `(cursor-color . ,curs-color))
     (set-cursor-color curs-color)))
 
 (run-with-idle-timer 2 nil 'ram-change-cursor-color)
 
-(add-hook 'after-load-theme-hook #'ram-change-cursor-color)
+;; (add-hook 'after-load-theme-hook #'ram-change-cursor-color)
 
 (setq blink-cursor-mode nil)
 (setq blink-cursor-blinks 1)
