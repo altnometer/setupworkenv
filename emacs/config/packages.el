@@ -279,8 +279,8 @@
 (setq magit-diff-refine-hunk 'all)
 
 (define-key global-map (kbd "s-m") 'magit-status)
-(define-key global-map (kbd "C-c g") 'magit-file-dispatch)
-(define-key global-map (kbd "C-c C-g") 'magit-dispatch)
+(define-key global-map (kbd "s-M") 'magit-file-dispatch)
+(define-key global-map (kbd "M-s-m") 'magit-dispatch)
 
 ;;* minibuffer
 
