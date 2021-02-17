@@ -1311,21 +1311,36 @@ one, an error is signaled."
 
 ;; https://orgmode.org/manual/Structure-Templates.html
 
-(eval-after-load "org"
-  '(progn (add-to-list 'org-structure-template-alist
-                       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-          (add-to-list 'org-structure-template-alist
-                       '("cl" "#+BEGIN_SRC clojure\n?\n#+END_SRC"))
-          (add-to-list 'org-structure-template-alist
-                       '("cls" "#+BEGIN_SRC clojurescript\n?\n#+END_SRC"))
-          (add-to-list 'org-structure-template-alist
-                       '("qt" "#+BEGIN_QUOTE\n?\n#+END_QUOTE"))
-          (add-to-list 'org-structure-template-alist
-                       '("rac" "#+BEGIN_SRC racket :lang racket/base :results output \n?\n#+END_SRC"))
-          (add-to-list 'org-structure-template-alist
-                       '("n" "#+NAME: ?"))
-          (add-to-list 'org-structure-template-alist
-                       '("he" "#+HEADER: ?"))))
+;; (eval-after-load "org"
+;;   '(progn (add-to-list 'org-structure-template-alist
+;;                        '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+;;           (add-to-list 'org-structure-template-alist
+;;                        '("cl" "#+BEGIN_SRC clojure\n?\n#+END_SRC"))
+;;           (add-to-list 'org-structure-template-alist
+;;                        '("cls" "#+BEGIN_SRC clojurescript\n?\n#+END_SRC"))
+;;           (add-to-list 'org-structure-template-alist
+;;                        '("qt" "#+BEGIN_QUOTE\n?\n#+END_QUOTE"))
+;;           (add-to-list 'org-structure-template-alist
+;;                        '("rac" "#+BEGIN_SRC racket :lang racket/base :results output \n?\n#+END_SRC"))
+;;           (add-to-list 'org-structure-template-alist
+;;                        '("n" "#+NAME: ?"))
+;;           (add-to-list 'org-structure-template-alist
+;;                        '("he" "#+HEADER: ?"))))
+
+(with-eval-after-load "org"
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist
+               '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist
+               '("cl" . "src clojure"))
+  (add-to-list 'org-structure-template-alist
+               '("cls" . "src clojurescrsipt"))
+  (add-to-list 'org-structure-template-alist
+               '("rac" . "src racket :lang racket/base :results output"))
+  (add-to-list 'org-structure-template-alist
+               '("n" . "name"))
+  (add-to-list 'org-structure-template-alist
+               '("hd" . "header")))
 
 ;;** org-mode: org-babel
 
