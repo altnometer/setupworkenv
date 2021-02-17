@@ -2965,15 +2965,16 @@ That is, remove a non kept dired from the recent list."
 
 (define-key global-map (kbd "s-f") #'ram-choose-from-recentf)
 
-;;** packages: rg
+;;** packages: rg (ripgrep)
 
 (straight-use-package
  '(rg :type git :flavor melpa :host github :repo "dajva/rg.el"))
 
-(define-key global-map (kbd "M-s g") #'prot/grep-vc-or-dir)
+(global-set-key (kbd "C-c s") #'rg-menu)
+
 (with-eval-after-load 'rg
   (setq rg-group-result t)
-  (setq rg-hide-command t)
+  (setq rg-hide-command nil)
   (setq rg-show-columns nil)
   (setq rg-custom-type-aliases nil)
   (setq rg-default-alias-fallback "all")
@@ -2991,6 +2992,11 @@ That is, remove a non kept dired from the recent list."
     :confirm prefix
     :flags ("--hidden --glob=!.git --glob=!savehist --no-ignore-vcs"))
 
+  (rg-define-search rg-word
+  :format literal
+  :flags ("--word-regexp")
+  :menu ("Custom" "w" "Word"))
+
   (defun prot/rg-save-search-as-name ()
     "Save `rg' search results."
     (interactive)
@@ -3001,7 +3007,9 @@ That is, remove a non kept dired from the recent list."
   (define-key rg-mode-map (kbd "C-n") #'next-line)
   (define-key rg-mode-map (kbd "C-p") #'previous-line)
   (define-key rg-mode-map (kbd "M-n") #'rg-next-file)
-  (define-key rg-mode-map (kbd "M-p") #'rg-prev-file))
+  (define-key rg-mode-map (kbd "M-p") #'rg-prev-file)
+
+  (define-key global-map (kbd "M-s g") #'prot/grep-vc-or-dir))
 
 
 ;;** packages: sudo-edit
