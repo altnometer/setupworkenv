@@ -3322,11 +3322,10 @@ That is, remove a non kept dired from the recent list."
 ;; (add-hook 'clojure-mode-hook (lambda () (
 ;;                                          (progn
 ;;                                            (modify-syntax-entry ?# "w" clojure-mode-syntax-table)))))
-(add-hook 'python-mode-hook (lambda () (
-                                        (progn
-                                          (modify-syntax-entry ?_ "w" python-mode-syntax-table)
-                                          ;; (modify-syntax-entry ?- "w" python-mode-syntax-table)
-                                          ))))
+(add-hook 'python-mode-hook (lambda () (progn
+                                         (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+                                         ;; (modify-syntax-entry ?- "w" python-mode-syntax-table)
+                                         )))
 
 ;;** system: whitespace
 
