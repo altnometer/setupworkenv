@@ -1626,7 +1626,17 @@ one, an error is signaled."
 
 ;;* racket
 
+(straight-use-package
+ '(racket-mode :type git :flavor melpa :files
+               (:defaults "*.rkt"
+                          ("racket" "racket/*")
+                          (:exclude "racket/example/*" "racket/test/*")
+                          "racket-mode-pkg.el")
+               :host github :repo "greghendershott/racket-mode"))
+(require 'racket-mode)
+
 ;; (add-hook 'racket-mode-hook #'racket-unicode-input-method-enable)
+
 (with-eval-after-load 'racket-mode
   (define-key racket-mode-map (kbd "<M-f8>") #'narrow-to-defun))
 
@@ -1635,13 +1645,6 @@ one, an error is signaled."
 (with-eval-after-load "racket-repl"
   (define-key racket-repl-mode-map (kbd "<f2>") #'racket-repl-submit))
 
-(straight-use-package
- '(racket-mode :type git :flavor melpa :files
-               (:defaults "*.rkt"
-                          ("racket" "racket/*")
-                          (:exclude "racket/example/*" "racket/test/*")
-                          "racket-mode-pkg.el")
-               :host github :repo "greghendershott/racket-mode"))
 ;;* lispy
 (straight-use-package 'lispy)
 
