@@ -2151,7 +2151,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 (straight-use-package
  '(flycheck-clj-kondo :type git :flavor melpa :host github :repo "borkdude/flycheck-clj-kondo"))
 
-;;* clojure mode
+;;* clojure
 
 (straight-use-package
  '(clojure-mode :type git :flavor melpa
