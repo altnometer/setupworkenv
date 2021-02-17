@@ -1215,9 +1215,10 @@ one, an error is signaled."
 
 ;; (require 'breadcrumbs)
 
-(autoload 'global-breadcrumbs-mode "breadcrumbs")
+;; (autoload 'global-breadcrumbs-mode "breadcrumbs")
+(autoload 'breadcrumbs-blink "breadcrumbs")
 
-(global-breadcrumbs-mode 1)
+;; (global-breadcrumbs-mode 1)
 
 ;;** sentences
 (setq sentence-end-double-space nil)
