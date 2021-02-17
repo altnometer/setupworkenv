@@ -2895,7 +2895,17 @@ With \\[universal-argument] do it for the current file instead."
 (setq recentf-auto-cleanup 'never) ;; disable before we start recentf!
 (recentf-mode 1)
 (setq recentf-max-saved-items 2000)
-(run-at-time nil (* 5 60) 'recentf-save-list)
+(run-at-time nil (* 1 60) 'recentf-save-list)
+
+;; do not show message in minibuffer
+;; credit to
+;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2016-08/msg00367.html
+(defun recentf-save-silently-advice (original &rest args)
+  (let ((inhibit-message t)
+        (message-log-max nil))
+    (apply original args)))
+
+(advice-add 'recentf-save-list :around #'recentf-save-silently-advice)
 
 ;;*** packages/recentf: functions
 
