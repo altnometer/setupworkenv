@@ -1443,6 +1443,13 @@ one, an error is signaled."
 (define-key ram-leader-map-tap-global (kbd "d") #'prot/outline-down-heading)
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-to-subtree)
 
+;;* hideshow
+
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+
+(with-eval-after-load "hideshow"
+  (define-key hs-minor-mode-map (kbd "<C-tab>") #'hs-toggle-hiding))
+
 ;;* emacs-git-gutter-fringe
 
 (straight-use-package
