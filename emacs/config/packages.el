@@ -1971,7 +1971,9 @@ heading to appear."
         '((avy-goto-char . avy-order-closest)
           (avy-goto-char-2 . avy-order-closest)
           (avy-goto-word-1 . avy-order-closest)
-          (lispy-ace-paren . ram-avy-order-furthest)
+          ;; (lispy-ace-paren . ram-avy-order-furthest)
+          ;; (lispy-ace-paren . ram-avy-order-from-beg-of-defun)
+          (lispy-ace-paren . ram-avy-order-from-end-of-defun)
           (lispy-ace-char . avy-order-closest)
           (lispy-ace-symbol . avy-order-closest)
           (lispy-ace-subword . avy-order-closest)
@@ -2000,6 +2002,14 @@ heading to appear."
 only for the selected window."
        (- (max (abs (- (point) (window-start))) (abs (- (point) (window-end))))
           (abs (- (caar x) (point)))))
+
+     (defun ram-avy-order-from-beg-of-defun (x)
+       "Order from beginning of `defun'."
+       (abs (- (caar x) (save-excursion (beginning-of-defun) (point)))))
+
+     (defun ram-avy-order-from-end-of-defun (x)
+       "Order from end of `defun'."
+       (abs (- (caar x) (save-excursion (end-of-defun) (point)))))
 
      (defun ram-avy--done ()
        "Clean up overlays."
