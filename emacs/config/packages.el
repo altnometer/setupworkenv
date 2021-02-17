@@ -1383,14 +1383,19 @@ one, an error is signaled."
 ;;* outline
 
 ;;** outline: setup
-(straight-use-package
- '(bicycle :type git :flavor melpa :host github :repo "tarsius/bicycle"))
 
-;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
 (outline-minor-mode t)
 
 (with-eval-after-load "outline"
   (require 'foldout))
+
+;;** outline: bicycle
+(straight-use-package
+ '(bicycle :type git :flavor melpa :host github :repo "tarsius/bicycle"))
+
+(add-hook 'prog-mode-hook #'outline-minor-mode)
+
+;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
 
 ;;** outline: functions
 
@@ -1424,6 +1429,9 @@ one, an error is signaled."
     (outline-forward-same-level 1))
 
 ;;** outline: bindings
+
+(with-eval-after-load "outline"
+  (define-key outline-minor-mode-map (kbd "<tab>") #'bicycle-cycle))
 
 (define-key ram-leader-map-tap-global (kbd "n") #'outline-next-visible-heading)
 (define-key ram-leader-map-tap-global (kbd "p") #'outline-previous-visible-heading)
