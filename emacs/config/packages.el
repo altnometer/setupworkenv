@@ -1348,12 +1348,13 @@ one, an error is signaled."
  '(org-babel-eval-in-repl :type git :flavor melpa :host github :repo "diadochos/org-babel-eval-in-repl"))
 
 (with-eval-after-load "ob"
+  (require 'eval-in-repl-racket)
   (require 'org-babel-eval-in-repl)
-  (define-key ram-leader-map-tap-org (kbd "e") 'ober-eval-in-repl)
-  (define-key ram-leader-map-tap-org (kbd "E") 'ober-eval-block-in-repl)
+  (define-key ram-leader-map-tap-org (kbd "e") 'ober-eval-block-in-repl)
+  (define-key ram-leader-map-tap-org (kbd "E") 'ober-eval-in-repl)
   )
 
-(with-eval-after-load "eval-in-repl"
+(with-eval-after-load "org-babel-eval-in-repl"
   (setq eir-jump-after-eval nil))
 
 ;; ;;* git-gutter
