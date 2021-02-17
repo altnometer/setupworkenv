@@ -2177,7 +2177,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (add-to-list 'super-save-triggers 'switch-to-next-buffer)
   (add-to-list 'super-save-triggers 'winner-undo)
   (add-to-list 'super-save-triggers 'winner-redo)
-  (add-to-list 'super-save-triggers 'counsel-M-x))
+  (add-to-list 'super-save-triggers 'counsel-M-x)
+  (add-to-list 'super-save-triggers 'ram-edit-abbrev-file))
 
 ;;* ivy, swiper, counsel:
 ;; https://oremacs.com/swiper/
