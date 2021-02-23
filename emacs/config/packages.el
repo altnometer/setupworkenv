@@ -3075,8 +3075,10 @@ That is, remove a non kept dired from the recent list."
 
   (define-key global-map (kbd "s-M-C") 'flyspell-check-next-highlighted-word)
 
-  (define-key global-map (kbd "C-H-e") 'flycheck-next-error)
-  (define-key global-map (kbd "C-H-E") 'flycheck-previous-error))
+  ;; hyper key is disables in favor of f1, ... keys
+  ;; (define-key global-map (kbd "C-H-e") 'flycheck-next-error)
+  ;; (define-key global-map (kbd "C-H-E") 'flycheck-previous-error)
+  )
 
 ;;*** flyspell-goto-previous-error
 
