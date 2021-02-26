@@ -156,24 +156,24 @@
          (candidate (nth n ram-eshell-history)))
     (if (and candidate (ram-eshell-completion--continues-p))
         (progn
-          (insert (if scrolling-candidates-p
-                      (format "%s (%s of %s)" candidate
-                              (1+ ram-eshell-displayed-candidate)
-                              (seq-length ram-eshell-history))
-                    (format "%s (%s)" candidate
-                            (seq-length ram-eshell-history))))
+          ;; (insert (if scrolling-candidates-p
+          ;;             (format "%s (%s of %s)" candidate
+          ;;                     (1+ ram-eshell-displayed-candidate)
+          ;;                     (seq-length ram-eshell-history))
+          ;;           (format "%s (%s)" candidate
+          ;;                   (seq-length ram-eshell-history))))
+          (insert (format "%s (%s of %s)" candidate
+                          (1+ ram-eshell-displayed-candidate)
+                          (seq-length ram-eshell-history)))
           (ram-eshell--completion-highligth-matches ovs search-substrings)
+          (eshell-bol)
           (re-search-forward (car search-substrings) (point-at-eol) t 1))
       (when (ram-eshell-completion--continues-p)
         (insert (format "%s (%s)"
                         (string-join (reverse search-substrings) " ")
-                        (propertize "No matches" 'face '((:foreground "red")))))
-        (beginning-of-line)
-        (re-search-forward (car search-substrings) (point-at-eol) t)
-        (ram-eshell-reset-candidates (orderless-filter
-                                      (string-join search-substrings " ") ram-eshell-history)))
-      (ram-eshell-reset-candidates (delete-dups
-                                    (ring-elements eshell-history-ring))))))
+                        (propertize ram-eshell-message-no-matches 'face '((:foreground "red")))))
+        (eshell-bol)
+        (re-search-forward (car search-substrings) (point-at-eol) t)))))
 
 (defun ram-eshell--handle-ins-spc ()
   (message ">>>> empty space")
