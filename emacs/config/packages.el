@@ -986,7 +986,8 @@ one, an error is signaled."
 
 ;;** buffers
 
-(global-auto-revert-mode nil)
+;; zero disable the mode
+(global-auto-revert-mode 0)
 
 ;;*** buffers: no prompt kill
 
@@ -2540,6 +2541,12 @@ repository, then the corresponding root is used instead."
 ;; (define-key global-map (kbd "C-c k") 'counsel-ag)
 
 ;;* modeline
+
+;; update vc-mode info (e.g., current branch)
+(setq auto-revert-check-vc-info t)
+;; default is 5 seconds
+(setq auto-revert-interval 3)
+
 ;;** modeline faces
 
 (defface my/mode:vc-added
