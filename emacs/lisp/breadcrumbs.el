@@ -166,8 +166,11 @@ Color attributes might be overriden by `breadcrumbs-right-foreground-color' and
   (let* ((windows (seq-filter
                    (lambda (w) (breadcrumbs-enabled-buffer-p (window-buffer w)))
                    (window-list-1 nil 'nomini 'A)))
-         (unselected-windows (cdr windows))
-         (selected-win (car windows)))
+         ;; (unselected-windows (cdr windows))
+         (selected-win (car windows))
+         (unselected-windows (seq-filter
+                              (lambda (w) (not (equal w selected-win)))
+                              (window-list-1 nil 'nomini 'A))))
     (when unselected-windows
       (breadcrumbs-put unselected-windows))
     (when selected-win
