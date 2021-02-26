@@ -302,5 +302,11 @@ Color attributes might be overriden by `breadcrumbs-right-foreground-color' and
       (seq-find #'derived-mode-p breadcrumbs-enabled-major-modes)) t)
    ((with-current-buffer buf
       (seq-find #'derived-mode-p breadcrumbs-disabled-major-modes)) nil)
+   ((let* ((buffer-name (if (stringp buf) buf (buffer-name buf)))
+           (names breadcrumbs-disabled-buffer-names))
+      ;; credit to https://emacs.stackexchange.com/a/28689
+      (while (and names (not (string-match (car names) buffer-name)))
+        (setq names (cdr names)))
+      names) nil)
    ((string-match-p "^[[:space:]]" (buffer-name buf)) nil)
    (t t)))
