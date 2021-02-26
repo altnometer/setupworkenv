@@ -132,3 +132,12 @@ URxvt*scrollTtyKeypress: true
 URxvt.font: xft:dejavusansmono:size=12
 URxvt.scrollBar            : false
 URxvt.perl-ext-common      : resize-font
+
+! font settings
+Xft.dpi: 96
+Xft.antialias: true
+Xft.hinting: true
+Xft.rgba: rgb
+Xft.autohint: false
+Xft.hintstyle: hintslight
+Xft.lcdfilter: lcddefault
