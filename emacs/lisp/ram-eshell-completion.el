@@ -184,16 +184,18 @@
     ;; next set of chars will be appended to this empty str
 
     (if (not ram-eshell-history)
-        (message "no matches")
+        (progn
+          (message (format "ram-eshell-completion-mode: %s" ram-eshell-message-no-matches))
+         (setcar search-substrings (concat (car search-substrings) (this-command-keys))))
       (ram-eshell--insert-candidate)
-      (forward-word))
+      (forward-word)
 
-    (message (format ">>> search substrings before: %s" search-substrings))
-    (when (not (string= "" (car search-substrings)))
-      (setq search-substrings (cons "" search-substrings)))
-    (message (format ">>> search substrings after: %s" search-substrings))
-    (message (format ">>> search string: %s" (string-join search-substrings " * ")))
-    (message (format ">>> candidates num: %s" (seq-length candidates)))))
+      (message (format ">>> search substrings before: %s" search-substrings))
+      (when (not (string= "" (car search-substrings)))
+        (setq search-substrings (cons "" search-substrings)))
+      (message (format ">>> search substrings after: %s" search-substrings))
+      (message (format ">>> search string: %s" (string-join search-substrings " * ")))
+      (message (format ">>> candidates num: %s" (seq-length candidates))))))
 
 (defun ram-eshell--handle-ins-non-spc (char)
   (message (format "\n**** not empty space, char: %s" char))
