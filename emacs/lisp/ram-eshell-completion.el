@@ -346,7 +346,7 @@
   (ram-eshell-completion-mode -1)
   (eshell-bol))
 
-(defun ram-eshell-completion-beginning-of-line ()
+(defun ram-eshell-completion-end-of-line ()
   "Run `move-end-of-line' after disabling `ram-eshell-completion-mode'."
   (interactive)
   (ram-eshell-completion--trim-input-right)
