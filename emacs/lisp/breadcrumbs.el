@@ -67,8 +67,13 @@
   :type '(repeat symbol))
 
 (defcustom breadcrumbs-disabled-major-modes
-  '(magit-status-mode magit-diff-mode magit-rev-mode)
-  "A list of major-modes where breadcrumbs is enabled."
+  '(magit-status-mode magit-diff-mode magit-rev-mode rg-mode)
+  "A list of major-modes where breadcrumbs is disabled."
+  :type '(repeat symbol))
+
+(defcustom breadcrumbs-disabled-buffer-names
+  '("*rg*")
+  "A list of buffer names where breadcrumbs is disabled."
   :type '(repeat symbol))
 
 (defface breadcrumbs-left-face nil
