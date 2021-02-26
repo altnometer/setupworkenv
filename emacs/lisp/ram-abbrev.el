@@ -6,6 +6,7 @@
 (set-default 'abbrev-mode t)
 
 (setq save-abbrevs nil)
+
 (clear-abbrev-table global-abbrev-table)
 
 (define-abbrev-table 'global-abbrev-table
@@ -15,7 +16,7 @@
     ("2t" "second")
     ("3t" "third")
     ("ty" "thank you")
-    ("br" "breadcrumbs")))
+    ("ws" "⃞")))
 
 ;;* clojure
 (when (boundp 'clojure-mode-abbrev-table)
@@ -68,7 +69,8 @@
         ("di" "display")
         ("la" "lambda")
         ("lam" "lambda")
-        ("pr" "procedure?")))
+        ;; ("pr" "procedure?")
+        ))
 
 (define-abbrev-table 'racket-mode-abbrev-table
   racket-abbrevs)
@@ -85,25 +87,45 @@
         ("~c" "~cons~")
         ("ab" "abstraction")
         ("ag" "argument")
+        ("ags" "arguments")
         ("app" "application")
         ("bc" "because")
         ("bf" "before")
         ("bh" "behavior")
         ("bn" "between")
+
+        ("chr" "character")
+        ("char" "character")
+        ("chrs" "characters")
+        ("chars" "characters")
+        ("charz" "characterize")
+        ("charzd" "characterized")
+        ("charc" "characteristic")
         ("con" "continuation")
         ("cm" "computer")
-        ("com" "computation")
+        ("comn" "computation")
+
+        ("dec" "declare")
+        ("decn" "declaration")
         ("def" "definition")
         ("df" "different")
+        ("dfc" "difference")
 
         ("el" "element")
+        ("els" "elements")
         ("env" "environment")
         ("ev" "evaluate")
         ("eva" "evaluate")
+        ("evd" "evaluated")
+        ("evg" "evaluating")
         ("evn" "evaluation")
         ("evt" "evaluation")
         ("exp" "expression")
+        ("exps" "expressions")
         ("exl" "example")
+        ("ext" "execute")
+        ("exts" "executes")
+        ("exn" "execution")
 
         ("fn" "function")
 
@@ -112,29 +134,49 @@
         ("imp" "implementation")
         ("impt" "implement")
 
+        ("inz" "initialize")
+        ("inzd" "initialized")
+        ("inzg" "initializing")
+        ("inv" "invoke")
+        ("invd" "invoked")
+        ("invg" "invoking")
+        ("invn" "invocation")
+
         ("mt" "manipulate")
         ("mtg" "manipulating")
         ("mec" "mechanism")
 
+        ("nb" "number")
+        ("nbs" "numbers")
         ("nm" "number")
+        ("nms" "numbers")
 
         ("ob" "object")
 
         ("par" "parentheses")
         ("pg" "program")
-        ("pgg" "programming")
+        ("pgn" "programming")
         ("pr" "procedure")
+        ("prs" "procedures")
         ("prd" "predicate")
         ("pri" "principle")
         ("prm" "parameter")
         ("prms" "parameters")
+        ("prev" "previous")
 
+        ("rc" "recursive")
+        ("rcl" "recursively")
+        ("rcn" "recursion")
+        ("recv" "receiver")
         ("rep" "represent")
         ("repn" "representation")
         ("repg" "representing")
         ("rn" "return")
+        ("rnd" "returned")
         ("rns" "returns")
+
         ("sm" "symbol")
+        ("sms" "symbols")
         ("st" "structure")
         ("tq" "technique")
         ("und" "understand")))
