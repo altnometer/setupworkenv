@@ -24,6 +24,18 @@
   "Indicate the number of the currently displayed candidate.")
 (make-variable-buffer-local 'ram-eshell-displayed-candidate)
 
+(defvar ram-eshell-message-no-matches "No matches"
+  "Display this string when no completion candidates found.")
+
+(defvar ram-eshell-trim-right-regex
+  (concat
+   "[[:space:]]*"
+   "\\|"
+   "\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"
+   "\\|"
+   (format "\\(?:(%s)\\)?" ram-eshell-message-no-matches))
+  "Regex used to trim the input from `ram-eshell-completion-mode' messages.")
+
 ;;* secondary functions
 
 (defun ram-eshell-reset-candidates (candidates)
