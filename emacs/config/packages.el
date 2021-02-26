@@ -2103,6 +2103,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
      ;; (define-key global-map (kbd "s-s") 'avy-goto-char-2)
      (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
+     (define-key global-map (kbd "s-R") 'avy-goto-top-paren)
      ;; (define-key global-map (kbd "s-d") 'avy-goto-char-in-line)
      (define-key global-map (kbd "s-N") 'avy-resume)
      ))
