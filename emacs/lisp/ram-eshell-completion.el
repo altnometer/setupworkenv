@@ -2,7 +2,11 @@
 
 (provide 'ram-eshell-completion)
 
-;;* variable definitions
+;;* variables
+
+;;** variables: eshell-mode
+
+;;** variables: ram-eshell-completion-mode
 
 (defvar ovs nil
   "A list of overlays to highlight matches.")
