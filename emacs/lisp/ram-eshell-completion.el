@@ -79,7 +79,7 @@
     (delete-region (eshell-bol) (point-at-eol))
     (insert (string-trim-right
              input
-             "[[:space:]]*\\(?:([[:digit:]]+)\\|([[:digit:]]+[[:space:]]+of[[:space:]]+[[:digit:]]+)\\)?"))
+             ram-eshell-trim-right-regex))
     (goto-char point)))
 
 (defun ram-eshell-completion--continues-p ()
