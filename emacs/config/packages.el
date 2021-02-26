@@ -2149,8 +2149,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 ;;* linters: flycheck-clj-kondo
 ;; First install the package:
-(straight-use-package
- '(flycheck-clj-kondo :type git :flavor melpa :host github :repo "borkdude/flycheck-clj-kondo"))
+;; (straight-use-package
+;;  '(flycheck-clj-kondo :type git :flavor melpa :host github :repo "borkdude/flycheck-clj-kondo"))
 
 ;;* clojure
 
