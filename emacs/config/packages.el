@@ -502,9 +502,34 @@ succession."
    (let ((headlines '())
          (headline-regex
           ;; TODO: use 'outline-regexp and copy the line
-          (if (eq major-mode 'org-mode)
-              "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$"
-            "^;;\\(?:;\\(;[^#]\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$"))
+          (cond
+           ((eq major-mode 'org-mode)
+            "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
+           ((eq major-mode 'python-mode)
+            ;; (group
+            ;;    (* space)                 ; 0 or more spaces
+            ;;    (one-or-more (syntax comment-start))
+            ;;    (one-or-more space)
+            ;;    ;; Heading level
+            ;;    (group (repeat 1 8 "\*")) ; Outline stars
+            ;;    (one-or-more space)
+            ;;    )
+            (rx line-start
+                           (* space)
+                       ; 0 or more spaces
+                           ;; (group (one-or-more (syntax comment-start)))
+                           (group (+ (syntax comment-start)))
+                           ;; Heading level
+                           (+ space)
+                           (group (repeat 1 8 "\*"))
+                           (+ space)
+                           ;; heading text
+                           ;; Must be accessible with (match-string 3)
+                           (group (+? not-newline))
+                           (* space)
+                           line-end))
+           (t
+            "^;;\\(?:;\\(;[^#]\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
          (hist-item (car ram-jump-to-outline-history)))
      (define-key minibuffer-local-completion-map (kbd "<return>")
@@ -1410,7 +1435,8 @@ one, an error is signaled."
 (straight-use-package
  '(bicycle :type git :flavor melpa :host github :repo "tarsius/bicycle"))
 
-(add-hook 'prog-mode-hook #'outline-minor-mode)
+(add-hook 'emacs-lisp-mode-hook #'outline-minor-mode)
+(add-hook 'clojure-mode-hook #'outline-minor-mode)
 
 ;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
 
@@ -2162,7 +2188,63 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   (define-key clojure-mode-map (kbd "<M-f8>") #'narrow-to-defun)
-  (require 'flycheck-clj-kondo))
+  ;; (require 'flycheck-clj-kondo)
+  )
+
+;;* python
+
+(defun python-mode-outline-hook ()
+  (setq outline-level 'python-outline-level)
+
+  (setq outline-regexp
+        (rx (or
+             ;; Commented outline heading
+             (group
+              (* space)                 ; 0 or more spaces
+              (one-or-more (syntax comment-start))
+              (one-or-more space)
+              ;; Heading level
+              (group (repeat 1 8 "\*")) ; Outline stars
+              (one-or-more space))
+
+             ;; Python keyword heading
+             (group
+              ;; Heading level
+              (group (* space))         ; 0 or more spaces
+              bow
+              ;; Keywords
+              (or "class" "def" "else" "elif" "except" "for" "if" "try" "while")
+              eow)))))
+
+(defun python-outline-level ()
+  (or
+   ;; Commented outline heading
+   (and (string-match (rx
+                       (* space)
+                       (one-or-more (syntax comment-start))
+                       (one-or-more space)
+                       (group (one-or-more "\*"))
+                       (one-or-more space))
+                      (match-string 0))
+        (- (match-end 0) (match-beginning 0)))
+
+   ;; Python keyword heading, set by number of indentions
+   ;; Add 8 (the highest standard outline level) to every Python keyword heading
+   (+ 8 (- (match-end 0) (match-beginning 0)))))
+
+;; (with-eval-after-load "outline"
+;;   (define-key outline-minor-mode-map (kbd "<tab>") #'bicycle-cycle))
+
+(add-hook 'python-mode-hook #'outline-minor-mode)
+
+(add-hook 'python-mode-hook 'python-mode-outline-hook)
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+  ;; (define-key python-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
+  ;; (define-key python-mode-map (kbd "<M-f8>") #'narrow-to-defun)
+  ;; (require 'flycheck-clj-kondo)
+  )
 
 ;;* super-save
 
