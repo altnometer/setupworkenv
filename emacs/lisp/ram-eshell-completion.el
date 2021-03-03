@@ -187,9 +187,9 @@
         (progn
           (message (format "ram-eshell-completion-mode: %s" ram-eshell-message-no-matches))
          (setcar search-substrings (concat (car search-substrings) (this-command-keys))))
-      (ram-eshell--insert-candidate)
-      (forward-word)
-
+      ;; (ram-eshell--insert-candidate)
+      ;; (forward-word)
+      (ram-eshell--display-candidates)
       (message (format ">>> search substrings before: %s" search-substrings))
       (when (not (string= "" (car search-substrings)))
         (setq search-substrings (cons "" search-substrings)))
@@ -207,11 +207,8 @@
                                 (string-join search-substrings " ") ram-eshell-history))
   (when (or (not (null (cdr search-substrings)))
             (>= (seq-length (car search-substrings)) 2))
-    (ram-eshell--insert-candidate))
-  ;; (let (candidates)
-  ;;   (setq candidates (orderless-filter (string-join search-substrings " ") ram-eshell-history))
-  ;;   (ram-eshell--insert-candidate candidates))
-  )
+    ;; (ram-eshell--insert-candidate)
+    (ram-eshell--display-candidates)))
 
 ;;* keymap
 
