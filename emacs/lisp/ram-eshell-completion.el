@@ -8,6 +8,19 @@
 
 ;;** variables: ram-eshell-completion-mode
 
+(defface ram-eshell-completion--hl-match-face
+  '((t :foreground "black"
+       :background "aquamarine"
+       ;; :weight bold
+       ;; :underline t
+       ))
+  "Face for highlighting matches in displayed candidates."
+  :group 'ram-eshell--completion)
+
+(defvar ov-candidates nil
+  "An overlay to display matching candidates.")
+(make-variable-buffer-local 'ov-candidates)
+
 (defvar ovs nil
   "A list of overlays to highlight matches.")
 (make-variable-buffer-local 'ovs)
