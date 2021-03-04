@@ -49,6 +49,18 @@
    (format "\\(?:(%s)\\)?" ram-eshell-message-no-matches))
   "Regex used to trim the input from `ram-eshell-completion-mode' messages.")
 
+(defvar ram-eshell-num-of-displayed-candidates 6
+  "Restricts number of displayed completion candidates.")
+
+(defvar ram-eshell-completion--length-of-displayed-candidate 60
+  "Length of displayed candidate string.")
+
+(defvar ram-eshell-completion--max-length-word 16
+  "Words over this length are truncated.")
+
+(defvar ram-eshell-completion--trancate-symbol "…"
+  "A substitute string to indicate truncated parts.")
+
 ;;* secondary functions
 
 (defun ram-eshell-reset-candidates (candidates)
