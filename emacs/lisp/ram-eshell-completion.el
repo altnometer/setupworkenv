@@ -208,6 +208,112 @@
                   ovs)))
       (ram-eshell--completion-highligth-matches ovs* (cdr search-substrings)))))
 
+(defun ram-eshell-completion--crop-word (word substr)
+  "Crop WORD."
+  (let ((front-segment (substring word 0 (string-match substr word)))
+        beginning-part middle-part
+        new-word)
+    (when (and (string-match (rx line-start
+                           (zero-or-more (not alnum))
+                           (one-or-more (or alnum "-"))) word)
+             ;; do not include if substr in the match
+             (not (s-matches-p substr (match-string 0 word))))
+      (setq beginning-part (match-string 0 front-segment)))
+    (when (string-match (rx-to-string
+                         `(: (group (zero-or-more (or alnum "-"))
+                                    (zero-or-more (not alnum))
+                                    ,substr
+                                    (zero-or-more (not alnum))
+                                    (zero-or-more (or alnum "-")))
+                             (group (zero-or-more anychar))
+                             line-end) t)
+                        word)
+      (setq middle-part (match-string 1 word))
+      (setq new-word (string-join (remove nil (vector beginning-part middle-part))
+                                  ram-eshell-completion--trancate-symbol)))
+    (when (and new-word
+             (not (string= "" (match-string 2 word))))
+        (setq new-word (concat new-word ram-eshell-completion--trancate-symbol))
+      (string-match substr new-word)
+      (add-text-properties
+       (match-beginning 0) (match-end 0)
+       '(face ram-eshell-completion--hl-match-face) new-word)
+      new-word)))
+
+(defun ram-eshell-completion--resize-list (words length resized-p)
+  "Remove words that do not contain `ram-eshell-completion--hl-match-face'.
+  Keep removing until LENGTH is less than
+  `ram-eshell-completion--length-of-displayed-candidate'."
+  (if (or (null words)
+           (<= length ram-eshell-completion--length-of-displayed-candidate))
+      words
+    (let* ((word (car words))
+          (match-begining
+           (text-property-any 0 (length word) 'face 'ram-eshell-completion--hl-match-face word))
+          match-end)
+      (if match-begining
+          (if (>= (length word) ram-eshell-completion--max-length-word)
+              (progn
+                ;; (message "matched: %s" word)
+                (setq match-end
+                     (text-property-not-all match-begining (length word) 'face 'ram-eshell-completion--hl-match-face word))
+               (cons
+                ;; (ram-eshell-completion--crop-word word match-begining match-end)
+                (ram-eshell-completion--crop-word word (substring word match-begining match-end))
+                (ram-eshell-completion--resize-list (cdr words) length nil)))
+            ;; (message "match-begining: %s" match-begining)
+            ;; (message "match-end: %s" match-end)
+            (cons word (ram-eshell-completion--resize-list (cdr words) length nil)))
+        ;; (progn
+        ;;     (setq match-end
+        ;;           (text-property-not-all match-begining (length word) 'face 'ram-eshell-completion--hl-match-face word))
+        ;;     (message "matched: %s" word)
+        ;;     (message "match-begining: %s" match-begining)
+        ;;     (message "match-end: %s" match-end)
+        ;;     (cons word (ram-eshell-completion--resize-list (cdr words) length nil)))
+        (if resized-p
+            (ram-eshell-completion--resize-list (cdr words) (- length (length word)) resized-p)
+          (let ((replacement ram-eshell-completion--trancate-symbol))
+            (cons replacement
+                  (ram-eshell-completion--resize-list
+                   (cdr words)
+                   (- length (- (length word) (length replacement))) t))))))))
+
+(defun ram-eshell-completion--resize-str (str)
+  "Trim string to `ram-eshell-completion--length-of-displayed-candidate'."
+  (let* ((words (reverse (split-string str)))
+         (num-spaces (1- (length words)))
+         (str-len-no-spaces (- (length str) num-spaces)))
+    (string-join (reverse
+                  (ram-eshell-completion--resize-list words str-len-no-spaces nil)) " ")))
+
+(defun ram-eshell--make-display-candidates-string (candidates)
+  "Make a string of candidates that is displayed to the user."
+  (let ((candidates (if (> (length candidates) ram-eshell-num-of-displayed-candidates)
+                        (butlast candidates (- (length candidates) ram-eshell-num-of-displayed-candidates))
+                      candidates)))
+    (concat
+     (format " (%s of %s)\n" (1+ ram-eshell-displayed-candidate)
+             (length ram-eshell-history))
+     (mapconcat (lambda (str)
+                  (let ((str (ram-eshell--completion-highlight-string-matches
+                              (concat (string-trim str))
+                              search-substrings)))
+                    (if (> (length str) ram-eshell-completion--length-of-displayed-candidate)
+                        (ram-eshell-completion--resize-str str)
+                      str)))
+                candidates "\n"))))
+
+(defun ram-eshell--display-candidates ()
+  "Display completion candidates. "
+  (if ram-eshell-history
+      (let ((str (ram-eshell--make-display-candidates-string ram-eshell-history)))
+        ;; (overlay-put ov-candidates 'after-string nil)
+        (move-overlay ov-candidates (point-at-eol) (point-at-eol))
+        (overlay-put ov-candidates 'after-string str)
+        (put-text-property 0 1 'cursor 0 str))
+    (ram-eshell-completion--hide-overlay)))
+
 (defun ram-eshell--insert-candidate (&optional n)
   "Insert Nth candidate."
   (delete-region (eshell-bol) (point-at-eol))
