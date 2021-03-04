@@ -121,8 +121,14 @@
   "Delete ram-eshell-completion-mode variables."
   (dolist (ov ovs)
     (delete-overlay ov))
+  (delete-overlay ov-candidates)
   (kill-local-variable 'ovs)
   (kill-local-variable 'search-substrings))
+
+(defun ram-eshell-completion--hide-overlay ()
+  "Hide overlay."
+  (overlay-put ov-candidates 'after-string nil)
+  (move-overlay ov-candidates 1 1))
 
 ;;;###autoload
 (defun ram-eshell-completion-toggle-mode ()
