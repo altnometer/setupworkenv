@@ -175,6 +175,21 @@
 
 ;;** post secondary functions
 
+(defun ram-eshell--completion-highlight-string-matches (string search-substrings)
+  "Highlight SEARCH-SUBSTRINGS matches in STRING."
+  (if search-substrings
+    (let* ((r (car search-substrings)))
+      (when (not (string= r ""))
+        (cl-labels ((hl (start)
+                        (when (string-match r string start)
+                          (add-text-properties
+                           (match-beginning 0) (match-end 0)
+                           '(face ram-eshell-completion--hl-match-face) string)
+                          (hl (match-end 0)))))
+          (hl 0)))
+      (ram-eshell--completion-highlight-string-matches string (cdr search-substrings)))
+    string))
+
 (defun ram-eshell--completion-highligth-matches (ovs search-substrings)
   "Highlight matches."
   (when (and ovs search-substrings)
