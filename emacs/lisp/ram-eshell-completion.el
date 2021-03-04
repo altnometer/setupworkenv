@@ -71,6 +71,11 @@
 
 (defun ram-eshell-completion--set-vars ()
   "Set ram-eshell-completion-mode variables."
+  (if ov-candidates
+      (progn
+        (overlay-put ov-candidates 'after-string nil)
+        (move-overlay ov-candidates 1 1))
+    (setq ov-candidates (make-overlay 1 1)))
   (if ovs
       (dolist (ov ovs)
         (move-overlay ov 1 1))
