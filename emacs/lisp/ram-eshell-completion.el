@@ -149,6 +149,15 @@
 
 ;;* post functions
 
+;; how to get a trace from commands in 'post-command-hook
+;; credit to Johan Bockgård
+;; https://lists.gnu.org/archive/html/emacs-devel/2010-07/msg01410.html
+(defadvice ram-eshell--completion-post (around intercept activate)
+  (condition-case err
+      ad-do-it
+    ;; Let the debugger run
+    ((debug error) (signal (car err) (cdr err)))))
+
 (defun ram-eshell--completion-post ()
   (let* ((inserted-char
           (if (eq this-command 'self-insert-command)
