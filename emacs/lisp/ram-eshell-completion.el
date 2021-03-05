@@ -312,7 +312,6 @@
 
 (defun ram-eshell--display-candidates ()
   "Display completion candidates. "
-  (setq ram-eshell-displayed-candidate 0)
   (if ram-eshell-history
       (let ((str (ram-eshell--make-display-candidates-string ram-eshell-history)))
         ;; (overlay-put ov-candidates 'after-string nil)
