@@ -434,13 +434,29 @@
 
 ;;;###autoload
 (defun ram-eshell-completion-send-input ()
-  "Clean input, enable `ram-eshell-completion-mode' and run `eshell-send-input'."
+  "Run `eshell-send-input'  with `ram-eshell-displayed-candidate' candidate.
+ Enable `ram-eshell-completion-mode'."
   (interactive)
-  (ram-eshell-completion--trim-input-right)
+  ;; if input is empty, do not insert candidate from history
+  (when (not (string= "" (string-trim (buffer-substring-no-properties
+                                (save-excursion (eshell-bol) (point)) (point-at-eol)))))
+    (delete-region (eshell-bol) (point-at-eol))
+    (insert (string-trim (nth ram-eshell-displayed-candidate ram-eshell-history))))
   (eshell-send-input)
   (if ram-eshell-completion-mode
       (ram-eshell-completion--set-vars)
     (ram-eshell-completion-mode 1)))
+
+;;;###autoload
+(defun ram-eshell-completion-insert-candidate-as-input ()
+  "Insert `ram-eshell-displayed-candidate' candidate as input.
+Disable `ram-eshell-completion-mode."
+  (interactive)
+  (when ram-eshell-completion-mode
+      (ram-eshell-completion--set-vars)
+      (ram-eshell-completion-mode -1))
+  (delete-region (eshell-bol) (point-at-eol))
+  (insert (string-trim (nth ram-eshell-displayed-candidate ram-eshell-history))))
 
 (defun ram-eshell-completion-delete-backward-char ()
   "Delete char in `search-substrings'."
