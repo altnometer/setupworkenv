@@ -88,7 +88,6 @@
       (overlay-put ov 'face '((:foreground "green")))))
   (ram-eshell-reset-candidates (delete-dups
                                 (ring-elements eshell-history-ring)))
-  (setq ram-eshell-displayed-candidate 0)
   (let ((input (buffer-substring-no-properties
                 (save-excursion (eshell-bol) (point)) (point-at-eol))))
     (cond
@@ -98,7 +97,8 @@
       (setq search-substrings (cons "" (split-string input " " t "[[:space:]]+")))
       (ram-eshell-reset-candidates
        (orderless-filter (string-join search-substrings " ") ram-eshell-history))
-      (ram-eshell--insert-candidate))
+      ;; (ram-eshell--insert-candidate)
+      (ram-eshell--display-candidates))
      (t (setq search-substrings (list ""))))))
 
 (defun ram-eshell-completion--trim-input-right ()
