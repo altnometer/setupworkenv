@@ -399,8 +399,8 @@
 
 ;;** keymap|bindings: functions
 
-(defun ram-eshell-completion-prev ()
-  "Insert previous history candidate."
+(defun ram-eshell-completion-next ()
+  "Insert next history candidate."
   (interactive)
   (if (not (ram-eshell-completion--continues-p))
       (progn (setq this-command 'eshell-previous-matching-input-from-input)
@@ -410,8 +410,8 @@
           (% (1+ ram-eshell-displayed-candidate) (seq-length ram-eshell-history)))
     (ram-eshell--insert-candidate ram-eshell-displayed-candidate)))
 
-(defun ram-eshell-completion-next ()
-  "Insert next history candidate."
+(defun ram-eshell-completion-prev ()
+  "Insert prev history candidate."
   (interactive)
   (if (not (ram-eshell-completion--continues-p))
       ;; (eshell-next-matching-input-from-input 1)
