@@ -131,16 +131,24 @@
   (move-overlay ov-candidates 1 1))
 
 ;;;###autoload
+
+;; (defun ram-eshell-completion-toggle-mode ()
+;;   "Toggle `ram-eshell-completion-mode'."
+;;   (interactive)
+;;   (if ram-eshell-completion-mode
+;;       (let ((search-string (string-join (reverse search-substrings) " ")))
+;;         (ram-eshell-completion-mode -1)
+;;         (eshell-bol)
+;;         (delete-region (point) (point-at-eol))
+;;         (insert search-string)
+;;         (end-of-line))
+;;     (ram-eshell-completion-mode)))
+
 (defun ram-eshell-completion-toggle-mode ()
   "Toggle `ram-eshell-completion-mode'."
   (interactive)
   (if ram-eshell-completion-mode
-      (let ((search-string (string-join (reverse search-substrings) " ")))
-        (ram-eshell-completion-mode -1)
-        (eshell-bol)
-        (delete-region (point) (point-at-eol))
-        (insert search-string)
-        (end-of-line))
+      (ram-eshell-completion-mode -1)
     (ram-eshell-completion-mode)))
 
 ;;* pre functions
