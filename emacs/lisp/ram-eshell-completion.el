@@ -225,10 +225,7 @@
                         (add-text-properties from (length string)
                                              '(face ((:background "grey"))) string)
                         string))))
-      ;; (setq old-props (get-old-props 0))
-      (highlight 0 (get-old-props 0))
-      ;; (text-property-any 0 (length string) 'face 'ram-eshell-completion--hl-match-face string)
-      )))
+      (highlight 0 (get-old-props 0)))))
 
 (defun ram-eshell--completion-highligth-matches (ovs search-substrings)
   "Highlight matches."
