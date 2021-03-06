@@ -198,6 +198,38 @@
       (ram-eshell--completion-highlight-string-matches string (cdr search-substrings)))
     string))
 
+(defun ram-eshell--completion-highlight-selected-candidate (string)
+  "Highlight STRING preserving other highlighting."
+  (let ((face 'ram-eshell-completion--hl-match-face)
+        old-props)
+    (cl-labels
+        ((get-old-props (search-from)
+                        (let* ((prop-beg (text-property-any
+                                          search-from
+                                          (length string) 'face face string))
+                               (prop-end (and prop-beg
+                                              (text-property-not-all
+                                               prop-beg (length string) 'face face string))))
+                          (cond
+                           ((not prop-beg) nil)
+                           ((not prop-end) (list (cons prop-beg (length string))))
+                           (t (cons (cons prop-beg prop-end) (get-old-props prop-end))))))
+         (highlight (from exclude)
+                    (let ((exclude-beg (car (car exclude)))
+                          (exclude-end (cdr (car exclude))))
+                      (if exclude
+                          (progn
+                            (add-text-properties from exclude-beg
+                                                 '(face ((:background "grey"))) string)
+                            (highlight exclude-end (cdr exclude)))
+                        (add-text-properties from (length string)
+                                             '(face ((:background "grey"))) string)
+                        string))))
+      ;; (setq old-props (get-old-props 0))
+      (highlight 0 (get-old-props 0))
+      ;; (text-property-any 0 (length string) 'face 'ram-eshell-completion--hl-match-face string)
+      )))
+
 (defun ram-eshell--completion-highligth-matches (ovs search-substrings)
   "Highlight matches."
   (when (and ovs search-substrings)
@@ -313,7 +345,7 @@
                          (setq new-str (ram-eshell-completion--resize-str str))
                        (setq new-str str))
                      (when (= counter ram-eshell-displayed-candidate)
-                       (setq new-str (propertize new-str 'face '((:background "grey")))))
+                       (setq new-str (ram-eshell--completion-highlight-selected-candidate new-str)))
                      (setq counter (1+ counter))
                      new-str))
                   candidates "\n")))))
