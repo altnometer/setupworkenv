@@ -9,8 +9,26 @@
 ;;** variables: ram-eshell-completion-mode
 
 (defface ram-eshell-completion--hl-match-face
+  '((t :foreground "green3"
+       ;; :background "grey"
+       ;; :weight bold
+       ;; :underline t
+       ))
+  "Face for highlighting matches in displayed candidates."
+  :group 'ram-eshell--completion)
+
+(defface ram-eshell-completion--hl-match-selected-face
+  '((t :foreground "green3"
+       :background "light gray"
+       ;; :weight bold
+       ;; :underline t
+       ))
+  "Face for highlighting matches in selected candidates."
+  :group 'ram-eshell--completion)
+
+(defface ram-eshell-completion--hl-selected-face
   '((t :foreground "black"
-       :background "aquamarine"
+       :background "light grey"
        ;; :weight bold
        ;; :underline t
        ))
@@ -199,17 +217,20 @@
     string))
 
 (defun ram-eshell--completion-highlight-selected-candidate (string)
-  "Highlight STRING preserving other highlighting."
-  (let ((face 'ram-eshell-completion--hl-match-face)
+  "Highlight STRING and re-highlight existing highlighting."
+  (let ((hl-old-face 'ram-eshell-completion--hl-match-face)
+        ;; change old highlighting to match backgrounds with "selected" face
+        (rehl-old-face 'ram-eshell-completion--hl-match-selected-face)
+        (hl-face 'ram-eshell-completion--hl-selected-face)
         old-props)
     (cl-labels
         ((get-old-props (search-from)
                         (let* ((prop-beg (text-property-any
                                           search-from
-                                          (length string) 'face face string))
+                                          (length string) 'face hl-old-face string))
                                (prop-end (and prop-beg
                                               (text-property-not-all
-                                               prop-beg (length string) 'face face string))))
+                                               prop-beg (length string) 'face hl-old-face string))))
                           (cond
                            ((not prop-beg) nil)
                            ((not prop-end) (list (cons prop-beg (length string))))
@@ -220,10 +241,12 @@
                       (if exclude
                           (progn
                             (add-text-properties from exclude-beg
-                                                 '(face ((:background "grey"))) string)
+                                                 `(face ,hl-face) string)
+                            (add-text-properties  exclude-beg exclude-end
+                                                  `(face ,rehl-old-face) string)
                             (highlight exclude-end (cdr exclude)))
                         (add-text-properties from (length string)
-                                             '(face ((:background "grey"))) string)
+                                             `(face ,hl-face) string)
                         string))))
       (highlight 0 (get-old-props 0)))))
 
