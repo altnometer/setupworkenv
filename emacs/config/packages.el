@@ -124,70 +124,76 @@
 (straight-use-package
  '(company :type git :flavor melpa :host github :repo "company-mode/company-mode"))
 
-(add-hook 'after-init-hook 'global-company-mode)
+;; (require 'company)
+
+;; (add-hook 'after-init-hook 'global-company-mode)
 (setq company-minimum-prefix-length 0)
 ;; upper case, lower case ignore when searching.
 (setq completion-ignore-case nil)
 (setq company-dabbrev-ignore-case nil)
 ;; do not downcase (lower case) the candidates (if upper case exist)
 (setq company-dabbrev-downcase nil)
+(setq company-transformers '(company-sort-by-backend-importance))
 
 (setq company-idle-delay nil)
 
-(with-eval-after-load 'company
-  ;; (define-key global-map (kbd "s-c") 'company-complete)
-  (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
-  (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
-  (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+;; (define-key global-map (kbd "s-c") 'company-complete)
+;; (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+;; originally bound to #'dabbrev-completion
+(global-set-key (kbd "C-M-/") #'company-complete)
 
-  (define-key company-active-map (kbd "M-n") nil)
-  (define-key company-active-map (kbd "M-p") nil)
-  (define-key company-active-map (kbd "C-n") #'company-select-next)
-  (define-key company-active-map (kbd "C-p") #'company-select-previous)
+(setq company-backends
+      '(
+        (company-capf company-dabbrev)
+        (
+         company-files
+         company-dabbrev
+         company-gtags
+         company-etags
+         company-keywords
+         company-capf
+         company-yasnippet)
+        (company-abbrev company-dabbrev)))
 
-  (setq company-backends
-        '(
-          (company-capf company-dabbrev)
-          (
-           company-files
-           company-dabbrev
-           company-gtags
-           company-etags
-           company-keywords
-           company-capf
-           company-yasnippet)
-          (company-abbrev company-dabbrev)))
+(add-hook 'emacs-lisp-mode-hook 'company-mode)
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 '((company-elisp company-dabbrev-code company-files)))))
 
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (set (make-local-variable 'company-backends)
-                   (list '(company-capf :with company-dabbrev)
-                         (car company-backends)))))
+(add-hook 'lisp-interaction-mode-hook 'company-mode)
+(add-hook 'lisp-interaction-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 '((company-elisp company-dabbrev-code company-files)))))
 
-  (add-hook 'clojure-mode-hook
-            (lambda ()
-              (set (make-local-variable 'company-backends)
-                   (list '(company-capf)))))
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 (list '(company-capf)))))
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 (list '(company-capf)))))
 
-  ;; (add-hook 'emacs-lisp-mode-hook
-  ;;         (lambda ()
-  ;;           (set (make-local-variable 'company-backends)
-  ;;                (list
-  ;;                 (cons '(company-capf :with company-dabbrev)
-  ;;                       (car company-backends))))))
+;; (add-hook 'emacs-lisp-mode-hook
+;;         (lambda ()
+;;           (set (make-local-variable 'company-backends)
+;;                (list
+;;                 (cons '(company-capf :with company-dabbrev)
+;;                       (car company-backends))))))
 
-  ;; ;; if you want to append to the end of the list.
-  ;; (append (car company-backends)
-  ;;         (list 'company-elisp))
+;; ;; if you want to append to the end of the list.
+;; (append (car company-backends)
+;;         (list 'company-elisp))
 
-  ;; (with-eval-after-load 'company
-  ;;   (add-hook 'emacs-lisp-mode 'company-mode)
-  ;;   (add-hook 'cider-repl-mode-hook 'company-mode)
-  ;;   (add-hook 'cider-mode-hook 'company-mode))
+;; (add-hook 'cider-repl-mode-hook 'company-mode)
+;; (add-hook 'cider-mode-hook 'company-mode)
 
-  ;; (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
-  ;; (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
-  )
+
+;; (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+;; (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+
 
 
 ;;* emacs-lisp elisp
