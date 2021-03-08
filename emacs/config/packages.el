@@ -3031,10 +3031,15 @@ With \\[universal-argument] do it for the current file instead."
 ;;** packages: keycast
 
 (straight-use-package
+ '(moody :type git :flavor melpa :host github :repo "tarsius/moody"))
+(require 'moody)
+
+(straight-use-package
  '(keycast :type git :flavor melpa :host github :repo "tarsius/keycast"))
 (setq keycast-insert-after " -- ")
 (setq keycast-remove-tail-elements nil)
 (setq keycast-separator-width 2)
+(setq keycast-window-predicate 'moody-window-active-p)
 (keycast-mode)
 
 ;;** packages: recentf
