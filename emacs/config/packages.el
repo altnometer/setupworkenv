@@ -272,6 +272,7 @@
 
 ;;** eshell: history
 
+(add-hook 'eshell-pre-command-hook #'eshell-save-some-history)
 (setq eshell-history-size 10000)
 (setq eshell-hist-ignoredups t)
 (setq eshell-input-filter
@@ -292,6 +293,9 @@
 (with-eval-after-load "esh-mode"
   (define-key eshell-mode-map (kbd "S-SPC") #'ram-eshell-completion-toggle-mode)
   (define-key eshell-mode-map (kbd "<return>") #'ram-eshell-completion-send-input))
+(with-eval-after-load "esh-mode"
+  (define-key eshell-mode-map (kbd "S-SPC") #'ram-eshell-completion-toggle-mode)
+  (define-key eshell-mode-map (kbd "<C-return>") #'ram-eshell-completion-insert-candidate-as-input))
 
 ;;** eshell: settings
 
@@ -300,6 +304,9 @@
 ;; the previous settings do not seem to work, hence the following two lines:
 (remove-hook 'eshell-output-filter-functions 'eshell-postoutput-scroll-to-bottom)
 (remove-hook 'eshell-output-filter-functions 'eshell-preinput-scroll-to-bottom)
+
+(add-to-list 'eshell-output-filter-functions #'eshell-truncate-buffer)
+(setq eshell-buffer-maximum-lines 1000)
 
 ;;* magit
 (straight-use-package
