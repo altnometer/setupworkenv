@@ -3017,6 +3017,49 @@ With \\[universal-argument] do it for the current file instead."
 (straight-use-package
  '(iedit :type git :flavor melpa :host github :repo "victorhge/iedit"))
 
+;;** packages: imenu
+
+(setq imenu-use-markers t)
+(setq imenu-auto-rescan t)
+(setq imenu-auto-rescan-maxout 600000)
+(setq imenu-max-item-length 100)
+(setq imenu-use-popup-menu nil)
+(setq imenu-eager-completion-buffer t)
+(setq imenu-space-replacement " ")
+(setq imenu-level-separator "/")
+
+;; based on prot/imenu-vertical
+;; https://gitlab.com/protesilaos/dotfiles/
+;; until /commit/960bcf8a5df304f77517ee92ade1627c0c57336f
+(defun prot/imenu-vertical ()
+  "Use a vertical Icomplete layout for `imenu'.
+Configure `orderless-matching-styles' for this command."
+  (interactive)
+  (let ((orderless-matching-styles
+         '(orderless-literal
+           orderless-regexp
+           orderless-prefixes)))
+    (setq this-command 'imenu)        ; let `embark' know what this is
+    (icomplete-vertical-do (:height (/ (frame-height) 4))
+      (call-interactively 'imenu))))
+
+;; based on prot/imenu-recenter-pulse
+;; https://gitlab.com/protesilaos/dotfiles/
+;; until /commit/960bcf8a5df304f77517ee92ade1627c0c57336f
+(defun prot/imenu-recenter-pulse ()
+  "Recenter `imenu' position at the top with subtle feedback."
+  (let ((pulse-delay 0.05))
+    (recenter 0)
+    (pulse-momentary-highlight-one-line (point) 'modus-theme-intense-red)))
+
+(add-hook 'imenu-after-jump-hook #'prot/imenu-recenter-pulse)
+(add-hook 'imenu-after-jump-hook (lambda ()
+                                   (when (and (eq major-mode 'org-mode)
+                                              (org-at-heading-p))
+                                     (org-show-entry)
+                                     (org-reveal t))))
+(define-key global-map (kbd "M-g d") #'prot/imenu-vertical)
+(define-key global-map (kbd "M-g M-d") #'prot/imenu-vertical)
 
 ;;** packages: iy-go-to-char
 
