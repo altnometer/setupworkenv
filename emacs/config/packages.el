@@ -1555,6 +1555,15 @@ one, an error is signaled."
   (setq git-gutter:buffer-hunks 1)
   (setq git-gutter:statistic 1))
 
+(add-to-list 'window-buffer-change-functions
+             (lambda (frame)
+               "Call `git-gutter' when buffer changes."
+               (let ((buffer
+                      (window-buffer (frame-selected-window frame))))
+                 (with-current-buffer buffer
+                   (when vc-mode
+                     (git-gutter))))))
+
 
 ;;* hydra
 (straight-use-package
