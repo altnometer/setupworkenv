@@ -67,6 +67,9 @@
    (format "\\(?:(%s)\\)?" ram-eshell-message-no-matches))
   "Regex used to trim the input from `ram-eshell-completion-mode' messages.")
 
+(defvar ram-eshell-min-char-to-start-completion 2
+  "Restricts number of displayed completion candidates.")
+
 (defvar ram-eshell-num-of-displayed-candidates 6
   "Restricts number of displayed completion candidates.")
 
@@ -184,20 +187,38 @@
     ;; Let the debugger run
     ((debug error) (signal (car err) (cdr err)))))
 
+;; (defun ram-eshell--completion-post ()
+;;   (let* ((inserted-char
+;;           (if (eq this-command 'self-insert-command)
+;;               (this-command-keys))))
+;;     (cond
+;;      ;; ((not (or (string= inserted-char " ")
+;;      ;;           (null inserted-char)))
+;;      ;;  (ram-eshell--handle-ins-non-spc inserted-char))
+;;      ((not (or (string= inserted-char " ")
+;;                (null inserted-char)))
+;;       (ram-eshell--handle-post-command))
+;;      ((string= inserted-char " ")
+;;       (ram-eshell--handle-post-command)
+;;       ;; (ram-eshell--handle-ins-spc)
+;;       )
+;;      ((eq this-command 'eshell-interrupt-process)
+;;       ;; (delete-region (eshell-bol) (point-at-eol))
+;;       (ram-eshell-completion--set-vars))
+;;      (t "message: unaccounted condition"))))
+
 (defun ram-eshell--completion-post ()
-  (let* ((inserted-char
-          (if (eq this-command 'self-insert-command)
-              (this-command-keys))))
-    (cond
-     ((not (or (string= inserted-char " ")
-               (null inserted-char)))
-      (ram-eshell--handle-ins-non-spc inserted-char))
-     ((string= inserted-char " ")
-      (ram-eshell--handle-ins-spc))
-     ((eq this-command 'eshell-interrupt-process)
-      ;; (delete-region (eshell-bol) (point-at-eol))
-      (ram-eshell-completion--set-vars))
-     (t "message: unaccounted condition"))))
+  ;; (message "???? this command is: %s" this-command)
+  (cond
+   ((memq this-command '(self-insert-command
+                         kill-region
+                         yank
+                         delete-backward-char
+                         delete-char))
+    (ram-eshell-completion--set-vars))
+   ((eq this-command 'eshell-interrupt-process)
+    (ram-eshell-completion--set-vars))
+   (t nil)))
 
 ;;** post secondary functions
 
@@ -429,18 +450,79 @@
       (message (format ">>> search string: %s" (string-join search-substrings " * ")))
       (message (format ">>> candidates num: %s" (seq-length candidates))))))
 
+(defun ram-eshell-completion--subset-of-substrings-p (l1 l2)
+  "True if L1 is a subset of corresponding substrings in L2."
+  (cl-labels ((substringp
+               (str1 str2)
+               (if (< (length str1) (length str2))
+                   (if (string= str1 (substring str2 0 (length str1)))
+                       t
+                     (substringp str1 (substring str2 1 (length str2))))
+                 (and str1 str2 (string= str1 str2)))))
+    (cond
+     ((and l1 (not l2)) nil)
+     ((not l1) t)
+     ((substringp (car l1) (car l2))
+      (ram-eshell-completion--subset-of-substrings-p (cdr l1) (cdr l2)))
+     (t nil))))
+
 (defun ram-eshell--handle-ins-non-spc (char)
   (message (format "\n**** not empty space, char: %s" char))
   (message (format "**** search substr: %s" search-substrings))
-  ;; (when (not (null candidates)) (setq candidates nil))
-  (setcar search-substrings (concat (car search-substrings) char))
+  (let ((new-search-substrings
+         (split-string (buffer-substring-no-properties
+                        (save-excursion (eshell-bol) (point))
+                        (point-at-eol))))
+        (old-search-substrings search-substrings))
+    (setq search-substrings new-search-substrings)
+    ;; if old search substrings are the subset of new ones, then
+    ;; reuse candidates from previous search to narrow them further
+    (if (ram-eshell-completion--subset-of-substrings-p
+         search-substrings
+         new-search-substrings)
+        (ram-eshell-reset-candidates (orderless-filter
+                                      (string-join search-substrings " ") ram-eshell-history))
+      (ram-eshell-reset-candidates (orderless-filter
+                                  (string-join search-substrings " ")
+                                  (delete-dups
+                                   (ring-elements eshell-history-ring))))))
   (message (format "**** search substr: %s" search-substrings))
-  (ram-eshell-reset-candidates (orderless-filter
-                                (string-join search-substrings " ") ram-eshell-history))
-  (when (or (not (null (cdr search-substrings)))
+(when (or (not (null (cdr search-substrings)))
             (>= (seq-length (car search-substrings)) 2))
     ;; (ram-eshell--insert-candidate)
-    (ram-eshell--display-candidates)))
+  (ram-eshell--display-candidates)))
+
+(defun ram-eshell--handle-post-command ()
+  (message (format "**** old search substrings: %s" search-substrings))
+  (let ((old-search-substrings search-substrings)
+        (new-search-substrings
+         (split-string (buffer-substring-no-properties
+                        (save-excursion (eshell-bol) (point))
+                        (point-at-eol)))))
+    (setq search-substrings new-search-substrings)
+    ;; if old search substrings are the subset of new ones, then
+    ;; reuse candidates from previous search to narrow them further
+    (if (ram-eshell-completion--subset-of-substrings-p
+         old-search-substrings
+         new-search-substrings)
+        (ram-eshell-reset-candidates (orderless-filter
+                                      (string-join search-substrings " ") ram-eshell-history))
+      (ram-eshell-reset-candidates (orderless-filter
+                                    (string-join search-substrings " ")
+                                    (delete-dups
+                                     (ring-elements eshell-history-ring)))))
+    (message (format "**** new search substrings: %s" search-substrings))
+    ;; check if any search substring long enough to start completion
+    (when (cl-labels ((item-len-greater-than-p
+                       (l num)
+                       (if (not l)
+                           nil
+                         (if (> (length (car l)) num)
+                             t
+                           (item-len-greater-than-p (cdr l) num)))))
+            (item-len-greater-than-p
+             search-substrings (1- ram-eshell-min-char-to-start-completion)))
+      (ram-eshell--display-candidates))))
 
 ;;* keymap
 
@@ -454,14 +536,15 @@
 
   (define-key ram-eshell-completion-mode-map (kbd "M-p") #'ram-eshell-completion-prev)
   (define-key ram-eshell-completion-mode-map (kbd "M-n") #'ram-eshell-completion-next)
-  (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-delete-backward-char)
-  (define-key ram-eshell-completion-mode-map (kbd "<M-backspace>") #'ram-eshell-completion-backward-kill-word)
-  (define-key ram-eshell-completion-mode-map (kbd "C-f") #'ram-eshell-completion-forward-char)
-  (define-key ram-eshell-completion-mode-map (kbd "C-b") #'ram-eshell-completion-backward-char)
-  (define-key ram-eshell-completion-mode-map (kbd "M-f") #'ram-eshell-completion-forward-word)
-  (define-key ram-eshell-completion-mode-map (kbd "M-b") #'ram-eshell-completion-backward-word)
-  (define-key ram-eshell-completion-mode-map (kbd "C-a") #'ram-eshell-completion-beginning-of-line)
-  (define-key ram-eshell-completion-mode-map (kbd "C-e") #'ram-eshell-completion-end-of-line))
+  ;; (define-key ram-eshell-completion-mode-map (kbd "<backspace>") #'ram-eshell-completion-delete-backward-char)
+  ;; (define-key ram-eshell-completion-mode-map (kbd "<M-backspace>") #'ram-eshell-completion-backward-kill-word)
+  ;; (define-key ram-eshell-completion-mode-map (kbd "C-f") #'ram-eshell-completion-forward-char)
+  ;; (define-key ram-eshell-completion-mode-map (kbd "C-b") #'ram-eshell-completion-backward-char)
+  ;; (define-key ram-eshell-completion-mode-map (kbd "M-f") #'ram-eshell-completion-forward-word)
+  ;; (define-key ram-eshell-completion-mode-map (kbd "M-b") #'ram-eshell-completion-backward-word)
+  ;; (define-key ram-eshell-completion-mode-map (kbd "C-a") #'ram-eshell-completion-beginning-of-line)
+  ;; (define-key ram-eshell-completion-mode-map (kbd "C-e") #'ram-eshell-completion-end-of-line)
+  )
 
 ;;** keymap|bindings: functions
 
