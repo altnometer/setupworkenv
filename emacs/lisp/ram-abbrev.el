@@ -48,7 +48,8 @@
       '(
         ("df" "defun")
         ("la" "lambda")
-        ("lam" "lambda")))
+        ("lam" "lambda")
+        ("rec" "ram-eshell-completion-")))
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   emacs-lisp-abbrevs)
