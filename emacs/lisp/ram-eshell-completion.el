@@ -582,35 +582,26 @@ Set `ram-eshell-history' to eshell-history-ring."
 ;;** keymap|bindings: functions
 
 (defun ram-eshell-completion-next ()
-  "Insert next history candidate."
+  "Move to next history candidate.
+Increment `ram-eshell-displayed-candidate'."
   (interactive)
-  (if (not (ram-eshell-completion--continues-p))
-      (progn (setq this-command 'eshell-previous-matching-input-from-input)
-             (eshell-previous-matching-input-from-input 1)
-             (ram-eshell-completion-mode -1))
-    (setq ram-eshell-displayed-candidate
-          (% (1+ ram-eshell-displayed-candidate)
-             (min
-              ram-eshell-num-of-displayed-candidates
-              (length ram-eshell-history))))
-    ;; (ram-eshell--insert-candidate ram-eshell-displayed-candidate)
-    (ram-eshell--display-candidates)))
+  (setq ram-eshell-displayed-candidate
+        (% (1+ ram-eshell-displayed-candidate)
+           (min
+            ram-eshell-num-of-displayed-candidates
+            (length ram-eshell-history))))
+  (ram-eshell--display-candidates))
 
 (defun ram-eshell-completion-prev ()
-  "Insert prev history candidate."
+  "Move to previous history candidate.
+Decrement `ram-eshell-displayed-candidate'."
   (interactive)
-  (if (not (ram-eshell-completion--continues-p))
-      ;; (eshell-next-matching-input-from-input 1)
-      (progn (setq this-command 'eshell-next-matching-input-from-input)
-             (eshell-next-matching-input-from-input 1)
-             (ram-eshell-completion-mode -1))
-    (if (<= ram-eshell-displayed-candidate 0)
-        (setq ram-eshell-displayed-candidate (1- (min
-                                                  ram-eshell-num-of-displayed-candidates
-                                                  (length ram-eshell-history))))
-      (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate)))
-    ;; (ram-eshell--insert-candidate ram-eshell-displayed-candidate)
-    (ram-eshell--display-candidates)))
+  (if (<= ram-eshell-displayed-candidate 0)
+      (setq ram-eshell-displayed-candidate (1- (min
+                                                ram-eshell-num-of-displayed-candidates
+                                                (length ram-eshell-history))))
+    (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate)))
+  (ram-eshell--display-candidates))
 
 ;;;###autoload
 (defun ram-eshell-completion-send-input ()
