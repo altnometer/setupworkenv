@@ -79,9 +79,16 @@
     (setq ov-candidates (make-overlay 1 1)))
   (ram-eshell-completion--reset-history))
 
+(defun ram-eshell-completion--delete-vars ()
+  "Delete ram-eshell-completion-mode variables."
+  (delete-overlay ov-candidates)
+  (kill-local-variable 'search-substrings)
+  (kill-local-variable 'ram-eshell-history)
+  (kill-local-variable 'ram-eshell-displayed-candidate)
+  (kill-local-variable 'ram-eshell-completion--displaying-candidates-p))
+
 (defun ram-eshell-completion--reset-history ()
-  "Reset search history to the total command history.
-Set `ram-eshell-history' to eshell-history-ring."
+  "Set `ram-eshell-history' to eshell-history-ring."
   ;; (message "((((((( reseting history")
   (setq ram-eshell-displayed-candidate 0)
   (setq ram-eshell-history
@@ -93,16 +100,6 @@ Set `ram-eshell-history' to eshell-history-ring."
   (setq ram-eshell-completion--displaying-candidates-p nil)
   (overlay-put ov-candidates 'after-string nil)
   (move-overlay ov-candidates 1 1))
-
-(defun ram-eshell-completion--continues-p ()
-  "True if we are in the middle of searching for a completion candidate."
-  (not (and (string= "" (car search-substrings))
-            (null (cdr search-substrings)))))
-
-(defun ram-eshell-completion--delete-vars ()
-  "Delete ram-eshell-completion-mode variables."
-  (delete-overlay ov-candidates)
-  (kill-local-variable 'search-substrings))
 
 ;;;###autoload
 
@@ -145,7 +142,7 @@ Set `ram-eshell-history' to eshell-history-ring."
    ;;  (ram-eshell-completion--set-vars))
    (t nil)))
 
-;;* functions: make display cadidates
+;;* functions: make display candidates
 
 (defun ram-eshell--completion-highlight-string-matches (string search-substrings)
   "Highlight SEARCH-SUBSTRINGS matches in STRING."
@@ -361,8 +358,15 @@ Set `ram-eshell-history' to eshell-history-ring."
 
 ;;* keymap
 
+(defvar ram-eshell-completion-mode-map nil
+  "Keymap for `ram-eshell-completion-mode'")
+
+(setq ram-eshell-completion-mode-map (make-sparse-keymap))
+
+;;** keymap: emulation-mode-map-alists
+
 ;; adapted from `company-mode' keymap handling
-(defvar-local ram-eshell-completion-active-keymap
+(defvar ram-eshell-completion-active-keymap
   (let ((keymap (make-sparse-keymap)))
     (define-key keymap "\M-p" #'ram-eshell-completion-prev)
     (define-key keymap "\M-n" #'ram-eshell-completion-next)
@@ -387,15 +391,7 @@ Set `ram-eshell-history' to eshell-history-ring."
 (defun ram-eshell-completion-uninstall-map ()
   (setf (cdar ram-eshell-completion-emulation-alist) nil))
 
-;;** keymap: bindings
-
-(defvar ram-eshell-completion-mode-map nil
-  "Keymap for `ram-eshell-completion-mode'")
-
-(progn
-  (setq ram-eshell-completion-mode-map (make-sparse-keymap)))
-
-;;** keymap|bindings: functions
+;;** keymap: commands
 
 (defun ram-eshell-completion-next ()
   "Move to next history candidate.
@@ -419,7 +415,6 @@ Decrement `ram-eshell-displayed-candidate'."
     (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate)))
   (ram-eshell--display-candidates))
 
-;;;###autoload
 (defun ram-eshell-completion-send-input ()
   "Run `eshell-send-input'  with `ram-eshell-displayed-candidate' candidate."
   (interactive)
@@ -435,7 +430,6 @@ Decrement `ram-eshell-displayed-candidate'."
       (ram-eshell-completion--reset-history)))
   (eshell-send-input))
 
-;;;###autoload
 (defun ram-eshell-completion-insert-candidate-as-input ()
   "Insert `ram-eshell-displayed-candidate' candidate as input.
 Disable `ram-eshell-completion-mode."
