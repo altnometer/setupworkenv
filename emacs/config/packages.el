@@ -1490,7 +1490,7 @@ one, an error is signaled."
     (outline-map-region 'outline-hide-subtree (point-min) (point-max))
     (move-beginning-of-line 1))
 
-(defun ram-toggle-narrow-to-subtree (arg)
+(defun ram-toggle-narrow-outline-heading (arg)
   "Toggle narrow and widen from anywhere in subtree."
   (interactive "p")
   (if (buffer-narrowed-p)
@@ -1526,7 +1526,7 @@ one, an error is signaled."
 (define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
 (define-key ram-leader-map-tap-global (kbd "u") #'outline-up-heading)
 (define-key ram-leader-map-tap-global (kbd "d") #'prot/outline-down-heading)
-(define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-to-subtree)
+(define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-outline-heading)
 
 ;;* hideshow
 
