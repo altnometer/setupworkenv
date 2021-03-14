@@ -1,10 +1,10 @@
-;;; ram-eshell-completion.el --- Complete eshell history. -*- lexical-binding: t; -*-
+;;; rec.el --- Complete eshell history. -*- lexical-binding: t; -*-
 
 (provide 'ram-eshell-completion)
 
 ;;* faces
 
-(defface ram-eshell-completion--hl-match-face
+(defface rec--hl-match-face
   '((t :foreground "green3"
        ;; :background "grey"
        ;; :weight bold
@@ -13,7 +13,7 @@
   "Face for highlighting matches in displayed candidates."
   :group 'ram-eshell--completion)
 
-(defface ram-eshell-completion--hl-match-selected-face
+(defface rec--hl-match-selected-face
   '((t :foreground "green3"
        :background "light gray"
        ;; :weight bold
@@ -22,7 +22,7 @@
   "Face for highlighting matches in selected candidates."
   :group 'ram-eshell--completion)
 
-(defface ram-eshell-completion--hl-selected-face
+(defface rec--hl-selected-face
   '((t :foreground "black"
        :background "light grey"
        ;; :weight bold
@@ -39,13 +39,13 @@
 (defvar ram-eshell-num-of-displayed-candidates 6
   "Restricts number of displayed completion candidates.")
 
-(defvar ram-eshell-completion--length-of-displayed-candidate 60
+(defvar rec--length-of-displayed-candidate 60
   "Length of displayed candidate string.")
 
-(defvar ram-eshell-completion--max-length-word 16
+(defvar rec--max-length-word 16
   "Words over this length are truncated.")
 
-(defvar ram-eshell-completion--trancate-symbol "…"
+(defvar rec--trancate-symbol "…"
   "A substitute string for truncated parts.")
 
 ;;** variables: local
@@ -62,7 +62,7 @@
 (defvar-local ram-eshell-displayed-candidate nil
   "Indicate the number of the currently displayed candidate.")
 
-(defvar-local ram-eshell-completion--displaying-candidates-p nil
+(defvar-local rec--displaying-candidates-p nil
   "Indicate whether candidates are currently displayed.")
 
 ;;* secondary functions
@@ -72,22 +72,22 @@
   (setq ram-eshell-history candidates)
   (setq ram-eshell-displayed-candidate 0))
 
-(defun ram-eshell-completion--set-vars ()
+(defun rec--set-vars ()
   "Set ram-eshell-completion-mode variables."
   (if ov-candidates
-      (ram-eshell-completion--hide-completion-ov)
+      (rec--hide-completion-ov)
     (setq ov-candidates (make-overlay 1 1)))
-  (ram-eshell-completion--reset-history))
+  (rec--reset-history))
 
-(defun ram-eshell-completion--delete-vars ()
+(defun rec--delete-vars ()
   "Delete ram-eshell-completion-mode variables."
   (delete-overlay ov-candidates)
   (kill-local-variable 'search-substrings)
   (kill-local-variable 'ram-eshell-history)
   (kill-local-variable 'ram-eshell-displayed-candidate)
-  (kill-local-variable 'ram-eshell-completion--displaying-candidates-p))
+  (kill-local-variable 'rec--displaying-candidates-p))
 
-(defun ram-eshell-completion--reset-history ()
+(defun rec--reset-history ()
   "Set `ram-eshell-history' to eshell-history-ring."
   ;; (message "((((((( reseting history")
   (setq ram-eshell-displayed-candidate 0)
@@ -95,15 +95,14 @@
         (delete-dups
          (ring-elements eshell-history-ring))))
 
-(defun ram-eshell-completion--hide-completion-ov ()
+(defun rec--hide-completion-ov ()
   "Hide overlay displaying completion candidates."
-  (setq ram-eshell-completion--displaying-candidates-p nil)
+  (setq rec--displaying-candidates-p nil)
   (overlay-put ov-candidates 'after-string nil)
   (move-overlay ov-candidates 1 1))
 
 ;;;###autoload
-
-(defun ram-eshell-completion-toggle-mode ()
+(defun rec-toggle-mode ()
   "Toggle `ram-eshell-completion-mode'."
   (interactive)
   (if ram-eshell-completion-mode
@@ -112,23 +111,23 @@
 
 ;;* pre functions
 
-(defun ram-eshell--completion-pre ()
-  (ram-eshell-completion-uninstall-map))
+(defun rec--pre ()
+  (rec-uninstall-map))
 
 ;;* post functions
 
 ;; how to get a trace from commands in 'post-command-hook
 ;; credit to Johan Bockgård
 ;; https://lists.gnu.org/archive/html/emacs-devel/2010-07/msg01410.html
-(defadvice ram-eshell--completion-post (around intercept activate)
+(defadvice rec--post (around intercept activate)
   (condition-case err
       ad-do-it
     ;; Let the debugger run
     ((debug error) (signal (car err) (cdr err)))))
 
-(defun ram-eshell--completion-post ()
-  (if ram-eshell-completion--displaying-candidates-p
-      (ram-eshell-completion-install-map))
+(defun rec--post ()
+  (if rec--displaying-candidates-p
+      (rec-install-map))
   (cond
    ((memq this-command '(self-insert-command
                          kill-region
@@ -137,14 +136,14 @@
                          delete-char))
     (ram-eshell--handle-post-command))
    ((eq this-command 'eshell-interrupt-process)
-    (ram-eshell-completion--set-vars))
+    (rec--set-vars))
    ;; ((null this-command)
-   ;;  (ram-eshell-completion--set-vars))
+   ;;  (rec--set-vars))
    (t nil)))
 
 ;;* functions: make display candidates
 
-(defun ram-eshell--completion-highlight-string-matches (string search-substrings)
+(defun rec--highlight-string-matches (string search-substrings)
   "Highlight SEARCH-SUBSTRINGS matches in STRING."
   (if search-substrings
     (let* ((r (car search-substrings)))
@@ -153,18 +152,18 @@
                         (when (string-match r string start)
                           (add-text-properties
                            (match-beginning 0) (match-end 0)
-                           '(face ram-eshell-completion--hl-match-face) string)
+                           '(face rec--hl-match-face) string)
                           (hl (match-end 0)))))
           (hl 0)))
-      (ram-eshell--completion-highlight-string-matches string (cdr search-substrings)))
+      (rec--highlight-string-matches string (cdr search-substrings)))
     string))
 
-(defun ram-eshell--completion-highlight-selected-candidate (string)
+(defun rec--highlight-selected-candidate (string)
   "Highlight STRING and re-highlight existing highlighting."
-  (let ((hl-old-face 'ram-eshell-completion--hl-match-face)
+  (let ((hl-old-face 'rec--hl-match-face)
         ;; change old highlighting to match backgrounds with "selected" face
-        (rehl-old-face 'ram-eshell-completion--hl-match-selected-face)
-        (hl-face 'ram-eshell-completion--hl-selected-face)
+        (rehl-old-face 'rec--hl-match-selected-face)
+        (hl-face 'rec--hl-selected-face)
         old-props)
     (cl-labels
         ((get-old-props (search-from)
@@ -193,7 +192,7 @@
                         string))))
       (highlight 0 (get-old-props 0)))))
 
-(defun ram-eshell-completion--crop-word (word substr)
+(defun rec--crop-word (word substr)
   "Crop WORD."
   (let ((front-segment (substring word 0 (string-match substr word)))
         beginning-part middle-part
@@ -215,51 +214,51 @@
                         word)
       (setq middle-part (match-string 1 word))
       (setq new-word (string-join (remove nil (vector beginning-part middle-part))
-                                  ram-eshell-completion--trancate-symbol)))
+                                  rec--trancate-symbol)))
     (when (and new-word
              (not (string= "" (match-string 2 word))))
-        (setq new-word (concat new-word ram-eshell-completion--trancate-symbol))
+        (setq new-word (concat new-word rec--trancate-symbol))
       (string-match substr new-word)
       (add-text-properties
        (match-beginning 0) (match-end 0)
-       '(face ram-eshell-completion--hl-match-face) new-word)
+       '(face rec--hl-match-face) new-word)
       new-word)))
 
-(defun ram-eshell-completion--resize-list (words length resized-p)
-  "Remove words that do not contain `ram-eshell-completion--hl-match-face'.
+(defun rec--resize-list (words length resized-p)
+  "Remove words that do not contain `rec--hl-match-face'.
   Keep removing until LENGTH is less than
-  `ram-eshell-completion--length-of-displayed-candidate'."
+  `rec--length-of-displayed-candidate'."
   (if (or (null words)
-           (<= length ram-eshell-completion--length-of-displayed-candidate))
+           (<= length rec--length-of-displayed-candidate))
       words
     (let* ((word (car words))
           (match-begining
-           (text-property-any 0 (length word) 'face 'ram-eshell-completion--hl-match-face word))
+           (text-property-any 0 (length word) 'face 'rec--hl-match-face word))
           match-end)
       (if match-begining
-          (if (>= (length word) ram-eshell-completion--max-length-word)
+          (if (>= (length word) rec--max-length-word)
               (progn
                 (setq match-end
-                     (text-property-not-all match-begining (length word) 'face 'ram-eshell-completion--hl-match-face word))
+                     (text-property-not-all match-begining (length word) 'face 'rec--hl-match-face word))
                (cons
-                (ram-eshell-completion--crop-word word (substring word match-begining match-end))
-                (ram-eshell-completion--resize-list (cdr words) length nil)))
-            (cons word (ram-eshell-completion--resize-list (cdr words) length nil)))
+                (rec--crop-word word (substring word match-begining match-end))
+                (rec--resize-list (cdr words) length nil)))
+            (cons word (rec--resize-list (cdr words) length nil)))
         (if resized-p
-            (ram-eshell-completion--resize-list (cdr words) (- length (length word)) resized-p)
-          (let ((replacement ram-eshell-completion--trancate-symbol))
+            (rec--resize-list (cdr words) (- length (length word)) resized-p)
+          (let ((replacement rec--trancate-symbol))
             (cons replacement
-                  (ram-eshell-completion--resize-list
+                  (rec--resize-list
                    (cdr words)
                    (- length (- (length word) (length replacement))) t))))))))
 
-(defun ram-eshell-completion--resize-str (str)
-  "Trim string to `ram-eshell-completion--length-of-displayed-candidate'."
+(defun rec--resize-str (str)
+  "Trim string to `rec--length-of-displayed-candidate'."
   (let* ((words (reverse (split-string str)))
          (num-spaces (1- (length words)))
          (str-len-no-spaces (- (length str) num-spaces)))
     (string-join (reverse
-                  (ram-eshell-completion--resize-list words str-len-no-spaces nil)) " ")))
+                  (rec--resize-list words str-len-no-spaces nil)) " ")))
 
 (defun ram-eshell--make-display-candidates-string (candidates)
   "Make a string of candidates that is displayed to the user."
@@ -271,29 +270,29 @@
              (length ram-eshell-history))
      (let ((counter 0))
        (mapconcat (lambda (str)
-                   (let ((str (ram-eshell--completion-highlight-string-matches
+                   (let ((str (rec--highlight-string-matches
                                (concat (string-trim str))
                                search-substrings))
                          new-str)
-                     (if (> (length str) ram-eshell-completion--length-of-displayed-candidate)
-                         (setq new-str (ram-eshell-completion--resize-str str))
+                     (if (> (length str) rec--length-of-displayed-candidate)
+                         (setq new-str (rec--resize-str str))
                        (setq new-str str))
                      (when (= counter ram-eshell-displayed-candidate)
-                       (setq new-str (ram-eshell--completion-highlight-selected-candidate new-str)))
+                       (setq new-str (rec--highlight-selected-candidate new-str)))
                      (setq counter (1+ counter))
                      new-str))
                   candidates "\n")))))
 
 (defun ram-eshell--display-candidates ()
   "Display completion candidates. "
-  (setq ram-eshell-completion--displaying-candidates-p t)
+  (setq rec--displaying-candidates-p t)
   (let ((str (ram-eshell--make-display-candidates-string ram-eshell-history)))
     ;; (overlay-put ov-candidates 'after-string nil)
     (move-overlay ov-candidates (point-at-eol) (point-at-eol))
     (overlay-put ov-candidates 'after-string str)
     (put-text-property 0 1 'cursor 0 str)))
 
-(defun ram-eshell-completion--subset-of-substrings-p (l1 l2)
+(defun rec--subset-of-substrings-p (l1 l2)
   "True if L1 is a subset of corresponding substrings in L2."
   (cl-labels ((substringp
                (str1 str2)
@@ -306,7 +305,7 @@
      ((and l1 (not l2)) nil)
      ((not l1) t)
      ((substringp (car l1) (car l2))
-      (ram-eshell-completion--subset-of-substrings-p (cdr l1) (cdr l2)))
+      (rec--subset-of-substrings-p (cdr l1) (cdr l2)))
      (t nil))))
 
 (defun ram-eshell--handle-post-command ()
@@ -321,8 +320,8 @@
      ((or (null search-substrings)
           (not (member t (mapcar (lambda (s) (not (string= "" s))) search-substrings))))
       ;; (message "(((((((( no search-substrings: %s" search-substrings)
-      (ram-eshell-completion--hide-completion-ov)
-      (ram-eshell-completion--reset-history))
+      (rec--hide-completion-ov)
+      (rec--reset-history))
      ;; all `search-substrings' strings are shorter than `ram-eshell-min-char-to-start-completion'
      ;; narrow search candidates, hide completion
      ((not (member t
@@ -330,12 +329,12 @@
                              (> (length s) (1- ram-eshell-min-char-to-start-completion)))
                            search-substrings)))
       ;; (message "(((((( no search-substrings long enough: %s" search-substrings)
-      (ram-eshell-completion--hide-completion-ov)
+      (rec--hide-completion-ov)
       (ram-eshell-reset-candidates (orderless-filter
                                     (string-join search-substrings " ") ram-eshell-history)))
      ;; old search substrings are the subset of new ones
      ;; reuse previous candidates to narrow them further
-     ((ram-eshell-completion--subset-of-substrings-p
+     ((rec--subset-of-substrings-p
        old-search-substrings
        new-search-substrings)
       ;; (message "(((((( search-substrings %s is a subset of %s" old-search-substrings new-search-substrings)
@@ -343,8 +342,8 @@
                                     (string-join search-substrings " ") ram-eshell-history))
       (if ram-eshell-history
           (progn (ram-eshell--display-candidates)
-                 (ram-eshell-completion-install-map))
-        (ram-eshell-completion--hide-completion-ov)))
+                 (rec-install-map))
+        (rec--hide-completion-ov)))
      (t
       ;; (message "((((((( true case")
       (ram-eshell-reset-candidates (orderless-filter
@@ -353,8 +352,8 @@
                                    (ring-elements eshell-history-ring))))
       (if (and search-substrings ram-eshell-history)
           (progn (ram-eshell--display-candidates)
-                 (ram-eshell-completion-install-map))
-        (ram-eshell-completion--hide-completion-ov))))))
+                 (rec-install-map))
+        (rec--hide-completion-ov))))))
 
 ;;* keymap
 
@@ -366,34 +365,34 @@
 ;;** keymap: emulation-mode-map-alists
 
 ;; adapted from `company-mode' keymap handling
-(defvar ram-eshell-completion-active-keymap
+(defvar rec-active-keymap
   (let ((keymap (make-sparse-keymap)))
-    (define-key keymap "\M-p" #'ram-eshell-completion-prev)
-    (define-key keymap "\M-n" #'ram-eshell-completion-next)
-    (define-key keymap (kbd "<return>") #'ram-eshell-completion-send-input)
-    (define-key keymap (kbd "<C-return>") #'ram-eshell-completion-insert-candidate-as-input)
+    (define-key keymap "\M-p" #'rec-prev)
+    (define-key keymap "\M-n" #'rec-next)
+    (define-key keymap (kbd "<return>") #'rec-send-input)
+    (define-key keymap (kbd "<C-return>") #'rec-insert-candidate-as-input)
     keymap)
   "Keymap enabled when displaying completion candidates.")
 
-(defvar-local ram-eshell-completion-emulation-alist '((t . nil))
+(defvar-local rec-emulation-alist '((t . nil))
   "Keymap active only when displaying completion candidates.")
 
-(defun ram-eshell-completion-ensure-emulation-alist ()
-  (unless (eq 'ram-eshell-completion-emulation-alist (car emulation-mode-map-alists))
+(defun rec-ensure-emulation-alist ()
+  (unless (eq 'rec-emulation-alist (car emulation-mode-map-alists))
     (setq emulation-mode-map-alists
-          (cons 'ram-eshell-completion-emulation-alist
-                (delq 'ram-eshell-completion-emulation-alist emulation-mode-map-alists)))))
+          (cons 'rec-emulation-alist
+                (delq 'rec-emulation-alist emulation-mode-map-alists)))))
 
-(defun ram-eshell-completion-install-map ()
-  (when (not (cdar ram-eshell-completion-emulation-alist))
-    (setf (cdar ram-eshell-completion-emulation-alist) ram-eshell-completion-active-keymap)))
+(defun rec-install-map ()
+  (when (not (cdar rec-emulation-alist))
+    (setf (cdar rec-emulation-alist) rec-active-keymap)))
 
-(defun ram-eshell-completion-uninstall-map ()
-  (setf (cdar ram-eshell-completion-emulation-alist) nil))
+(defun rec-uninstall-map ()
+  (setf (cdar rec-emulation-alist) nil))
 
 ;;** keymap: commands
 
-(defun ram-eshell-completion-next ()
+(defun rec-next ()
   "Move to next history candidate.
 Increment `ram-eshell-displayed-candidate'."
   (interactive)
@@ -404,7 +403,7 @@ Increment `ram-eshell-displayed-candidate'."
             (length ram-eshell-history))))
   (ram-eshell--display-candidates))
 
-(defun ram-eshell-completion-prev ()
+(defun rec-prev ()
   "Move to previous history candidate.
 Decrement `ram-eshell-displayed-candidate'."
   (interactive)
@@ -415,7 +414,7 @@ Decrement `ram-eshell-displayed-candidate'."
     (setq ram-eshell-displayed-candidate (1- ram-eshell-displayed-candidate)))
   (ram-eshell--display-candidates))
 
-(defun ram-eshell-completion-send-input ()
+(defun rec-send-input ()
   "Run `eshell-send-input'  with `ram-eshell-displayed-candidate' candidate."
   (interactive)
   (let ((input-is-empty-p
@@ -423,19 +422,19 @@ Decrement `ram-eshell-displayed-candidate'."
           "" (string-trim (buffer-substring-no-properties
                            (save-excursion (eshell-bol) (point)) (point-at-eol))))))
     (unless input-is-empty-p
-      (ram-eshell-completion--hide-completion-ov)
+      (rec--hide-completion-ov)
       (delete-region (eshell-bol) (point-at-eol))
       (insert (string-trim (nth ram-eshell-displayed-candidate
                                 ram-eshell-history)))
-      (ram-eshell-completion--reset-history)))
+      (rec--reset-history)))
   (eshell-send-input))
 
-(defun ram-eshell-completion-insert-candidate-as-input ()
+(defun rec-insert-candidate-as-input ()
   "Insert `ram-eshell-displayed-candidate' candidate as input.
-Disable `ram-eshell-completion-mode."
+Disable `ram-eshell-completion-mode'."
   (interactive)
   (delete-region (eshell-bol) (point-at-eol))
-  (ram-eshell-completion--hide-completion-ov)
+  (rec--hide-completion-ov)
   (insert (string-trim (nth ram-eshell-displayed-candidate
                             ram-eshell-history)))
   (when ram-eshell-completion-mode
@@ -449,15 +448,10 @@ Disable `ram-eshell-completion-mode."
   nil " ram-eshell-completion-mode" ram-eshell-completion-mode-map
   (if ram-eshell-completion-mode
       (progn
-        (ram-eshell-completion--set-vars)
-        (ram-eshell-completion-ensure-emulation-alist)
-        ;; (local-set-key (kbd "<C-tab>") #'ram-eshell--completion-post)
-        ;; (add-hook 'pre-command-hook 'breadcrumbs--record-vars nil nil)
-        (add-hook 'pre-command-hook 'ram-eshell--completion-pre nil t)
-        (add-hook 'post-command-hook 'ram-eshell--completion-post nil t))
-    (ram-eshell-completion--delete-vars)
-    (remove-hook 'pre-command-hook 'ram-eshell--completion-pre t)
-    (remove-hook 'post-command-hook 'ram-eshell--completion-post t)
-    ;; (remove-hook 'pre-command-hook 'breadcrumbs--record-vars nil)
-    ;; (remove-hook 'post-command-hook 'breadcrumbs--post-command nil)
-    ))
+        (rec--set-vars)
+        (rec-ensure-emulation-alist)
+        (add-hook 'pre-command-hook 'rec--pre nil t)
+        (add-hook 'post-command-hook 'rec--post nil t))
+    (rec--delete-vars)
+    (remove-hook 'pre-command-hook 'rec--pre t)
+    (remove-hook 'post-command-hook 'rec--post t)))

@@ -287,15 +287,10 @@
 (with-eval-after-load "esh-mode"
   (add-hook 'eshell-mode-hook 'ram-eshell-completion-mode))
 
-(autoload 'ram-eshell-completion-toggle-mode "ram-eshell-completion")
-(autoload 'ram-eshell-completion-send-input "ram-eshell-completion")
+(autoload 'rec-toggle-mode "ram-eshell-completion")
 
 (with-eval-after-load "esh-mode"
-  (define-key eshell-mode-map (kbd "S-SPC") #'ram-eshell-completion-toggle-mode)
-  (define-key eshell-mode-map (kbd "<return>") #'ram-eshell-completion-send-input))
-(with-eval-after-load "esh-mode"
-  (define-key eshell-mode-map (kbd "S-SPC") #'ram-eshell-completion-toggle-mode)
-  (define-key eshell-mode-map (kbd "<C-return>") #'ram-eshell-completion-insert-candidate-as-input))
+  (define-key eshell-mode-map (kbd "S-SPC") #'rec-toggle-mode))
 
 ;;** eshell: settings
 
