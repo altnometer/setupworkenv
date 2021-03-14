@@ -107,7 +107,8 @@
   (interactive)
   (if ram-eshell-completion-mode
       (ram-eshell-completion-mode -1)
-    (ram-eshell-completion-mode)))
+    (ram-eshell-completion-mode)
+    (ram-eshell--handle-post-command)))
 
 ;;* pre functions
 
