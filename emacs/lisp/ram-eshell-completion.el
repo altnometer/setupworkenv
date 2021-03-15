@@ -151,16 +151,16 @@
 (defun rec--highlight-string-matches (string rec-search-substrings)
   "Highlight REC-SEARCH-SUBSTRINGS matches in STRING."
   (if rec-search-substrings
-    (let* ((r (car rec-search-substrings)))
-      (when (not (string= r ""))
-        (cl-labels ((hl (start)
-                        (when (string-match r string start)
-                          (add-text-properties
-                           (match-beginning 0) (match-end 0)
-                           '(face rec--hl-match-face) string)
-                          (hl (match-end 0)))))
-          (hl 0)))
-      (rec--highlight-string-matches string (cdr rec-search-substrings)))
+      (let* ((r (car rec-search-substrings)))
+        (when (not (string= r ""))
+          (cl-labels ((hl (start)
+                          (when (string-match r string start)
+                            (add-text-properties
+                             (match-beginning 0) (match-end 0)
+                             '(face rec--hl-match-face) string)
+                            (hl (match-end 0)))))
+            (hl 0)))
+        (rec--highlight-string-matches string (cdr rec-search-substrings)))
     string))
 
 (defun rec--highlight-selected-candidate (string)
@@ -189,8 +189,8 @@
                           (progn
                             (add-text-properties from exclude-beg
                                                  `(face ,hl-face) string)
-                            (add-text-properties  exclude-beg exclude-end
-                                                  `(face ,rehl-old-face) string)
+                            (add-text-properties exclude-beg exclude-end
+                                                 `(face ,rehl-old-face) string)
                             (highlight exclude-end (cdr exclude)))
                         (add-text-properties from (length string)
                                              `(face ,hl-face) string)
@@ -283,17 +283,17 @@
              (length rec-history))
      (let ((counter 0))
        (mapconcat (lambda (str)
-                   (let ((str (rec--highlight-string-matches
-                               (concat (string-trim str))
-                               rec-search-substrings))
-                         new-str)
-                     (if (> (length str) rec--length-of-displayed-candidate)
-                         (setq new-str (rec--resize-str str))
-                       (setq new-str str))
-                     (when (= counter rec-displayed-candidate)
-                       (setq new-str (rec--highlight-selected-candidate new-str)))
-                     (setq counter (1+ counter))
-                     new-str))
+                    (let ((str (rec--highlight-string-matches
+                                (concat (string-trim str))
+                                rec-search-substrings))
+                          new-str)
+                      (if (> (length str) rec--length-of-displayed-candidate)
+                          (setq new-str (rec--resize-str str))
+                        (setq new-str str))
+                      (when (= counter rec-displayed-candidate)
+                        (setq new-str (rec--highlight-selected-candidate new-str)))
+                      (setq counter (1+ counter))
+                      new-str))
                   candidates "\n")))))
 
 (defun rec--display-candidates ()
