@@ -65,12 +65,16 @@
 (defvar-local rec--displaying-candidates-p nil
   "Indicate whether candidates are currently displayed.")
 
-;;* secondary functions
+;;* functions: secondary
 
 (defun rec-reset-candidates (candidates)
   "Set `rec-history' to CANDIDATES."
-  (setq rec-history candidates)
-  (setq rec-displayed-candidate 0))
+  (let ((orderless-matching-styles
+         '(orderless-literal)))
+    (setq rec-history
+          (orderless-filter
+           (string-join rec-search-substrings " ") candidates))
+    (setq rec-displayed-candidate 0)))
 
 (defun rec--set-vars ()
   "Set `ram-eshell-completion-mode' variables."
@@ -339,26 +343,22 @@
                            rec-search-substrings)))
       ;; (message "(((((( no rec-search-substrings long enough: %s" rec-search-substrings)
       (rec--hide-completion-ov)
-      (rec-reset-candidates (orderless-filter
-                                    (string-join rec-search-substrings " ") rec-history)))
+      (rec-reset-candidates rec-history))
      ;; old search substrings are the subset of new ones
      ;; reuse previous candidates to narrow them further
      ((rec--subset-of-substrings-p
        old-rec-search-substrings
        new-rec-search-substrings)
       ;; (message "(((((( rec-search-substrings %s is a subset of %s" old-rec-search-substrings new-rec-search-substrings)
-      (rec-reset-candidates (orderless-filter
-                                    (string-join rec-search-substrings " ") rec-history))
+      (rec-reset-candidates rec-history)
       (if rec-history
           (progn (rec--display-candidates)
                  (rec-install-map))
         (rec--hide-completion-ov)))
      (t
       ;; (message "((((((( true case")
-      (rec-reset-candidates (orderless-filter
-                                  (string-join rec-search-substrings " ")
-                                  (delete-dups
-                                   (ring-elements eshell-history-ring))))
+      (rec-reset-candidates (delete-dups
+                             (ring-elements eshell-history-ring)))
       (if (and rec-search-substrings rec-history)
           (progn (rec--display-candidates)
                  (rec-install-map))
