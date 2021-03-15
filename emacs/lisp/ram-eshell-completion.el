@@ -195,55 +195,61 @@
 
 (defun rec--crop-word (word substr)
   "Crop WORD."
-  (let ((front-segment (substring word 0 (string-match substr word)))
-        beginning-part middle-part
+  (let (;; segments around substr
+        beginning-part   ; any [:alnum:] but with no substr
+        middle-part      ; includes substr and [:alnum:] segment after
         new-word)
+    ;; set beginning-part if regex for it matches
     (when (and (string-match (rx line-start
-                           (zero-or-more (not alnum))
-                           (one-or-more (or alnum "-"))) word)
-             ;; do not include if substr in the match
-             (not (s-matches-p substr (match-string 0 word))))
-      (setq beginning-part (match-string 0 front-segment)))
-    (when (string-match (rx-to-string
-                         `(: (group (zero-or-more (or alnum "-"))
-                                    (zero-or-more (not alnum))
-                                    ,substr
-                                    (zero-or-more (not alnum))
-                                    (zero-or-more (or alnum "-")))
-                             (group (zero-or-more anychar))
-                             line-end) t)
-                        word)
-      (setq middle-part (match-string 1 word))
-      (setq new-word (string-join (remove nil (vector beginning-part middle-part))
-                                  rec--trancate-symbol)))
+                                 (zero-or-more (not alnum))
+                                 (one-or-more (or alnum "-"))) word)
+               ;; do not include if substr in the match
+               (not (s-matches-p substr (match-string 0 word))))
+      (setq beginning-part (match-string 0 word)))
+    ;; set middle-part to regex match group 1
+    (string-match (rx-to-string
+                   `(: (group (zero-or-more (or alnum "-"))
+                              (zero-or-more (not alnum))
+                              ,substr
+                              (zero-or-more (not alnum))
+                              (zero-or-more (or alnum "-")))
+                       (group (zero-or-more anychar))
+                       line-end) t)
+                  word)
+    (setq middle-part (match-string 1 word))
+    ;; set new-word by joining parts
+    (setq new-word (string-join (remove nil (vector beginning-part middle-part))
+                                rec--trancate-symbol))
+    ;; add rec--trancate-symbol if needed
     (when (and new-word
-             (not (string= "" (match-string 2 word))))
-        (setq new-word (concat new-word rec--trancate-symbol))
-      (string-match substr new-word)
-      (add-text-properties
-       (match-beginning 0) (match-end 0)
-       '(face rec--hl-match-face) new-word)
-      new-word)))
+               (not (string= "" (match-string 2 word))))
+      (setq new-word (concat new-word rec--trancate-symbol)))
+    ;; restore 'face property for SUBSTR
+    (string-match substr new-word)
+    (add-text-properties
+     (match-beginning 0) (match-end 0)
+     '(face rec--hl-match-face) new-word)
+    new-word))
 
 (defun rec--resize-list (words length resized-p)
   "Remove words that do not contain `rec--hl-match-face'.
   Keep removing until LENGTH is less than
   `rec--length-of-displayed-candidate'."
   (if (or (null words)
-           (<= length rec--length-of-displayed-candidate))
+          (<= length rec--length-of-displayed-candidate))
       words
     (let* ((word (car words))
-          (match-begining
-           (text-property-any 0 (length word) 'face 'rec--hl-match-face word))
-          match-end)
+           (match-begining
+            (text-property-any 0 (length word) 'face 'rec--hl-match-face word))
+           match-end)
       (if match-begining
           (if (>= (length word) rec--max-length-word)
               (progn
                 (setq match-end
-                     (text-property-not-all match-begining (length word) 'face 'rec--hl-match-face word))
-               (cons
-                (rec--crop-word word (substring word match-begining match-end))
-                (rec--resize-list (cdr words) length nil)))
+                      (text-property-not-all match-begining (length word) 'face 'rec--hl-match-face word))
+                (cons
+                 (rec--crop-word word (substring word match-begining match-end))
+                 (rec--resize-list (cdr words) length nil)))
             (cons word (rec--resize-list (cdr words) length nil)))
         (if resized-p
             (rec--resize-list (cdr words) (- length (length word)) resized-p)
@@ -257,9 +263,11 @@
   "Trim string to `rec--length-of-displayed-candidate'."
   (let* ((words (reverse (split-string str)))
          (num-spaces (1- (length words)))
-         (str-len-no-spaces (- (length str) num-spaces)))
-    (string-join (reverse
-                  (rec--resize-list words str-len-no-spaces nil)) " ")))
+         (str-len-no-spaces (- (length str) num-spaces))
+         resized-str)
+    (setq resized-str (string-join (reverse
+                                    (rec--resize-list words str-len-no-spaces nil)) " "))
+    resized-str))
 
 (defun rec--make-display-candidates-string (candidates)
   "Make a string of candidates that is displayed to the user."
