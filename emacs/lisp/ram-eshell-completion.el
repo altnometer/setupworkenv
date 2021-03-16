@@ -324,9 +324,10 @@
 (defun rec-start-completion ()
   (let ((old-rec-search-substrings rec-search-substrings)
         (new-rec-search-substrings
-         (split-string (buffer-substring-no-properties
-                        (save-excursion (eshell-bol) (point))
-                        (point-at-eol)))))
+         (mapcar #'regexp-quote
+                 (split-string (buffer-substring-no-properties
+                                (save-excursion (eshell-bol) (point))
+                                (point-at-eol))))))
     (setq rec-search-substrings new-rec-search-substrings)
     (cond
      ;; empty `rec-search-substrings', reset history, hide completion
