@@ -365,22 +365,22 @@
                  (rec-install-map))
         (rec--hide-completion-ov))))))
 
-;;* keymap
+;;* keymap|bindings
 
 (defvar ram-eshell-completion-mode-map nil
   "Keymap for `ram-eshell-completion-mode'")
 
 (setq ram-eshell-completion-mode-map (make-sparse-keymap))
 
-;;** keymap: emulation-mode-map-alists
+;;** keymap|bindings: emulation-mode-map-alists
 
 ;; adapted from `company-mode' keymap handling
 (defvar rec-active-keymap
   (let ((keymap (make-sparse-keymap)))
     (define-key keymap "\M-p" #'rec-prev)
     (define-key keymap "\M-n" #'rec-next)
-    (define-key keymap (kbd "<return>") #'rec-send-input)
-    (define-key keymap (kbd "<C-return>") #'rec-insert-candidate-as-input)
+    (define-key keymap (kbd "<return>") #'rec-insert-candidate-as-input)
+    (define-key keymap (kbd "<C-return>") #'rec-send-input)
     keymap)
   "Keymap enabled when displaying completion candidates.")
 
@@ -400,7 +400,7 @@
 (defun rec-uninstall-map ()
   (setf (cdar rec-emulation-alist) nil))
 
-;;** keymap: commands
+;;** keymap|bindings: commands
 
 (defun rec-next ()
   "Move to next history candidate.
