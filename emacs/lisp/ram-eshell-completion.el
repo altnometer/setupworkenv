@@ -39,10 +39,7 @@
 (defvar rec-num-of-displayed-candidates 6
   "Restricts number of displayed completion candidates.")
 
-(defvar rec--length-of-displayed-candidate 60
-  "Length of displayed candidate string.")
-
-(defvar rec--max-length-word 16
+(defvar rec--max-length-word 32
   "Words over this length are truncated.")
 
 (defvar rec--trancate-symbol "…"
@@ -66,6 +63,10 @@
   "Indicate whether candidates are currently displayed.")
 
 ;;* functions: secondary
+
+(defun rec--length-of-displayed-candidate ()
+  "Calculate max length of displayed candidate string based on window width."
+  (- (window-width) 5))
 
 (defun rec-reset-candidates (candidates)
   "Set `rec-history' to CANDIDATES."
@@ -240,7 +241,7 @@
   Keep removing until LENGTH is less than
   `rec--length-of-displayed-candidate'."
   (if (or (null words)
-          (<= length rec--length-of-displayed-candidate))
+          (<= length (rec--length-of-displayed-candidate)))
       words
     (let* ((word (car words))
            (match-begining
@@ -287,7 +288,7 @@
                                 (concat (string-trim str))
                                 rec-search-substrings))
                           new-str)
-                      (if (> (length str) rec--length-of-displayed-candidate)
+                      (if (> (length str) (rec--length-of-displayed-candidate))
                           (setq new-str (rec--resize-str str))
                         (setq new-str str))
                       (when (= counter rec-displayed-candidate)
