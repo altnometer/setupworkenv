@@ -236,12 +236,12 @@
      '(face rec--hl-match-face) new-word)
     new-word))
 
-(defun rec--resize-list (words length resized-p)
+(defun rec--resize-list (words length max-length resized-p)
   "Remove words that do not contain `rec--hl-match-face'.
   Keep removing until LENGTH is less than
   `rec--length-of-displayed-candidate'."
   (if (or (null words)
-          (<= length (rec--length-of-displayed-candidate)))
+          (<= length max-length))
       words
     (let* ((word (car words))
            (match-begining
@@ -252,26 +252,36 @@
               (progn
                 (setq match-end
                       (text-property-not-all match-begining (length word) 'face 'rec--hl-match-face word))
-                (cons
-                 (rec--crop-word word (substring word match-begining match-end))
-                 (rec--resize-list (cdr words) length nil)))
-            (cons word (rec--resize-list (cdr words) length nil)))
+                (let ((cropped-word
+                       (rec--crop-word word (substring word match-begining match-end))))
+                  (cons
+                   cropped-word
+                   (rec--resize-list (cdr words) (- length
+                                                    (- (length word) (length cropped-word)))
+                                     max-length nil))))
+            (cons word (rec--resize-list (cdr words) length max-length nil)))
+        ;; when previous word was discarded (words resized), 'rec--trancate-symbol
+        ;; was already inserted, do not insert it again.
         (if resized-p
-            (rec--resize-list (cdr words) (- length (length word)) resized-p)
+            (rec--resize-list (cdr words) (- length (length word)) max-length resized-p)
           (let ((replacement rec--trancate-symbol))
             (cons replacement
                   (rec--resize-list
                    (cdr words)
-                   (- length (- (length word) (length replacement))) t))))))))
+                   (- length (- (length word) (length replacement)))
+                   max-length
+                   t))))))))
 
 (defun rec--resize-str (str)
   "Trim string to `rec--length-of-displayed-candidate'."
   (let* ((words (reverse (split-string str)))
          (num-spaces (1- (length words)))
          (str-len-no-spaces (- (length str) num-spaces))
+         (max-len-str-no-spaces (- (rec--length-of-displayed-candidate) num-spaces))
          resized-str)
-    (setq resized-str (string-join (reverse
-                                    (rec--resize-list words str-len-no-spaces nil)) " "))
+    (setq resized-str (string-join (reverse (rec--resize-list
+                                             words str-len-no-spaces
+                                             max-len-str-no-spaces nil)) " "))
     resized-str))
 
 (defun rec--make-display-candidates-string (candidates)
