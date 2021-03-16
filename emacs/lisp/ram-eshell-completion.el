@@ -64,7 +64,7 @@
 
 ;;* functions: secondary
 
-(defun rec--length-of-displayed-candidate ()
+(defun rec--max-length-of-displayed-candidate ()
   "Calculate max length of displayed candidate string based on window width."
   (- (window-width) 5))
 
@@ -239,7 +239,7 @@
 (defun rec--resize-list (words length max-length resized-p)
   "Remove words that do not contain `rec--hl-match-face'.
   Keep removing until LENGTH is less than
-  `rec--length-of-displayed-candidate'."
+  `rec--max-length-of-displayed-candidate'."
   (if (or (null words)
           (<= length max-length))
       words
@@ -273,11 +273,11 @@
                    t))))))))
 
 (defun rec--resize-str (str)
-  "Trim string to `rec--length-of-displayed-candidate'."
+  "Trim string to `rec--max-length-of-displayed-candidate'."
   (let* ((words (reverse (split-string str)))
          (num-spaces (1- (length words)))
          (str-len-no-spaces (- (length str) num-spaces))
-         (max-len-str-no-spaces (- (rec--length-of-displayed-candidate) num-spaces))
+         (max-len-str-no-spaces (- (rec--max-length-of-displayed-candidate) num-spaces))
          resized-str)
     (setq resized-str (string-join (reverse (rec--resize-list
                                              words str-len-no-spaces
@@ -298,7 +298,7 @@
                                 (concat (string-trim str))
                                 rec-search-substrings))
                           new-str)
-                      (if (> (length str) (rec--length-of-displayed-candidate))
+                      (if (> (length str) (rec--max-length-of-displayed-candidate))
                           (setq new-str (rec--resize-str str))
                         (setq new-str str))
                       (when (= counter rec-displayed-candidate)
