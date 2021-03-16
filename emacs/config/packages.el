@@ -3052,8 +3052,9 @@ Configure `orderless-matching-styles' for this command."
 ;; until /commit/960bcf8a5df304f77517ee92ade1627c0c57336f
 (defun prot/imenu-recenter-pulse ()
   "Recenter `imenu' position at the top with subtle feedback."
-  (let ((pulse-delay 0.05))
-    (recenter 0)
+  (let ((pulse-delay 0.1))
+    ;; (recenter 0)
+    (recenter)
     (pulse-momentary-highlight-one-line (point) 'modus-theme-intense-red)))
 
 (add-hook 'imenu-after-jump-hook #'prot/imenu-recenter-pulse)
