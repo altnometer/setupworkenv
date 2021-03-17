@@ -303,6 +303,70 @@
 (add-to-list 'eshell-output-filter-functions #'eshell-truncate-buffer)
 (setq eshell-buffer-maximum-lines 1000)
 
+
+;;* exwm
+
+(straight-use-package
+ '(exwm :type git :host github :repo "emacs-straight/exwm"))
+
+(require 'exwm)
+
+;; Enable EXWM
+(exwm-enable)
+
+(setq exwm-workspace-number 4)
+;; Make class name the buffer name
+(add-hook 'exwm-update-class-hook
+          (lambda ()
+            (exwm-workspace-rename-buffer exwm-class-name)))
+
+(setq exwm-manage-force-tiling t)
+
+;; Global keybindings.
+(setq exwm-input-global-keys
+      `(
+        ;; 's-r': Reset (to line-mode).
+        ;; ([?\s-r] . exwm-reset)
+        ([?\s-.] . exwm-reset)
+        ;; 's-w': Switch workspace.
+        ;; ([?\s-w] . exwm-workspace-switch)
+        ;; 's-&': Launch application.
+        ([?\s-'] . (lambda (command)
+                     (interactive (list (read-shell-command "$ ")))
+                     (start-process-shell-command command nil command)))
+        ;; 's-N': Switch to certain workspace.
+        ,@ (mapcar (lambda (i)
+                        `(,(kbd (format "s-%d" i)) .
+                          (lambda ()
+                            (interactive)
+                            (exwm-workspace-switch-create ,i))))
+                      (number-sequence 0 9))))
+
+
+
+(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+
+;; example: disable exwm-input-set-local-simulation-keys for Firefox
+(add-hook 'exwm-manage-finish-hook
+          (lambda ()
+            (when (and exwm-class-name
+                       (string= exwm-class-name "Firefox"))
+              (exwm-input-set-local-simulation-keys nil))))
+
+;; Line-editing shortcuts
+
+(setq exwm-input-simulation-keys
+      '(([?\C-b] . [left])
+        ([?\C-f] . [right])
+        ([?\C-p] . [up])
+        ([?\C-n] . [down])
+        ([?\C-a] . [home])
+        ([?\C-e] . [end])
+        ([?\M-v] . [prior])
+        ([?\C-v] . [next])
+        ([?\C-d] . [delete])
+        ([?\C-k] . [S-end delete])))
+
 ;;* magit
 (straight-use-package
  '(magit :type git :flavor melpa :files ("lisp/magit"
