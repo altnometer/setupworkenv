@@ -1103,7 +1103,8 @@ one, an error is signaled."
           (ram-info-buffer-p (current-buffer) nil)
           (ram-interactive-buffer-p (current-buffer) nil))
       (kill-buffer (current-buffer))
-    (save-buffer (current-buffer))))
+    (save-buffer (current-buffer))
+    (kill-buffer (current-buffer))))
 (global-set-key (kbd "C-x k") #'ram-kill-curr-buffer)
 
 ;;*** buffers: switch
