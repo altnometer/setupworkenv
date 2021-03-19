@@ -199,7 +199,7 @@
 ;;* emacs-lisp elisp
 
 (add-hook 'emacs-lisp-mode-hook (lambda () (outline-hide-sublevels 1)))
-(define-key emacs-lisp-mode-map (kbd "<M-f8>") #'narrow-to-defun)
+(define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
 
 ;; display eval result inline, use cider for that
 ;; credit to https://endlessparentheses.com/eval-result-overlays-in-emacs-lisp.html
@@ -325,6 +325,7 @@
 ;; Global keybindings.
 (setq exwm-input-global-keys
       `(
+        ([?\s-q] . kill-buffer-and-window)
         ;; 's-r': Reset (to line-mode).
         ;; ([?\s-r] . exwm-reset)
         ([?\s-.] . exwm-reset)
@@ -1797,7 +1798,7 @@ one, an error is signaled."
 ;; (add-hook 'racket-mode-hook #'racket-unicode-input-method-enable)
 
 (with-eval-after-load 'racket-mode
-  (define-key racket-mode-map (kbd "<M-f8>") #'narrow-to-defun))
+  (define-key racket-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun))
 
 ;;** racket: repl
 
@@ -2303,7 +2304,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 (with-eval-after-load 'clojure-mode
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
-  (define-key clojure-mode-map (kbd "<M-f8>") #'narrow-to-defun)
+  (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
   ;; (require 'flycheck-clj-kondo)
   )
 
@@ -2358,7 +2359,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 (with-eval-after-load 'python
   (define-key python-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
   ;; (define-key python-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
-  ;; (define-key python-mode-map (kbd "<M-f8>") #'narrow-to-defun)
+  ;; (define-key python-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
   ;; (require 'flycheck-clj-kondo)
   )
 
@@ -3802,6 +3803,17 @@ That is, remove a non kept dired from the recent list."
     (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
 
 (define-key global-map (kbd "<M-f16>") #'copy-line)
+
+;;** custom: narrow
+
+(defun ram-toggle-narrow-to-defun ()
+  "Toggle `narrow-to-defun'."
+  (interactive)
+  (if (not (buffer-narrowed-p))
+      (narrow-to-defun)
+    (widen)
+    (recenter)))
+
 ;;** custom: ram-cursor-mode
 (autoload 'global-ram-cursor-mode "ram-cursor")
 (global-ram-cursor-mode 1)
