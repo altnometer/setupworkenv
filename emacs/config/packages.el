@@ -2767,10 +2767,15 @@ been modified since its last check-in."
     ;;         branch)
     (concat (propertize (format "%s " branch) 'face (cadr props)))))
 
+;;** modeline: line format
+
 (setq-default mode-line-format
               '(
                 (:eval (if (buffer-narrowed-p)
-                           (propertize "%n " 'face '((:background "green")))))
+                           (progn (propertize "%n " 'face '((:background "green"))))
+                         (propertize (format " %s "
+                                             exwm-workspace-current-index) 'face '((:foreground "chartreuse3")))))
+                ;; on remote machine?
                 "[" "%@" "]"
                 ;; mode-line-modified
                 ;; %, * or - for read only, changed, saved
