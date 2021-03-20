@@ -310,11 +310,39 @@
  '(exwm :type git :host github :repo "emacs-straight/exwm"))
 
 (require 'exwm)
+(require 'exwm-randr)
 
-;; Enable EXWM
-(exwm-enable)
+;;** exwm-randr
+
+(setq exwm-randr-workspace-output-plist '((0 "HDMI-1")
+                                          (1 "HDMI-1")
+                                          (2 "HDMI-1")
+                                          (3 "HDMI-1")
+                                          (4 "HDMI-1")
+                                          (5 "HDMI-1")
+                                          (6 "HDMI-1")
+                                          (7 "HDMI-1")
+                                          (8 "HDMI-1")
+                                          (9 "HDMI-1")))
+
+(add-hook 'exwm-randr-screen-change-hook
+          (lambda ()
+            (start-process-shell-command
+             "xrandr" nil
+             "xrandr --output HDMI-1 --mode 3840x2160 --pos 0x0 --rotate normal"
+             ;; "xrandr --output HDMI-1 --mode 1920x1080 --pos 0x0 --rotate normal
+;; xrandr --output HDMI-1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal
+;; xrandr --output HDMI-1 --mode 1920x1080 --pos 3840x0 --rotate normal"
+             )))
+
+;;** exwm: settings
+
+;; echo area stopped appearing with this option
+;; (setq exwm-workspace-minibuffer-position 'bottom)
+;; (setq exwm-workspace-display-echo-area-timeout 5)
 
 (setq exwm-workspace-number 4)
+
 ;; Make class name the buffer name
 (add-hook 'exwm-update-class-hook
           (lambda ()
@@ -322,12 +350,28 @@
 
 (setq exwm-manage-force-tiling t)
 
+;;** exwm: bindings
+
 ;; Global keybindings.
 (setq exwm-input-global-keys
       `(
+        (,(kbd "C-g") . keyboard-quit)
         ([?\s-q] . kill-buffer-and-window)
-        ;; 's-r': Reset (to line-mode).
-        ;; ([?\s-r] . exwm-reset)
+        ;; ([?\s-Q] . save-buffers-kill-emacs)
+
+        ([?\s-f] . ram-choose-from-recentf)
+        (,(kbd "C-s-f") . find-file)
+        (,(kbd "C-S-s-f") . find-file-other-window)
+
+        ([?\s-z] . exwm-layout-toggle-fullscreen)
+        ([?\s-/] . exwm-layout-toggle-mode-line)
+        ([?\s-y] . exwm-workspace-toggle-minibuffer)
+        ;; ([?\s-h] . exwm-window-*focus left*)
+        ;; ([?\s-j] . exwm-window-*focus down*)
+        ;; ([?\s-H] . exwm-window-*move left*)
+        ;; ([?\s--] . exwm-window-*resize*)
+
+        ;; 's-.': Reset (to line-mode).
         ([?\s-.] . exwm-reset)
         ;; 's-w': Switch workspace.
         ;; ([?\s-w] . exwm-workspace-switch)
@@ -336,23 +380,23 @@
                      (interactive (list (read-shell-command "$ ")))
                      (start-process-shell-command command nil command)))
         ;; 's-N': Switch to certain workspace.
-        ,@ (mapcar (lambda (i)
+        ,@(mapcar (lambda (i)
                         `(,(kbd (format "s-%d" i)) .
                           (lambda ()
                             (interactive)
                             (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 9))))
+                  (number-sequence 0 9))))
 
 
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
 ;; example: disable exwm-input-set-local-simulation-keys for Firefox
-(add-hook 'exwm-manage-finish-hook
-          (lambda ()
-            (when (and exwm-class-name
-                       (string= exwm-class-name "Firefox"))
-              (exwm-input-set-local-simulation-keys nil))))
+;; (add-hook 'exwm-manage-finish-hook
+;;           (lambda ()
+;;             (when (and exwm-class-name
+;;                        (string= exwm-class-name "Firefox"))
+;;               (exwm-input-set-local-simulation-keys nil))))
 
 ;; Line-editing shortcuts
 
@@ -367,6 +411,9 @@
         ([?\C-v] . [next])
         ([?\C-d] . [delete])
         ([?\C-k] . [S-end delete])))
+
+;; must be the last in 'exwm settings
+(exwm-enable)
 
 ;;* magit
 (straight-use-package
