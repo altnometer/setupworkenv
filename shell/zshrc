@@ -267,10 +267,12 @@ vg() {
      vim  +${line_number} ${file}
   fi
 }
-# default value is 'fg=8' which is hard/impossible to read in dark themes
+# default value is 'fg=8' which is hard/impossible to read in dark color themes
 # is not visible in dark solarised (true color).
-# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=5'
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=grey'
+# use this in dark backgrounds:
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=grey'
+# use this in light backgrounds (ligth color themes)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 # diable auto correct
 unsetopt correct_all
 
