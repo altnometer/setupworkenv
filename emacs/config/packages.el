@@ -344,6 +344,14 @@
                                           (8 "HDMI-1")
                                           (9 "HDMI-1")))
 
+(start-process-shell-command
+             "xrandr" nil
+             "xrandr --output HDMI-1 --mode 3840x2160 --pos 0x0 --rotate normal"
+             ;; "xrandr --output HDMI-1 --mode 1920x1080 --pos 0x0 --rotate normal
+;; xrandr --output HDMI-1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal
+;; xrandr --output HDMI-1 --mode 1920x1080 --pos 3840x0 --rotate normal"
+             )
+
 (add-hook 'exwm-randr-screen-change-hook
           (lambda ()
             (start-process-shell-command
