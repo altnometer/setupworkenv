@@ -1075,7 +1075,15 @@ instead."
         '(prot/orderless-literal-dispatcher
           prot/orderless-initialism-dispatcher)))
 
-;;* windows, buffers, sentences
+;;* frame, window, buffer, sentence
+
+;;** frame
+
+;; transparency
+;; (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
+;; (add-to-list 'default-frame-alist '(alpha . (90 . 90)))
+(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;;** windows
 
