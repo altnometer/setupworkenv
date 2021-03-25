@@ -235,6 +235,21 @@
                                             (point))))))
 (run-with-idle-timer 1 nil #'set-displaying-eval-defun-result-inline)
 
+;;* shell
+
+;; shell settings are based on
+;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
+(setq explicit-shell-file-name "/usr/bin/zsh")
+(setq shell-file-name "zsh")
+(setenv "SHELL" shell-file-name)
+(add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
+
+(straight-use-package
+ '(vterm :type git :flavor melpa :files
+         ("*" (:exclude ".dir-locals.el" ".gitignore" ".clang-format" ".travis.yml") "vterm-pkg.el")
+         :host github :repo "akermu/emacs-libvterm"))
+(require 'vterm)
+
 ;;* eshell
 
 ;;** eshell: completion
@@ -245,13 +260,6 @@
 
 (add-hook 'eshell-mode-hook
           (lambda () (define-key eshell-mode-map (kbd "<tab>") #'completion-at-point)))
-
-;;** eshell: terminal, default shell
-
-(defvar my-term-shell "/usr/bin/zsh")
-(defadvice ansi-term (before force-bash)
-  (interactive (list my-term-shell)))
-(ad-activate 'ansi-term)
 
 ;;** eshell: bindings
 
