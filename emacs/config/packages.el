@@ -298,7 +298,12 @@
 (autoload 'rec-toggle-mode "ram-eshell-completion")
 
 (with-eval-after-load "esh-mode"
-  (define-key eshell-mode-map (kbd "S-SPC") #'rec-toggle-mode))
+  (define-key eshell-mode-map (kbd "S-SPC") #'rec-toggle-mode)
+  (define-key eshell-mode-map (kbd "<return>") (lambda () (interactive)
+                                                 (eshell-send-input)
+                                                 (rec-toggle-mode))))
+
+
 
 ;;** eshell: settings
 
