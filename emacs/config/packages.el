@@ -307,6 +307,12 @@
 
 ;;** eshell: settings
 
+;; (add-to-list eshell-visual-commands "top")
+(setq eshell-visual-subcommands '("git" "log" "clone" "diff" "show"))
+(setq eshell-visual-options '("git" "--help" "--paginate"))
+
+(setq eshell-visual-commands '())
+
 (setq eshell-scroll-to-bottom-on-input nil)
 (setq eshell-scroll-to-bottom-on-output nil)
 ;; the previous settings do not seem to work, hence the following two lines:
