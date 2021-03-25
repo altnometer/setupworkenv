@@ -2365,6 +2365,15 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 ;;* python
 
+;;** python: ide
+
+(straight-use-package
+ '(elpy :type git :flavor melpa
+        :files ("*.el" "NEWS.rst" "snippets" "elpy" "elpy-pkg.el")
+        :host github :repo "jorgenschaefer/elpy"))
+(elpy-enable)
+
+;;** python: outlines
 (defun python-mode-outline-hook ()
   (setq outline-level 'python-outline-level)
 
