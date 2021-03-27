@@ -3,5 +3,31 @@ xmodmap ~/.Xmodmap
 #exec i3 -V >> ~/.i3/i3.log 2>&1
 setterm -blank 0 -powersave off -powerdown 0
 xset s off
-exec i3
+# does not solve jerky screed switching with any vsync option
+#compton --daemon --backend glx --vsync opengl-mswc
+# exec i3
 #xset s off -dpms
+
+# this part is from exwm
+
+# Disable access control for the current user.
+#xhost +SI:localuser:$USER
+
+# Make Java applications aware this is a non-reparenting window manager.
+export _JAVA_AWT_WM_NONREPARENTING=1
+
+# Set default cursor.
+#xsetroot -cursor_name left_ptr
+
+# Set keyboard repeat rate.
+#xset r rate 200 60
+
+# Uncomment the following block to use the exwm-xim module.
+#export XMODIFIERS=@im=exwm-xim
+#export GTK_IM_MODULE=xim
+#export QT_IM_MODULE=xim
+#export CLUTTER_IM_MODULE=xim
+
+# Finally start Emacs
+exec emacs -mm --debug-init
+#exec emacs --no-init-file
