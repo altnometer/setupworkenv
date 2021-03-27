@@ -418,12 +418,12 @@
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
-;; example: disable exwm-input-set-local-simulation-keys for Firefox
 ;; (add-hook 'exwm-manage-finish-hook
 ;;           (lambda ()
 ;;             (when (and exwm-class-name
 ;;                        (string= exwm-class-name "Firefox"))
-;;               (exwm-input-set-local-simulation-keys nil))))
+;;               (exwm-input-set-local-simulation-keys nil)
+;;               (setq mode-line-format nil))))
 
 ;; Line-editing shortcuts
 
