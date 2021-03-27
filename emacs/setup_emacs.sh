@@ -27,7 +27,7 @@ if hash emacs 2>/dev/null && [ -d "${EMACS_DEST_DIR}" ]; then
     echo -e "\n\x1b[33;01m emacs is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
-    apt-get install -y hddtemp lm-sensors
+    apt-get install -y hddtemp lm-sensors upower
     echo -e "\n\x1b[33;01m Installing, configuring emacs ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y emacs
     # documentation is in non-free repository, inlcude these repositories to install docs.
