@@ -2754,6 +2754,48 @@ repository, then the corresponding root is used instead."
 ;; default is 5 seconds
 (setq auto-revert-interval 3)
 
+;; none seem to work
+;; (cancel-function-timers 'force-mode-line-update)
+;; (run-at-time 1 nil '(lambda () (force-mode-line-update t)))
+;; (run-with-timer 0 1 #'(lambda () (force-mode-line-update t)))
+
+;;** mode-line: battery
+
+(customize-set-variable 'battery-mode-line-format "%b%p%%%")
+
+(defun ram-modify-battery-mode-line-string ()
+  "Modify `battery-mode-line-string' properties."
+  (if (string-match "[0-9.]+" battery-mode-line-string)
+      (let* ((matched-number (match-string 0 battery-mode-line-string))
+            (charge-percent (floor (string-to-number matched-number)))
+            (new-str (replace-regexp-in-string (regexp-quote matched-number)
+                                               (number-to-string charge-percent)
+                                               battery-mode-line-string
+                                               nil
+                                               'literal)))
+        (setq battery-mode-line-string
+              (if (< charge-percent 20)
+                  (propertize new-str 'face '((:foreground "red")))
+                (propertize new-str 'face '((:foreground "green4"))))))))
+
+(advice-add 'battery-update :after #'ram-modify-battery-mode-line-string)
+
+(display-battery-mode t)
+
+;;** mode-line: time
+
+(display-time-mode t)
+
+;; Time format
+;; (setq display-time-format "%H%M")
+(customize-set-variable 'display-time-string-forms
+                        '((propertize (concat day dayname
+                                              " " 24-hours ":" minutes)
+                                      'face '((:foreground "grey60")))))
+
+;; Update display-time-string
+(display-time-update)
+
 ;;** modeline faces
 
 (defface my/mode:vc-added
@@ -2860,18 +2902,38 @@ been modified since its last check-in."
 
 ;;** modeline: line format
 
+;; credit to:
+;; https://github.com/xiongtx/.emacs.d/blob/347d9990a394fbcb222e4cda9759743e17b1977a/init.org#mode-line
+;; use this function to right align mode-line input
+(defun *-mode-line-fill (reserve)
+  "Return empty space using FACE and leaving RESERVE space on the right."
+  (unless reserve
+    (setq reserve 20))
+  (when (and window-system
+             (eq 'right (get-scroll-bar-mode)))
+    (setq reserve (- reserve 3)))
+  (propertize " "
+              'display `((space :align-to (- (+ right right-fringe right-margin) ,reserve)))))
+
 (setq-default mode-line-format
               '(
-                (:eval (if (buffer-narrowed-p)
-                           (progn (propertize "%n " 'face '((:background "green"))))
-                         (propertize (format " %s "
-                                             exwm-workspace-current-index) 'face '((:foreground "chartreuse3")))))
+                ;; show workspaces
+
+                (:eval (if (and (window-at-side-p (get-buffer-window) 'bottom)
+                                (window-at-side-p (get-buffer-window) 'left))
+                           (propertize (format " %s "
+                                               exwm-workspace-current-index) 'face '((:foreground "green4")))
+                         "   "))
+                (:eval (when (buffer-narrowed-p)
+                         (progn (propertize " %n " 'face '((:background "green"))))))
+
                 ;; on remote machine?
                 "[" "%@" "]"
                 ;; mode-line-modified
                 ;; %, * or - for read only, changed, saved
                 " %*%*%* "
                 ;; mode-line-buffer-identification
+
                 (:eval (propertize "%b " 'face font-lock-keyword-face
                                    'help-echo (buffer-file-name)))
                 (:eval (if (boundp 'git-gutter-mode)
@@ -2881,6 +2943,7 @@ been modified since its last check-in."
                            (propertize (format "-%s " (cdr (git-gutter:statistic)))
                                        'face '((:foreground "chocolate")))))
                 (:eval (my-mode-line-vc-info))
+
                 ;; (:eval (propertize vc-mode 'face '((:foreground "DarkGoldenrod2"))))
                 ;; line and column
                 " ("
@@ -2895,7 +2958,18 @@ been modified since its last check-in."
                 ;; "-- user: "
                 ;; value of user
                 ;; (getenv "USER")
-                " -- "))
+                " -- "
+
+                (:eval
+                 (when (and (window-at-side-p (get-buffer-window) 'bottom)
+                            (window-at-side-p (get-buffer-window) 'right))
+                   (format "%s%s %s"
+                           ;; right align
+                           (*-mode-line-fill (+ (length battery-mode-line-string)
+                                                1
+                                                (length display-time-string)))
+                           battery-mode-line-string
+                           display-time-string)))))
 
 ;;* themes
 
