@@ -139,7 +139,8 @@
                          kill-region
                          yank
                          delete-backward-char
-                         delete-char))
+                         delete-char
+                         completion-at-point))
     (rec-start-completion))
    ((eq this-command 'eshell-interrupt-process)
     (rec--set-vars))
@@ -392,6 +393,7 @@
     (define-key keymap "\M-n" #'rec-next)
     (define-key keymap (kbd "<return>") #'rec-insert-candidate-as-input)
     (define-key keymap (kbd "<C-return>") #'rec-send-input)
+    (define-key keymap (kbd "<tab>") #'rec-completion-at-point)
     keymap)
   "Keymap enabled when displaying completion candidates.")
 
@@ -460,6 +462,13 @@ Disable `ram-eshell-completion-mode'."
                             rec-history)))
   (when ram-eshell-completion-mode
     (ram-eshell-completion-mode -1)))
+
+(defun rec-completion-at-point ()
+  "Run `completion-at-point'  safely.
+Disable `ram-eshell-completion-mode' before and enable it after."
+  (interactive)
+  (rec--hide-completion-ov)
+  (completion-at-point))
 
 ;;* minor-mode definition
 
