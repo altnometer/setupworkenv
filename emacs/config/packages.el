@@ -1179,14 +1179,14 @@ one, an error is signaled."
 
 ;;*** buffers: no prompt kill
 
-(defun ram-kill-curr-buffer ()
-  (interactive)
+(defun ram-kill-curr-buffer (arg)
+  (interactive "p")
   ;; do not save buffers that strat with "*"
   (if (or (string-match "^\\*.*$" (buffer-name (current-buffer)))
           (ram-info-buffer-p (current-buffer) nil)
           (ram-interactive-buffer-p (current-buffer) nil))
       (kill-buffer (current-buffer))
-    (save-buffer (current-buffer))
+    (when (not arg) (save-buffer (current-buffer)))
     (kill-buffer (current-buffer))))
 (global-set-key (kbd "C-x k") #'ram-kill-curr-buffer)
 
