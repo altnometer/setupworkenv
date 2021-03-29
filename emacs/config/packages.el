@@ -1244,7 +1244,7 @@ one, an error is signaled."
 
 (defvar ram-info-buffers '("*ob-ipython-inspect*"
                            "*Ivy Help*"
-                           "*scratch*"
+                           ;; "*scratch*"
                            "*Backtrace*"
                            "*info*"))
 
@@ -1340,7 +1340,7 @@ one, an error is signaled."
       (window--display-buffer buf (car windows) 'reuse alist))))
 
 (defun ram-display-buffer-in-same-window (buf alist)
-  "Display buffer in any other window if it exists."
+  "Display buffer in the same window."
   (let ((buffer-window (get-buffer-window buf 'A)))
     (when buffer-window
       (window--display-buffer buf buffer-window 'reuse alist))))
@@ -1406,8 +1406,6 @@ one, an error is signaled."
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
-                 (with-current-buffer buf
-                   (eq major-mode 'dired-mode))
                  (string-prefix-p "*eshell*" (if (stringp buf) buf (buffer-name buf))))
                (
                 ;; (lambda (buf alist)
@@ -1417,6 +1415,18 @@ one, an error is signaled."
                 ;;   nil)
                 ram-display-buffer-in-same-window
                 ram-display-buffer-in-info-window
+                ram-display-buffer-in-other-window
+                ram-display-buffer-split-right)))
+
+(add-to-list 'display-buffer-alist
+             `((lambda (buf alist)
+                 (string= "*scratch*" (if (stringp buf) buf (buffer-name buf))))
+               (
+                ;; (lambda (buf alist)
+                ;;   (message (format "################ buf name: %s, mode: %s"
+                ;;                    buf
+                ;;                    (with-current-buffer buf major-mode)))
+                ;;   nil)
                 ram-display-buffer-in-other-window
                 ram-display-buffer-split-right)))
 
