@@ -2764,10 +2764,14 @@ repository, then the corresponding root is used instead."
 ;; default is 5 seconds
 (setq auto-revert-interval 3)
 
-;; none seem to work
-;; (cancel-function-timers 'force-mode-line-update)
-;; (run-at-time 1 nil '(lambda () (force-mode-line-update t)))
-;; (run-with-timer 0 1 #'(lambda () (force-mode-line-update t)))
+;;** mode-line: timer
+
+;; (cancel-timer mode-line-timer)
+(run-at-time 1 nil '(lambda () (force-mode-line-update t)))
+(defvar mode-line-timer
+  (run-with-timer 2 4 #'(lambda () (force-mode-line-update t))))
+(defvar mode-line-cpu-temp-timer
+  (run-with-timer 2 4 #'(lambda () (ram-get-cpu-temp))))
 
 ;;** mode-line: battery
 
@@ -2791,6 +2795,47 @@ repository, then the corresponding root is used instead."
 (advice-add 'battery-update :after #'ram-modify-battery-mode-line-string)
 
 (display-battery-mode t)
+
+;;** mode-line: cpu temp
+
+(defvar ram-sensors-output nil)
+(defvar ram-shell-cpu-temp "ram-shell-cpu-temp"
+  "A name for a shell process to query cpu temperatures.")
+(defvar ram-cpu-temp-str nil)
+
+(defvar sh-proc (make-process
+                 :name ram-shell-cpu-temp
+                 :buffer nil
+                 :command '("bash")
+                 :connection-type 'pipe
+                 :filter (lambda (proc output)
+                           (setq ram-sensors-output (concat output ram-sensors-output)))))
+
+(defun ram-get-cpu-temp ()
+  "Set `ram-cpu-temp-str' to current cpu temperature."
+  "cpu temp"
+  (let ((output ram-sensors-output))
+    (setq ram-sensors-output nil)
+    (process-send-string ram-shell-cpu-temp "sensors\n")
+    (if output
+        (let ((temps
+            (mapcar
+             (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
+             (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
+                         (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
+                                 (split-string output "\n" t "[ \f\t\r\v]+")))))
+           mode-line-cpu-temp)
+       (setq mode-line-cpu-temp
+             (cl-labels ((temps-to-str (temps)
+                                       (if (null temps)
+                                           '()
+                                         (let* ((tmp (car temps))
+                                                (tmp-str (if (> (car temps) 60)
+                                                             (propertize (number-to-string tmp) 'face '((:foreground "red2")))
+                                                           (propertize (number-to-string tmp) 'face '((:foreground "gray60"))))))
+                                           (cons tmp-str (temps-to-str (cdr temps)))))))
+               (temps-to-str temps)))
+       (setq ram-cpu-temp-str (string-join mode-line-cpu-temp " "))))))
 
 ;;** mode-line: time
 
@@ -2859,6 +2904,7 @@ cannot be determined."
   :group 'MY/mode)
 
 ;;** modeline functions
+
 (defvar my-vc-mode-attrs
   '(("" . (" NoVC " my/mode:vc-none))
     ("-" . (" VC = " my/mode:vc-in-sync))
@@ -2973,13 +3019,18 @@ been modified since its last check-in."
                 (:eval
                  (when (and (window-at-side-p (get-buffer-window) 'bottom)
                             (window-at-side-p (get-buffer-window) 'right))
-                   (format "%s%s %s"
-                           ;; right align
-                           (*-mode-line-fill (+ (length battery-mode-line-string)
-                                                1
-                                                (length display-time-string)))
-                           battery-mode-line-string
-                           display-time-string)))))
+                   (let ((cpu-temp (or ram-cpu-temp-str ""))
+                         (bat (ram-get-battery-status)))
+                     ;; right align
+                     (format "%s%s %s %s"
+                             (*-mode-line-fill (+ (length cpu-temp)
+                                                  1
+                                                  (length bat)
+                                                  1
+                                                  (length display-time-string)))
+                             cpu-temp
+                             bat
+                             display-time-string))))))
 
 ;;* themes
 
