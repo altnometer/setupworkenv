@@ -2779,24 +2779,46 @@ repository, then the corresponding root is used instead."
 
 (customize-set-variable 'battery-mode-line-format "%b%p%%%")
 
-(defun ram-modify-battery-mode-line-string ()
-  "Modify `battery-mode-line-string' properties."
+(display-battery-mode t)
+
+;; (assoc "Percentage" (dbus-get-all-properties :system
+;;                           "org.freedesktop.UPower"
+;;                           (expand-file-name
+;;                            (setq bat0 (car (dbus-call-method :system
+;;                                                              "org.freedesktop.UPower"
+;;                                                              "/org/freedesktop/UPower"
+;;                                                              "org.freedesktop.UPower"
+;;                                                              "EnumerateDevices")))
+;;                            "/org/freedesktop/UPower")
+;;                           "org.freedesktop.UPower.Device"))
+
+(defun ram-get-battery-status ()
+  "Modify `battery-mode-line-string'."
+  ;; refresh dbus service for devices
+  ;; in my experience, it gets stuck sometimes
+  ;; it seems to cause some misbehavior in exwm
+  ;; (cl-dolist (device (dbus-call-method
+  ;;                     :system
+  ;;                     "org.freedesktop.UPower"
+  ;;                     "/org/freedesktop/UPower"
+  ;;                     "org.freedesktop.UPower"
+  ;;                     "EnumerateDevices"))
+  ;;   (dbus-call-method :system
+  ;;                     "org.freedesktop.UPower"
+  ;;                     (expand-file-name  device "/org/freedesktop/UPower")
+  ;;                     "org.freedesktop.UPower.Device"
+  ;;                     "Refresh"))
   (if (string-match "[0-9.]+" battery-mode-line-string)
       (let* ((matched-number (match-string 0 battery-mode-line-string))
-            (charge-percent (floor (string-to-number matched-number)))
-            (new-str (replace-regexp-in-string (regexp-quote matched-number)
-                                               (number-to-string charge-percent)
-                                               battery-mode-line-string
-                                               nil
-                                               'literal)))
-        (setq battery-mode-line-string
-              (if (< charge-percent 20)
-                  (propertize new-str 'face '((:foreground "red")))
-                (propertize new-str 'face '((:foreground "green4"))))))))
-
-(advice-add 'battery-update :after #'ram-modify-battery-mode-line-string)
-
-(display-battery-mode t)
+             (charge-percent (floor (string-to-number matched-number)))
+             (new-str (replace-regexp-in-string (regexp-quote matched-number)
+                                                (number-to-string charge-percent)
+                                                battery-mode-line-string
+                                                nil
+                                                'literal)))
+        (if (< charge-percent 20)
+            (propertize new-str 'face '((:foreground "red")))
+          (propertize new-str 'face '((:foreground "green4")))))))
 
 ;;** mode-line: cpu temp
 
