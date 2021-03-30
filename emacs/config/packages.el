@@ -418,12 +418,14 @@
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
-;; (add-hook 'exwm-manage-finish-hook
-;;           (lambda ()
-;;             (when (and exwm-class-name
-;;                        (string= exwm-class-name "Firefox"))
-;;               (exwm-input-set-local-simulation-keys nil)
-;;               (setq mode-line-format nil))))
+(add-hook 'exwm-manage-finish-hook
+          (lambda ()
+            (when (and exwm-class-name
+                       (string= exwm-class-name "qutebrowser"))
+              (exwm-input-set-local-simulation-keys nil)
+              (set-window-fringes (selected-window) 0 0)
+              ;; (setq mode-line-format nil)
+              )))
 
 ;; Line-editing shortcuts
 
