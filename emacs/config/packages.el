@@ -2837,7 +2837,6 @@ repository, then the corresponding root is used instead."
 
 (defun ram-get-cpu-temp ()
   "Set `ram-cpu-temp-str' to current cpu temperature."
-  "cpu temp"
   (let ((output ram-sensors-output))
     (setq ram-sensors-output nil)
     (process-send-string ram-shell-cpu-temp "sensors\n")
