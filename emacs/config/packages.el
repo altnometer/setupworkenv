@@ -2863,6 +2863,38 @@ repository, then the corresponding root is used instead."
           (setq ram-cpu-temp-str (string-join mode-line-cpu-temp " ")))
       (setq ram-cpu-temp-str ""))))
 
+;;** mode-line: memory
+
+(defvar ram-free-cmd-output nil
+  "Holds the modified output of linux \"free\" command. ")
+(defvar ram-shell-free-cmd-name "ram-shell-free"
+  "A name for a shell process to run \"free\" command.")
+(defvar ram-memory-mode-line-str nil)
+
+(defvar sh-memory-query-proc (make-process
+                              :name ram-shell-free-cmd-name
+                              :buffer nil
+                              :command '("bash")
+                              :connection-type 'pipe
+                              :filter (lambda (proc output)
+                                        (setq ram-free-cmd-output (concat output ram-free-cmd-output)))))
+
+(defun ram-get-memory-stats ()
+  "Set `ram-memory-mode-line-str' to current memory stats."
+  (let ((output ram-free-cmd-output))
+    (setq ram-free-cmd-output nil)
+    (process-send-string ram-shell-free-cmd-name "free -m\n")
+    (if output
+        (let ((mem-output
+               (mapcar (lambda (s)
+                         (let ((l (split-string s)))
+                           (cons (car l) (mapcar #'string-to-number (cdr l)))))
+                       (split-string output "\n" t "[ \f\t\r\v]+"))))
+          (setq ram-memory-mode-line-str
+                (propertize (format " %4.1f "
+                                    (/ (nth 5 (cdr (assoc "Mem:" mem-output))) 1000.0))
+                            'face '((:foreground "grey60")))))
+      (setq ram-memory-mode-line-str ""))))
 
 ;;** mode-line: time
 
