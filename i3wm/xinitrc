@@ -29,5 +29,9 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 #export CLUTTER_IM_MODULE=xim
 
 # Finally start Emacs
+if [ ! "$DBUS_SESSION_BUS_ADDRESS" ] && have dbus-launch; then
+  exec dbus-launch --exit-with-session ~/.xinitrc "$@" || exit
+fi
 exec emacs -mm --debug-init
+#exec dbus-launch --exit-with-session emacs -mm --debug-init
 #exec emacs --no-init-file
