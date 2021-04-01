@@ -2773,7 +2773,9 @@ repository, then the corresponding root is used instead."
 (defvar mode-line-timer
   (run-with-timer 2 4 #'(lambda () (force-mode-line-update t))))
 (defvar mode-line-cpu-temp-timer
-  (run-with-timer 2 4 #'(lambda () (ram-get-cpu-temp))))
+  (run-with-timer 2 3 #'ram-get-cpu-temp))
+(defvar mode-line-memory-stats-timer
+  (run-with-timer 2 3.1 #'ram-get-memory-stats))
 
 ;;** mode-line: battery
 
