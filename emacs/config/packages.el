@@ -2842,22 +2842,21 @@ repository, then the corresponding root is used instead."
   (let ((output ram-sensors-cmd-output))
     (setq ram-sensors-cmd-output nil)
     (process-send-string ram-shell-sensors-cmd-name "sensors\n")
-    (if output
-        (let* ((temps
-                (mapcar
-                 (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
-                 (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
-                             (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
-                                     (split-string output "\n" t "[ \f\t\r\v]+")))))
-               (average (/ (cl-reduce #'+ temps) (length temps)))
-               (temp-str (if (< average 60)
-                             (propertize (number-to-string average)
-                                         'face '((:foreground "pink2")))
+    (when output
+      (let* ((temps
+              (mapcar
+               (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
+               (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
+                           (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
+                                   (split-string output "\n" t "[ \f\t\r\v]+")))))
+             (average (/ (cl-reduce #'+ temps) (length temps)))
+             (temp-str (if (< average 60)
                            (propertize (number-to-string average)
-                                       'face '((:foreground "brown2")))))
-               mode-line-cpu-temp)
-          (setq ram-cpu-temp-mode-line-str temp-str))
-      (setq ram-cpu-temp-mode-line-str ""))))
+                                       'face '((:foreground "pink2")))
+                         (propertize (number-to-string average)
+                                     'face '((:foreground "brown2")))))
+             mode-line-cpu-temp)
+        (setq ram-cpu-temp-mode-line-str temp-str)))))
 
 ;;** mode-line: memory
 
@@ -2880,17 +2879,16 @@ repository, then the corresponding root is used instead."
   (let ((output ram-free-cmd-output))
     (setq ram-free-cmd-output nil)
     (process-send-string ram-shell-free-cmd-name "free -m\n")
-    (if output
-        (let ((mem-output
-               (mapcar (lambda (s)
-                         (let ((l (split-string s)))
-                           (cons (car l) (mapcar #'string-to-number (cdr l)))))
-                       (split-string output "\n" t "[ \f\t\r\v]+"))))
-          (setq ram-memory-mode-line-str
-                (propertize (format " %4.1f "
-                                    (/ (nth 5 (cdr (assoc "Mem:" mem-output))) 1000.0))
-                            'face '((:foreground "grey60")))))
-      (setq ram-memory-mode-line-str ""))))
+    (when output
+      (let ((mem-output
+             (mapcar (lambda (s)
+                       (let ((l (split-string s)))
+                         (cons (car l) (mapcar #'string-to-number (cdr l)))))
+                     (split-string output "\n" t "[ \f\t\r\v]+"))))
+        (setq ram-memory-mode-line-str
+              (propertize (format " %4.1f "
+                                  (/ (nth 5 (cdr (assoc "Mem:" mem-output))) 1000.0))
+                          'face '((:foreground "grey60"))))))))
 
 ;;** mode-line: time
 
@@ -3072,8 +3070,8 @@ been modified since its last check-in."
                 (:eval
                  (when (and (window-at-side-p (get-buffer-window) 'bottom)
                             (window-at-side-p (get-buffer-window) 'right))
-                   (let* ((mem ram-memory-mode-line-str)
-                          (cpu-temp ram-cpu-temp-mode-line-str)
+                   (let* ((mem (or ram-memory-mode-line-str ""))
+                          (cpu-temp (or ram-cpu-temp-mode-line-str ""))
                           (bat (ram-get-battery-status))
                           (time display-time-string)
                           (right-align-str (*-mode-line-fill (+ (length mem)
