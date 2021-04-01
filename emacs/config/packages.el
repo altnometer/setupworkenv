@@ -2824,24 +2824,24 @@ repository, then the corresponding root is used instead."
 
 ;;** mode-line: cpu temp
 
-(defvar ram-sensors-output nil)
-(defvar ram-shell-cpu-temp "ram-shell-cpu-temp"
+(defvar ram-sensors-cmd-output nil)
+(defvar ram-shell-sensors-cmd-name "ram-shell-cpu-temp"
   "A name for a shell process to query cpu temperatures.")
-(defvar ram-cpu-temp-str nil)
+(defvar ram-cpu-temp-mode-line-str nil)
 
 (defvar sh-proc (make-process
-                 :name ram-shell-cpu-temp
+                 :name ram-shell-sensors-cmd-name
                  :buffer nil
                  :command '("bash")
                  :connection-type 'pipe
                  :filter (lambda (proc output)
-                           (setq ram-sensors-output (concat output ram-sensors-output)))))
+                           (setq ram-sensors-cmd-output (concat output ram-sensors-cmd-output)))))
 
 (defun ram-get-cpu-temp ()
-  "Set `ram-cpu-temp-str' to current cpu temperature."
-  (let ((output ram-sensors-output))
-    (setq ram-sensors-output nil)
-    (process-send-string ram-shell-cpu-temp "sensors\n")
+  "Set `ram-cpu-temp-mode-line-str' to current cpu temperature."
+  (let ((output ram-sensors-cmd-output))
+    (setq ram-sensors-cmd-output nil)
+    (process-send-string ram-shell-sensors-cmd-name "sensors\n")
     (if output
         (let ((temps
                (mapcar
@@ -2860,8 +2860,8 @@ repository, then the corresponding root is used instead."
                                                               (propertize (number-to-string tmp) 'face '((:foreground "gray60"))))))
                                               (cons tmp-str (temps-to-str (cdr temps)))))))
                   (temps-to-str temps)))
-          (setq ram-cpu-temp-str (string-join mode-line-cpu-temp " ")))
-      (setq ram-cpu-temp-str ""))))
+          (setq ram-cpu-temp-mode-line-str (string-join mode-line-cpu-temp " ")))
+      (setq ram-cpu-temp-mode-line-str ""))))
 
 ;;** mode-line: memory
 
@@ -3077,7 +3077,7 @@ been modified since its last check-in."
                  (when (and (window-at-side-p (get-buffer-window) 'bottom)
                             (window-at-side-p (get-buffer-window) 'right))
                    (let* ((mem ram-memory-mode-line-str)
-                          (cpu-temp ram-cpu-temp-str)
+                          (cpu-temp ram-cpu-temp-mode-line-str)
                           (bat (ram-get-battery-status))
                           (time display-time-string)
                           (right-align-str (*-mode-line-fill (+ (length mem)
