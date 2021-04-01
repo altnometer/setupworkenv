@@ -3078,18 +3078,21 @@ been modified since its last check-in."
                 (:eval
                  (when (and (window-at-side-p (get-buffer-window) 'bottom)
                             (window-at-side-p (get-buffer-window) 'right))
-                   (let ((cpu-temp (or ram-cpu-temp-str ""))
-                         (bat (ram-get-battery-status)))
-                     ;; right align
-                     (format "%s%s %s %s"
-                             (*-mode-line-fill (+ (length cpu-temp)
-                                                  1
-                                                  (length bat)
-                                                  1
-                                                  (length display-time-string)))
+                   (let* ((mem ram-memory-mode-line-str)
+                          (cpu-temp ram-cpu-temp-str)
+                          (bat (ram-get-battery-status))
+                          (time display-time-string)
+                          (right-align-str (*-mode-line-fill (+ (length mem)
+                                                                (length cpu-temp)
+                                                                1
+                                                                (length bat)
+                                                                (length time)))))
+                     (format "%s%s%s %s%s "
+                             right-align-str
+                             mem
                              cpu-temp
                              bat
-                             display-time-string))))))
+                             time))))))
 
 ;;* themes
 
