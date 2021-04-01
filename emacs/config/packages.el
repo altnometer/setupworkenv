@@ -2842,23 +2842,25 @@ repository, then the corresponding root is used instead."
     (process-send-string ram-shell-cpu-temp "sensors\n")
     (if output
         (let ((temps
-            (mapcar
-             (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
-             (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
-                         (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
-                                 (split-string output "\n" t "[ \f\t\r\v]+")))))
-           mode-line-cpu-temp)
-       (setq mode-line-cpu-temp
-             (cl-labels ((temps-to-str (temps)
-                                       (if (null temps)
-                                           '()
-                                         (let* ((tmp (car temps))
-                                                (tmp-str (if (> (car temps) 60)
-                                                             (propertize (number-to-string tmp) 'face '((:foreground "red2")))
-                                                           (propertize (number-to-string tmp) 'face '((:foreground "gray60"))))))
-                                           (cons tmp-str (temps-to-str (cdr temps)))))))
-               (temps-to-str temps)))
-       (setq ram-cpu-temp-str (string-join mode-line-cpu-temp " "))))))
+               (mapcar
+                (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
+                (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
+                            (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
+                                    (split-string output "\n" t "[ \f\t\r\v]+")))))
+              mode-line-cpu-temp)
+          (setq mode-line-cpu-temp
+                (cl-labels ((temps-to-str (temps)
+                                          (if (null temps)
+                                              '()
+                                            (let* ((tmp (car temps))
+                                                   (tmp-str (if (> (car temps) 60)
+                                                                (propertize (number-to-string tmp) 'face '((:foreground "red2")))
+                                                              (propertize (number-to-string tmp) 'face '((:foreground "gray60"))))))
+                                              (cons tmp-str (temps-to-str (cdr temps)))))))
+                  (temps-to-str temps)))
+          (setq ram-cpu-temp-str (string-join mode-line-cpu-temp " ")))
+      (setq ram-cpu-temp-str ""))))
+
 
 ;;** mode-line: time
 
