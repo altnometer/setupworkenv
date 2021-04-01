@@ -2759,7 +2759,7 @@ repository, then the corresponding root is used instead."
 ;; (define-key global-map (kbd "C-c j") 'counsel-git-grep)
 ;; (define-key global-map (kbd "C-c k") 'counsel-ag)
 
-;;* modeline
+;;* mode-line
 
 ;; update vc-mode info (e.g., current branch)
 (setq auto-revert-check-vc-info t)
@@ -2910,7 +2910,7 @@ repository, then the corresponding root is used instead."
 ;; Update display-time-string
 (display-time-update)
 
-;;** modeline faces
+;;** mode-line: version control (vc)
 
 (defface my/mode:vc-added
   `(
@@ -2961,8 +2961,6 @@ control"
   "VC status tag face for files whose version-control status
 cannot be determined."
   :group 'MY/mode)
-
-;;** modeline functions
 
 (defvar my-vc-mode-attrs
   '(("" . (" NoVC " my/mode:vc-none))
@@ -3015,7 +3013,7 @@ been modified since its last check-in."
     ;;         branch)
     (concat (propertize (format "%s " branch) 'face (cadr props)))))
 
-;;** modeline: line format
+;;** mode-line: format
 
 ;; credit to:
 ;; https://github.com/xiongtx/.emacs.d/blob/347d9990a394fbcb222e4cda9759743e17b1977a/init.org#mode-line
