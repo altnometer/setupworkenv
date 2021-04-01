@@ -2819,8 +2819,8 @@ repository, then the corresponding root is used instead."
                                                 nil
                                                 'literal)))
         (if (< charge-percent 20)
-            (propertize new-str 'face '((:foreground "red")))
-          (propertize new-str 'face '((:foreground "green4")))))))
+            (propertize new-str 'face '((:foreground "brown2")))
+          (propertize new-str 'face '((:foreground "PaleGreen3")))))))
 
 ;;** mode-line: cpu temp
 
