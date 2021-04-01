@@ -2843,24 +2843,20 @@ repository, then the corresponding root is used instead."
     (setq ram-sensors-cmd-output nil)
     (process-send-string ram-shell-sensors-cmd-name "sensors\n")
     (if output
-        (let ((temps
-               (mapcar
-                (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
-                (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
-                            (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
-                                    (split-string output "\n" t "[ \f\t\r\v]+")))))
-              mode-line-cpu-temp)
-          (setq mode-line-cpu-temp
-                (cl-labels ((temps-to-str (temps)
-                                          (if (null temps)
-                                              '()
-                                            (let* ((tmp (car temps))
-                                                   (tmp-str (if (> (car temps) 60)
-                                                                (propertize (number-to-string tmp) 'face '((:foreground "red2")))
-                                                              (propertize (number-to-string tmp) 'face '((:foreground "gray60"))))))
-                                              (cons tmp-str (temps-to-str (cdr temps)))))))
-                  (temps-to-str temps)))
-          (setq ram-cpu-temp-mode-line-str (string-join mode-line-cpu-temp " ")))
+        (let* ((temps
+                (mapcar
+                 (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
+                 (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
+                             (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
+                                     (split-string output "\n" t "[ \f\t\r\v]+")))))
+               (average (/ (cl-reduce #'+ temps) (length temps)))
+               (temp-str (if (< average 60)
+                             (propertize (number-to-string average)
+                                         'face '((:foreground "pink2")))
+                           (propertize (number-to-string average)
+                                       'face '((:foreground "brown2")))))
+               mode-line-cpu-temp)
+          (setq ram-cpu-temp-mode-line-str temp-str))
       (setq ram-cpu-temp-mode-line-str ""))))
 
 ;;** mode-line: memory
