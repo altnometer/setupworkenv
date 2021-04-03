@@ -422,6 +422,7 @@
                        (string= exwm-class-name "qutebrowser"))
               (exwm-input-set-local-simulation-keys nil)
               (set-window-fringes (selected-window) 0 0)
+              (exwm-layout-toggle-fullscreen)
               ;; (setq mode-line-format nil)
               )))
 
