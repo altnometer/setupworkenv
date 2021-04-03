@@ -379,8 +379,14 @@
         ;; ([?\s-Q] . save-buffers-kill-emacs)
 
         ([?\s-f] . ram-choose-from-recentf)
+        ([?\s-b] . switch-to-buffer)
+        ([?\s-e] . ram-open-eshell)
+        ([?\s-o] . other-window)
         (,(kbd "C-s-f") . find-file)
         (,(kbd "C-S-s-f") . find-file-other-window)
+
+        (,(kbd "<M-f15>") . ram-other-workspace)
+        (,(kbd "<f15>") . ram-other-workspace)
 
         ([?\s-z] . exwm-layout-toggle-fullscreen)
         ([?\s-/] . exwm-layout-toggle-mode-line)
