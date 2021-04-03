@@ -441,6 +441,7 @@
         ([?\C-k] . [S-end delete])))
 
 ;; must be the last in 'exwm settings
+(exwm-randr-enable)
 (exwm-enable)
 
 ;;* magit
