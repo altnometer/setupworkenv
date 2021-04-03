@@ -1089,6 +1089,22 @@ instead."
 
 ;;** frame
 
+;;*** frame: navigate
+
+(defun ram-other-workspace (count)
+  "Focus next visible workspace."
+  (interactive "p")
+  (let ((count (1- count))
+        (visible-workspace
+         (seq-filter (lambda (f) (and (not (equal f (selected-frame)))
+                                      (frame-parameter f 'exwm-active)))
+                     (frame-list))))
+    (exwm-workspace-switch (nth count visible-workspace))))
+
+;; all <M-f*> keys in layer activated with <tab> hold (right top thumb key)
+(define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
+(define-key global-map (kbd "<f15>") #'ram-other-workspace)
+
 ;; transparency
 ;; (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
 ;; (add-to-list 'default-frame-alist '(alpha . (90 . 90)))
