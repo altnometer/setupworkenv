@@ -1128,13 +1128,21 @@ Then, quit other window."
      ((car win-info-buf-list) (quit-window nil (car win-info-buf-list)))
      ((cadr win-list) (quit-window nil (cadr win-list))))))
 
-(define-key global-map (kbd "<M-f15>") 'other-window)
-(define-key global-map (kbd "s-o") 'other-window)
-(define-key global-map (kbd "<M-S-f15>") (lambda () (interactive) (other-window -1)))
+(define-key global-map (kbd "s-w") 'ram-quit-other-windows)
+;; <XF86Copy> key is in layer where F1-F12 defined, in place of "w" key
 (define-key global-map (kbd "<M-XF86Copy>") 'delete-other-windows)
 (define-key global-map (kbd "<M-S-XF86Copy>") 'delete-window)
-(define-key global-map (kbd "s-w") 'ram-quit-other-windows)
 (define-key global-map (kbd "s-W") 'delete-window)
+
+;;*** windows: navigate
+
+(defun ram-other-window (count)
+  "Call `other-window' with added ALL-FRAMES."
+  (interactive "p")
+  (other-window count 'visible))
+
+(define-key global-map (kbd "s-o") 'other-window)
+(define-key global-map (kbd "<M-S-f15>") (lambda () (interactive) (other-window -1)))
 
 ;;*** windows: general settings
 ;; used for splitting windows sensibly, default width 160, height 80
