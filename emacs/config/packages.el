@@ -367,6 +367,7 @@
           (lambda ()
             (exwm-workspace-rename-buffer exwm-class-name)))
 
+;; floating X windows frames differ from emacs frames
 (setq exwm-manage-force-tiling t)
 
 ;;** exwm: bindings
