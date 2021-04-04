@@ -3032,6 +3032,25 @@ been modified since its last check-in."
     ;;         branch)
     (concat (propertize (format "%s " branch) 'face (cadr props)))))
 
+;;** mode-line: 'face
+
+(face-spec-set 'mode-line
+               '((((class color) (min-colors 88))
+                  ;; :box (:line-width 2 :color "grey55" :style nil)
+                  :box nil
+                  :weight light
+                  :background "grey55" :foreground "black" :height 155)))
+
+(face-spec-set 'mode-line-inactive
+               '(;; (default
+                 ;;   :inherit mode-line)
+                 (((class color) (min-colors 88))
+                  ;; :box (:line-width 2 :color "grey90" :style nil)
+                  :box nil
+                  :weight light
+                  :foreground "grey20" :background "grey90" :height 155)))
+
+
 ;;** mode-line: format
 
 ;; credit to:
