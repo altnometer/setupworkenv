@@ -386,6 +386,9 @@
         (,(kbd "C-s-f") . find-file)
         (,(kbd "C-S-s-f") . find-file-other-window)
 
+        ([?\s-N] . ram-next-workspace)
+        ([?\s-P] . ram-previous-workspace)
+        ([?\s-O] . ram-other-workspace)
         (,(kbd "<M-f15>") . ram-other-workspace)
         (,(kbd "<f15>") . ram-other-workspace)
 
@@ -444,6 +447,68 @@
 ;; must be the last in 'exwm settings
 (exwm-randr-enable)
 (exwm-enable)
+
+;;*** exwm: navigate workspaces
+
+(defvar ram-next-workspaces nil
+  "Hold workspace indexes added after `ram-previous-workspace' command.")
+
+(defun ram-next-workspace ()
+  "Switch to next workspace."
+  (interactive)
+  (if ram-next-workspaces
+      (let((next-idx (car ram-next-workspaces)))
+        (setq ram-next-workspaces (cdr ram-next-workspaces))
+        (exwm-workspace-switch next-idx))
+    (user-error "No next workspace")))
+
+(defvar ram-prev-workspaces nil
+  "Hold visited workspace added after `exwm-workspace-switch' is invoked.")
+
+(defun ram--add-workspace-index (frame-or-index &optional force)
+  "Add current workspace index to `ram-prev-workspaces'."
+  (let ((idx (exwm-workspace--position exwm-workspace--current)))
+    (when idx
+      (setq ram-prev-workspaces (cons idx (delq idx ram-prev-workspaces))))))
+
+(defun ram-previous-workspace ()
+  "Switch to previous workspace."
+  (interactive)
+  (if ram-prev-workspaces
+      (let ((current-idx (exwm-workspace--position exwm-workspace--current))
+            (prev-idx (car ram-prev-workspaces)))
+        (setq ram-next-workspaces (cons current-idx (delq current-idx ram-next-workspaces)))
+        (setq ram-prev-workspaces (cdr ram-prev-workspaces))
+        (exwm-workspace-switch prev-idx)
+        ;; advice on #'exwm-workspace-switch adds index to ram-prev-workspaces,
+        ;; remove it
+        (setq ram-prev-workspaces (cdr ram-prev-workspaces)))
+    (user-error "No previous workspace")))
+
+(advice-add #'exwm-workspace-switch :before #'ram--add-workspace-index)
+
+(defun ram-other-workspace (count)
+  "Focus next visible workspace."
+  (interactive "p")
+  (let ((count (1- count))
+        (visible-workspace
+         (seq-filter (lambda (f) (and (not (equal f (selected-frame)))
+                                      (frame-parameter f 'exwm-active)))
+                     (frame-list))))
+    (exwm-workspace-switch (nth count visible-workspace))))
+
+;; all <M-f*> keys in layer activated with <tab> hold (right top thumb key)
+(define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
+(define-key global-map (kbd "s-O") #'ram-other-workspace)
+(define-key global-map (kbd "s-N") #'ram-next-workspace)
+(define-key global-map (kbd "s-P") #'ram-previous-workspace)
+(define-key global-map (kbd "<f15>") #'ram-other-workspace)
+
+;; transparency
+;; (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
+;; (add-to-list 'default-frame-alist '(alpha . (90 . 90)))
+;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;;* magit
 (straight-use-package
