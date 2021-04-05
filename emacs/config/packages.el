@@ -3164,23 +3164,25 @@ been modified since its last check-in."
                 " -- "
 
                 (:eval
-                 (when (and (window-at-side-p (get-buffer-window) 'bottom)
-                            (window-at-side-p (get-buffer-window) 'right))
-                   (let* ((mem (or ram-memory-mode-line-str ""))
-                          (cpu-temp (or ram-cpu-temp-mode-line-str ""))
-                          (bat (ram-get-battery-status))
-                          (time display-time-string)
-                          (right-align-str (*-mode-line-fill (+ (length mem)
-                                                                (length cpu-temp)
-                                                                1
-                                                                (length bat)
-                                                                (length time)))))
-                     (format "%s%s%s %s%s "
-                             right-align-str
-                             mem
-                             cpu-temp
-                             bat
-                             time))))))
+                 ;; display only if frame is right of other frame
+                 (when (not (= 0 (car (frame-position (window-frame (get-buffer-window))))))
+                   (when (and (window-at-side-p (get-buffer-window) 'bottom)
+                              (window-at-side-p (get-buffer-window) 'right))
+                     (let* ((mem (or ram-memory-mode-line-str ""))
+                            (cpu-temp (or ram-cpu-temp-mode-line-str ""))
+                            (bat (ram-get-battery-status))
+                            (time display-time-string)
+                            (right-align-str (*-mode-line-fill (+ (length mem)
+                                                                  (length cpu-temp)
+                                                                  1
+                                                                  (length bat)
+                                                                  (length time)))))
+                       (format "%s%s%s %s%s "
+                               right-align-str
+                               mem
+                               cpu-temp
+                               bat
+                               time)))))))
 
 ;;* themes
 
