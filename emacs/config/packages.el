@@ -331,7 +331,7 @@
 (require 'exwm)
 (require 'exwm-randr)
 
-;;** exwm-randr
+;;** exwm: exwm-randr
 
 (setq exwm-randr-workspace-output-plist '(0 "HDMI-1-1"
                                           1 "HDMI-1-1"
