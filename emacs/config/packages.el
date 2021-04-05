@@ -3124,8 +3124,9 @@ been modified since its last check-in."
 
                 (:eval (if (and (window-at-side-p (get-buffer-window) 'bottom)
                                 (window-at-side-p (get-buffer-window) 'left))
-                           (propertize (format " %s "
-                                               exwm-workspace-current-index) 'face '((:foreground "green4")))
+                           (propertize (format " %s " (exwm-workspace--position
+                                                       (window-frame (get-buffer-window))))
+                                       'face '((:foreground "green4")))
                          "   "))
                 (:eval (when (buffer-narrowed-p)
                          (progn (propertize " %n " 'face '((:background "green"))))))
