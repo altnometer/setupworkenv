@@ -28,10 +28,18 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 #export QT_IM_MODULE=xim
 #export CLUTTER_IM_MODULE=xim
 
+
+xrandr --setmonitor HDMI-1-1 1920/300x2160/340+0+0 HDMI-1
+xrandr --setmonitor HDMI-1-2 1920/300x2160/340+1920+0 none
+
+#xrandr --output HDMI-1-1 --primary --mode 1920x2160 --pos 0x0 --rotate normal
+#xrandr --output HDMI-1-2 --mode 1920x2160 --pos 1920x0 --rotate normal
+
 # Finally start Emacs
 if [ ! "$DBUS_SESSION_BUS_ADDRESS" ] && have dbus-launch; then
   exec dbus-launch --exit-with-session ~/.xinitrc "$@" || exit
 fi
+
 exec emacs -mm --debug-init
 #exec dbus-launch --exit-with-session emacs -mm --debug-init
 #exec emacs --no-init-file
