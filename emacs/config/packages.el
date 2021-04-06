@@ -1573,8 +1573,10 @@ one, an error is signaled."
                 ;;                    buf
                 ;;                    (with-current-buffer buf major-mode)))
                 ;;   nil)
-                ram-display-buffer-in-other-window
-                ram-display-buffer-split-right)))
+                (lambda (buf alist)
+                  "Display \"*scratch*\" buffers in exwm workspace 0."
+                  (exwm-workspace-switch-create 0)
+                  'display-buffer-use-some-window))))
 
 ;; (add-to-list 'display-buffer-alist
 ;;              `("*"
