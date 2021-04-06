@@ -1466,20 +1466,20 @@ one, an error is signaled."
                ;;     win))
                ))
 
-(add-to-list 'display-buffer-alist
-             `(ram-info-buffer-p
-               (
-                ;; (lambda (buf alist)
-                ;;   (progn (message (format "*************************** buf name: %s, mode: %s"
-                ;;                           buf
-                ;;                           (with-current-buffer buf major-mode))) nil))
-                ram-display-buffer-common-window
-                ram-display-buffer-in-info-window
-                ram-display-buffer-reuse-right-window
-                ;; display-buffer-reuse-mode-window
-                ;; display-buffer-use-some-window
-                ;; display-buffer-in-side-window
-                ram-display-buffer-split-right)))
+;; (add-to-list 'display-buffer-alist
+;;              `(ram-info-buffer-p
+;;                (
+;;                 (lambda (buf alist)
+;;                   (progn (message (format "*************************** buf name: %s, mode: %s"
+;;                                           buf
+;;                                           (with-current-buffer buf major-mode))) nil))
+;;                 ram-display-buffer-common-window
+;;                 ram-display-buffer-in-info-window
+;;                 ram-display-buffer-reuse-right-window
+;;                 ;; display-buffer-reuse-mode-window
+;;                 ;; display-buffer-use-some-window
+;;                 ;; display-buffer-in-side-window
+;;                 ram-display-buffer-split-right)))
 
 (add-to-list 'display-buffer-alist
              `(ram-interactive-buffer-p
@@ -1494,6 +1494,33 @@ one, an error is signaled."
                 ram-display-buffer-split-right)))
 
 ;; display 'dired-mode buffers, must be added after #'ram-interactive-buffer-p
+;; (add-to-list 'display-buffer-alist
+;;              `((lambda (buf alist)
+;;                  (with-current-buffer buf
+;;                    (eq major-mode 'dired-mode)))
+;;                (ram-display-buffer-in-info-window
+;;                 (lambda (buf alist)
+;;                   (let* ((sel-win (selected-window))
+;;                          (win (next-window sel-win -1 'A)))
+;;                     (if (and (window-live-p win)
+;;                              (not (eq sel-win win)))
+;;                         (window--display-buffer buf win 'reuse alist)
+;;                       nil)))
+;;                 ram-display-buffer-split-right)))
+
+;; (add-to-list 'display-buffer-alist
+;;              `((lambda (buf alist)
+;;                  (with-current-buffer buf
+;;                    (eq major-mode 'dired-mode)))
+;;                ((lambda (buf alist)
+;;                   (let* ((sel-win (selected-window))
+;;                          (win (next-window sel-win -1 'A)))
+;;                     (if (and (window-live-p win)
+;;                              (not (eq sel-win win)))
+;;                         (window--display-buffer buf win 'reuse alist)
+;;                       nil)))
+;;                 ram-display-buffer-split-right)))
+
 (add-to-list 'display-buffer-alist
              `((lambda (buffer alist)
                  (with-current-buffer buffer
