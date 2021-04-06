@@ -1495,18 +1495,33 @@ one, an error is signaled."
 
 ;; display 'dired-mode buffers, must be added after #'ram-interactive-buffer-p
 (add-to-list 'display-buffer-alist
-             `((lambda (buf alist)
-                 (with-current-buffer buf
+             `((lambda (buffer alist)
+                 (with-current-buffer buffer
                    (eq major-mode 'dired-mode)))
-               (ram-display-buffer-in-info-window
-                (lambda (buf alist)
-                  (let* ((sel-win (selected-window))
-                         (win (next-window sel-win -1 'A)))
-                    (if (and (window-live-p win)
-                             (not (eq sel-win win)))
-                        (window--display-buffer buf win 'reuse alist)
-                      nil)))
-                ram-display-buffer-split-right)))
+               (lambda (buffer alist)
+                 ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
+                 (let* ((frame (exwm-workspace--workspace-from-frame-or-index 7))
+                        (selected-window (frame-selected-window frame))
+                        (window (next-window selected-window 'nomini frame)))
+                   (exwm-workspace-switch frame)
+                   (cond
+                    ;; reuse window displaying same buffer
+                    ((string= (buffer-name (window-buffer selected-window))
+                              (if (stringp buffer) buffer (buffer-name buffer)))
+                     (window--display-buffer buffer selected-window 'reuse alist))
+                    ;; reuse other window
+                    ((and (window-live-p window) (not (eq selected-window window)))
+                     (window--display-buffer buffer window 'reuse alist))
+                    ;; if 'selected-window buffer is 'dired-mode, split below it
+                    ((with-current-buffer (window-buffer selected-window) (eq major-mode 'dired-mode))
+                     (let ((window (split-window-no-error selected-window nil 'below)))
+                       (when window
+                         (setq window (window--display-buffer buffer window 'window alist))
+                         (balance-windows-area)
+                         window)))
+                    ;; reuse 'selected-window
+                    (t (window--display-buffer buffer selected-window 'reuse alist)))))))
+
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
