@@ -1426,6 +1426,31 @@ one, an error is signaled."
 
 ;;**** buffers/display: add to 'display-buffer-alist
 
+(defun ram-display-buffer-in-desktop (buffer-regex idx)
+  "Return entry to `display-buffer-alist' of form \"(CONDITION . ACTION)\"."
+  (list buffer-regex
+        `(
+         ;; (lambda (buf alist)
+         ;;   (message (format "################ buf name: %s, mode: %s"
+         ;;                    buf
+         ;;                    (with-current-buffer buf major-mode)))
+         ;;   nil)
+          (lambda (buffer alist)
+                 ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
+                 (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,idx))
+                        (window (car (window-list-1 nil 'nomini frame)))
+                        (old-frame (window-frame (get-buffer-window))))
+             (when window
+               (exwm-workspace-switch-create ,idx)
+               (setq window (window--display-buffer buffer window 'reuse alist))
+               (exwm-workspace-switch old-frame)
+               window))))))
+
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-desktop (regexp-quote "*Help*") 8))
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-desktop (regexp-quote "*Messages*") 9))
+
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
                  (with-current-buffer buf (or (eq major-mode 'emacs-lisp-mode)
