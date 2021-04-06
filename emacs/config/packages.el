@@ -333,16 +333,16 @@
 
 ;;** exwm: exwm-randr
 
-(setq exwm-randr-workspace-output-plist '(0 "HDMI-1-1"
+(setq exwm-randr-workspace-output-plist '(0 "HDMI-1-2"
                                           1 "HDMI-1-1"
                                           2 "HDMI-1-1"
-                                          3 "HDMI-1-2"
-                                          4 "HDMI-1-2"
-                                          5 "HDMI-1-2"
-                                          6 "HDMI-1-1"
-                                          7 "HDMI-1-1"
-                                          8 "HDMI-1-1"
-                                          9 "HDMI-1-1"))
+                                          3 "HDMI-1-1"
+                                          4 "HDMI-1-1"
+                                          5 "HDMI-1-1"
+                                          6 "HDMI-1-2"
+                                          7 "HDMI-1-2"
+                                          8 "HDMI-1-2"
+                                          9 "HDMI-1-2"))
 
 ;; (start-process-shell-command
 ;;              "xrandr" nil
@@ -360,7 +360,7 @@
 ;; (setq exwm-workspace-minibuffer-position 'bottom)
 ;; (setq exwm-workspace-display-echo-area-timeout 5)
 
-(setq exwm-workspace-number 4)
+(setq exwm-workspace-number 10)
 
 ;; Make class name the buffer name
 (add-hook 'exwm-update-class-hook
