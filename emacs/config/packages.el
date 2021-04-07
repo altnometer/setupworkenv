@@ -1521,6 +1521,8 @@ one, an error is signaled."
 ;;                       nil)))
 ;;                 ram-display-buffer-split-right)))
 
+;;***** buffers/display/alist: dired
+
 (add-to-list 'display-buffer-alist
              `((lambda (buffer alist)
                  (with-current-buffer buffer
