@@ -1424,7 +1424,7 @@ one, an error is signaled."
     (when buffer-window
       (window--display-buffer buf buffer-window 'reuse alist))))
 
-;;**** buffers/display: add to 'display-buffer-alist
+;;**** buffers/display: alist
 
 (defun ram-display-buffer-in-desktop (buffer-regex idx)
   "Return entry to `display-buffer-alist' of form \"(CONDITION . ACTION)\"."
@@ -1447,9 +1447,9 @@ one, an error is signaled."
                window))))))
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-desktop (regexp-quote "*Help*") 8))
+             (ram-display-buffer-in-desktop (regexp-quote "*Help*") 6))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-desktop (regexp-quote "*Messages*") 9))
+             (ram-display-buffer-in-desktop (regexp-quote "*Messages*") 6))
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
