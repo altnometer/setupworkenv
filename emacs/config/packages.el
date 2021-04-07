@@ -1307,8 +1307,6 @@ one, an error is signaled."
                          debugger-mode
                          diff-mode
                          helpful-mode
-                         help-mode
-                         Info-mode
                          ivy-occur-mode
                          ivy-occur-grep-mode
                          lisp-interaction-mode
@@ -1324,8 +1322,7 @@ one, an error is signaled."
 (defvar ram-info-buffers '("*ob-ipython-inspect*"
                            "*Ivy Help*"
                            ;; "*scratch*"
-                           "*Backtrace*"
-                           "*info*"))
+                           "*Backtrace*"))
 
 (defun ram-info-buffer-p (buf act)
   "Check if BUF belongs to a custom info group."
@@ -1485,6 +1482,8 @@ then show BUFFER-REGEXP in (cdr WORKSPACE)."
 
 (add-to-list 'display-buffer-alist
              (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") '(6 . 4)))
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" '(6 . 4)))
 (add-to-list 'display-buffer-alist
              (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") '(6 . 4)))
 
