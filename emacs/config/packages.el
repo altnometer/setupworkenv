@@ -1549,20 +1549,48 @@ one, an error is signaled."
                     ;; reuse 'selected-window
                     (t (window--display-buffer buffer selected-window 'reuse alist)))))))
 
+;;***** buffers/display/alist: eshell
 
 (add-to-list 'display-buffer-alist
-             `((lambda (buf alist)
-                 (string-prefix-p "*eshell*" (if (stringp buf) buf (buffer-name buf))))
-               (
-                ;; (lambda (buf alist)
-                ;;   (message (format "################ buf name: %s, mode: %s"
-                ;;                    buf
-                ;;                    (with-current-buffer buf major-mode)))
-                ;;   nil)
-                ram-display-buffer-in-same-window
-                ram-display-buffer-in-info-window
-                ram-display-buffer-in-other-window
-                ram-display-buffer-split-right)))
+             `(;; "^\\*eshell\\*<[0-9]+>$"
+               (lambda (buffer alist)
+                 ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
+                 (let* ((frame (exwm-workspace--workspace-from-frame-or-index 9))
+                        (selected-window (frame-selected-window frame))
+                        (next-window (next-window selected-window 'nomini frame)))
+                   (exwm-workspace-switch frame)
+                   (cond
+                    ;; reuse selected-window if it is displaying same buffer
+                    ((string= (buffer-name (window-buffer selected-window))
+                              (if (stringp buffer) buffer (buffer-name buffer)))
+                     (window--display-buffer buffer selected-window 'reuse alist))
+                    ;; reuse next-window if it exists
+                    ((and (window-live-p next-window) (not (eq selected-window next-window)))
+                     (window--display-buffer buffer next-window 'reuse alist))
+                    ;; if 'selected-window buffer is 'eshell-mode, split below it
+                    ((with-current-buffer (window-buffer selected-window) (eq major-mode 'eshell-mode))
+                     (let ((next-window (split-window-no-error selected-window nil 'below)))
+                       (when next-window
+                         (setq next-window (window--display-buffer buffer next-window 'next-window alist))
+                         (balance-windows-area)
+                         next-window)))
+                    ;; reuse 'selected-window
+                    (t (window--display-buffer buffer selected-window 'reuse alist)))))))
+
+
+;; (add-to-list 'display-buffer-alist
+;;              `((lambda (buf alist)
+;;                  (string-prefix-p "*eshell*" (if (stringp buf) buf (buffer-name buf))))
+;;                (
+;;                 ;; (lambda (buf alist)
+;;                 ;;   (message (format "################ buf name: %s, mode: %s"
+;;                 ;;                    buf
+;;                 ;;                    (with-current-buffer buf major-mode)))
+;;                 ;;   nil)
+;;                 ram-display-buffer-in-same-window
+;;                 ram-display-buffer-in-info-window
+;;                 ram-display-buffer-in-other-window
+;;                 ram-display-buffer-split-right)))
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
