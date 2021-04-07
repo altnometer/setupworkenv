@@ -1427,29 +1427,63 @@ one, an error is signaled."
 ;;**** buffers/display: alist
 
 (defun ram-display-buffer-in-desktop (buffer-regex idx)
-  "Return entry to `display-buffer-alist' of form \"(CONDITION . ACTION)\"."
+  "Return an entry to be added to `display-buffer-alist'."
   (list buffer-regex
         `(
-         ;; (lambda (buf alist)
-         ;;   (message (format "################ buf name: %s, mode: %s"
-         ;;                    buf
-         ;;                    (with-current-buffer buf major-mode)))
-         ;;   nil)
+          ;; (lambda (buf alist)
+          ;;   (message (format "################ buffer-regex: %s\n buf name: %s, mode: %s"
+          ;;                    ,buffer-regexp
+          ;;                    buf
+          ;;                    (with-current-buffer buf major-mode)))
+          ;;   nil)
           (lambda (buffer alist)
-                 ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
-                 (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,idx))
-                        (window (car (window-list-1 nil 'nomini frame)))
-                        (old-frame (window-frame (get-buffer-window))))
-             (when window
-               (exwm-workspace-switch-create ,idx)
-               (setq window (window--display-buffer buffer window 'reuse alist))
-               (exwm-workspace-switch old-frame)
-               window))))))
+            ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
+            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,idx))
+                   (window (car (window-list-1 nil 'nomini frame)))
+                   (old-frame (window-frame (get-buffer-window))))
+              (when window
+                (exwm-workspace-switch-create ,idx)
+                (setq window (window--display-buffer buffer window 'reuse alist))
+                (exwm-workspace-switch old-frame)
+                window))))))
+
+(defun ram-display-buffer-in-other-monitor (buffer-regexp workspace)
+  "Display BUFFER-REGEXP in other `exwm-randr-monitor'.
+
+If WORKSPACE shares the same monitor as selected window, then
+show BUFFER-REGEXP in (- `exwm-workspace-number' WORKSPACE)
+rather than WORKSPACE."
+  (list buffer-regexp
+        `(
+          ;; (lambda (buf alist)
+          ;;   (message (format "################ buffer-regex: %s\n buf name: %s, mode: %s"
+          ;;                    ,buffer-regexp
+          ;;                    buf
+          ;;                    (with-current-buffer buf major-mode)))
+          ;;   nil)
+          (lambda (buffer alist)
+            ,(format "Display %s buffer in exwm desktop %d" buffer-regexp workspace)
+            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,workspace))
+                   (old-frame (window-frame (get-buffer-window)))
+                   (monitor (frame-parameter frame 'exwm-randr-monitor))
+                   (old-monitor (frame-parameter old-frame 'exwm-randr-monitor))
+                   ;; select workspace on the other monitor
+                   (workspace (if (equal monitor old-monitor)
+                                  (- exwm-workspace-number ,workspace)
+                                ,workspace))
+                   (window (car (window-list-1 nil 'nomini
+                                               (exwm-workspace--workspace-from-frame-or-index workspace)))))
+              (when window
+                (exwm-workspace-switch-create workspace)
+                (setq window (window--display-buffer buffer window 'reuse alist))
+                (exwm-workspace-switch old-frame)
+                window))))))
+
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-desktop (regexp-quote "*Help*") 6))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") 6))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-desktop (regexp-quote "*Messages*") 6))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") 6))
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
