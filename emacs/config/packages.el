@@ -1489,19 +1489,24 @@ then show BUFFER-REGEXP in (cdr WORKSPACE)."
              (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") '(6 . 4)))
 
 (add-to-list 'display-buffer-alist
-             `((lambda (buf alist)
-                 (with-current-buffer buf (or (eq major-mode 'emacs-lisp-mode)
-                                              (eq major-mode 'clojure-mode))))
-               (ram-display-buffer-common-window
-                ram-display-buffer-in-info-window
-                ram-display-buffer-in-interactive-window
-                ram-display-buffer-reuse-right-window
-                ram-display-buffer-split-right)
-               ;; (lambda (buf alist)
-               ;;   (let ((win (next-window (frame-first-window) -1 'A)))
-               ;;     (set-window-buffer win buf)
-               ;;     win))
-               ))
+             (ram-display-buffer-in-other-monitor 'emacs-lisp-mode '(2 . 8)))
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-other-monitor 'clojure-mode '(2 . 8)))
+
+;; (add-to-list 'display-buffer-alist
+;;              `((lambda (buf alist)
+;;                  (with-current-buffer buf (or (eq major-mode 'emacs-lisp-mode)
+;;                                               (eq major-mode 'clojure-mode))))
+;;                (ram-display-buffer-common-window
+;;                 ram-display-buffer-in-info-window
+;;                 ram-display-buffer-in-interactive-window
+;;                 ram-display-buffer-reuse-right-window
+;;                 ram-display-buffer-split-right)
+;;                ;; (lambda (buf alist)
+;;                ;;   (let ((win (next-window (frame-first-window) -1 'A)))
+;;                ;;     (set-window-buffer win buf)
+;;                ;;     win))
+;;                ))
 
 ;; (add-to-list 'display-buffer-alist
 ;;              `(ram-info-buffer-p
