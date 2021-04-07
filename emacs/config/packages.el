@@ -1447,12 +1447,11 @@ one, an error is signaled."
                 (exwm-workspace-switch old-frame)
                 window))))))
 
-(defun ram-display-buffer-in-other-monitor (buffer-regexp workspace)
+(defun ram-display-buffer-in-other-monitor (buffer-regexp workspaces)
   "Display BUFFER-REGEXP in other `exwm-randr-monitor'.
 
-If WORKSPACE shares the same monitor as selected window, then
-show BUFFER-REGEXP in (- `exwm-workspace-number' WORKSPACE)
-rather than WORKSPACE."
+If (car WORKSPACE) shares the same monitor as selected window,
+then show BUFFER-REGEXP in (cdr WORKSPACE)."
   (list buffer-regexp
         `(
           ;; (lambda (buf alist)
@@ -1462,28 +1461,28 @@ rather than WORKSPACE."
           ;;                    (with-current-buffer buf major-mode)))
           ;;   nil)
           (lambda (buffer alist)
-            ,(format "Display %s buffer in exwm desktop %d" buffer-regexp workspace)
-            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,workspace))
+            ,(format "Display %s buffer in exwm workspace %d or %d" buffer-regexp (car workspaces) (cdr workspaces))
+            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,(car workspaces)))
                    (old-frame (window-frame (get-buffer-window)))
                    (monitor (frame-parameter frame 'exwm-randr-monitor))
                    (old-monitor (frame-parameter old-frame 'exwm-randr-monitor))
                    ;; select workspace on the other monitor
-                   (workspace (if (equal monitor old-monitor)
-                                  (- exwm-workspace-number ,workspace)
-                                ,workspace))
+                   (workspc (if (equal monitor old-monitor)
+                                  ,(cdr workspaces)
+                                ,(car workspaces)))
                    (window (car (window-list-1 nil 'nomini
-                                               (exwm-workspace--workspace-from-frame-or-index workspace)))))
+                                               (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window
-                (exwm-workspace-switch-create workspace)
+                (exwm-workspace-switch-create workspc)
                 (setq window (window--display-buffer buffer window 'reuse alist))
                 (exwm-workspace-switch old-frame)
                 window))))))
 
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") 6))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") '(6 . 4)))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") 6))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") '(6 . 4)))
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
