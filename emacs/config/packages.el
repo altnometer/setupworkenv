@@ -1447,21 +1447,25 @@ one, an error is signaled."
                 (exwm-workspace-switch old-frame)
                 window))))))
 
-(defun ram-display-buffer-in-other-monitor (buffer-regexp workspaces)
+(defun ram-display-buffer-in-other-monitor (buffer-regexp-or-mode-symbol workspaces)
   "Display BUFFER-REGEXP in other `exwm-randr-monitor'.
 
 If (car WORKSPACE) shares the same monitor as selected window,
 then show BUFFER-REGEXP in (cdr WORKSPACE)."
-  (list buffer-regexp
+  (list (if (stringp buffer-regexp-or-mode-symbol)
+            buffer-regexp-or-mode-symbol
+          `(lambda (buffer alist)
+            (with-current-buffer buffer (eq major-mode ',buffer-regexp-or-mode-symbol))))
         `(
           ;; (lambda (buf alist)
-          ;;   (message (format "################ buffer-regex: %s\n buf name: %s, mode: %s"
-          ;;                    ,buffer-regexp
+          ;;   (message (format "############# identified by: %s\n buf name: %s, mode: %s"
+          ;;                    ,buffer-regexp-or-mode-symbol
           ;;                    buf
           ;;                    (with-current-buffer buf major-mode)))
           ;;   nil)
           (lambda (buffer alist)
-            ,(format "Display %s buffer in exwm workspace %d or %d" buffer-regexp (car workspaces) (cdr workspaces))
+            ,(format "Display %s buffer in exwm workspace %d or %d"
+                     buffer-regexp-or-mode-symbol (car workspaces) (cdr workspaces))
             (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,(car workspaces)))
                    (old-frame (window-frame (get-buffer-window)))
                    (monitor (frame-parameter frame 'exwm-randr-monitor))
