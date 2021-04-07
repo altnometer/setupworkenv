@@ -4059,6 +4059,14 @@ That is, remove a non kept dired from the recent list."
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
 
+;;*** system/general settings: *scratch*
+
+(defun ram-switch-to-scratch ()
+  (interactive)
+  (switch-to-buffer "*scratch*"))
+
+(define-key ram-leader-map-tap-global (kbd "'") 'ram-switch-to-scratch)
+
 ;;** system: savehist
 
 (setq savehist-file "~/.emacs.d/savehist")
