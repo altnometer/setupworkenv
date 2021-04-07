@@ -1588,7 +1588,7 @@ rather than WORKSPACE."
 ;;***** buffers/display/alist: eshell
 
 (add-to-list 'display-buffer-alist
-             `(;; "^\\*eshell\\*<[0-9]+>$"
+             `("^\\*eshell\\*<[0-9]+>$"
                (lambda (buffer alist)
                  ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
                  (let* ((frame (exwm-workspace--workspace-from-frame-or-index 9))
