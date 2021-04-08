@@ -1444,53 +1444,75 @@ one, an error is signaled."
                 (exwm-workspace-switch old-frame)
                 window))))))
 
-(defun ram-display-buffer-in-other-monitor (buffer-regexp-or-mode-symbol workspaces)
-  "Display BUFFER-REGEXP in other `exwm-randr-monitor'.
+(defun ram-display-buffer-in-other-monitor (buffer-regexp-or-mode-symbol primary secondary focus-workspace-p)
+  "Return an element to be added to `display-buffer-alist'.
 
-If (car WORKSPACE) shares the same monitor as selected window,
-then show BUFFER-REGEXP in (cdr WORKSPACE)."
+This element enables displaying BUFFER-REGEXP-OR-MODE-SYMBOL in
+`exwm-randr-monitor' workspaces PRIMARY or SECONDARY. It would
+focus the displayed BUFFER-REGEXP-OR-MODE-SYMBOL if
+FOCUS-WORKSPACE-P is t.
+
+Display in PRIMARY workspace if possible.
+
+When the currently selected workspace is in the same monitor as
+PRIMARY one, consider if `current-buffer' is \"the same\" as the
+target buffer, either by `string-match-p' or `major-mode'
+equality. If they are the same and if FOCUS-WORKSPACE-P is t, use
+SECONDARY workspace which should be on the other monitor."
+
   (list (if (stringp buffer-regexp-or-mode-symbol)
             buffer-regexp-or-mode-symbol
           `(lambda (buffer alist)
-            (with-current-buffer buffer (eq major-mode ',buffer-regexp-or-mode-symbol))))
-        `(
-          ;; (lambda (buf alist)
-          ;;   (message (format "############# identified by: %s\n buf name: %s, mode: %s"
-          ;;                    ,buffer-regexp-or-mode-symbol
-          ;;                    buf
-          ;;                    (with-current-buffer buf major-mode)))
-          ;;   nil)
-          (lambda (buffer alist)
+             (with-current-buffer buffer (eq major-mode ',buffer-regexp-or-mode-symbol))))
+        `((lambda (buffer alist)
             ,(format "Display %s buffer in exwm workspace %d or %d"
-                     buffer-regexp-or-mode-symbol (car workspaces) (cdr workspaces))
-            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,(car workspaces)))
-                   (old-frame (window-frame (get-buffer-window)))
+                     buffer-regexp-or-mode-symbol primary secondary)
+            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,primary))
                    (monitor (frame-parameter frame 'exwm-randr-monitor))
-                   (old-monitor (frame-parameter old-frame 'exwm-randr-monitor))
-                   ;; select workspace on the other monitor
-                   (workspc (if (equal monitor old-monitor)
-                                  ,(cdr workspaces)
-                                ,(car workspaces)))
+                   (selected-monitor (frame-parameter (selected-frame) 'exwm-randr-monitor))
+                   (focus-workspace-p ,focus-workspace-p)
+                   (primary ,primary)
+                   (secondary ,secondary)
+                   (same-buffer-p ,(if (stringp buffer-regexp-or-mode-symbol)
+                                       `(string-match-p ',buffer-regexp-or-mode-symbol
+                                                        (buffer-name (current-buffer)))
+                                     `(eq major-mode ',buffer-regexp-or-mode-symbol)))
+                   ;; decide between primary and secondary workspaces
+                   (workspc (if (equal monitor selected-monitor)
+                                ;; We are in monitor displaying primary workspace,
+                                ;; if it is displaying same buffer as the target one,
+                                ;; and we need to focus after we open it,
+                                ;; select secondary workspace which is in the other monitor,
+                                ;; otherwise, remain in the same monitor and keep focus there,
+                                (if (and same-buffer-p focus-workspace-p)
+                                    secondary
+                                  (setq focus-workspace-p t)
+                                  primary)
+                              primary))
                    (window (car (window-list-1 nil 'nomini
                                                (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window
-                (exwm-workspace-switch-create workspc)
-                (setq window (window--display-buffer buffer window 'reuse alist))
-                (exwm-workspace-switch old-frame)
-                window))))))
+                (if focus-workspace-p
+                    (progn (exwm-workspace-switch-create workspc)
+                           (window--display-buffer buffer window 'reuse alist))
+                  (let ((selected-frame (selected-frame)))
+                    (exwm-workspace-switch-create workspc)
+                    (setq window (window--display-buffer buffer window 'reuse alist))
+                    (exwm-workspace-switch selected-frame)
+                    window))))))))
 
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") '(6 . 4)))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") 6 4 nil))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" '(6 . 4)))
+             (ram-display-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" 6 4 t))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") '(6 . 4)))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") 6 4 nil))
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor 'emacs-lisp-mode '(2 . 8)))
+             (ram-display-buffer-in-other-monitor 'emacs-lisp-mode 2 8 t))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor 'clojure-mode '(2 . 8)))
+             (ram-display-buffer-in-other-monitor 'clojure-mode 2 8 t))
 
 ;; (add-to-list 'display-buffer-alist
 ;;              `((lambda (buf alist)
