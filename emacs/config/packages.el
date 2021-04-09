@@ -1598,32 +1598,32 @@ either by regexp match or by the major-mode sameness. "
                (eq major-mode ',buffer-regexp-or-mode-symbol))))
         `(lambda (buffer alist)
            ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
-           (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,primary))
-                  (selected-window (frame-selected-window frame))
-                  (window (next-window selected-window 'nomini frame))
+           (let* ((target-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
+                  (target-window (frame-selected-window target-frame))
+                  (next-to-target-window (next-window target-window 'nomini target-frame))
                   (test-buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
                                                `(string-match-p ,buffer-regexp-or-mode-symbol
-                                                                (buffer-name (window-buffer selected-window)))
-                                             `(with-current-buffer (window-buffer selected-window)
+                                                                (buffer-name (window-buffer target-window)))
+                                             `(with-current-buffer (window-buffer target-window)
                                                 (eq major-mode ',buffer-regexp-or-mode-symbol)))))
-             (exwm-workspace-switch frame)
+             (exwm-workspace-switch target-frame)
              (cond
-              ;; reuse window displaying same buffer
-              ((string= (buffer-name (window-buffer selected-window))
+              ;; reuse target-window displaying same buffer
+              ((string= (buffer-name (window-buffer target-window))
                         (if (stringp buffer) buffer (buffer-name buffer)))
-               (window--display-buffer buffer selected-window 'reuse alist))
-              ;; reuse other window
-              ((and (window-live-p window) (not (eq selected-window window)))
-               (window--display-buffer buffer window 'reuse alist))
-              ;; if 'selected-window buffer is of the same mode, split it horizontally
+               (window--display-buffer buffer target-window 'reuse alist))
+              ;; reuse next-to-target-window
+              ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
+               (window--display-buffer buffer next-to-target-window 'reuse alist))
+              ;; if 'target-window buffer is of the same mode, split it horizontally
               (test-buffer-sameness-p
-               (let ((window (split-window-no-error selected-window nil 'below)))
-                 (when window
-                   (setq window (window--display-buffer buffer window 'window alist))
+               (let ((new-window (split-window-no-error target-window nil 'below)))
+                 (when new-window
+                   (setq new-window (window--display-buffer buffer new-window 'window alist))
                    (balance-windows-area)
-                   window)))
-              ;; reuse 'selected-window
-              (t (window--display-buffer buffer selected-window 'reuse alist)))))))
+                   new-window)))
+              ;; reuse 'target-window
+              (t (window--display-buffer buffer target-window 'reuse alist)))))))
 
 (add-to-list 'display-buffer-alist
              (ram-display-buffer-in-other-monitor-horiz-split 'dired-mode 7 3))
