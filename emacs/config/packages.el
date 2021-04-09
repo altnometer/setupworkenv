@@ -1596,34 +1596,34 @@ either by regexp match or by the major-mode sameness. "
           `(lambda (buffer alist)
              (with-current-buffer buffer
                (eq major-mode ',buffer-regexp-or-mode-symbol))))
-        (let ((test-buffer-sameness-p (if (stringp buffer-regexp-or-mode-symbol)
-                                          `(string-match-p ,buffer-regexp-or-mode-symbol
-                                                           (buffer-name (window-buffer selected-window)))
-                                        `(with-current-buffer (window-buffer selected-window)
-                                           (eq major-mode ',buffer-regexp-or-mode-symbol)))))
-          `(lambda (buffer alist)
-             ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
-             (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,primary))
-                    (selected-window (frame-selected-window frame))
-                    (window (next-window selected-window 'nomini frame)))
-               (exwm-workspace-switch frame)
-               (cond
-                ;; reuse window displaying same buffer
-                ((string= (buffer-name (window-buffer selected-window))
-                          (if (stringp buffer) buffer (buffer-name buffer)))
-                 (window--display-buffer buffer selected-window 'reuse alist))
-                ;; reuse other window
-                ((and (window-live-p window) (not (eq selected-window window)))
-                 (window--display-buffer buffer window 'reuse alist))
-                ;; if 'selected-window buffer is of the same mode, split it horizontally
-                (,test-buffer-sameness-p
-                 (let ((window (split-window-no-error selected-window nil 'below)))
-                   (when window
-                     (setq window (window--display-buffer buffer window 'window alist))
-                     (balance-windows-area)
-                     window)))
-                ;; reuse 'selected-window
-                (t (window--display-buffer buffer selected-window 'reuse alist))))))))
+        `(lambda (buffer alist)
+           ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
+           (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,primary))
+                  (selected-window (frame-selected-window frame))
+                  (window (next-window selected-window 'nomini frame))
+                  (test-buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
+                                               `(string-match-p ,buffer-regexp-or-mode-symbol
+                                                                (buffer-name (window-buffer selected-window)))
+                                             `(with-current-buffer (window-buffer selected-window)
+                                                (eq major-mode ',buffer-regexp-or-mode-symbol)))))
+             (exwm-workspace-switch frame)
+             (cond
+              ;; reuse window displaying same buffer
+              ((string= (buffer-name (window-buffer selected-window))
+                        (if (stringp buffer) buffer (buffer-name buffer)))
+               (window--display-buffer buffer selected-window 'reuse alist))
+              ;; reuse other window
+              ((and (window-live-p window) (not (eq selected-window window)))
+               (window--display-buffer buffer window 'reuse alist))
+              ;; if 'selected-window buffer is of the same mode, split it horizontally
+              (test-buffer-sameness-p
+               (let ((window (split-window-no-error selected-window nil 'below)))
+                 (when window
+                   (setq window (window--display-buffer buffer window 'window alist))
+                   (balance-windows-area)
+                   window)))
+              ;; reuse 'selected-window
+              (t (window--display-buffer buffer selected-window 'reuse alist)))))))
 
 (add-to-list 'display-buffer-alist
              (ram-display-buffer-in-other-monitor-horiz-split 'dired-mode 7 3))
