@@ -1586,76 +1586,51 @@ SECONDARY workspace which should be on the other monitor."
 
 ;;***** buffers/display/alist: dired
 
+(defun ram-display-buffer-in-other-monitor-horiz-split (buffer-regexp-or-mode-symbol primary secondary)
+  "Display buffer in the other `exwm-randr-monitor'.
+
+Split window horizontally for the same buffer type, determined
+either by regexp match or by the major-mode sameness. "
+  (list (if (stringp buffer-regexp-or-mode-symbol)
+            buffer-regexp-or-mode-symbol
+          `(lambda (buffer alist)
+             (with-current-buffer buffer
+               (eq major-mode ',buffer-regexp-or-mode-symbol))))
+        (let ((test-buffer-sameness-p (if (stringp buffer-regexp-or-mode-symbol)
+                                          `(string-match-p ,buffer-regexp-or-mode-symbol
+                                                           (buffer-name (window-buffer selected-window)))
+                                        `(with-current-buffer (window-buffer selected-window)
+                                           (eq major-mode ',buffer-regexp-or-mode-symbol)))))
+          `(lambda (buffer alist)
+             ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
+             (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,primary))
+                    (selected-window (frame-selected-window frame))
+                    (window (next-window selected-window 'nomini frame)))
+               (exwm-workspace-switch frame)
+               (cond
+                ;; reuse window displaying same buffer
+                ((string= (buffer-name (window-buffer selected-window))
+                          (if (stringp buffer) buffer (buffer-name buffer)))
+                 (window--display-buffer buffer selected-window 'reuse alist))
+                ;; reuse other window
+                ((and (window-live-p window) (not (eq selected-window window)))
+                 (window--display-buffer buffer window 'reuse alist))
+                ;; if 'selected-window buffer is of the same mode, split it horizontally
+                (,test-buffer-sameness-p
+                 (let ((window (split-window-no-error selected-window nil 'below)))
+                   (when window
+                     (setq window (window--display-buffer buffer window 'window alist))
+                     (balance-windows-area)
+                     window)))
+                ;; reuse 'selected-window
+                (t (window--display-buffer buffer selected-window 'reuse alist))))))))
+
 (add-to-list 'display-buffer-alist
-             `((lambda (buffer alist)
-                 (with-current-buffer buffer
-                   (eq major-mode 'dired-mode)))
-               (lambda (buffer alist)
-                 ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
-                 (let* ((frame (exwm-workspace--workspace-from-frame-or-index 7))
-                        (selected-window (frame-selected-window frame))
-                        (window (next-window selected-window 'nomini frame)))
-                   (exwm-workspace-switch frame)
-                   (cond
-                    ;; reuse window displaying same buffer
-                    ((string= (buffer-name (window-buffer selected-window))
-                              (if (stringp buffer) buffer (buffer-name buffer)))
-                     (window--display-buffer buffer selected-window 'reuse alist))
-                    ;; reuse other window
-                    ((and (window-live-p window) (not (eq selected-window window)))
-                     (window--display-buffer buffer window 'reuse alist))
-                    ;; if 'selected-window buffer is 'dired-mode, split below it
-                    ((with-current-buffer (window-buffer selected-window) (eq major-mode 'dired-mode))
-                     (let ((window (split-window-no-error selected-window nil 'below)))
-                       (when window
-                         (setq window (window--display-buffer buffer window 'window alist))
-                         (balance-windows-area)
-                         window)))
-                    ;; reuse 'selected-window
-                    (t (window--display-buffer buffer selected-window 'reuse alist)))))))
-
-;;***** buffers/display/alist: eshell
-
+             (ram-display-buffer-in-other-monitor-horiz-split 'dired-mode 7 3))
 (add-to-list 'display-buffer-alist
-             `("^\\*eshell\\*<[0-9]+>$"
-               (lambda (buffer alist)
-                 ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
-                 (let* ((frame (exwm-workspace--workspace-from-frame-or-index 9))
-                        (selected-window (frame-selected-window frame))
-                        (next-window (next-window selected-window 'nomini frame)))
-                   (exwm-workspace-switch frame)
-                   (cond
-                    ;; reuse selected-window if it is displaying same buffer
-                    ((string= (buffer-name (window-buffer selected-window))
-                              (if (stringp buffer) buffer (buffer-name buffer)))
-                     (window--display-buffer buffer selected-window 'reuse alist))
-                    ;; reuse next-window if it exists
-                    ((and (window-live-p next-window) (not (eq selected-window next-window)))
-                     (window--display-buffer buffer next-window 'reuse alist))
-                    ;; if 'selected-window buffer is 'eshell-mode, split below it
-                    ((with-current-buffer (window-buffer selected-window) (eq major-mode 'eshell-mode))
-                     (let ((next-window (split-window-no-error selected-window nil 'below)))
-                       (when next-window
-                         (setq next-window (window--display-buffer buffer next-window 'next-window alist))
-                         (balance-windows-area)
-                         next-window)))
-                    ;; reuse 'selected-window
-                    (t (window--display-buffer buffer selected-window 'reuse alist)))))))
+             (ram-display-buffer-in-other-monitor-horiz-split "^\\*eshell\\*<[0-9]+>$" 7 3))
 
-
-;; (add-to-list 'display-buffer-alist
-;;              `((lambda (buf alist)
-;;                  (string-prefix-p "*eshell*" (if (stringp buf) buf (buffer-name buf))))
-;;                (
-;;                 ;; (lambda (buf alist)
-;;                 ;;   (message (format "################ buf name: %s, mode: %s"
-;;                 ;;                    buf
-;;                 ;;                    (with-current-buffer buf major-mode)))
-;;                 ;;   nil)
-;;                 ram-display-buffer-in-same-window
-;;                 ram-display-buffer-in-info-window
-;;                 ram-display-buffer-in-other-window
-;;                 ram-display-buffer-split-right)))
+;;***** buffers/display/alist: scratch
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
