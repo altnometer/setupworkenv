@@ -1660,15 +1660,33 @@ either by regexp match or by the major-mode sameness. "
              (with-current-buffer buffer
                (eq major-mode ',buffer-regexp-or-mode-symbol))))
         `(lambda (buffer alist)
-           ;; ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
-           (let* ((target-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
+           ;; ,(format "Display %s buffer in exwm desktop %d or %d" buffer-regexp-or-mode-symbol primary secondary)
+           (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
+                  (primary ,primary)
+                  (secondary ,secondary)
+                  (buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
+                                           `(lambda (frm)
+                                              (string-match-p ',buffer-regexp-or-mode-symbol
+                                                              (buffer-name (window-buffer (frame-selected-window frm)))))
+                                         `(lambda (frm)
+                                            (eq (buffer-local-value 'major-mode (window-buffer (frame-selected-window frm)))
+                                                ',buffer-regexp-or-mode-symbol))))
+                  (workspc (cond
+                             ;; selected is displaying sameness buffer, choose it
+                             ((funcall buffer-sameness-p (selected-frame))
+                              (if (eq (selected-frame) primary-frame)
+                                  primary
+                                secondary))
+                             (t
+                              ;; if selected workspace is in the same monitor as the primary,
+                              ;; choose secondary.
+                              (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
+                                           (frame-parameter primary-frame 'exwm-randr-monitor))
+                                  secondary
+                                primary))))
+                  (target-frame (exwm-workspace--workspace-from-frame-or-index workspc))
                   (target-window (frame-selected-window target-frame))
-                  (next-to-target-window (next-window target-window 'nomini target-frame))
-                  (test-buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
-                                               `(string-match-p ,buffer-regexp-or-mode-symbol
-                                                                (buffer-name (window-buffer target-window)))
-                                             `(with-current-buffer (window-buffer target-window)
-                                                (eq major-mode ',buffer-regexp-or-mode-symbol)))))
+                  (next-to-target-window (next-window target-window 'nomini target-frame)))
              (exwm-workspace-switch target-frame)
              (cond
               ;; reuse target-window displaying same buffer
@@ -1679,7 +1697,7 @@ either by regexp match or by the major-mode sameness. "
               ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
                (window--display-buffer buffer next-to-target-window 'reuse alist))
               ;; if 'target-window buffer is of the same mode, split it horizontally
-              (test-buffer-sameness-p
+              ((funcall buffer-sameness-p target-frame)
                (let ((new-window (split-window-no-error target-window nil 'below)))
                  (when new-window
                    (setq new-window (window--display-buffer buffer new-window 'window alist))
