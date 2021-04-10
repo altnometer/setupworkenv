@@ -1444,13 +1444,14 @@ one, an error is signaled."
                 (exwm-workspace-switch old-frame)
                 window))))))
 
-(defun ram-display-buffer-in-other-monitor (buffer-regexp-or-mode-symbol primary secondary)
+(defun ram-switch-to-buffer-in-other-monitor (buffer-regexp-or-mode-symbol primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
 This element enables displaying BUFFER-REGEXP-OR-MODE-SYMBOL in
-`exwm-randr-monitor' workspaces PRIMARY or SECONDARY.
+`exwm-randr-monitor' workspaces PRIMARY or SECONDARY and
+selecting it.
 
-The workspace is selected by a set of conditions in `cond'
+The workspace is chosen by a set of conditions in `cond'
 expression."
 
   (list (if (stringp buffer-regexp-or-mode-symbol)
@@ -1506,18 +1507,17 @@ expression."
                 (progn (exwm-workspace-switch workspc)
                        (window--display-buffer buffer window-to-display-in 'reuse alist))))))))
 
+(add-to-list 'display-buffer-alist
+             (ram-switch-to-buffer-in-other-monitor (regexp-quote "*Help*") 6 4))
+(add-to-list 'display-buffer-alist
+             (ram-switch-to-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" 6 4))
+(add-to-list 'display-buffer-alist
+             (ram-switch-to-buffer-in-other-monitor (regexp-quote "*Messages*") 6 4))
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") 6 4))
+             (ram-switch-to-buffer-in-other-monitor 'emacs-lisp-mode 2 8))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" 6 4))
-(add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") 6 4))
-
-(add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor 'emacs-lisp-mode 2 8))
-(add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor 'clojure-mode 2 8))
+             (ram-switch-to-buffer-in-other-monitor 'clojure-mode 2 8))
 
 ;; (add-to-list 'display-buffer-alist
 ;;              `((lambda (buf alist)
