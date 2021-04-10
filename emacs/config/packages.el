@@ -1507,12 +1507,70 @@ expression."
                 (progn (exwm-workspace-switch workspc)
                        (window--display-buffer buffer window-to-display-in 'reuse alist))))))))
 
+(defun ram-display-buffer-in-other-monitor (buffer-regexp-or-mode-symbol primary secondary)
+  "Return an element to be added to `display-buffer-alist'.
+
+This element enables displaying BUFFER-REGEXP-OR-MODE-SYMBOL in
+`exwm-randr-monitor' workspaces PRIMARY or SECONDARY without
+selecting it.
+
+The workspace is chosen by a set of conditions in `cond'
+expression."
+
+  (list (if (stringp buffer-regexp-or-mode-symbol)
+            buffer-regexp-or-mode-symbol
+          `(lambda (buffer alist)
+             (eq (buffer-local-value 'major-mode (get-buffer buffer))
+                 ',buffer-regexp-or-mode-symbol)))
+        `((lambda (buffer alist)
+            ,(format "Display %s buffer in exwm workspace %d or %d"
+                     buffer-regexp-or-mode-symbol primary secondary)
+            (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
+                   (selected-monitor (frame-parameter (selected-frame) 'exwm-randr-monitor))
+                   (primary ,primary)
+                   (secondary ,secondary)
+                   (buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
+                                           `(lambda (frm)
+                                              (string-match-p ',buffer-regexp-or-mode-symbol
+                                                              (buffer-name (window-buffer (frame-selected-window frm)))))
+                                         `(lambda (frm)
+                                            (eq (buffer-local-value 'major-mode (window-buffer (frame-selected-window frm)))
+                                                ',buffer-regexp-or-mode-symbol))))
+                   (focus-worksps-p nil)
+                   (selectd-frm (selected-frame))
+                   ;; decide between primary and secondary workspaces
+
+                   (workspc (cond
+                             ;; selected is displaying sameness buffer, choose it
+                             ((funcall buffer-sameness-p (selected-frame))
+                              (setq focus-worksps-p t)
+                              (if (eq (selected-frame) primary-frame)
+                                  primary
+                                secondary))
+                             (t
+                              ;; if selected workspace is in the same monitor as the primary,
+                              ;; choose secondary.
+                              (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
+                                           (frame-parameter primary-frame 'exwm-randr-monitor))
+                                  secondary
+                                primary))))
+                   (window-to-display-in
+                    (car (window-list-1 nil 'nomini
+                                        (exwm-workspace--workspace-from-frame-or-index workspc)))))
+              (when window-to-display-in
+                (exwm-workspace-switch workspc)
+                (setq window-to-display-in
+                      (window--display-buffer buffer window-to-display-in 'reuse alist))
+                (unless focus-worksps-p
+                  (exwm-workspace-switch selectd-frm))
+                window-to-display-in))))))
+
 (add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor (regexp-quote "*Help*") 6 4))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") 6 4))
 (add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" 6 4))
+             (ram-display-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" 6 4))
 (add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor (regexp-quote "*Messages*") 6 4))
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") 6 4))
 
 (add-to-list 'display-buffer-alist
              (ram-switch-to-buffer-in-other-monitor 'emacs-lisp-mode 2 8))
