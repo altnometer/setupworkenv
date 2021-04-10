@@ -1463,43 +1463,65 @@ SECONDARY workspace which should be on the other monitor."
   (list (if (stringp buffer-regexp-or-mode-symbol)
             buffer-regexp-or-mode-symbol
           `(lambda (buffer alist)
-             (with-current-buffer buffer (eq major-mode ',buffer-regexp-or-mode-symbol))))
+             (eq (buffer-local-value 'major-mode (get-buffer buffer))
+                 ',buffer-regexp-or-mode-symbol)))
         `((lambda (buffer alist)
             ,(format "Display %s buffer in exwm workspace %d or %d"
                      buffer-regexp-or-mode-symbol primary secondary)
-            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,primary))
-                   (monitor (frame-parameter frame 'exwm-randr-monitor))
+            (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
                    (selected-monitor (frame-parameter (selected-frame) 'exwm-randr-monitor))
                    (focus-workspace-p ,focus-workspace-p)
                    (primary ,primary)
                    (secondary ,secondary)
-                   (same-buffer-p ,(if (stringp buffer-regexp-or-mode-symbol)
-                                       `(string-match-p ',buffer-regexp-or-mode-symbol
-                                                        (buffer-name (current-buffer)))
-                                     `(eq major-mode ',buffer-regexp-or-mode-symbol)))
+                   (buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
+                                           `(lambda (frm)
+                                             (string-match-p ',buffer-regexp-or-mode-symbol
+                                                             (buffer-name (window-buffer (frame-selected-window frm)))))
+                                         `(lambda (frm)
+                                           (eq (buffer-local-value 'major-mode (window-buffer (frame-selected-window frm)))
+                                               ',buffer-regexp-or-mode-symbol))))
                    ;; decide between primary and secondary workspaces
-                   (workspc (if (equal monitor selected-monitor)
-                                ;; We are in monitor displaying primary workspace,
-                                ;; if it is displaying same buffer as the target one,
-                                ;; and we need to focus after we open it,
-                                ;; select secondary workspace which is in the other monitor,
-                                ;; otherwise, remain in the same monitor and keep focus there,
-                                (if (and same-buffer-p focus-workspace-p)
-                                    secondary
-                                  (setq focus-workspace-p t)
-                                  primary)
-                              primary))
-                   (window (car (window-list-1 nil 'nomini
-                                               (exwm-workspace--workspace-from-frame-or-index workspc)))))
-              (when window
+                   (workspc (cond
+                             ;; primary-frame is not active, select it
+                             ((not (frame-parameter primary-frame 'exwm-active))
+                              ;; (message "???????? case 1")
+                              primary)
+                             ;; primary is active but buffer-sameness-p is false, select it
+                             ((and (frame-parameter primary-frame 'exwm-active)
+                                   (not (funcall buffer-sameness-p primary-frame)))
+                              ;; (message "???????? case 2")
+                              primary)
+                             ;; primary selected and
+                             ;; buffer-sameness-p is true, select secondary
+                             ((and (eq (selected-frame) primary-frame)
+                                   (funcall buffer-sameness-p primary-frame))
+                              ;; (message "???????? case 3")
+                              secondary)
+                             ;; primary is active but not selected,
+                             ;; buffer-sameness-p is true, select secondary
+                             ((and (frame-parameter primary-frame 'exwm-active)
+                                   (not  (eq (selected-frame) primary-frame))
+                                   (funcall buffer-sameness-p primary-frame))
+                              ;; buffer-sameness-p is true, select primary
+                              ;; (message "???????? case 4")
+                              (if (funcall buffer-sameness-p (selected-frame))
+                                  primary
+                                secondary))
+                             (t
+                              ;; (message "???????? case default")
+                              primary)))
+                   (display-here-window
+                    (car (window-list-1 nil 'nomini
+                                        (exwm-workspace--workspace-from-frame-or-index workspc)))))
+              (when display-here-window
                 (if focus-workspace-p
                     (progn (exwm-workspace-switch-create workspc)
-                           (window--display-buffer buffer window 'reuse alist))
+                           (window--display-buffer buffer display-here-window 'reuse alist))
                   (let ((selected-frame (selected-frame)))
                     (exwm-workspace-switch-create workspc)
-                    (setq window (window--display-buffer buffer window 'reuse alist))
+                    (setq display-here-window (window--display-buffer buffer display-here-window 'reuse alist))
                     (exwm-workspace-switch selected-frame)
-                    window))))))))
+                    display-here-window))))))))
 
 
 (add-to-list 'display-buffer-alist
