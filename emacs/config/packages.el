@@ -1649,7 +1649,7 @@ expression."
 
 ;;***** buffers/display/alist: dired
 
-(defun ram-display-buffer-in-other-monitor-horiz-split (buffer-regexp-or-mode-symbol primary secondary)
+(defun ram-switch-to-buffer-in-other-monitor-horiz-split (buffer-regexp-or-mode-symbol primary secondary)
   "Display buffer in the other `exwm-randr-monitor'.
 
 Split window horizontally for the same buffer type, determined
@@ -1707,9 +1707,9 @@ either by regexp match or by the major-mode sameness. "
               (t (window--display-buffer buffer target-window 'reuse alist)))))))
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor-horiz-split 'dired-mode 7 3))
+             (ram-switch-to-buffer-in-other-monitor-horiz-split 'dired-mode 7 3))
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor-horiz-split "^\\*eshell\\*<[0-9]+>$" 7 3))
+             (ram-switch-to-buffer-in-other-monitor-horiz-split "^\\*eshell\\*<[0-9]+>$" 7 3))
 
 ;;***** buffers/display/alist: scratch
 
