@@ -269,7 +269,7 @@
   (let ((eshell-buffer
          (nth (max (1- arg) 0)
               (sort
-               (seq-filter (lambda (b) (s-starts-with-p "*eshell*" (buffer-name b))) (buffer-list))
+               (seq-filter (lambda (b) (string-prefix-p "*eshell*" (buffer-name b))) (buffer-list))
                (lambda (s1 s2) (string-lessp (buffer-name s1) (buffer-name s2)))))))
     (if eshell-buffer
         (switch-to-buffer eshell-buffer)
