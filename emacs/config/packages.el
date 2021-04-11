@@ -1423,25 +1423,22 @@ one, an error is signaled."
 
 ;;**** buffers/display: alist
 
-(defun ram-display-buffer-in-desktop (buffer-regex idx)
-  "Return an entry to be added to `display-buffer-alist'."
-  (list buffer-regex
-        `(
-          ;; (lambda (buf alist)
-          ;;   (message (format "################ buffer-regex: %s\n buf name: %s, mode: %s"
-          ;;                    ,buffer-regexp
-          ;;                    buf
-          ;;                    (with-current-buffer buf major-mode)))
-          ;;   nil)
-          (lambda (buffer alist)
-            ,(format "Display %s buffer in exwm desktop %d" buffer-regex idx)
-            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,idx))
-                   (window (car (window-list-1 nil 'nomini frame)))
-                   (old-frame (window-frame (get-buffer-window))))
+;;***** buffers/display/alist: functions
+
+(defun ram-switch-to-buffer-in-specific-monitor (buffer-regexp-or-mode-symbol workspace-idx)
+  "Switch to BUFFER-REGEXP-OR-MODE-SYMBOL in WORKSPACE-IDX."
+  (list (if (stringp buffer-regexp-or-mode-symbol)
+            buffer-regexp-or-mode-symbol
+          `(lambda (buffer alist)
+             (eq (buffer-local-value 'major-mode (get-buffer buffer))
+                 ',buffer-regexp-or-mode-symbol)))
+        `((lambda (buffer alist)
+            ,(format "Display %s buffer in exwm desktop %d" buffer-regexp-or-mode-symbol workspace-idx)
+            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,workspace-idx))
+                   (window (car (window-list-1 nil 'nomini frame))))
               (when window
-                (exwm-workspace-switch-create ,idx)
+                (exwm-workspace-switch ,workspace-idx)
                 (setq window (window--display-buffer buffer window 'reuse alist))
-                (exwm-workspace-switch old-frame)
                 window))))))
 
 (defun ram-switch-to-buffer-in-other-monitor (buffer-regexp-or-mode-symbol primary secondary)
@@ -1565,20 +1562,6 @@ expression."
                   (exwm-workspace-switch selectd-frm))
                 window-to-display-in))))))
 
-(add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") 6 4))
-(add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" 6 4))
-(add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") 6 4))
-
-(add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor 'emacs-lisp-mode 2 8))
-(add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor 'clojure-mode 2 8))
-
-;;***** buffers/display/alist: dired
-
 (defun ram-switch-to-buffer-in-other-monitor-horiz-split (buffer-regexp-or-mode-symbol primary secondary)
   "Display buffer in the other `exwm-randr-monitor'.
 
@@ -1595,25 +1578,25 @@ either by regexp match or by the major-mode sameness. "
                   (primary ,primary)
                   (secondary ,secondary)
                   (buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
-                                           `(lambda (frm)
-                                              (string-match-p ',buffer-regexp-or-mode-symbol
-                                                              (buffer-name (window-buffer (frame-selected-window frm)))))
-                                         `(lambda (frm)
-                                            (eq (buffer-local-value 'major-mode (window-buffer (frame-selected-window frm)))
-                                                ',buffer-regexp-or-mode-symbol))))
+                                          `(lambda (frm)
+                                             (string-match-p ',buffer-regexp-or-mode-symbol
+                                                             (buffer-name (window-buffer (frame-selected-window frm)))))
+                                        `(lambda (frm)
+                                           (eq (buffer-local-value 'major-mode (window-buffer (frame-selected-window frm)))
+                                               ',buffer-regexp-or-mode-symbol))))
                   (workspc (cond
-                             ;; selected is displaying sameness buffer, choose it
-                             ((funcall buffer-sameness-p (selected-frame))
-                              (if (eq (selected-frame) primary-frame)
-                                  primary
-                                secondary))
-                             (t
-                              ;; if selected workspace is in the same monitor as the primary,
-                              ;; choose secondary.
-                              (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
-                                           (frame-parameter primary-frame 'exwm-randr-monitor))
-                                  secondary
-                                primary))))
+                            ;; selected is displaying sameness buffer, choose it
+                            ((funcall buffer-sameness-p (selected-frame))
+                             (if (eq (selected-frame) primary-frame)
+                                 primary
+                               secondary))
+                            (t
+                             ;; if selected workspace is in the same monitor as the primary,
+                             ;; choose secondary.
+                             (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
+                                          (frame-parameter primary-frame 'exwm-randr-monitor))
+                                 secondary
+                               primary))))
                   (target-frame (exwm-workspace--workspace-from-frame-or-index workspc))
                   (target-window (frame-selected-window target-frame))
                   (next-to-target-window (next-window target-window 'nomini target-frame)))
@@ -1636,12 +1619,29 @@ either by regexp match or by the major-mode sameness. "
               ;; reuse 'target-window
               (t (window--display-buffer buffer target-window 'reuse alist)))))))
 
+;;***** buffers/display/alist: (add-to-list 'display-buffer-alist ...)
+
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Help*") 6 4))
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-other-monitor "^\\*info\\*\\(<[0-9]+>\\)?$" 6 4))
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-other-monitor (regexp-quote "*Messages*") 6 4))
+
+(add-to-list 'display-buffer-alist
+             (ram-switch-to-buffer-in-other-monitor 'emacs-lisp-mode 2 8))
+(add-to-list 'display-buffer-alist
+             (ram-switch-to-buffer-in-other-monitor 'clojure-mode 2 8))
+
 (add-to-list 'display-buffer-alist
              (ram-switch-to-buffer-in-other-monitor-horiz-split 'dired-mode 7 3))
 (add-to-list 'display-buffer-alist
              (ram-switch-to-buffer-in-other-monitor-horiz-split "^\\*eshell\\*<[0-9]+>$" 7 3))
 
 ;;***** buffers/display/alist: scratch
+
+(add-to-list 'display-buffer-alist
+             (ram-switch-to-buffer-in-specific-monitor (regexp-quote "*scratch*") 0))
 
 (add-to-list 'display-buffer-alist
              `((lambda (buf alist)
