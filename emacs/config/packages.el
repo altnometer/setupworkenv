@@ -1493,15 +1493,12 @@ expression."
                 (progn (exwm-workspace-switch workspc)
                        (window--display-buffer buffer window-to-display-in 'reuse alist))))))))
 
-(defun ram-display-buffer-in-other-monitor (test-buffer-p primary secondary)
+(defun ram-get-display-buffer-in-other-monitor-alist-entry (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
-This element enables displaying BUFFER-REGEXP-OR-MODE-SYMBOL in
-`exwm-randr-monitor' workspaces PRIMARY or SECONDARY without
-selecting it.
-
-The workspace is chosen by a set of conditions in `cond'
-expression."
+This element is of the form (CONDITION . ACTION) where
+test-buffer-p is CONDITION. The ACTION function return a window
+on either PRIMARY or SECONDARY `exwm-randr-monitor'."
 
   (list test-buffer-p
         `((lambda (buffer alist)
@@ -1594,7 +1591,7 @@ either by regexp match or by the major-mode sameness. "
 ;;***** buffers/display/alist: (add-to-list 'display-buffer-alist ...)
 
 (add-to-list 'display-buffer-alist
-             (ram-display-buffer-in-other-monitor
+             (ram-get-display-buffer-in-other-monitor-alist-entry
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
                   (or (string-match-p "\\*Help\\*" buf-name)
