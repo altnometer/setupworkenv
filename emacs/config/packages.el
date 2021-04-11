@@ -1512,20 +1512,16 @@ expression."
                    (secondary ,secondary)
                    (buffer-sameness-p (lambda (frm)
                                         (,test-buffer-p (window-buffer (frame-selected-window frm)))))
-                   (focus-worksps-p nil)
-                   (selectd-frm (selected-frame))
+                   (selected-frm (selected-frame))
                    ;; decide between primary and secondary workspaces
-
                    (workspc (cond
                              ;; selected is displaying sameness buffer, choose it
                              ((funcall buffer-sameness-p (selected-frame))
-                              (setq focus-worksps-p t)
                               (if (eq (selected-frame) primary-frame)
                                   primary
                                 secondary))
                              (t
-                              ;; if selected workspace is in the same monitor as the primary,
-                              ;; choose secondary.
+                              ;; choose workspace in the other monitor
                               (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
                                            (frame-parameter primary-frame 'exwm-randr-monitor))
                                   secondary
@@ -1535,11 +1531,8 @@ expression."
                                         (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window-to-display-in
                 (exwm-workspace-switch workspc)
-                (setq window-to-display-in
-                      (window--display-buffer buffer window-to-display-in 'reuse alist))
-                (unless focus-worksps-p
-                  (exwm-workspace-switch selectd-frm))
-                window-to-display-in))))))
+                (exwm-workspace-switch selected-frm)
+                (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
 (defun ram-switch-to-buffer-in-other-monitor-horiz-split (buffer-regexp-or-mode-symbol primary secondary)
   "Display buffer in the other `exwm-randr-monitor'.
@@ -1606,7 +1599,8 @@ either by regexp match or by the major-mode sameness. "
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
                   (or (string-match-p "\\*Help\\*" buf-name)
                       (string-match-p "^\\*info\\*\\(<[0-9]+>\\)?$" buf-name)
-                      (string-match-p "\\*Messages\\*" buf-name)))) 6 4))
+                      (string-match-p "\\*Messages\\*" buf-name))))
+              6 4))
 
 (add-to-list 'display-buffer-alist
              (ram-switch-to-buffer-in-other-monitor
