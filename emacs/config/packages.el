@@ -1434,11 +1434,12 @@ switching to buffer in WORKSPACE-IDX."
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm desktop %d" workspace-idx)
             (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,workspace-idx))
-                   (window (car (window-list-1 nil 'nomini frame))))
+                   (window (car (window-list-1 nil 'nomini frame)))
+                   (selected-frm (selected-frame)))
               (when window
                 (exwm-workspace-switch ,workspace-idx)
-                (setq window (window--display-buffer buffer window 'reuse alist))
-                window))))))
+                (exwm-workspace-switch selected-frm)
+                (window--display-buffer buffer window 'reuse alist)))))))
 
 (defun ram-switch-to-buffer-in-other-monitor (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
