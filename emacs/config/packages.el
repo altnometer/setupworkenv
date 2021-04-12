@@ -1535,28 +1535,19 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
                 (exwm-workspace-switch selected-frm)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
-(defun ram-switch-to-buffer-in-other-monitor-horiz-split (buffer-regexp-or-mode-symbol primary secondary)
+(defun ram-switch-to-buffer-in-other-monitor-horiz-split (test-buffer-p primary secondary)
   "Display buffer in the other `exwm-randr-monitor'.
 
 Split window horizontally for the same buffer type, determined
 either by regexp match or by the major-mode sameness. "
-  (list (if (stringp buffer-regexp-or-mode-symbol)
-            buffer-regexp-or-mode-symbol
-          `(lambda (buffer alist)
-             (with-current-buffer buffer
-               (eq major-mode ',buffer-regexp-or-mode-symbol))))
+  (list test-buffer-p
         `(lambda (buffer alist)
-           ;; ,(format "Display %s buffer in exwm desktop %d or %d" buffer-regexp-or-mode-symbol primary secondary)
+           ,(format "Display BUFFER in exwm desktop %d or %d with horizontal split." primary secondary)
            (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
                   (primary ,primary)
                   (secondary ,secondary)
-                  (buffer-sameness-p ,(if (stringp buffer-regexp-or-mode-symbol)
-                                          `(lambda (frm)
-                                             (string-match-p ',buffer-regexp-or-mode-symbol
-                                                             (buffer-name (window-buffer (frame-selected-window frm)))))
-                                        `(lambda (frm)
-                                           (eq (buffer-local-value 'major-mode (window-buffer (frame-selected-window frm)))
-                                               ',buffer-regexp-or-mode-symbol))))
+                  (buffer-sameness-p (lambda (frm)
+                                        (,test-buffer-p (window-buffer (frame-selected-window frm)))))
                   (workspc (cond
                             ;; selected is displaying sameness buffer, choose it
                             ((funcall buffer-sameness-p (selected-frame))
@@ -1612,9 +1603,13 @@ either by regexp match or by the major-mode sameness. "
               2 8))
 
 (add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor-horiz-split 'dired-mode 7 3))
-(add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor-horiz-split "^\\*eshell\\*<[0-9]+>$" 7 3))
+             (ram-switch-to-buffer-in-other-monitor-horiz-split
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
+                      (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (or (eq 'dired-mode mode)
+                      (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
+              7 3))
 
 ;;***** buffers/display/alist: scratch
 
