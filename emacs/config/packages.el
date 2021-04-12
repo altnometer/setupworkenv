@@ -1535,11 +1535,15 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
                 (exwm-workspace-switch selected-frm)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
-(defun ram-switch-to-buffer-in-other-monitor-horiz-split (test-buffer-p primary secondary)
-  "Display buffer in the other `exwm-randr-monitor'.
+(defun ram-create-display-buffer-in-other-monitor-horiz-split-alist-element (test-buffer-p primary secondary)
+  "Return an element to be added to `display-buffer-alist'.
 
-Split window horizontally for the same buffer type, determined
-either by regexp match or by the major-mode sameness. "
+TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION)
+element. The ACTION part returns a window to display the buffer
+in either PRIMARY or SECONDARY `exwm-mode' workspaces.
+
+It is possible to split the selected window horizontally if it is
+displaying TEST-BUFFER-P buffer."
   (list test-buffer-p
         `(lambda (buffer alist)
            ,(format "Display BUFFER in exwm desktop %d or %d with horizontal split." primary secondary)
@@ -1603,7 +1607,7 @@ either by regexp match or by the major-mode sameness. "
               2 8))
 
 (add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor-horiz-split
+             (ram-create-display-buffer-in-other-monitor-horiz-split-alist-element
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
                       (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
