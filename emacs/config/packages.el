@@ -1497,7 +1497,7 @@ expression."
                 (exwm-workspace-switch selected-frm)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
-(defun ram-get-display-buffer-in-other-monitor-alist-entry (test-buffer-p primary secondary)
+(defun ram-create-display-buffer-in-other-monitor-alist-element (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
 This element is of the form (CONDITION . ACTION) where
@@ -1595,7 +1595,7 @@ either by regexp match or by the major-mode sameness. "
 ;;***** buffers/display/alist: (add-to-list 'display-buffer-alist ...)
 
 (add-to-list 'display-buffer-alist
-             (ram-get-display-buffer-in-other-monitor-alist-entry
+             (ram-create-display-buffer-in-other-monitor-alist-element
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
                   (or (string-match-p "\\*Help\\*" buf-name)
