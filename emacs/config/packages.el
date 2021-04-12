@@ -1425,11 +1425,12 @@ one, an error is signaled."
 
 ;;***** buffers/display/alist: functions
 
-(defun ram-switch-to-buffer-in-specific-monitor (test-buffer-p workspace-idx)
-  "Return an entry for `display-buffer-alist'.
+(defun ram-create-display-buffer-in-specific-monitor-alist-element (test-buffer-p workspace-idx)
+  "Return an element to be added to `display-buffer-alist'.
 
-It works for buffers for which TEST-BUFFER-P is true. It enables
-switching to buffer in WORKSPACE-IDX."
+TEST-BUFFER-P is the condition part of the element. The action
+part returns a window for displaying the buffer in WORKSPACE-IDX
+`exwm-mode' workspace."
   (list test-buffer-p
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm desktop %d" workspace-idx)
@@ -1441,7 +1442,7 @@ switching to buffer in WORKSPACE-IDX."
                 (exwm-workspace-switch selected-frm)
                 (window--display-buffer buffer window 'reuse alist)))))))
 
-(defun ram-switch-to-buffer-in-other-monitor (test-buffer-p primary secondary)
+(defun ram-create-display-buffer-in-primary-workspace-alist-entry (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
 This element enables displaying BUFFER-REGEXP-OR-MODE-SYMBOL in
@@ -1616,7 +1617,7 @@ either by regexp match or by the major-mode sameness. "
 ;;***** buffers/display/alist: scratch
 
 (add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-specific-monitor
+             (ram-create-display-buffer-in-specific-monitor-alist-element
               (lambda (buffer &optional alist)
                 (string-match-p (regexp-quote "*scratch*")
                                 (if (stringp buffer) buffer (buffer-name buffer)))) 0))
