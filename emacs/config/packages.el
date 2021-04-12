@@ -1442,12 +1442,12 @@ part returns a window for displaying the buffer in WORKSPACE-IDX
                 (exwm-workspace-switch selected-frm)
                 (window--display-buffer buffer window 'reuse alist)))))))
 
-(defun ram-create-display-buffer-in-primary-workspace-alist-entry (test-buffer-p primary secondary)
+(defun ram-create-display-buffer-in-primary-workspace-alist-element (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
-This element enables displaying BUFFER-REGEXP-OR-MODE-SYMBOL in
-`exwm-randr-monitor' workspaces PRIMARY or SECONDARY and
-selecting it.
+ TEST-BUFFER-P as the condition part of the element. The action
+part returns a window for displaying the buffer in
+`exwm-mode' workspaces PRIMARY or SECONDARY.
 
 The workspace is chosen by a set of conditions in `cond'
 expression."
@@ -1460,6 +1460,7 @@ expression."
                    (secondary ,secondary)
                    (buffer-sameness-p (lambda (frm)
                                         (,test-buffer-p (window-buffer (frame-selected-window frm)))))
+                   (selected-frm (selected-frame))
                    ;; decide between primary and secondary workspaces
                    (workspc (cond
                              ;; primary-frame is not active, select it
@@ -1472,17 +1473,17 @@ expression."
                               ;; (message "???????? case 2")
                               primary)
                              ;; selected primary is displaying sameness buffer, select secondary
-                             ((and (eq (selected-frame) primary-frame)
+                             ((and (eq selected-frm primary-frame)
                                    (funcall buffer-sameness-p primary-frame))
                               ;; (message "???????? case 3")
                               secondary)
                              ;; not selected primary is displaying sameness buffer
                              ((and (frame-parameter primary-frame 'exwm-active)
-                                   (not (eq (selected-frame) primary-frame))
+                                   (not (eq selected-frm primary-frame))
                                    (funcall buffer-sameness-p primary-frame))
                               ;; selected displaying sameness buffer too, select primary
                               ;; (message "???????? case 4")
-                              (if (funcall buffer-sameness-p (selected-frame))
+                              (if (funcall buffer-sameness-p selected-frm)
                                   primary
                                 secondary))
                              (t
@@ -1492,8 +1493,9 @@ expression."
                     (car (window-list-1 nil 'nomini
                                         (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window-to-display-in
-                (progn (exwm-workspace-switch workspc)
-                       (window--display-buffer buffer window-to-display-in 'reuse alist))))))))
+                (exwm-workspace-switch workspc)
+                (exwm-workspace-switch selected-frm)
+                (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
 (defun ram-get-display-buffer-in-other-monitor-alist-entry (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
@@ -1602,7 +1604,7 @@ either by regexp match or by the major-mode sameness. "
               6 4))
 
 (add-to-list 'display-buffer-alist
-             (ram-switch-to-buffer-in-other-monitor
+             (ram-create-display-buffer-in-primary-workspace-alist-element
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
                   (or (eq 'emacs-lisp-mode mode)
