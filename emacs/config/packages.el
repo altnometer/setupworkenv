@@ -1615,27 +1615,11 @@ displaying TEST-BUFFER-P buffer."
                       (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
               7 3))
 
-;;***** buffers/display/alist: scratch
-
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-specific-monitor-alist-element
               (lambda (buffer &optional alist)
                 (string-match-p (regexp-quote "*scratch*")
                                 (if (stringp buffer) buffer (buffer-name buffer)))) 0))
-
-(add-to-list 'display-buffer-alist
-             `((lambda (buf alist)
-                 (string= "*scratch*" (if (stringp buf) buf (buffer-name buf))))
-               (
-                ;; (lambda (buf alist)
-                ;;   (message (format "################ buf name: %s, mode: %s"
-                ;;                    buf
-                ;;                    (with-current-buffer buf major-mode)))
-                ;;   nil)
-                (lambda (buf alist)
-                  "Display \"*scratch*\" buffers in exwm workspace 0."
-                  (exwm-workspace-switch-create 0)
-                  'display-buffer-use-some-window))))
 
 ;; (add-to-list 'display-buffer-alist
 ;;              `("*"
