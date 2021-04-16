@@ -408,6 +408,10 @@
         ([?\s-'] . (lambda (command)
                      (interactive (list (read-shell-command "$ ")))
                      (start-process-shell-command command nil command)))
+        (,(kbd "<f2>") . (lambda () (interactive) (exwm-workspace-switch-create 2)))
+        (,(kbd "<f10>") . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+        (,(kbd "<f6>") . (lambda () (interactive) (exwm-workspace-switch-create 6)))
+        (,(kbd "<f7>") . (lambda () (interactive) (exwm-workspace-switch-create 7)))
         ;; 's-N': Switch to certain workspace.
         ,@(mapcar (lambda (i)
                         `(,(kbd (format "s-%d" i)) .
@@ -500,6 +504,16 @@
     (exwm-workspace-switch (nth count visible-workspace))))
 
 ;; all <M-f*> keys in layer activated with <tab> hold (right top thumb key)
+(define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
+;; <f1> is bound to #'help-for-help by default
+(define-key global-map (kbd "<f1>") nil)
+(define-key global-map (kbd "<f1>") (lambda () (interactive (exwm-workspace-switch-create 1))))
+;; <f2> is a prefix to some '2C-mode commands
+(define-key global-map (kbd "<f2>") nil)
+(define-key global-map (kbd "<f2>") (lambda () (interactive (exwm-workspace-switch-create 2))))
+(define-key global-map (kbd "<f10>") (lambda () (interactive (exwm-workspace-switch-create 0))))
+(define-key global-map (kbd "<f6>") (lambda () (interactive (exwm-workspace-switch-create 6))))
+(define-key global-map (kbd "<f7>") (lambda () (interactive (exwm-workspace-switch-create 7))))
 (define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
 (define-key global-map (kbd "s-O") #'ram-other-workspace)
 (define-key global-map (kbd "s-N") #'ram-next-workspace)
