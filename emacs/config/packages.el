@@ -3054,6 +3054,18 @@ repository, then the corresponding root is used instead."
 ;; default is 5 seconds
 (setq auto-revert-interval 3)
 
+;;** mode-line: selected-window
+
+;; credit to https://emacs.stackexchange.com/a/13874/31822
+
+(defvar ram-selwin nil)
+
+(defun ram-get-selected-window (windows)
+  (when (not (minibuffer-window-active-p (frame-selected-window)))
+    (setq ram-selwin (selected-window))))
+
+(add-function :before pre-redisplay-function #'ram-get-selected-window)
+
 ;;** mode-line: timer
 
 ;; (cancel-timer mode-line-timer)
@@ -3174,9 +3186,8 @@ repository, then the corresponding root is used instead."
                          (cons (car l) (mapcar #'string-to-number (cdr l)))))
                      (split-string output "\n" t "[ \f\t\r\v]+"))))
         (setq ram-memory-mode-line-str
-              (propertize (format " %4.1f "
-                                  (/ (nth 5 (cdr (assoc "Mem:" mem-output))) 1000.0))
-                          'face '((:foreground "grey60"))))))))
+              (format " %4.1f "
+                      (/ (nth 5 (cdr (assoc "Mem:" mem-output))) 1000.0)))))))
 
 ;;** mode-line: time
 
@@ -3185,9 +3196,8 @@ repository, then the corresponding root is used instead."
 ;; Time format
 ;; (setq display-time-format "%H%M")
 (customize-set-variable 'display-time-string-forms
-                        '((propertize (concat day dayname
-                                              " " 24-hours ":" minutes)
-                                      'face '((:foreground "grey60")))))
+                        '((concat day dayname
+                                  " " 24-hours ":" minutes)))
 
 ;; Update display-time-string
 (display-time-update)
@@ -3380,10 +3390,16 @@ been modified since its last check-in."
                  (when (not (= 0 (car (frame-position (window-frame (get-buffer-window))))))
                    (when (and (window-at-side-p (get-buffer-window) 'bottom)
                               (window-at-side-p (get-buffer-window) 'right))
-                     (let* ((mem (or ram-memory-mode-line-str ""))
+                     (let* ((mem (propertize (or ram-memory-mode-line-str "")
+                                             'face (if (eq ram-selwin (get-buffer-window))
+                                                       '((:foreground "grey90"))
+                                                     '((:foreground "grey60")))))
                             (cpu-temp (or ram-cpu-temp-mode-line-str ""))
                             (bat (ram-get-battery-status))
-                            (time display-time-string)
+                            (time (propertize display-time-string
+                                              'face (if (eq ram-selwin (get-buffer-window))
+                                                        '((:foreground "grey90"))
+                                                      '((:foreground "grey60")))))
                             (right-align-str (*-mode-line-fill (+ (length mem)
                                                                   (length cpu-temp)
                                                                   1
