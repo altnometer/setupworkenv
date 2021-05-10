@@ -1487,15 +1487,8 @@ expression."
                    (buffer-sameness-p (lambda (frm)
                                         (,test-buffer-p (window-buffer (frame-selected-window frm)))))
                    (selected-frm (selected-frame))
-                   (other-frame-p (or (cdr (assq 'inhibit-same-window alist))
-                                      (cdr (assq 'reusable-frames alist))))
                    ;; decide between primary and secondary workspaces
                    (workspc (cond
-                             ;; wish to display in other frame, select workspc in other monitor
-                             (other-frame-p (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
-                                                         (frame-parameter primary-frame 'exwm-randr-monitor))
-                                                secondary
-                                              primary))
                              ;; primary-frame is not active, select it
                              ((not (frame-parameter primary-frame 'exwm-active))
                               ;; (message "???????? case 1")
@@ -1522,6 +1515,13 @@ expression."
                              (t
                               ;; (message "???????? case default")
                               primary)))
+                   ;; ALIST indicates it wants other window or frame
+                   (other-frame-p (or (cdr (assq 'inhibit-same-window alist))
+                                      (cdr (assq 'reusable-frames alist))))
+                   ;; swap workspc when other-frame-p is true
+                   (workspc (if other-frame-p
+                                (if (= workspc primary) secondary primary)
+                              workspc))
                    (workspc-frm (exwm-workspace--workspace-from-frame-or-index workspc))
                    (window-to-display-in (car (window-list-1 nil 'nomini workspc-frm))))
               (when window-to-display-in
