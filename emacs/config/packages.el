@@ -426,15 +426,25 @@
 
 (add-hook 'exwm-manage-finish-hook
           (lambda ()
-            (when (and exwm-class-name
-                       (string= exwm-class-name "qutebrowser"))
+            (cond
+             ((and exwm-class-name
+                   (string= exwm-class-name "qutebrowser"))
+              (exwm-workspace-switch 1)
               (exwm-input-set-local-simulation-keys nil)
               (set-window-fringes (selected-window) 0 0)
               ;; git-gutter adds right fringe
               (git-gutter-mode -1)
               (exwm-layout-toggle-fullscreen)
               ;; (setq mode-line-format nil)
-              )))
+              )
+             ((and exwm-class-name
+                   (string= exwm-class-name "MuPDF"))
+              (exwm-workspace-switch 1))
+             )))
+
+(setq exwm-manage-configurations
+      '(((member exwm-instance-name '("qutebrowser" "mupdf"))
+         workspace 1)))
 
 ;; Line-editing shortcuts
 
