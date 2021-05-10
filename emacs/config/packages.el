@@ -413,12 +413,12 @@
         (,(kbd "<f6>") . (lambda () (interactive) (exwm-workspace-switch-create 6)))
         (,(kbd "<f7>") . (lambda () (interactive) (exwm-workspace-switch-create 7)))
         ;; 's-N': Switch to certain workspace.
-        ,@(mapcar (lambda (i)
-                        `(,(kbd (format "s-%d" i)) .
-                          (lambda ()
-                            (interactive)
-                            (exwm-workspace-switch-create ,i))))
-                  (number-sequence 0 9))))
+        (\,@ (mapcar (lambda (i)
+                       `(,(kbd (format "s-%d" i)) .
+                         (lambda ()
+                           (interactive)
+                           (exwm-workspace-switch-create ,i))))
+                     (number-sequence 0 9)))))
 
 
 
