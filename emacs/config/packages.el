@@ -1626,13 +1626,70 @@ displaying TEST-BUFFER-P buffer."
                       (string-match-p "\\*Messages\\*" buf-name))))
               6 4))
 
+
+;;****** buffers/display/alist: emacs-lisp
+
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-primary-workspace-alist-element
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
-                  (or (eq 'emacs-lisp-mode mode)
-                      (eq 'clojure-mode mode))))
+                  (eq 'emacs-lisp-mode mode)))
               2 8))
+
+
+;;****** buffers/display/alist: clojure
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-primary-workspace-alist-element
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
+                  (eq 'clojure-mode mode)))
+              2 8))
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-other-monitor-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
+                      (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (or (eq 'cider-repl-mode mode)
+                      (eq 'cider-stacktrace-mode mode))))
+              8 2))
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-primary-workspace-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "^\\*Org Src .+?\\[ clojure \\]\\*$" buf-name)))
+              2 8))
+
+
+;;****** buffers/display/alist: racket
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-primary-workspace-alist-element
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
+                  (eq 'racket-mode mode)))
+              2 8))
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-other-monitor-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
+                      (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (eq 'racket-repl-mode mode)))
+              8 2))
+
+;;****** buffers/display/alist: org
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-primary-workspace-alist-element
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
+                  (eq 'org-mode mode)))
+              8 2))
+
+;;****** buffers/display/alist: eshell, dired
 
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-other-monitor-horiz-split-alist-element
@@ -1642,6 +1699,8 @@ displaying TEST-BUFFER-P buffer."
                   (or (eq 'dired-mode mode)
                       (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
               7 3))
+
+;;****** buffers/display/alist: *scratch*
 
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-specific-monitor-alist-element
