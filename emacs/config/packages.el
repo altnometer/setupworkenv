@@ -379,6 +379,8 @@
         ([?\s-q] . kill-buffer-and-window)
         ;; ([?\s-Q] . save-buffers-kill-emacs)
 
+        ([?\s-n] . switch-to-next-buffer)
+        ([?\s-p] . switch-to-prev-buffer)
         ([?\s-f] . ram-choose-from-recentf)
         ([?\s-b] . switch-to-buffer)
         ([?\s-e] . ram-open-eshell)
