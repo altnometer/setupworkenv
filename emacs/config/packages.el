@@ -1510,12 +1510,14 @@ expression."
                              (t
                               ;; (message "???????? case default")
                               primary)))
-                   (window-to-display-in
-                    (car (window-list-1 nil 'nomini
-                                        (exwm-workspace--workspace-from-frame-or-index workspc)))))
+                   (workspc-frm (exwm-workspace--workspace-from-frame-or-index workspc))
+                   (window-to-display-in (car (window-list-1 nil 'nomini workspc-frm))))
               (when window-to-display-in
-                (exwm-workspace-switch workspc)
-                (exwm-workspace-switch selected-frm)
+                (exwm-workspace-switch workspc-frm)
+                ;; when new and selected frame share same monitor, keep new one active
+                (when (not (string= (frame-parameter workspc-frm 'exwm-randr-monitor)
+                                    (frame-parameter selected-frm 'exwm-randr-monitor)))
+                  (exwm-workspace-switch selected-frm))
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
 (defun ram-create-display-buffer-in-other-monitor-alist-element (test-buffer-p primary secondary)
