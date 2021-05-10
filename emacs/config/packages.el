@@ -2683,10 +2683,26 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
  '(clojure-mode :type git :flavor melpa
                 :files ("clojure-mode.el" "clojure-mode-pkg.el")
                 :host github :repo "clojure-emacs/clojure-mode"))
+
+(defun ram-switch-to-clojure-repl ()
+  "Switch to Clojure REPL if it is running.
+
+If there is no Clojure REPL, send warning."
+  (interactive)
+  (let* ((repl-regexp "^\\*cider-repl .*$")
+         (repl (car (seq-filter
+                     (lambda (b) (string-match-p repl-regexp (buffer-name b)))
+                     (buffer-list)))))
+    (if repl
+        (switch-to-buffer repl)
+      (error "No Clojure REPL buffer found with name: %s" repl-regexp))))
+
 (with-eval-after-load 'clojure-mode
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+  (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+  (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
   ;; (require 'flycheck-clj-kondo)
   )
 
