@@ -1600,12 +1600,18 @@ displaying TEST-BUFFER-P buffer."
               ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
                (window--display-buffer buffer next-to-target-window 'reuse alist))
               ;; if 'target-window buffer is of the same mode, split it horizontally
-              ((funcall buffer-sameness-p target-frame)
-               (let ((new-window (split-window-no-error target-window nil 'below)))
-                 (when new-window
-                   (setq new-window (window--display-buffer buffer new-window 'window alist))
-                   (balance-windows-area)
-                   new-window)))
+              ;; ((funcall buffer-sameness-p target-frame)
+              ;;  (let ((new-window (split-window-no-error target-window nil 'below)))
+              ;;    (when new-window
+              ;;      (setq new-window (window--display-buffer buffer new-window 'window alist))
+              ;;      (balance-windows-area)
+              ;;      new-window)))
+              ;; split unconditionally
+              (t (let ((new-window (split-window-no-error target-window nil 'below)))
+                   (when new-window
+                     (setq new-window (window--display-buffer buffer new-window 'window alist))
+                     (balance-windows-area)
+                     new-window)))
               ;; reuse 'target-window
               (t (window--display-buffer buffer target-window 'reuse alist)))))))
 
