@@ -1531,7 +1531,6 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm workspace %d or %d" primary secondary)
             (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
-                   (selected-monitor (frame-parameter (selected-frame) 'exwm-randr-monitor))
                    (primary ,primary)
                    (secondary ,secondary)
                    (buffer-sameness-p (lambda (frm)
