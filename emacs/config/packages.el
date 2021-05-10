@@ -1572,11 +1572,11 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
 (defun ram-create-display-buffer-in-other-monitor-horiz-split-alist-element (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
-TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION)
-element. The ACTION part returns a window to display the buffer
-in either PRIMARY or SECONDARY `exwm-mode' workspaces.
+TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION). The
+ACTION part returns a window to display the buffer in either
+PRIMARY or SECONDARY `exwm-mode' workspaces.
 
-It is possible to split the selected window horizontally if it is
+It splits the selected window horizontally if it is not
 displaying TEST-BUFFER-P buffer."
   (list test-buffer-p
         `(lambda (buffer alist)
