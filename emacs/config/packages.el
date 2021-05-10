@@ -4097,6 +4097,8 @@ That is, remove a non kept dired from the recent list."
 
 ;;** system: general settings
 
+(setq confirm-nonexistent-file-or-buffer t)
+
 (setq vc-follow-symlinks t)
 
 ;; (when (display-graphic-p)
