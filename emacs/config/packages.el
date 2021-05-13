@@ -1569,6 +1569,36 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
                 (exwm-workspace-switch selected-frm)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
+(defun ram-create-display-buffer-in-same-monitor-horiz-split-alist-element (test-buffer-p)
+  "Return an element to be added to `display-buffer-alist'.
+
+TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION). The
+ACTION part returns a window to display the buffer in the
+`#'selected-frame'.
+
+It splits the window horizontally if TEST-BUFFER-P is not
+visible."
+  (list test-buffer-p
+        `(lambda (buffer alist)
+           ,(format "Display BUFFER in a horizontal split.")
+           (let* (                  
+                  (target-window (frame-selected-window (selected-frame)))
+                  (next-to-target-window (next-window target-window 'nomini (selected-frame))))
+             (cond
+              ;; reuse target-window displaying same buffer
+              ((string= (buffer-name (window-buffer target-window))
+                        (if (stringp buffer) buffer (buffer-name buffer)))
+               (window--display-buffer buffer target-window 'reuse alist))
+              ;; reuse next-to-target-window
+              ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
+               (window--display-buffer buffer next-to-target-window 'reuse alist))
+              ;; split unconditionally
+              (t (let ((new-window (split-window-no-error target-window nil 'below)))
+                   (when new-window
+                     (setq new-window (window--display-buffer buffer new-window 'window alist))
+                     (balance-windows-area)
+                     new-window))))))))
+
 (defun ram-create-display-buffer-in-other-monitor-horiz-split-alist-element (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
@@ -1685,12 +1715,11 @@ displaying TEST-BUFFER-P buffer."
               2 8))
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-other-monitor-horiz-split-alist-element
+             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
                       (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (eq 'racket-repl-mode mode)))
-              8 2))
+                  (eq 'racket-repl-mode mode)))))
 
 ;;****** buffers/display/alist: org
 
