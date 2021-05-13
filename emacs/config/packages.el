@@ -383,6 +383,7 @@
         ([?\s-p] . switch-to-prev-buffer)
         ([?\s-f] . ram-choose-from-recentf)
         ([?\s-b] . switch-to-buffer)
+        ([?\s-B] . switch-to-buffer-other-window)
         ([?\s-e] . ram-open-eshell)
         ([?\s-o] . other-window)
         (,(kbd "C-s-f") . find-file)
