@@ -536,6 +536,14 @@
 ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;;* magit
+
+(straight-use-package
+ '(magit-section :type git
+                 :files ("lisp/magit-section.el"
+                        "Documentation/magit-section.texi")
+                 :host github
+                 :repo "magit/magit"))
+
 (straight-use-package
  '(magit :type git :flavor melpa :files ("lisp/magit"
                                          "lisp/magit*.el"
