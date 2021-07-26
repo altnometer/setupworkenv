@@ -1178,7 +1178,9 @@ instead."
 
   (setq orderless-style-dispatchers
         '(prot/orderless-literal-dispatcher
-          prot/orderless-initialism-dispatcher)))
+          prot/orderless-initialism-dispatcher))
+  (add-hook 'minibuffer-exit-hook
+            'orderless-remove-transient-configuration))
 
 ;;* frame, window, buffer, sentence
 
@@ -4162,13 +4164,6 @@ That is, remove a non kept dired from the recent list."
 (setq confirm-nonexistent-file-or-buffer t)
 
 (setq vc-follow-symlinks t)
-
-;; (when (display-graphic-p)
-;;   (desktop-save-mode 1);; is x window
-;;   ())
-
-;; Add variables to desktop saving
-(add-to-list 'desktop-globals-to-save 'register-alist)
 
 (setq confirm-kill-emacs 'y-or-n-p)
 
