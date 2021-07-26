@@ -286,3 +286,6 @@ then
     unfunction preexec
     PS1='$ '
 fi
+
+# opam configuration
+test -r /home/sam/.opam/opam-init/init.zsh && . /home/sam/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
