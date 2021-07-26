@@ -439,14 +439,10 @@
               (git-gutter-mode -1)
               (exwm-layout-toggle-fullscreen)
               ;; (setq mode-line-format nil)
-              )
-             ((and exwm-class-name
-                   (string= exwm-class-name "MuPDF"))
-              (exwm-workspace-switch 1))
-             )))
+              ))))
 
 (setq exwm-manage-configurations
-      '(((member exwm-instance-name '("qutebrowser" "mupdf"))
+      '(((member exwm-instance-name '("qutebrowser"))
          workspace 1)))
 
 ;; Line-editing shortcuts
