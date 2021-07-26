@@ -1588,7 +1588,7 @@ visible."
   (list test-buffer-p
         `(lambda (buffer alist)
            ,(format "Display BUFFER in a horizontal split.")
-           (let* (                  
+           (let* (
                   (target-window (frame-selected-window (selected-frame)))
                   (next-to-target-window (next-window target-window 'nomini (selected-frame))))
              (cond
@@ -1672,7 +1672,8 @@ displaying TEST-BUFFER-P buffer."
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
                   (or (string-match-p "\\*Help\\*" buf-name)
                       (string-match-p "^\\*info\\*\\(<[0-9]+>\\)?$" buf-name)
-                      (string-match-p "\\*Messages\\*" buf-name))))
+                      (string-match-p "\\*Messages\\*" buf-name)
+                      (string-match-p "^magit.*$" buf-name))))
               6 4))
 
 
