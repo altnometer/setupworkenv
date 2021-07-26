@@ -70,12 +70,12 @@
 
 (defun rec-reset-candidates (candidates)
   "Set `rec-history' to CANDIDATES."
-  (let ((orderless-matching-styles
-         '(orderless-literal)))
-    (setq rec-history
-          (orderless-filter
-           (string-join rec-search-substrings " ") candidates))
-    (setq rec-displayed-candidate 0)))
+  (setq orderless-transient-matching-styles '(orderless-literal))
+  (setq rec-history
+        (orderless-filter
+         (string-join rec-search-substrings " ") candidates))
+  (setq orderless-transient-matching-styles nil)
+  (setq rec-displayed-candidate 0))
 
 (defun rec--set-vars ()
   "Set `ram-eshell-completion-mode' variables."
