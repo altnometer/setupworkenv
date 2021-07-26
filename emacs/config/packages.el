@@ -3821,6 +3821,39 @@ Configure `orderless-matching-styles' for this command."
 (define-key global-map (kbd "C-s-d") #'iy-go-to-or-up-to-continue)
 (define-key global-map (kbd "M-s-d") #'iy-go-to-or-up-to-continue-backward)
 
+
+;;** packages: haskell-mode
+
+(straight-use-package
+ '(haskell-mode :type git :flavor melpa
+                :files (:defaults "NEWS" "logo.svg" "haskell-mode-pkg.el")
+                :host github :repo "haskell/haskell-mode"))
+(require 'haskell)
+(setq haskell-interactive-mode-eval-mode 'haskell-mode)
+
+;; add capability to submit code to interpreter and mark errors
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+
+;; add missing keybindings for navigating errors
+(define-key interactive-haskell-mode-map (kbd "M-n") 'haskell-goto-next-error)
+(define-key interactive-haskell-mode-map (kbd "M-p") 'haskell-goto-prev-error)
+(define-key interactive-haskell-mode-map (kbd "C-c M-p")
+ 'haskell-goto-first-error)
+
+;; merge this with your existing custom-set-variables
+(custom-set-variables
+
+ ;; NOTE: include following line to work around haskell-mode
+ ;; bug if using GHC >= 8.2.1.
+ ;; See: https://github.com/haskell/haskell-mode/issues/1553
+ '(haskell-process-args-stack-ghci
+   '("--ghci-options=-ferror-spans -fshow-loaded-modules"
+     "--no-build" "--no-load"))
+
+ ;; some options suggested in the haskell-mode documentation
+ '(haskell-process-auto-import-loaded-modules t)
+ '(haskell-process-log t)
+ '(haskell-process-suggest-remove-import-lines t))
 ;;** packages: keycast
 
 (straight-use-package
