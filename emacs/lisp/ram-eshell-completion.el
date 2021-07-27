@@ -208,17 +208,17 @@
     ;; set beginning-part if regex for it matches
     (when (and (string-match (rx line-start
                                  (zero-or-more (not alnum))
-                                 (one-or-more (or alnum "-"))) word)
+                                 (one-or-more (or alnum "-" "/"))) word)
                ;; do not include if substr in the match
                (not (s-matches-p substr (match-string 0 word))))
       (setq beginning-part (match-string 0 word)))
     ;; set middle-part to regex match group 1
     (string-match (rx-to-string
-                   `(: (group (zero-or-more (or alnum "-"))
+                   `(: (group (zero-or-more (or alnum "-" "/"))
                               (zero-or-more (not alnum))
                               ,substr
                               (zero-or-more (not alnum))
-                              (zero-or-more (or alnum "-")))
+                              (zero-or-more (or alnum "-" "/")))
                        (group (zero-or-more anychar))
                        line-end) t)
                   word)
@@ -253,8 +253,8 @@
               (progn
                 (setq match-end
                       (text-property-not-all match-begining (length word) 'face 'rec--hl-match-face word))
-                (let ((cropped-word
-                       (rec--crop-word word (substring word match-begining match-end))))
+                (let* ((match-substr (substring word match-begining match-end))
+                       (cropped-word (rec--crop-word word match-substr)))
                   (cons
                    cropped-word
                    (rec--resize-list (cdr words) (- length
