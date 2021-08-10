@@ -2687,9 +2687,27 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 (straight-use-package
  '(multiple-cursors :type git :flavor melpa :host github :repo "magnars/multiple-cursors.el"))
 ;; will make <return> insert a newline; multiple-cursors-mode can still be disabled with C-g
-(eval-after-load "multiple-cursors"
-  '(define-key mc/keymap (kbd "<return>") nil))
+(with-eval-after-load "multiple-cursors"
+  (define-key mc/keymap (kbd "<return>") nil)
 
+  (add-to-list 'mc/cmds-to-run-once 'mc/toggle-cursor-at-point)
+  (add-to-list 'mc/cmds-to-run-once 'multiple-cursors-mode))
+
+
+;;credit to https://stackoverflow.com/a/39885314/9913235
+(defun mc/toggle-cursor-at-point ()
+  "Add or remove a cursor at point."
+  (interactive)
+  (require 'multiple-cursors)
+  (if multiple-cursors-mode
+      (error "Cannot toggle cursor at point while `multiple-cursors-mode' is active.")
+    (let ((existing (mc/fake-cursor-at-point)))
+      (if existing
+          (mc/remove-fake-cursor existing)
+        (mc/create-fake-cursor-at-point)))))
+
+(define-key global-map (kbd "M-<f9>") #'mc/toggle-cursor-at-point)
+(define-key global-map (kbd "M-S-<f9>") 'multiple-cursors-mode)
 
 ;;* brackets, parentheses, parens
 
