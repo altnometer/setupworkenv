@@ -2846,6 +2846,8 @@ If there is no Clojure REPL, send warning."
   (add-hook 'after-init-hook 'super-save-mode)
   ;; save on find-file
   (add-to-list 'super-save-hook-triggers 'find-file-hook)
+  ;; TODO: the following does not seem to have an effect
+  (add-to-list 'super-save-triggers 'execute-extended-command)
   (add-to-list 'super-save-triggers 'switch-to-prev-buffer)
   (add-to-list 'super-save-triggers 'switch-to-next-buffer)
   (add-to-list 'super-save-triggers 'winner-undo)
