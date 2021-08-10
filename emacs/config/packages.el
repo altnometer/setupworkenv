@@ -2214,6 +2214,7 @@ displaying TEST-BUFFER-P buffer."
                :host github :repo "greghendershott/racket-mode"))
 (require 'racket-mode)
 
+;; breaks lispy-mode key bindings
 ;; (add-hook 'racket-mode-hook #'racket-unicode-input-method-enable)
 
 (with-eval-after-load 'racket-mode
