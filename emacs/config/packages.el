@@ -4437,7 +4437,9 @@ That is, remove a non kept dired from the recent list."
 
 (define-key global-map (kbd "<s-return>") 'smart-open-line)
 (define-key global-map (kbd "<S-s-return>") 'smart-open-line-above)
-(define-key global-map (kbd "<S-return>") 'newline-and-indent)
+(with-eval-after-load 'clojure-mode
+  (define-key clojure-mode-map (kbd "<S-return>") 'newline-and-indent))
+(define-key emacs-lisp-mode-map (kbd "<S-return>") 'newline-and-indent)
 
 ;;* xah-fly-keys
 
