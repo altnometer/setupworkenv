@@ -5,7 +5,7 @@ setterm -blank 0 -powersave off -powerdown 0
 xset s off
 # does not solve jerky screed switching with any vsync option
 #compton --daemon --backend glx --vsync opengl-mswc
-# exec i3
+#exec i3
 #xset s off -dpms
 
 # this part is from exwm
@@ -28,12 +28,8 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 #export QT_IM_MODULE=xim
 #export CLUTTER_IM_MODULE=xim
 
-
-xrandr --setmonitor HDMI-1-1 1920/300x2160/340+0+0 HDMI-1
-xrandr --setmonitor HDMI-1-2 1920/300x2160/340+1920+0 none
-
-#xrandr --output HDMI-1-1 --primary --mode 1920x2160 --pos 0x0 --rotate normal
-#xrandr --output HDMI-1-2 --mode 1920x2160 --pos 1920x0 --rotate normal
+#xrandr --setmonitor HDMI-1-1 1920/300x2160/340+0+0 HDMI-1
+#xrandr --setmonitor HDMI-1-2 1920/300x2160/340+1920+0 none
 
 # Finally start Emacs
 if [ ! "$DBUS_SESSION_BUS_ADDRESS" ] && have dbus-launch; then
