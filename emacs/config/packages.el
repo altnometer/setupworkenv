@@ -3899,6 +3899,10 @@ Configure `orderless-matching-styles' for this command."
 ;; https://github.com/ocaml/tuareg
 (load "/home/sam/.opam/4.10.0/share/emacs/site-lisp/tuareg-site-file")
 
+(with-eval-after-load 'tuareg
+  (define-key tuareg-mode-map (kbd "C-M-x") #'tuareg-eval-phrase)
+  (setq tuareg-indent-align-with-first-arg t))
+
 ;; https://github.com/ocaml/merlin
 ;; https://github.com/OCamlPro/opam-user-setup
 (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
