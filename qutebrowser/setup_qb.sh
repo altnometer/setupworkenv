@@ -40,7 +40,7 @@ then
         rm $CONF_DEST_PATH
     fi
     sudo -u ${SUDO_USER} mkdir -p $CONFIG_DEST_DIR
-	sudo -u ${SUDO_USER} ln -s $CONF_SOURCE_PATH $CONF_DEST_PATH
+    sudo -u ${SUDO_USER} ln -s $CONF_SOURCE_PATH $CONF_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $CONF_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
