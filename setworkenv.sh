@@ -26,7 +26,7 @@ fi
 REDMOO_DIR="${HOME}/redmoo"
 REDMOO_PROJECT_DIR="${REDMOO_DIR}/setupworkenv"
 # Change the public ip to the current value.
-OOSSH_KEY_FOR_GIT_REPOSITORY="${HOME}/.ssh/github_ssh_key_altnometer"
+SSH_KEY_FOR_GIT_REPOSITORY="${HOME}/.ssh/github_ssh_key_altnometer"
 # CLONE_REDMOO_FROM_THIS_REPOSITORY='lighthog@admin1:/home/lighthog/Depot/auct.git'
 CLONE_REDMOO_FROM_THIS_REPOSITORY='git@github.com:altnometer/setupworkenv.git'
 
