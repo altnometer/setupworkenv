@@ -21,13 +21,12 @@ fi
 # vars --------------------------------------------------------------------{{{
 # source $HOME/redmoo/auct/setup/setup_conf/all_scripts_conf.sh
 # which isn't cloned yet. So, they are redefined here, check
-# that they haveh't changed.
+# that they have not changed.
 # !!! ${HOME} must refer to /home/${SUDO_USER} rather than /root
 REDMOO_DIR="${HOME}/redmoo"
 REDMOO_PROJECT_DIR="${REDMOO_DIR}/setupworkenv"
 # Change the public ip to the current value.
-# CLONE_REDMOO_FROM_THIS_REPOSITORY='lighthog@repo:/home/lighthog/redmoo/auct.git'
-SSH_KEY_FOR_GIT_REPOSITORY="${HOME}/.ssh/github_ssh_key_altnometer"
+OOSSH_KEY_FOR_GIT_REPOSITORY="${HOME}/.ssh/github_ssh_key_altnometer"
 # CLONE_REDMOO_FROM_THIS_REPOSITORY='lighthog@admin1:/home/lighthog/Depot/auct.git'
 CLONE_REDMOO_FROM_THIS_REPOSITORY='git@github.com:altnometer/setupworkenv.git'
 
@@ -37,10 +36,10 @@ if [ ! -f "${SSH_KEY_FOR_GIT_REPOSITORY}" ]; then
 fi
 # }}}
 
-# To this poin:
+# To this point:
 # a username must be created,
 # sudo must be installed and username should be
-# useradd username sudo
+# run this command if it is not: # adduser username sudo
 
 # git ---------------------------------------------------------------------{{{
 if hash git 2>/dev/null; then
@@ -72,29 +71,29 @@ fi
 # source ${REDMOO_PROJECT_DIR}/setup/setup_conf/all_scripts_conf.sh
 # }}}
 
-# neovim ------------------------------------------------------------------{{{
-if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
-    echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
-else
-    echo -e "\n\x1b[33;01m Installing, configuring neovim ...  \x1b[39;49;00m\n" && sleep 1
-    VIMSETUPDIR=${REDMOO_PROJECT_DIR}/vimsetup
-    VIMSETUPFILE=${VIMSETUPDIR}/setup_neovim.sh
-    cd ${VIMSETUPDIR}
-    source ${VIMSETUPFILE}
-fi
-# }}}
+# # neovim ------------------------------------------------------------------{{{
+# if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
+#     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
+# else
+#     echo -e "\n\x1b[33;01m Installing, configuring neovim ...  \x1b[39;49;00m\n" && sleep 1
+#     VIMSETUPDIR=${REDMOO_PROJECT_DIR}/vimsetup
+#     VIMSETUPFILE=${VIMSETUPDIR}/setup_neovim.sh
+#     cd ${VIMSETUPDIR}
+#     source ${VIMSETUPFILE}
+# fi
+# # }}}
 
-# vim ---------------------------------------------------------------------{{{
-if hash vim 2>/dev/null && [ -d "${HOME}/.vim" ]; then
-    echo -e "\n\x1b[33;01m vim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
-else
-    echo -e "\n\x1b[33;01m Installing, configuring vim ...  \x1b[39;49;00m\n" && sleep 1
-    VIMSETUPDIR=${REDMOO_PROJECT_DIR}/vimsetup
-    VIMSETUPFILE=${VIMSETUPDIR}/setup_vim.sh
-    cd ${VIMSETUPDIR}
-    source ${VIMSETUPFILE}
-fi
-# }}}
+# # vim ---------------------------------------------------------------------{{{
+# if hash vim 2>/dev/null && [ -d "${HOME}/.vim" ]; then
+#     echo -e "\n\x1b[33;01m vim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
+# else
+#     echo -e "\n\x1b[33;01m Installing, configuring vim ...  \x1b[39;49;00m\n" && sleep 1
+#     VIMSETUPDIR=${REDMOO_PROJECT_DIR}/vimsetup
+#     VIMSETUPFILE=${VIMSETUPDIR}/setup_vim.sh
+#     cd ${VIMSETUPDIR}
+#     source ${VIMSETUPFILE}
+# fi
+# # }}}
 
 # zsh ---------------------------------------------------------------------{{{
 echo -e "\n\x1b[33;01m Configuring shell ... \x1b[39;49;00m\n" && sleep 1
@@ -103,28 +102,28 @@ SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
 source ${SHELLSETUPFILE}
 # }}}
 
-# tmux --------------------------------------------------------------------{{{
-echo -e "\n\x1b[33;01m Configuring tmux ... \x1b[39;49;00m\n" && sleep 1
-TMUXSETUPDIR=${REDMOO_PROJECT_DIR}/tmuxsetup
-TMUXSETUPFILE=${TMUXSETUPDIR}/setup_tmux.sh
-source ${TMUXSETUPFILE}
-# }}}
+# # tmux --------------------------------------------------------------------{{{
+# echo -e "\n\x1b[33;01m Configuring tmux ... \x1b[39;49;00m\n" && sleep 1
+# TMUXSETUPDIR=${REDMOO_PROJECT_DIR}/tmuxsetup
+# TMUXSETUPFILE=${TMUXSETUPDIR}/setup_tmux.sh
+# source ${TMUXSETUPFILE}
+# # }}}
 
-# ranger ------------------------------------------------------------------{{{
-RANGERSETUPDIR=${REDMOO_PROJECT_DIR}/ranger
-RANGERCONFIGFILE=${RANGERSETUPDIR}/setup_ranger.sh
-cd ${RANGERSETUPDIR}
-source ${RANGERCONFIGFILE}
-# }}}
+# # ranger ------------------------------------------------------------------{{{
+# RANGERSETUPDIR=${REDMOO_PROJECT_DIR}/ranger
+# RANGERCONFIGFILE=${RANGERSETUPDIR}/setup_ranger.sh
+# cd ${RANGERSETUPDIR}
+# source ${RANGERCONFIGFILE}
+# # }}}
 
-# terminal ----------------------------------------------------------------{{{
-# should go to gui setup
-# setup st terminal emulator
-STSETUPDIR=${REDMOO_PROJECT_DIR}/term
-STSETUPFILE=${STSETUPDIR}/setup_st.sh
-cd ${STSETUPDIR}
-source ${STSETUPFILE}
-# }}}
+# # terminal ----------------------------------------------------------------{{{
+# # should go to gui setup
+# # setup st terminal emulator
+# STSETUPDIR=${REDMOO_PROJECT_DIR}/term
+# STSETUPFILE=${STSETUPDIR}/setup_st.sh
+# cd ${STSETUPDIR}
+# source ${STSETUPFILE}
+# # }}}
 
 # iftop -------------------------------------------------------------------{{{
 #if ! hash /usr/sbin/iftop 2>/dev/null; then
@@ -145,19 +144,19 @@ source ${STSETUPFILE}
 # fi
 # }}}
 
-# docker ------------------------------------------------------------------{{{
-DOCKERSETUPDIR=${REDMOO_PROJECT_DIR}/docker
-DOCKERSETUPFILE=${DOCKERSETUPDIR}/setup_docker.sh
-cd ${DOCKERSETUPDIR}
-source ${DOCKERSETUPFILE}
-# }}}
+# # docker ------------------------------------------------------------------{{{
+# DOCKERSETUPDIR=${REDMOO_PROJECT_DIR}/docker
+# DOCKERSETUPFILE=${DOCKERSETUPDIR}/setup_docker.sh
+# cd ${DOCKERSETUPDIR}
+# source ${DOCKERSETUPFILE}
+# # }}}
 
-# elixir ------------------------------------------------------------------{{{
-ELIXIRSETUPDIR=${REDMOO_PROJECT_DIR}/elixir
-ELIXIRSETUPFILE=${ELIXIRSETUPDIR}/setup_elixir.sh
-cd ${ELIXIRSETUPDIR}
-source ${ELIXIRSETUPFILE}
-# }}}
+# # elixir ------------------------------------------------------------------{{{
+# ELIXIRSETUPDIR=${REDMOO_PROJECT_DIR}/elixir
+# ELIXIRSETUPFILE=${ELIXIRSETUPDIR}/setup_elixir.sh
+# cd ${ELIXIRSETUPDIR}
+# source ${ELIXIRSETUPFILE}
+# # }}}
 
 exit
 source ${PROJECT_SETUP_DIR}/iptablessetup/setupnewserveriptables.sh
