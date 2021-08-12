@@ -38,11 +38,11 @@ else
     # apt-get install -y emacs-common-non-dfsg
 
     # # tools for compiling
-    # apt-get install -y autoconf make gcc texinfo xorg-dev libgtk-3-dev libgccjit-10-dev \
+    # apt-get install -y autoconf make gcc texinfo xorg-dev libgtk-3-dev libgccjit-10-dev cmake libtool-bin\
     #         libjpeg-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev
 
     # tools for compiling
-    apt-get install -y autoconf make gcc texinfo libgccjit-10-dev \
+    apt-get install -y autoconf make gcc texinfo libgccjit-10-dev cmake libtool-bin \
             libjpeg-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev
 
     echo -e "\n\x1b[33;01m Installing, configuring emacs ...  \x1b[39;49;00m\n" && sleep 1
@@ -51,7 +51,7 @@ else
     git clone git://git.savannah.gnu.org/emacs.git
     cd emacs
     ./autogen.sh
-    ./configure --with-native-compilation --with-sound=no --with-cairo --with-x=no --with-x-toolkit=no \
+    ./configure --with-native-compilation --with-sound=no --with-cairo --with-x=yes --with-x-toolkit=no \
           --with-mailutils --without-toolkit-scroll-bars
     make -j$(nproc)
     make install
