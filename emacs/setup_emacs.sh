@@ -35,7 +35,7 @@ else
     apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
     echo -e "\n\x1b[33;01m add repositories for emacs docs ...  \x1b[39;49;00m\n" && sleep 1
     # documentation is in non-free repository, inlcude these repositories to install docs.
-    apt-get install -y emacs-common-non-dfsg
+    # apt-get install -y emacs-common-non-dfsg
 
     # # tools for compiling
     # apt-get install -y autoconf make gcc texinfo xorg-dev libgtk-3-dev libgccjit-10-dev \
