@@ -20,11 +20,11 @@ SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EMACS_DEST_DIR="${HOME}/.local/share/emacs/my.emacs.d"
 
-
 # consider installing the latest version, follow instructions in the link
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
 
-if hash emacs 2>/dev/null && [ -d "${EMACS_DEST_DIR}" ]; then
+# if hash emacs 2>/dev/null && [ -d "${EMACS_DEST_DIR}" ]; then
+if hash emacs 2>/dev/null; then
     echo -e "\n\x1b[33;01m emacs is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
@@ -59,8 +59,6 @@ else
 
     #apt-get install -y emacs
 fi
-
-exit
 
 # link files
 
