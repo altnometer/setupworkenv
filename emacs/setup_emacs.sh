@@ -29,7 +29,7 @@ if hash emacs 2>/dev/null && [ -d "${EMACS_DEST_DIR}" ]; then
 else
     echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
     # !!! sound: install pulseaudio, alsa-* packages.
-    apt-get install -y xorg xinput firefox-esr google-chrome-stable \
+    apt-get install -y xorg xinput firefox-esr \
         feh mupdf zathura
     apt-get install -y silversearcher-ag ripgrep pass
     apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
