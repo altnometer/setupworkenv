@@ -67,7 +67,7 @@ The list starts with the the inside sexp and moves outwards."
 
 (defun ram-change-color (color by-n)
   "Return color changed by BY-N."
-  (let ( (color (if (not (string* color "unspecified-bg"))
+  (let ( (color (if (not (string= color "unspecified-bg"))
                     color
                   (if (string= frame-background-mode "dark")
                       "#000000"
