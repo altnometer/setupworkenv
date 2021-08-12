@@ -237,4 +237,24 @@ else
 	exit 1
 fi
 
+
+# ** link EMACS_CONF_DIR (${HOME}/.emacs.d) to EMACS_DEST_DIR
+EMACS_CONF_DIR="${HOME}/.emacs.d"
+
+if [ -d $EMACS_DEST_DIR ];
+then
+    echo -e "\n\x1b[33;01m Removing default $EMACS_CONF_DIR ... \x1b[39;49;00m\n"
+    if [ -d "$EMACS_CONF_DIR" ]; then
+        rm -r $EMACS_CONF_DIR
+    fi
+    if [ -h "$EMACS_CONF_DIR" ]; then  # -h, true if file exist and a symbolic link.
+        rm $EMACS_CONF_DIR
+    fi
+    echo -e "\n\x1b[33;01m Linking $EMACS_DEST_DIR to $EMACS_CONF_DIR ... \x1b[39;49;00m\n"
+    sudo -u ${SUDO_USER} ln -s $EMACS_DEST_DIR $EMACS_CONF_DIR
+else
+    echo -e "\n\x1b[31;01m $EMACS_DEST_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
 SCRIPT_DIR=$SCRIPT_DIR_OLD
