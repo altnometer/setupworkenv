@@ -82,8 +82,8 @@ else
 fi
 
 
-CONF_SOURCE_DIR="${SCRIPT_DIR}/conf"
-CONF_DEST_DIR="${EMACS_DEST_DIR}/conf"
+CONF_SOURCE_DIR="${SCRIPT_DIR}/config"
+CONF_DEST_DIR="${EMACS_DEST_DIR}/config"
 
 if [ -d $CONF_SOURCE_DIR ];
 then
@@ -216,8 +216,8 @@ else
 fi
 
 # list of multicursor commands allowed for multiplo cursors
-MC_LISTS_SOURCE_PATH="${BACKUP_DIR}/emacs/recentf"
-MC_LISTS_dest_PATH="${EMACS_DEST_DIR}/recentf"
+MC_LISTS_SOURCE_PATH="${BACKUP_DIR}/emacs/.mc-lists.el"
+MC_LISTS_dest_PATH="${EMACS_DEST_DIR}/.mc-lists.el"
 
 if [ -f $MC_LISTS_SOURCE_PATH ];
 then
