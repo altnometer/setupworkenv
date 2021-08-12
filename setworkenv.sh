@@ -18,6 +18,81 @@ if [ -z ${SUDO_USER} ]; then
 fi
 # }}}
 
+# * linking backup files
+
+# Check if "${HOME}/backup" exist
+BACKUP_DIR="${HOME}/backup"
+if [ -d "${BACKUP_DIR}" ];
+then
+    echo -e "\n\x1b[33;01m ${BACKUP_DIR} directory exists, linking files ... \x1b[39;49;00m\n" && sleep 1
+else
+    echo -e "\n\x1b[33;01m ${BACKUP_DIR} is required ... \x1b[39;49;00m\n" && sleep 1
+    echo -e "\n\x1b[33;01m ${BACKUP_DIR} copy it from your previous machine, quiting. \x1b[39;49;00m\n" && sleep 1
+fi
+
+# ** linking .password-store
+
+PASSWORD_STORE_SOURCE_PATH="${BACKUP_DIR}/.password-store"
+PASSWORD_STORE_DEST_PATH="${HOME}/.password-store"
+
+if [ -d $PASSWORD_STORE_SOURCE_PATH ];
+then
+    echo -e "\n\x1b[33;01m Linking $PASSWORD_STORE_SOURCE_PATH to $PASSWORD_STORE_DEST_PATH ... \x1b[39;49;00m\n"
+    if [ -d "$PASSWORD_STORE_DEST_PATH" ]; then
+        rm -r $PASSWORD_STORE_DEST_PATH
+    fi
+    if [ -h "$PASSWORD_STORE_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
+        rm $PASSWORD_STORE_DEST_PATH
+    fi
+    sudo -u ${SUDO_USER} ln -s $PASSWORD_STORE_SOURCE_PATH $PASSWORD_STORE_DEST_PATH
+else
+    echo -e "\n\x1b[31;01m $PASSWORD_STORE_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
+# ** linking .ssh
+
+SSH_DIR_SOURCE_PATH="${BACKUP_DIR}/.ssh"
+SSH_DIR_DEST_PATH="${HOME}/.ssh"
+
+if [ -d $SSH_DIR_SOURCE_PATH ];
+then
+    echo -e "\n\x1b[33;01m Linking $SSH_DIR_SOURCE_PATH to $SSH_DIR_DEST_PATH ... \x1b[39;49;00m\n"
+    if [ -d "$SSH_DIR_DEST_PATH" ]; then
+        rm -r $SSH_DIR_DEST_PATH
+    fi
+    if [ -h "$SSH_DIR_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
+        rm $SSH_DIR_DEST_PATH
+    fi
+    sudo -u ${SUDO_USER} ln -s $SSH_DIR_SOURCE_PATH $SSH_DIR_DEST_PATH
+else
+    echo -e "\n\x1b[31;01m $SSH_DIR_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
+# ** linking fonts
+
+FONTS_DIR_SOURCE_PATH="${BACKUP_DIR}/fonts"
+FONTS_DIR_DEST_PARENT_PATH="${HOME}/.local/share"
+FONTS_DIR_DEST_PATH="${FONTS_DIR_DEST_PARENT_PATH}/fonts"
+
+if [ -d $FONTS_DIR_SOURCE_PATH ];
+then
+    echo -e "\n\x1b[33;01m Linking $FONTS_DIR_SOURCE_PATH to $FONTS_DIR_DEST_PATH ... \x1b[39;49;00m\n"
+    if [ -d "$FONTS_DIR_DEST_PATH" ]; then
+        rm -r $FONTS_DIR_DEST_PATH
+    fi
+    if [ -h "$FONTS_DIR_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
+        rm $FONTS_DIR_DEST_PATH
+    fi
+    sudo -u ${SUDO_USER} mkdir -p ${FONTS_DIR_DEST_PARENT_PATH}
+    sudo -u ${SUDO_USER} ln -s $FONTS_DIR_SOURCE_PATH $FONTS_DIR_DEST_PATH
+else
+    echo -e "\n\x1b[31;01m $FONTS_DIR_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
+
 # vars --------------------------------------------------------------------{{{
 # source $HOME/redmoo/auct/setup/setup_conf/all_scripts_conf.sh
 # which isn't cloned yet. So, they are redefined here, check
@@ -38,8 +113,8 @@ fi
 
 # To this point:
 # a username must be created,
-# sudo must be installed and username should be
-# run this command if it is not: # adduser username sudo
+# sudo must be installed and username should be in sudo group
+# otherwise, run this: # adduser username sudo
 
 # git ---------------------------------------------------------------------{{{
 if hash git 2>/dev/null; then
@@ -96,11 +171,19 @@ fi
 # # }}}
 
 # zsh ---------------------------------------------------------------------{{{
-echo -e "\n\x1b[33;01m Configuring shell ... \x1b[39;49;00m\n" && sleep 1
+echo -e "\n\x1b[33;01m Setting up zsh ... \x1b[39;49;00m\n" && sleep 1
 SHELLSETUPDIR=${REDMOO_PROJECT_DIR}/shell
 SHELLSETUPFILE=${SHELLSETUPDIR}/setupzsh.sh
 source ${SHELLSETUPFILE}
 # }}}
+
+# ** emacs
+echo -e "\n\x1b[33;01m Setting up emacs ... \x1b[39;49;00m\n" && sleep 1
+EMACS_SETUP_DIR=${REDMOO_PROJECT_DIR}/emacs
+EMACS_SETUP_FILE=${EMACS_SETUP_DIR}/setup_emacs.sh
+source ${EMACS_SETUP_FILE}
+
+exit
 
 # # tmux --------------------------------------------------------------------{{{
 # echo -e "\n\x1b[33;01m Configuring tmux ... \x1b[39;49;00m\n" && sleep 1
