@@ -67,12 +67,12 @@ The list starts with the the inside sexp and moves outwards."
 
 (defun ram-change-color (color by-n)
   "Return color changed by BY-N."
-  (let ( (color (if (not (string= color "unspecified-bg"))
+  (let* ((color-checked (if (not (string= color "unspecified-bg"))
                     color
                   (if (string= frame-background-mode "dark")
                       "#000000"
                     "#ffffff")))
-         (color-ls (color-values color)))
+         (color-ls (color-values color-checked)))
     (if (< (color-distance "black" color)
            (color-distance "white" color))
         (apply #'format "#%04x%04x%04x"
