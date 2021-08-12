@@ -3893,29 +3893,29 @@ Configure `orderless-matching-styles' for this command."
 ;;** packages: ocaml
 
 
-(add-to-list 'load-path "/home/sam/.opam/4.10.0/share/emacs/site-lisp")
-(require 'ocp-indent)
+;; (add-to-list 'load-path "/home/sam/.opam/4.10.0/share/emacs/site-lisp")
+;; (require 'ocp-indent)
 
-;; https://github.com/ocaml/tuareg
-(load "/home/sam/.opam/4.10.0/share/emacs/site-lisp/tuareg-site-file")
+;; ;; https://github.com/ocaml/tuareg
+;; (load "/home/sam/.opam/4.10.0/share/emacs/site-lisp/tuareg-site-file")
 
-(with-eval-after-load 'tuareg
-  (define-key tuareg-mode-map (kbd "C-M-x") #'tuareg-eval-phrase)
-  (setq tuareg-indent-align-with-first-arg t))
+;; (with-eval-after-load 'tuareg
+;;   (define-key tuareg-mode-map (kbd "C-M-x") #'tuareg-eval-phrase)
+;;   (setq tuareg-indent-align-with-first-arg t))
 
-;; https://github.com/ocaml/merlin
-;; https://github.com/OCamlPro/opam-user-setup
-(let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
-      (when (and opam-share (file-directory-p opam-share))
-       ;; Register Merlin
-       (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
-       (autoload 'merlin-mode "merlin" nil t nil)
-       ;; Automatically start it in OCaml buffers
-       (add-hook 'tuareg-mode-hook 'merlin-mode t)
-       (add-hook 'caml-mode-hook 'merlin-mode t)
-       ;; Use opam switch to lookup ocamlmerlin binary
-       (setq merlin-command 'opam)))
-;; (require 'merlin-company)
+;; ;; https://github.com/ocaml/merlin
+;; ;; https://github.com/OCamlPro/opam-user-setup
+;; (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
+;;       (when (and opam-share (file-directory-p opam-share))
+;;        ;; Register Merlin
+;;        (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
+;;        (autoload 'merlin-mode "merlin" nil t nil)
+;;        ;; Automatically start it in OCaml buffers
+;;        (add-hook 'tuareg-mode-hook 'merlin-mode t)
+;;        (add-hook 'caml-mode-hook 'merlin-mode t)
+;;        ;; Use opam switch to lookup ocamlmerlin binary
+;;        (setq merlin-command 'opam)))
+;; ;; (require 'merlin-company)
 
 ;; https://github.com/ocaml-ppx/ocamlformat#emacs-setup
 
