@@ -18,7 +18,9 @@ if [ -z ${SUDO_USER} ]; then
 fi
 SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-EMACS_DEST_DIR="${HOME}/.local/share/emacs/my.emacs.d"
+EMACS_DEST_DIR="${HOME}/.local/share/emacs.d/my.emacs.d"
+EMACS_INSTALL_DIR="${HOME}/.local/share/emacs"
+EMACS_BIN_DIR="${HOME}/.local/bin"
 
 # consider installing the latest version, follow instructions in the link
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
@@ -51,7 +53,9 @@ else
     git clone git://git.savannah.gnu.org/emacs.git
     cd emacs
     ./autogen.sh
-    ./configure --with-native-compilation --with-sound=no --with-cairo --with-x=yes --with-x-toolkit=no \
+    ./configure --prefix=$EMACS_INSTALL_DIR --bindir=$EMACS_BIN_DIR \
+          --with-native-compilation --with-sound=no --with-cairo \
+          --with-x=yes --with-x-toolkit=no \
           --with-mailutils --without-toolkit-scroll-bars
     make -j$(nproc)
     make install
