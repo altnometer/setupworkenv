@@ -26,7 +26,7 @@ if hash zsh 2>/dev/null;
 then
     echo -e "\n\x1b[33;01m zsh is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
 else
-    apt-get install -y zsh
+    apt-get install -y zsh curl
     chsh --shell $(which zsh) ${SUDO_USER}
     mkdir -p $ZSH_CUSTOM_PLUG_DIR
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
