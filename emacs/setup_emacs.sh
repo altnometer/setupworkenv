@@ -217,23 +217,33 @@ fi
 
 # list of multicursor commands allowed for multiplo cursors
 MC_LISTS_SOURCE_PATH="${BACKUP_DIR}/emacs/.mc-lists.el"
-MC_LISTS_dest_PATH="${EMACS_DEST_DIR}/.mc-lists.el"
+MC_LISTS_DEST_PATH="${EMACS_DEST_DIR}/.mc-lists.el"
 
 if [ -f $MC_LISTS_SOURCE_PATH ];
 then
-    echo -e "\n\x1b[33;01m Linking $MC_LISTS_SOURCE_PATH to $MC_LISTS_dest_PATH ... \x1b[39;49;00m\n"
-    if [ -f "$MC_LISTS_DEST_PATH" ]; then
-        rm $MC_LISTS_DEST_PATH
-    fi
-    if [ -h "$MC_LISTS_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
-        rm $MC_LISTS_DEST_PATH
-    fi
+    echo -e "\n\x1b[33;01m Linking $MC_LISTS_SOURCE_PATH to $MC_LISTS_DEST_PATH ... \x1b[39;49;00m\n"
     sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
-    sudo -u ${SUDO_USER} ln -s $MC_LISTS_SOURCE_PATH $MC_LISTS_dest_PATH
+    sudo -u ${SUDO_USER} ln -fs $MC_LISTS_SOURCE_PATH $MC_LISTS_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $MC_LISTS_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
+
+# if [ -f $MC_LISTS_SOURCE_PATH ];
+# then
+#     echo -e "\n\x1b[33;01m Linking $MC_LISTS_SOURCE_PATH to $MC_LISTS_DEST_PATH ... \x1b[39;49;00m\n"
+#     if [ -f "$MC_LISTS_DEST_PATH" ]; then
+#         rm $MC_LISTS_DEST_PATH
+#     fi
+#     if [ -h "$MC_LISTS_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
+#         rm $MC_LISTS_DEST_PATH
+#     fi
+#     sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+#     sudo -u ${SUDO_USER} ln -s $MC_LISTS_SOURCE_PATH $MC_LISTS_DEST_PATH
+# else
+#     echo -e "\n\x1b[31;01m $MC_LISTS_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
+# 	exit 1
+# fi
 
 
 # ** link EMACS_CONF_DIR (${HOME}/.emacs.d) to EMACS_DEST_DIR
