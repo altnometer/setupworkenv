@@ -20,12 +20,6 @@ if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
 
-# add elixir binaries if they exist
-# ELIXIR_LOCAL_BINARIES="$HOME/.local/share/elixir/bin"
-# if [ -d "$ELIXIR_LOCAL_BINARIES" ] ; then
-    # PATH="$ELIXIR_LOCAL_BINARIES:$PATH"
-# fi
-
 local_bin="${HOME}/.local/bin"
 mkdir -p $local_bin
 PATH=$local_bin:$PATH
@@ -161,73 +155,74 @@ tmk() {
         tmux kill-session -t ${name}
     fi
 }
-###############git#################
-# credit to David Winterbottom
-# of http://codeinthehole.com/tips/pull-requests-and-other-good-practices-for-teams-using-github/
-# alias git='hub'
-alias g='git status -sb'
-alias gs='git status'
-alias gh='git hist'
-alias gp='git pull'
-alias gpr='git pull --rebase'
-alias gpp='git pull --rebase && git push'
-alias gf='git fetch'
-alias gb='git branch'
-alias ga='git add'
-alias gc='git commit'
-alias gca='git commit --amend'
-alias gcv='git commit --no-verify'
-alias gd='git diff --color-words'
-alias gdc='git diff --cached -w'
-alias gdw='git diff --no-ext-diff --word-diff'
-alias gdv='git diff'
-alias gl='git log --oneline --decorate'
-# git log --all --graph --decorate --oneline
-alias gt='git tag'
-alias grc='git rebase --continue'
-alias grs='git rebase --skip'
-alias gsl='git stash list'
-alias gss='git stash save'
-alias gco='git checkout'
 
-#############docker################
-docker_remove () { docker stop $1 && docker rm $1; }
-docker_remove_all () {
-    echo -e "\n\x1b[33;01m Are you SURE?[Y/n]\x1b[39;49;00m\n"
-    read user_resp
-    if [ "${user_resp}" == "n" -o "${user_resp}" == "N" ]; then
-        exit 0
-    else
-        docker stop $( docker ps -a -q )
-        docker rm $( docker ps -a -q )
-    fi
-}
-alias dp='docker ps -a'
-alias ds='docker stop'
-alias dr=docker_remove
-alias dra=docker_remove_all
-alias dre='docker ps -aq -f status=exited | xargs docker rm'
-alias di='docker images'
-alias dri='docker rmi'
-alias drid='docker images -q --filter dangling=true | xargs docker rmi'
+# ###############git#################
+# # credit to David Winterbottom
+# # of http://codeinthehole.com/tips/pull-requests-and-other-good-practices-for-teams-using-github/
+# # alias git='hub'
+# alias g='git status -sb'
+# alias gs='git status'
+# alias gh='git hist'
+# alias gp='git pull'
+# alias gpr='git pull --rebase'
+# alias gpp='git pull --rebase && git push'
+# alias gf='git fetch'
+# alias gb='git branch'
+# alias ga='git add'
+# alias gc='git commit'
+# alias gca='git commit --amend'
+# alias gcv='git commit --no-verify'
+# alias gd='git diff --color-words'
+# alias gdc='git diff --cached -w'
+# alias gdw='git diff --no-ext-diff --word-diff'
+# alias gdv='git diff'
+# alias gl='git log --oneline --decorate'
+# # git log --all --graph --decorate --oneline
+# alias gt='git tag'
+# alias grc='git rebase --continue'
+# alias grs='git rebase --skip'
+# alias gsl='git stash list'
+# alias gss='git stash save'
+# alias gco='git checkout'
 
-#########kubernetes################
-alias kn='kubectl get node -o wide'
-alias kp='kubectl get pod -o wide'
-alias ks='kubectl get svc'
-alias kr='kubectl get rc -o wide'
-alias kd='kubectl get deploy'
-alias kpv='kubectl describe pod'
-alias krv='kubectl describe rc'
-alias ksv='kubectl describe svc'
-alias kpd='kubectl  delete pod'
-alias krd='kubectl delete rc'
-alias ksd='kubectl delete svc'
+# #############docker################
+# docker_remove () { docker stop $1 && docker rm $1; }
+# docker_remove_all () {
+#     echo -e "\n\x1b[33;01m Are you SURE?[Y/n]\x1b[39;49;00m\n"
+#     read user_resp
+#     if [ "${user_resp}" == "n" -o "${user_resp}" == "N" ]; then
+#         exit 0
+#     else
+#         docker stop $( docker ps -a -q )
+#         docker rm $( docker ps -a -q )
+#     fi
+# }
+# alias dp='docker ps -a'
+# alias ds='docker stop'
+# alias dr=docker_remove
+# alias dra=docker_remove_all
+# alias dre='docker ps -aq -f status=exited | xargs docker rm'
+# alias di='docker images'
+# alias dri='docker rmi'
+# alias drid='docker images -q --filter dangling=true | xargs docker rmi'
 
-############go env#################
-export GOROOT=${HOME}/.local/share/go
-export GOPATH=${HOME}/go
-export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+# #########kubernetes################
+# alias kn='kubectl get node -o wide'
+# alias kp='kubectl get pod -o wide'
+# alias ks='kubectl get svc'
+# alias kr='kubectl get rc -o wide'
+# alias kd='kubectl get deploy'
+# alias kpv='kubectl describe pod'
+# alias krv='kubectl describe rc'
+# alias ksv='kubectl describe svc'
+# alias kpd='kubectl  delete pod'
+# alias krd='kubectl delete rc'
+# alias ksd='kubectl delete svc'
+
+# ############go env#################
+# export GOROOT=${HOME}/.local/share/go
+# export GOPATH=${HOME}/go
+# export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
 ############nodejs#################
 VERSION=v10.15.1
@@ -255,16 +250,16 @@ export PATH="$NPM_PACKAGES/bin:$PATH"
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
 export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
 
-############erlang#################
-# persist IEx and erland interactive shell history
-# and increase its size from default 512KB to 1MB
-export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_file_bytes 1024000"
+# ############erlang#################
+# # persist IEx and erland interactive shell history
+# # and increase its size from default 512KB to 1MB
+# export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_file_bytes 1024000"
 
-export PATH="$HOME/.cargo/bin:$PATH"
+# ############rust###################
+# export PATH="$HOME/.cargo/bin:$PATH"
+# CARGO_BINARIES="$HOME/.cargo/bin"
+# if [ -d "$CARGO_BINARIES" ] ; then
+#    export PATH=$CARGO_BINARIES:$PATH
+# fi
 
-############rust###################
-CARGO_BINARIES="$HOME/.cargo/bin"
-if [ -d "$CARGO_BINARIES" ] ; then
-   export PATH=$CARGO_BINARIES:$PATH
-fi
-eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+# eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
