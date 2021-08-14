@@ -18,14 +18,14 @@ if [ -z ${SUDO_USER} ]; then
 fi
 SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-EMACS_DEST_DIR="${HOME}/.local/share/emacs.d/my.emacs.d"
+EMACS_CONF_DEST_DIR="${HOME}/.local/share/emacs.d/my.emacs.d"
 EMACS_INSTALL_DIR="${HOME}/.local/share/emacs"
 EMACS_BIN_DIR="${HOME}/.local/bin"
 
 # consider installing the latest version, follow instructions in the link
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
 
-# if hash emacs 2>/dev/null && [ -d "${EMACS_DEST_DIR}" ]; then
+# if hash emacs 2>/dev/null && [ -d "${EMACS_CONF_DEST_DIR}" ]; then
 if hash emacs 2>/dev/null; then
     echo -e "\n\x1b[33;01m emacs is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
@@ -67,7 +67,7 @@ fi
 # link files
 
 INIT_SOURCE_PATH="${SCRIPT_DIR}/init.el"
-INIT_DEST_PATH="${EMACS_DEST_DIR}/init.el"
+INIT_DEST_PATH="${EMACS_CONF_DEST_DIR}/init.el"
 
 if [ -f $INIT_SOURCE_PATH ];
 then
@@ -78,7 +78,7 @@ then
     if [ -h "$INIT_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
         rm $INIT_DEST_PATH
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $INIT_SOURCE_PATH $INIT_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $INIT_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -87,7 +87,7 @@ fi
 
 
 CONF_SOURCE_DIR="${SCRIPT_DIR}/config"
-CONF_DEST_DIR="${EMACS_DEST_DIR}/config"
+CONF_DEST_DIR="${EMACS_CONF_DEST_DIR}/config"
 
 if [ -d $CONF_SOURCE_DIR ];
 then
@@ -98,7 +98,7 @@ then
     if [ -h "$CONF_DEST_DIR" ]; then  # -h, true if file exist and a symbolic link.
         rm -r $CONF_DEST_DIR
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $CONF_SOURCE_DIR $CONF_DEST_DIR
 else
     echo -e "\n\x1b[31;01m $CONF_SOURCE_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -106,7 +106,7 @@ else
 fi
 
 LISP_SOURCE_DIR="${SCRIPT_DIR}/lisp"
-LISP_DEST_DIR="${EMACS_DEST_DIR}/lisp"
+LISP_DEST_DIR="${EMACS_CONF_DEST_DIR}/lisp"
 
 if [ -d $LISP_SOURCE_DIR ];
 then
@@ -117,7 +117,7 @@ then
     if [ -h "$LISP_DEST_DIR" ]; then  # -h, true if file exist and a symbolic link.
         rm -r $LISP_DEST_DIR
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $LISP_SOURCE_DIR $LISP_DEST_DIR
 else
     echo -e "\n\x1b[31;01m $LISP_SOURCE_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -125,7 +125,7 @@ else
 fi
 
 GITIGNORE_SOURCE_PATH="${SCRIPT_DIR}/../.gitignore"
-GITIGNORE_DEST_PATH="${EMACS_DEST_DIR}/.gitignore"
+GITIGNORE_DEST_PATH="${EMACS_CONF_DEST_DIR}/.gitignore"
 
 if [ -f $GITIGNORE_SOURCE_PATH ];
 then
@@ -136,7 +136,7 @@ then
     if [ -h "$GITIGNORE_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
         rm $GITIGNORE_DEST_PATH
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $GITIGNORE_SOURCE_PATH $GITIGNORE_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $GITIGNORE_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -144,7 +144,7 @@ else
 fi
 
 ESHELL_DIR_SOURCE_PATH="${BACKUP_DIR}/emacs/eshell"
-ESHELL_DIR_DEST_PATH="${EMACS_DEST_DIR}/eshell"
+ESHELL_DIR_DEST_PATH="${EMACS_CONF_DEST_DIR}/eshell"
 
 if [ -d $ESHELL_DIR_SOURCE_PATH ];
 then
@@ -155,7 +155,7 @@ then
     if [ -h "$ESHELL_DIR_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
         rm $ESHELL_DIR_DEST_PATH
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $ESHELL_DIR_SOURCE_PATH $ESHELL_DIR_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $ESHELL_DIR_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -163,7 +163,7 @@ else
 fi
 
 HISTORY_SOURCE_PATH="${BACKUP_DIR}/emacs/history"
-HISTORY_DEST_PATH="${EMACS_DEST_DIR}/history"
+HISTORY_DEST_PATH="${EMACS_CONF_DEST_DIR}/history"
 
 if [ -f $HISTORY_SOURCE_PATH ];
 then
@@ -174,7 +174,7 @@ then
     if [ -h "$HISTORY_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
         rm $HISTORY_DEST_PATH
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $HISTORY_SOURCE_PATH $HISTORY_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $HISTORY_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -182,7 +182,7 @@ else
 fi
 
 SAVEHISTORY_SOURCE_PATH="${BACKUP_DIR}/emacs/savehist"
-SAVEHISTORY_DEST_PATH="${EMACS_DEST_DIR}/savehist"
+SAVEHISTORY_DEST_PATH="${EMACS_CONF_DEST_DIR}/savehist"
 
 if [ -f $SAVEHISTORY_SOURCE_PATH ];
 then
@@ -193,7 +193,7 @@ then
     if [ -h "$SAVEHISTORY_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
         rm $SAVEHISTORY_DEST_PATH
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $SAVEHISTORY_SOURCE_PATH $SAVEHISTORY_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $SAVEHISTORY_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -201,7 +201,7 @@ else
 fi
 
 RECENTF_SOURCE_PATH="${BACKUP_DIR}/emacs/recentf"
-RECENTF_DEST_PATH="${EMACS_DEST_DIR}/recentf"
+RECENTF_DEST_PATH="${EMACS_CONF_DEST_DIR}/recentf"
 
 if [ -f $RECENTF_SOURCE_PATH ];
 then
@@ -212,7 +212,7 @@ then
     if [ -h "$RECENTF_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
         rm $RECENTF_DEST_PATH
     fi
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -s $RECENTF_SOURCE_PATH $RECENTF_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $RECENTF_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -221,12 +221,12 @@ fi
 
 # list of multicursor commands allowed for multiplo cursors
 MC_LISTS_SOURCE_PATH="${BACKUP_DIR}/emacs/.mc-lists.el"
-MC_LISTS_DEST_PATH="${EMACS_DEST_DIR}/.mc-lists.el"
+MC_LISTS_DEST_PATH="${EMACS_CONF_DEST_DIR}/.mc-lists.el"
 
 if [ -f $MC_LISTS_SOURCE_PATH ];
 then
     echo -e "\n\x1b[33;01m Linking $MC_LISTS_SOURCE_PATH to $MC_LISTS_DEST_PATH ... \x1b[39;49;00m\n"
-    sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+    sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
     sudo -u ${SUDO_USER} ln -fs $MC_LISTS_SOURCE_PATH $MC_LISTS_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $MC_LISTS_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -242,7 +242,7 @@ fi
 #     if [ -h "$MC_LISTS_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
 #         rm $MC_LISTS_DEST_PATH
 #     fi
-#     sudo -u ${SUDO_USER} mkdir -p $EMACS_DEST_DIR
+#     sudo -u ${SUDO_USER} mkdir -p $EMACS_CONF_DEST_DIR
 #     sudo -u ${SUDO_USER} ln -s $MC_LISTS_SOURCE_PATH $MC_LISTS_DEST_PATH
 # else
 #     echo -e "\n\x1b[31;01m $MC_LISTS_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
@@ -250,10 +250,10 @@ fi
 # fi
 
 
-# ** link EMACS_CONF_DIR (${HOME}/.emacs.d) to EMACS_DEST_DIR
+# ** link EMACS_CONF_DIR (${HOME}/.emacs.d) to EMACS_CONF_DEST_DIR
 EMACS_CONF_DIR="${HOME}/.emacs.d"
 
-if [ -d $EMACS_DEST_DIR ];
+if [ -d $EMACS_CONF_DEST_DIR ];
 then
     echo -e "\n\x1b[33;01m Removing default $EMACS_CONF_DIR ... \x1b[39;49;00m\n"
     #if [ -d "$EMACS_CONF_DIR" ]; then
@@ -262,10 +262,10 @@ then
     #if [ -h "$EMACS_CONF_DIR" ]; then  # -h, true if file exist and a symbolic link.
     #    rm $EMACS_CONF_DIR
     #fi
-    echo -e "\n\x1b[33;01m Linking $EMACS_DEST_DIR to $EMACS_CONF_DIR ... \x1b[39;49;00m\n"
-    sudo -u ${SUDO_USER} ln -fs $EMACS_DEST_DIR $EMACS_CONF_DIR
+    echo -e "\n\x1b[33;01m Linking $EMACS_CONF_DEST_DIR to $EMACS_CONF_DIR ... \x1b[39;49;00m\n"
+    sudo -u ${SUDO_USER} ln -fs $EMACS_CONF_DEST_DIR $EMACS_CONF_DIR
 else
-    echo -e "\n\x1b[31;01m $EMACS_DEST_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
+    echo -e "\n\x1b[31;01m $EMACS_CONF_DEST_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
 
