@@ -20,7 +20,7 @@ fi
 SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EMACS_CONF_DEST_DIR="${HOME}/.local/share/emacs.d/my.emacs.d"
-EMACS_INSTALL_DIR="${HOME}/.local/"
+EMACS_INSTALL_DIR="${HOME}/.local"
 EMACS_REPO_DIR="${HOME}/Repos/emacs"
 
 # consider installing the latest version, follow instructions in the link
@@ -55,8 +55,8 @@ else
         cd $EMACS_REPO_DIR
         sudo -u $SUDO_USER git pull
     else
-        mkdir -p "$EMACS_REPO_DIR/.."
-        sudo -u $SUDO_USER git clone git://git.savannah.gnu.org/emacs.git "$EMACS_REPO_DIR/.."
+        mkdir -p "$(dirname "$EMACS_REPO_DIR")"
+        sudo -u $SUDO_USER git clone git://git.savannah.gnu.org/emacs.git "$(dirname "$EMACS_REPO_DIR")"
         cd $EMACS_REPO_DIR
     fi
 
