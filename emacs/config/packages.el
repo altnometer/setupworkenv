@@ -248,6 +248,8 @@
  '(vterm :type git :flavor melpa :files
          ("*" (:exclude ".dir-locals.el" ".gitignore" ".clang-format" ".travis.yml") "vterm-pkg.el")
          :host github :repo "akermu/emacs-libvterm"))
+(define-key vterm-mode-map (kbd "M-<f9>") #'vterm-copy-mode)
+(define-key vterm-copy-mode-map (kbd "M-<f9>") #'vterm-copy-mode-done)
 (require 'vterm)
 
 ;;* eshell
