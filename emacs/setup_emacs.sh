@@ -16,11 +16,12 @@ if [ -z ${SUDO_USER} ]; then
     echo -e "\n\x1b[31;01m No \$SUDO_USER available, quiting ... \x1b[39;49;00m\n"
     exit 1
 fi
+
 SCRIPT_DIR_OLD=$SCRIPT_DIR
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EMACS_CONF_DEST_DIR="${HOME}/.local/share/emacs.d/my.emacs.d"
-EMACS_INSTALL_DIR="${HOME}/.local/share/emacs"
-EMACS_BIN_DIR="${HOME}/.local/bin"
+EMACS_INSTALL_DIR="${HOME}/.local/"
+EMACS_REPO_DIR="${HOME}/Repos/emacs"
 
 # consider installing the latest version, follow instructions in the link
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
@@ -49,9 +50,16 @@ else
 
     echo -e "\n\x1b[33;01m Installing, configuring emacs ...  \x1b[39;49;00m\n" && sleep 1
 
-    cd /tmp
-    git clone git://git.savannah.gnu.org/emacs.git
-    cd emacs
+    if [ -d $EMACS_REPO_DIR ];
+    then
+        cd $EMACS_REPO_DIR
+        sudo -u $SUDO_USER git pull
+    else
+        mkdir -p "$EMACS_REPO_DIR/.."
+        sudo -u $SUDO_USER git clone git://git.savannah.gnu.org/emacs.git "$EMACS_REPO_DIR/.."
+        cd $EMACS_REPO_DIR
+    fi
+
     sudo -u $SUDO_USER ./autogen.sh
     sudo -u $SUDO_USER ./configure --prefix=$EMACS_INSTALL_DIR \
            --with-native-compilation --with-sound=no --with-cairo \
