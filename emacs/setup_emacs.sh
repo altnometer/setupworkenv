@@ -53,7 +53,7 @@ else
     git clone git://git.savannah.gnu.org/emacs.git
     cd emacs
     sudo -u $SUDO_USER ./autogen.sh
-    sudo -u $SUDO_USER ./configure --prefix=$EMACS_INSTALL_DIR --bindir=$EMACS_BIN_DIR \
+    sudo -u $SUDO_USER ./configure --prefix=$EMACS_INSTALL_DIR \
            --with-native-compilation --with-sound=no --with-cairo \
            --with-x=yes --with-x-toolkit=no \
            --with-mailutils --without-toolkit-scroll-bars
