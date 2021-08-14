@@ -55,7 +55,7 @@ else
         cd $EMACS_REPO_DIR
         sudo -u $SUDO_USER git pull
     else
-        mkdir -p "$(dirname "$EMACS_REPO_DIR")"
+        sudo -u $SUDO_USER mkdir -p "$(dirname "$EMACS_REPO_DIR")"
         sudo -u $SUDO_USER git clone git://git.savannah.gnu.org/emacs.git "$(dirname "$EMACS_REPO_DIR")"
         cd $EMACS_REPO_DIR
     fi
