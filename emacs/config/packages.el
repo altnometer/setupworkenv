@@ -4207,30 +4207,63 @@ That is, remove a non kept dired from the recent list."
 
 ;;** system: faces, fonts
 
+;; credit to:
+;; https://coderwall.com/p/ifgyag/change-font-size-in-emacs-dynamically-based-on-screen-resolution
+(defun fontify-frame (frame)
+  (interactive)
+  (if window-system
+      (progn
+        (if (> (x-display-pixel-width) 2000)
+            (progn
+              (set-frame-parameter frame 'font "Operator Mono Medium-19")
+              (custom-set-faces
+               '(font-lock-comment-face ((t (:family "Operator Mono Light-19")))))
+              (custom-set-faces
+               '(font-lock-string-face ((t (:family "Operator Mono Light-19" :slant italic))))))
+          (progn
+            (set-frame-parameter frame 'font "Operator Mono Medium-12")
+            (custom-set-faces
+             '(font-lock-comment-face ((t (:family "Operator Mono Light-12")))))
+            (custom-set-faces
+             '(font-lock-string-face ((t (:family "Operator Mono Light-12" :slant italic))))))))))
+
+;; Fontify current frame
+(fontify-frame nil)
+
+;; Fontify any future frames
+(push 'fontify-frame after-make-frame-functions)
+
 ;; "C-u C-x =" shortcut for what-cursor-position command gives you the font info
 
-;; does not look nice above 25 points???
-;; (set-face-attribute 'default nil :font "-PfEd-Terminus (TTF)-normal-normal-normal-*-25-*-*-*-m-0-iso10646-1")
-
-;; (set-face-attribute 'default nil :font  "-ADBO-Source Code Pro-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
-
-;; (set-face-attribute 'default nil :font "-PfEd-Inconsolata-normal-normal-normal-*-25-*-*-*-m-0-iso10646-1")
-
-;; (set-face-attribute 'default nil :font "-MS  -Consolas-normal-normal-normal-*-23-*-*-*-m-0-iso10646-1")
-
-;; (set-face-attribute 'default nil :font "ApercuMono-20")
-
-(set-face-attribute 'default nil :font "FiraCode-19")
-
-;; (set-face-attribute 'default nil :font "Menlo-20")
-
 ;; (set-face-attribute 'default nil :font "AnonymousPro-20")
-
-;; (set-face-attribute 'fixed-pitch nil :font "-PfEd-Terminus (TTF)-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
-;; (set-face-attribute 'fixed-pitch nil :font "-MS  -Consolas-normal-normal-normal-*-23-*-*-*-m-0-iso10646-1")
-;; (set-face-attribute 'fixed-pitch nil :font "-PfEd-Inconsolata-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
-
-;; (set-face-attribute 'fixed-pitch nil :font  "-ADBO-Source Code Pro-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1")
+;; (set-face-attribute 'default nil :font "Apercu Mono Pro-19")
+;; (set-face-attribute 'default nil :font "Calibri-20")
+;; (set-face-attribute 'default nil :font "CascadiaCode-18")
+;; (set-face-attribute 'default nil :font "Consolas-19")
+;; (set-face-attribute 'default nil :font "DankMono-20")
+;; (set-face-attribute 'default nil :font "DroidSansMono-18")
+;; (set-face-attribute 'default nil :font "Envy Code R-18")
+;; (set-face-attribute 'default nil :font "FiraCode-18")
+;; (set-face-attribute 'default nil :font "FiraGo Book-18")
+;; (set-face-attribute 'default nil :font "Hack-18:style=Regular")
+;; (set-face-attribute 'default nil :font "Inconsolata-20")
+;; (set-face-attribute 'default nil :font "Input Mono-18:style=Regular")
+;; (set-face-attribute 'default nil :font "InputMono Light-18:style=Regular")
+;; (set-face-attribute 'default nil :font "Iosevka-19")
+;; (set-face-attribute 'default nil :font "JetBrainsMono-19")
+;; (set-face-attribute 'default nil :font "LiberationMono-19")
+;; (set-face-attribute 'default nil :font "Menlo-19")
+;; (set-face-attribute 'default nil :font "Monaco-18")
+;; (set-face-attribute 'default nil :font "Monoid-16")
+;; (set-face-attribute 'default nil :font "MonoLisa-Regular-18")
+;; (set-face-attribute 'default nil :font "Operator Mono Medium-19")
+;; (set-face-attribute 'default nil :font "Operator Mono Book-20")
+;; (set-face-attribute 'default nil :font "PragmataPro-19")
+;; (set-face-attribute 'default nil :font "SourceCodePro-19")
+;; (set-face-attribute 'default nil :font "SFNS Display-20")
+;; (set-face-attribute 'default nil :font "Terminus (TTF)-22")
+;; (set-face-attribute 'default nil :font "Victor Mono Medium-18")
+;; (set-face-attribute 'default nil :font "UbuntuMono-20")
 
 (set-face-attribute 'fixed-pitch nil :font "FiraCode-18")
 
