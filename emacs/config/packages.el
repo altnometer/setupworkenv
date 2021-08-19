@@ -4364,6 +4364,10 @@ That is, remove a non kept dired from the recent list."
 
 (define-key ram-leader-map-tap-global (kbd "'") 'ram-switch-to-scratch)
 
+;;*** system/general settings: eval
+
+(setq eval-expression-print-length 100)
+
 ;;** system: savehist
 
 (setq savehist-file "~/.emacs.d/savehist")
