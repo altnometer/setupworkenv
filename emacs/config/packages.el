@@ -3925,7 +3925,7 @@ Configure `orderless-matching-styles' for this command."
 
 (setq recentf-auto-cleanup 'never) ;; disable before we start recentf!
 (recentf-mode 1)
-(setq recentf-max-saved-items 2000)
+(setq recentf-max-saved-items 4000)
 (run-at-time nil (* 1 60) 'recentf-save-list)
 
 ;; do not show message in minibuffer
