@@ -2324,7 +2324,7 @@ heading to appear."
          (lispy-define-key map "r" 'lispy-up)
          (lispy-define-key map "d" 'lispy-different)
          (lispy-define-key map "o" 'lispy-other-mode)
-         (lispy-define-key map "p" 'lispy-eval-other-window)
+         ;; (lispy-define-key map "p" 'lispy-eval-other-window)
          (lispy-define-key map "P" 'lispy-paste)
          (lispy-define-key map "y" 'lispy-occur)
          (lispy-define-key map "z" 'lh-knight/body)
