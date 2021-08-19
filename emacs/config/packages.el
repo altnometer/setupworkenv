@@ -3974,7 +3974,7 @@ That is, remove a non kept dired from the recent list."
         (mapcar (lambda (name)
                   (if (string-equal name oldname)
                       newname
-                    oldname))
+                    name))
                 recentf-list)))
 
 (defun rjs/recentf-rename-directory (oldname newname)
