@@ -6,7 +6,8 @@
 Emacs*toolBar: 0
 Emacs*menuBar: 0
 Emacs*scrollBar: 0
-Emacs*font: -PfEd-Terminus (TTF)-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1
+Emacs*fontBackend: ftcrhb
+!Emacs*font: -PfEd-Terminus (TTF)-normal-normal-normal-*-24-*-*-*-m-0-iso10646-1
 Emacs*background: #fff
 Emacs*borderWidth: 2
 Emacs*internalBorder: 2
