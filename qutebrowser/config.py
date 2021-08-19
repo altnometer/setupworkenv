@@ -3,6 +3,19 @@
 ##   qute://help/configuring.html
 ##   qute://help/settings.html
 
+import subprocess
+output = subprocess.Popen('xrandr | grep \* | awk \'{print $1}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
+screen_width = int(output.split()[0].split(b'x')[0])
+screen_height = int(output.split()[0].split(b'x')[1])
+
+## adjust font sizes if screen width is less than that:
+large_screen_width = 3840
+
+if screen_width >= large_screen_width:
+    is_large_screen = True
+else:
+    is_large_screen = False
+
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
 config.load_autoconfig()
@@ -841,7 +854,12 @@ c.downloads.location.prompt = False
 # c.fonts.completion.entry = '10pt monospace'
 # c.fonts.completion.entry = '12pt monospace'
 # c.fonts.completion.entry = '14pt monospace'
-c.fonts.completion.entry = '18pt Consolas'
+if is_large_screen:
+    # c.fonts.completion.entry = '18pt consolas'
+    c.fonts.completion.entry = '18pt \'Operator Mono Light\''
+else:
+    # c.fonts.completion.entry = '10pt consolas'
+    c.fonts.completion.entry = '10pt \'Operator Mono Light\''
 
 ## Font used for the debugging console.
 ## Type: QtFont
@@ -855,11 +873,17 @@ c.fonts.completion.entry = '18pt Consolas'
 ## Type: Font
 # c.fonts.hints = 'bold 10pt monospace'
 # c.fonts.hints = 'bold 12pt monospace'
-c.fonts.hints = 'bold 16pt monospace'
+if is_large_screen:
+    c.fonts.hints = 'bold 16pt monospace'
+else:
+    c.fonts.hints = 'bold 10pt monospace'
 
 ## Font used in the keyhint widget.
 ## Type: Font
-# c.fonts.keyhint = '10pt monospace'
+if is_large_screen:
+    c.fonts.keyhint = '18pt \'Operator Mono Light\''
+else:
+    c.fonts.keyhint = '10pt \'Operator Mono Light\''
 
 ## Font used for error messages.
 ## Type: Font
@@ -887,14 +911,22 @@ c.fonts.hints = 'bold 16pt monospace'
 # c.fonts.statusbar = '10pt monospace'
 # c.fonts.statusbar = '18pt monospace'
 # c.fonts.statusbar = '16pt monospace'
-c.fonts.statusbar = '18pt consolas'
-# c.fonts.statusbar = '18pt SFNS Display'
+if is_large_screen:
+    # c.fonts.statusbar = '18pt consolas'
+    c.fonts.statusbar = '18pt \'Operator Mono Light\''
+else:
+    # c.fonts.statusbar = '10pt consolas'
+    c.fonts.statusbar = '10pt \'Operator Mono Light\''
+
 
 ## Font used in the tab bar.
 ## Type: QtFont
 # c.fonts.tabs = '12pt monospace'
 # c.fonts.tabs = 'bold 12pt SFNS Display'
-c.fonts.tabs = '18pt SFNS Display'
+if large_screen_width:
+    c.fonts.tabs = '18pt SFNS Display'
+else:
+    c.fonts.tabs = '10pt SFNS Display'
 
 ## Font family for cursive fonts.
 ## Type: FontFamily
