@@ -4523,11 +4523,13 @@ That is, remove a non kept dired from the recent list."
 
 ;; do not ask y/n
 ;; “always” means no asking
-(setq dired-recursive-copies (quote always))
+(setq dired-recursive-copies 'always)
 ;; “top” means ask once
-(setq dired-recursive-deletes (quote top))
+(setq dired-recursive-deletes 'top)
 
 (setq dired-isearch-filenames 'dwim)
+
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
 ;;** dired bindings
 
@@ -4535,7 +4537,7 @@ That is, remove a non kept dired from the recent list."
 ;; was dired-advertised-find-file
 ;; (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
 
-;; was dired-up-directory
+;; "^" default binding is to #'dired-up-directory
 ;; (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))
 
 (global-set-key (kbd "C-c j") 'dired-jump)
