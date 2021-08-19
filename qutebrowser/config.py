@@ -861,10 +861,6 @@ else:
     # c.fonts.completion.entry = '10pt consolas'
     c.fonts.completion.entry = '10pt \'Operator Mono Light\''
 
-## Font used for the debugging console.
-## Type: QtFont
-# c.fonts.debug_console = '10pt monospace'
-
 ## Font used for the downloadbar.
 ## Type: Font
 # c.fonts.downloads = '10pt monospace'
@@ -923,10 +919,12 @@ else:
 ## Type: QtFont
 # c.fonts.tabs = '12pt monospace'
 # c.fonts.tabs = 'bold 12pt SFNS Display'
-if large_screen_width:
-    c.fonts.tabs = '18pt SFNS Display'
+if is_large_screen:
+    c.fonts.tabs.selected = '18pt \'SFNS Display\''
+    c.fonts.tabs.unselected = '18pt \'SFNS Display\''
 else:
-    c.fonts.tabs = '10pt SFNS Display'
+    c.fonts.tabs.selected = '10pt \'SFNS Display\''
+    c.fonts.tabs.unselected = '10pt \'SFNS Display\''
 
 ## Font family for cursive fonts.
 ## Type: FontFamily
