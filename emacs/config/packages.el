@@ -1,5 +1,8 @@
 ;; packages.el --- Package configuration -*- lexical-binding: t -*-
 
+(defconst large-sreen-width 3840
+  "`large-sreen-width' value indicates when to use settings for large screens")
+
 ;;* Leader Key
 ;;** Definition
 ;; leader tap
@@ -3385,20 +3388,28 @@ been modified since its last check-in."
 ;;** mode-line: 'face
 
 (face-spec-set 'mode-line
-               '((((class color) (min-colors 88))
+               `((((class color) (min-colors 88))
                   ;; :box (:line-width 2 :color "grey55" :style nil)
                   :box nil
                   :weight light
-                  :background "grey55" :foreground "black" :height 155)))
+                  :background "grey55" :foreground "black"
+                  :height
+                  ,(if (>= (x-display-pixel-width) large-sreen-width)
+                       155
+                     100))))
 
 (face-spec-set 'mode-line-inactive
-               '(;; (default
+               `(;; (default
                  ;;   :inherit mode-line)
                  (((class color) (min-colors 88))
                   ;; :box (:line-width 2 :color "grey90" :style nil)
                   :box nil
                   :weight light
-                  :foreground "grey20" :background "grey90" :height 155)))
+                  :foreground "grey20" :background "grey90"
+                  :height 155
+                  ,(if (>= (x-display-pixel-width) large-sreen-width)
+                       155
+                     100))))
 
 
 ;;** mode-line: format
@@ -4214,7 +4225,7 @@ That is, remove a non kept dired from the recent list."
   (interactive)
   (if window-system
       (progn
-        (if (> (x-display-pixel-width) 2000)
+        (if (>= (x-display-pixel-width) large-sreen-width)
             (progn
               (set-frame-parameter frame 'font "Operator Mono Medium-19")
               (custom-set-faces
