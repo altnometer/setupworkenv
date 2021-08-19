@@ -3406,7 +3406,7 @@ been modified since its last check-in."
                   :box nil
                   :weight light
                   :foreground "grey20" :background "grey90"
-                  :height 155
+                  :height
                   ,(if (>= (x-display-pixel-width) large-sreen-width)
                        155
                      100))))
