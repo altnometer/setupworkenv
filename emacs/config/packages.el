@@ -4420,6 +4420,8 @@ That is, remove a non kept dired from the recent list."
                                          ;; (modify-syntax-entry ?- "w" python-mode-syntax-table)
                                          )))
 
+;;** system: tramp
+
 ;;** system: whitespace
 
 (setq-default
