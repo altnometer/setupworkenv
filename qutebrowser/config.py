@@ -990,7 +990,7 @@ else:
 ## Characters used for hint strings.
 ## Type: UniqueCharString
 # c.hints.chars = 'asdfghjkl'
-c.hints.chars = '0123456789'
+# c.hints.chars = '0123456789'
 
 ## Dictionary file to be used by the word hints.
 ## Type: File
@@ -1018,6 +1018,7 @@ c.hints.chars = '0123456789'
 ##   - letter: Use the characters in the `hints.chars` setting.
 ##   - word: Use hints words based on the html elements and the extra words.
 # c.hints.mode = 'letter'
+c.hints.mode = 'number'
 
 ## Comma-separated list of regular expressions to use for 'next' links.
 ## Type: List of Regex
