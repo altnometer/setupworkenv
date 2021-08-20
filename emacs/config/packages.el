@@ -247,15 +247,6 @@
 (setenv "SHELL" shell-file-name)
 (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
 
-(straight-use-package
- '(vterm :type git :flavor melpa :files
-         ("*" (:exclude ".dir-locals.el" ".gitignore" ".clang-format" ".travis.yml") "vterm-pkg.el")
-         :host github :repo "akermu/emacs-libvterm"))
-
-(require 'vterm)
-(define-key vterm-mode-map (kbd "M-<f9>") #'vterm-copy-mode)
-(define-key vterm-copy-mode-map (kbd "M-<f9>") #'vterm-copy-mode-done)
-
 ;;* eshell
 
 ;;** eshell: completion
