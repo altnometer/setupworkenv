@@ -127,15 +127,20 @@ alias ohmyzsh="vim ~/.oh-my-zsh"
 alias sr="sr -browser=$BROWSERCLI"
 alias surfraw="surfraw -browser=$BROWSER"
 alias vless="~/Repos/neovim/runtime/macros/less.sh"
+
 function ..(){
     builtin cd ../
     ls
 }
+
 # cd into a dir (disregard the file in the path) and ls.
 function cd(){
-    [[ ! -e $argv[-1] ]] || [[ -d $argv[-1] ]] || argv[-1]=${argv[-1]%/*}
+    # man --pager='less -p"^CONDITIONAL EXPRESSIONS"' bash
+    # ${argv[-1]%/* discards last part in the path
+    # if it is not dir and it is a file, then set argv[-1] to parent dir
+    [[ ! -d $argv[-1] ]] && [[ -f $argv[-1] ]] && argv[-1]=${argv[-1]%/*}
     builtin cd "$@"
-    # do not 'ls' if 'cd' with no arg.
+    # do not 'ls' if 'cd' with no arg. '-z' means string is null
     [[ -z "$argv[-1]" ]] || ls
 }
 
@@ -149,15 +154,17 @@ function mv(){
 # rm and run ls if rm is successful.
 function rm(){
     if /bin/rm "$@" ; then
-        ls
+        ls "${argv[-1]%/*}"
     fi
 }
-# run 'pwd' before ls.
+
+# echo directory where ls is run
 function ls(){
     args=("$@")
-    echo -n $(pwd)
-    [[ $# -gt 1 ]] && echo -n "/$args[2]"
-    echo
+    [[ -d $argv[-1] ]] && echo -e "\x1b[34;01m $argv[-1]  \x1b[39;49;00m\n"
+    [[ -f $argv[-1] ]] && echo -e "\x1b[34;01m ${argv[-1]%/*}  \x1b[39;49;00m\n"
+    # last arg is not file or dir
+    [[ ! -e $argv[-1] ]] && [[ ! -d $argv[-1] ]] && echo -e "\x1b[34;01m $(pwd)  \x1b[39;49;00m\n"
     /bin/ls "$@"
 }
 
@@ -209,7 +216,10 @@ bindkey "$terminfo[kcud1]" history-substring-search-down
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # extend active highliters. Only 'main' is active by default
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+# cursor disappears when moved back or forward as per the following issue:
+# https://github.com/zsh-users/zsh-syntax-highlighting/issues/171
+# ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 
 # modify highlighting
 # Declare the variable
@@ -217,6 +227,8 @@ typeset -A ZSH_HIGHLIGHT_STYLES
 
 # To differentiate aliases from other command types
 # ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
+
+# ZSH_HIGHLIGHT_STYLES=(cursor underline)
 
 # To have paths colored instead of underlined
 #: ${ZSH_HIGHLIGHT_STYLES[path]:=underline} default
