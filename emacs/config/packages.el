@@ -328,6 +328,34 @@
 (add-to-list 'eshell-output-filter-functions #'eshell-truncate-buffer)
 (setq eshell-buffer-maximum-lines 1000)
 
+;;* vterm
+
+(straight-use-package
+ '(vterm :type git :flavor melpa :files
+         ("*" (:exclude ".dir-locals.el" ".gitignore" ".clang-format" ".travis.yml") "vterm-pkg.el")
+         :host github :repo "akermu/emacs-libvterm"))
+
+(require 'vterm)
+
+;;** vterm: bindings
+
+(defun ram-open-vterm (arg)
+  "Switch to vterm buffer or open a new one."
+  (interactive "p")
+  (let ((vterm-buffer
+         (nth (max (1- arg) 0)
+              (sort
+               (seq-filter (lambda (b) (string-prefix-p "*vterm*" (buffer-name b))) (buffer-list))
+               (lambda (s1 s2) (string-lessp (buffer-name s1) (buffer-name s2)))))))
+    (if vterm-buffer
+        (switch-to-buffer vterm-buffer)
+      ;; (pop-to-buffer-same-window vterm-buffer)
+      (vterm arg))))
+
+(define-key global-map (kbd "s-v") #'ram-open-vterm)
+
+(define-key vterm-mode-map (kbd "M-<f9>") #'vterm-copy-mode)
+(define-key vterm-copy-mode-map (kbd "M-<f9>") #'vterm-copy-mode-done)
 
 ;;* exwm
 
@@ -4164,6 +4192,10 @@ That is, remove a non kept dired from the recent list."
 
 ;;* System
 
+;;** system: associate major-mode with file names
+
+(add-to-list 'auto-mode-alist '("zshrc\\'" . shell-script-mode))
+
 ;;** system: comments
 
 (defun ram-next-comment (num)
@@ -4200,8 +4232,8 @@ That is, remove a non kept dired from the recent list."
          (move-end-of-line 0))
        (goto-char (or (comment-search-forward (point-max) t) (point)))))))
 
-(define-key global-map (kbd "s-v") #'ram-next-comment)
-(define-key global-map (kbd "s-k") #'ram-previous-comment)
+(define-key global-map (kbd "s-k") #'ram-next-comment)
+(define-key global-map (kbd "s-K") #'ram-previous-comment)
 
 ;;** system: cursor
 
