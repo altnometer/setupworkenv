@@ -3265,13 +3265,14 @@ repository, then the corresponding root is used instead."
   "A name for a shell process to run \"free\" command.")
 (defvar ram-memory-mode-line-str nil)
 
-(defvar sh-memory-query-proc (make-process
-                              :name ram-shell-free-cmd-name
-                              :buffer nil
-                              :command '("bash")
-                              :connection-type 'pipe
-                              :filter (lambda (proc output)
-                                        (setq ram-free-cmd-output (concat output ram-free-cmd-output)))))
+(defvar sh-memory-query-proc
+  (make-process
+   :name ram-shell-free-cmd-name
+   :buffer nil
+   :command '("bash")
+   :connection-type 'pipe
+   :filter (lambda (proc output)
+             (setq ram-free-cmd-output (concat output ram-free-cmd-output)))))
 
 (defun ram-get-memory-stats ()
   "Set `ram-memory-mode-line-str' to current memory stats."
