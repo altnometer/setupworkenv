@@ -3289,6 +3289,12 @@ repository, then the corresponding root is used instead."
               (format " %4.1f "
                       (/ (nth 5 (cdr (assoc "Mem:" mem-output))) 1000.0)))))))
 
+;;** mode-line: number of monitors
+(defvar ram-number-of-monitors (string-to-number
+                                (shell-command-to-string
+                                 "xrandr --listmonitors | awk 'NR==1{printf \"%s\",$2}'"))
+  "Holds the number of connected monitors according to \"xrandr\" command.")
+
 ;;** mode-line: time
 
 (display-time-mode t)
@@ -3497,8 +3503,7 @@ been modified since its last check-in."
                  ;; display only if frame is right of other frame or there is only one monitor
                  (when (or
                         ;; there is only one monitor
-                        (and (fboundp 'exwm-randr--get-monitors)
-                             (= 1 (length (cadr (exwm-randr--get-monitors)))))
+                        (= 1 ram-number-of-monitors)
                         ;; frame X coord is not 0, thus, it is not the top left frame
                         (not (= 0 (car (frame-position (window-frame (get-buffer-window)))))))
                    (when (and (window-at-side-p (get-buffer-window) 'bottom)
