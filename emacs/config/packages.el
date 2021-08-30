@@ -4379,7 +4379,8 @@ That is, remove a non kept dired from the recent list."
 ;; (set-face-attribute 'default nil :font "Victor Mono Medium-18")
 ;; (set-face-attribute 'default nil :font "UbuntuMono-20")
 
-(set-face-attribute 'fixed-pitch nil :font "FiraCode-18")
+;; (set-face-attribute 'fixed-pitch nil :font "FiraCode-18")
+(set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium-19")
 
 ;; (set-face-attribute 'variable-pitch nil :font "FiraGo-18")
 
