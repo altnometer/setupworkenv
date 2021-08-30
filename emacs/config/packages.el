@@ -4329,11 +4329,15 @@ That is, remove a non kept dired from the recent list."
               (custom-set-faces
                '(font-lock-comment-face ((t (:family "Operator Mono Light-19")))))
               (custom-set-faces
+               '(font-lock-doc-face ((t (:family "Operator Mono Light-19" :slant italic)))))
+              (custom-set-faces
                '(font-lock-string-face ((t (:family "Operator Mono Light-19" :slant italic))))))
           (progn
             (set-frame-parameter frame 'font "Operator Mono Medium-12")
             (custom-set-faces
              '(font-lock-comment-face ((t (:family "Operator Mono Light-12")))))
+            (custom-set-faces
+             '(font-lock-doc-face ((t (:family "Operator Mono Light-12" :slant italic)))))
             (custom-set-faces
              '(font-lock-string-face ((t (:family "Operator Mono Light-12" :slant italic))))))))))
 
