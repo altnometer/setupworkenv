@@ -1862,11 +1862,25 @@ displaying TEST-BUFFER-P buffer."
   (define-key org-mode-map (kbd "<S-return>") 'newline-and-indent)
   (define-key org-mode-map (kbd "M-h") (lambda () (interactive) (push-mark) (org-mark-element))))
 
-;;** org-mode common settings
+;;** org-mode: common settings
 
 (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
 (add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
+
+;;** org-mode: faces, fonts
+
+;; (setq org-src-block-faces
+;;       '(("clojure" (:family "Operator Mono Medium" :weight 'normal :background "#EEFFEE"))))
+
+;; !!! Including :weight property would reset
+;; font-lock-string-face and font-lock-doc-face that are set to light.
+(with-eval-after-load "org"
+  (set-face-attribute
+ 'org-block nil
+ :family "Operator Mono Medium"))
+
+;;** org-mode: emphasis
 
 ;; modify org-emphasis-regexp-components, 3rd entry, to include char to emphasis markup
 ;; https://emacs.stackexchange.com/questions/13820/inline-verbatim-and-code-with-quotes-in-org-mode
