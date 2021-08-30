@@ -73,6 +73,7 @@
 ;; "M-(" was originally bound to #'insert-parentheses
 (global-unset-key (kbd "M-("))
 (define-key global-map (kbd "C-%") #'repeat)
+(define-key global-map (kbd "C-h a") 'apropos)
 
 ;;** bindings: up-list
 
@@ -1822,8 +1823,6 @@ displaying TEST-BUFFER-P buffer."
 
 
 ;;** org-mode: bindings
-
-(define-key global-map (kbd "C-h a") 'apropos)
 
 (defun ram-org-hide-block-toggle-all ()
   "interactive org-hide-block-toggle-all"
