@@ -2860,6 +2860,39 @@ If there is no Clojure REPL, send warning."
   ;; (require 'flycheck-clj-kondo)
   )
 
+;;* prolog
+
+;;** prolog: prolog-mode
+
+(autoload 'run-prolog "prolog" "Start a Prolog sub-process." t)
+(autoload 'prolog-mode "prolog" "Major mode for editing Prolog programs." t)
+;; (autoload 'mercury-mode "prolog" "Major mode for editing Mercury programs." t)
+(setq prolog-system 'swi)  ; optional, the system you are using;
+                           ; see `prolog-system' below for possible values
+
+;; (setq prolog-electric-if-then-else-flag t)
+
+(add-to-list 'auto-mode-alist '("\\.pl\\'" . prolog-mode))
+
+(with-eval-after-load "prolog"
+  (define-key prolog-mode-map (kbd "C-c l") (lambda ()
+                                              (interactive)
+                                              (insert ":- use_module(library(()).")
+                                              (forward-char -3))))
+
+;;** prolog: ediprolog
+
+(straight-use-package
+ '(ediprolog :type git :host github :repo "emacs-straight/ediprolog" :files ("*" (:exclude ".git"))))
+
+(with-eval-after-load "prolog"
+  (define-key prolog-mode-map (kbd "C-x C-e") #'ediprolog-dwim)
+  (define-key prolog-mode-map (kbd "C-M-x") #'ediprolog-dwim)
+
+  (custom-set-variables
+   '(ediprolog-system 'swi)
+   '(ediprolog-program "/usr/bin/swipl")))
+
 ;;* super-save
 
 ;; (use-package super-save
