@@ -1887,6 +1887,16 @@ displaying TEST-BUFFER-P buffer."
 (with-eval-after-load "org"
   (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n,\""))
 
+;; (with-eval-after-load
+;;     (add-to-list 'org-emphasis-alist '("/" (:background "green"))))
+(setq org-emphasis-alist
+  '(("*" (bold :foreground "Grey" ))
+    ("/" (:family "Operator Mono Light" :slant italic))
+    ("_" underline)
+    ("=" org-verbatim verbatim)
+    ("~" org-code verbatim)
+    ("+" (:strike-through t))))
+
 (setq org-hide-emphasis-markers t)
 ;; setting this to nil "unhides" the emphasis markers
 ;; (setq org-descriptive-links nil)
