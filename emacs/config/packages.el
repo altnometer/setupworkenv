@@ -3207,17 +3207,6 @@ repository, then the corresponding root is used instead."
 
 (add-function :before pre-redisplay-function #'ram-get-selected-window)
 
-;;** mode-line: timer
-
-;; (cancel-timer mode-line-timer)
-(run-at-time 1 nil '(lambda () (force-mode-line-update t)))
-(defvar mode-line-timer
-  (run-with-timer 2 4 #'(lambda () (force-mode-line-update t))))
-(defvar mode-line-cpu-temp-timer
-  (run-with-timer 2 3 #'ram-get-cpu-temp))
-(defvar mode-line-memory-stats-timer
-  (run-with-timer 2 3.1 #'ram-get-memory-stats))
-
 ;;** mode-line: battery
 
 (customize-set-variable 'battery-mode-line-format "%b%p%%%")
@@ -3479,6 +3468,16 @@ been modified since its last check-in."
                        155
                      100))))
 
+;;** mode-line: timer
+
+;; (cancel-timer mode-line-timer)
+(run-at-time 1 nil '(lambda () (force-mode-line-update t)))
+(defvar mode-line-timer
+  (run-with-timer 2 4 #'(lambda () (force-mode-line-update t))))
+(defvar mode-line-cpu-temp-timer
+  (run-with-timer 2 3 #'ram-get-cpu-temp))
+(defvar mode-line-memory-stats-timer
+  (run-with-timer 2 3.1 #'ram-get-memory-stats))
 
 ;;** mode-line: format
 
