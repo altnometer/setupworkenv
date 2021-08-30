@@ -1885,6 +1885,15 @@ displaying TEST-BUFFER-P buffer."
       org-return-follows-link t)
 (setq org-imenu-depth 7)
 
+;; credit to https://stackoverflow.com/a/7165419/9913235
+(font-lock-add-keywords 'org-mode '(("\"\\(\\(?:.\\|\n\\)*?[^\\]\\)\"" 0 font-lock-string-face)))
+
+;; this will affect derived modes too.
+;; (defun add-quotes-to-font-lock-keywords ()
+;;   (font-lock-add-keywords nil '(("\"\\(\\(?:.\\|\n\\)*?[^\\]\\)\"" 0 font-lock-string-face))))
+
+;; (add-hook 'text-mode-hook 'add-quotes-to-font-lock-keywords)
+
 ;;** org-mode: structure-templates
 
 ;; https://orgmode.org/manual/Structure-Templates.html
