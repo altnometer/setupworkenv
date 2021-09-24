@@ -1950,6 +1950,7 @@ displaying TEST-BUFFER-P buffer."
 ;;           (add-to-list 'org-structure-template-alist
 ;;                        '("he" "#+HEADER: ?"))))
 
+;; For example, type "<el" and press TAB key to expand
 (with-eval-after-load "org"
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist
@@ -1962,6 +1963,8 @@ displaying TEST-BUFFER-P buffer."
                '("rac" . "src racket :lang racket/base :results output"))
   (add-to-list 'org-structure-template-alist
                '("n" . "name"))
+  (add-to-list 'org-structure-template-alist
+               '("ex" . "example"))
   (add-to-list 'org-structure-template-alist
                '("hd" . "header")))
 
@@ -1977,6 +1980,7 @@ displaying TEST-BUFFER-P buffer."
      (clojure . t)
      (python . t)
      (racket . t)
+     (prolog . t)
      ;; (scribble . t)
      (css . t))))
 
@@ -1988,8 +1992,9 @@ displaying TEST-BUFFER-P buffer."
 (with-eval-after-load "ob"
   (require 'eval-in-repl-racket)
   (require 'org-babel-eval-in-repl)
-  (define-key ram-leader-map-tap-org (kbd "e") 'ober-eval-block-in-repl)
-  (define-key ram-leader-map-tap-org (kbd "E") 'ober-eval-in-repl)
+  (add-to-list 'ober-org-babel-type-list '("prolog" . (ediprolog ediprolog-dwim )))
+  (define-key ram-leader-map-tap-org (kbd "e") #'ober-eval-block-in-repl)
+  (define-key ram-leader-map-tap-org (kbd "E") #'ober-eval-in-repl)
   )
 
 (with-eval-after-load "org-babel-eval-in-repl"
