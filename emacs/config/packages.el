@@ -421,9 +421,9 @@
         (,(kbd "<M-f15>") . ram-other-workspace)
         (,(kbd "<f15>") . ram-other-workspace)
 
-        ([?\s-z] . exwm-layout-toggle-fullscreen)
-        ([?\s-/] . exwm-layout-toggle-mode-line)
-        ([?\s-y] . exwm-workspace-toggle-minibuffer)
+        ;; ([?\s-z] . exwm-layout-toggle-fullscreen)
+        ;; ([?\s-/] . exwm-layout-toggle-mode-line)
+        ;; ([?\s-y] . exwm-workspace-toggle-minibuffer)
         ;; ([?\s-h] . exwm-window-*focus left*)
         ;; ([?\s-j] . exwm-window-*focus down*)
         ;; ([?\s-H] . exwm-window-*move left*)
@@ -437,10 +437,10 @@
         ([?\s-'] . (lambda (command)
                      (interactive (list (read-shell-command "$ ")))
                      (start-process-shell-command command nil command)))
-        (,(kbd "<f2>") . (lambda () (interactive) (exwm-workspace-switch-create 2)))
-        (,(kbd "<f10>") . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-        (,(kbd "<f6>") . (lambda () (interactive) (exwm-workspace-switch-create 6)))
-        (,(kbd "<f7>") . (lambda () (interactive) (exwm-workspace-switch-create 7)))
+        ;; (,(kbd "<f2>") . (lambda () (interactive) (exwm-workspace-switch-create 2)))
+        ;; (,(kbd "<f10>") . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+        ;; (,(kbd "<f6>") . (lambda () (interactive) (exwm-workspace-switch-create 6)))
+        ;; (,(kbd "<f7>") . (lambda () (interactive) (exwm-workspace-switch-create 7)))
         ;; 's-N': Switch to certain workspace.
         (\,@ (mapcar (lambda (i)
                        `(,(kbd (format "s-%d" i)) .
