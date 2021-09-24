@@ -2527,10 +2527,14 @@ heading to appear."
 ;;** lispy bindings
 (define-key ram-leader-map-tap-prog (kbd "e") 'lispy-eval-and-comment)
 
+(defun ram-expand-abbrev-call-lispy-parens ()
+  "Call `expand-abbrev' and then call `lispy-parens'."
+  (interactive)
+  (expand-abbrev)
+  (lispy-parens current-prefix-arg))
+
 (with-eval-after-load "lispy"
-  (define-key lispy-mode-map
-    (kbd "(")
-    (lambda () (interactive) (expand-abbrev) (lispy-parens current-prefix-arg) ())))
+  (define-key lispy-mode-map (kbd "(") #'ram-expand-abbrev-call-lispy-parens)) ()
 
 ;;* avy
 
