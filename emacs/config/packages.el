@@ -3885,6 +3885,10 @@ With \\[universal-argument] do it for the current file instead."
 (straight-use-package
  '(esup :type git :flavor melpa :host github :repo "jschaf/esup"))
 
+;;** packages: eval-in-repl
+(straight-use-package
+ '(eval-in-repl :type git :flavor melpa :host github :repo "kaz-yos/eval-in-repl"))
+
 ;;** packages: expand-region
 (straight-use-package
  '(expand-region :type git :flavor melpa :host github :repo "magnars/expand-region.el"))
