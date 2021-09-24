@@ -2927,7 +2927,7 @@ If there is no Clojure REPL, send warning."
 (straight-use-package
  '(ediprolog :type git :host github :repo "emacs-straight/ediprolog" :files ("*" (:exclude ".git"))))
 
-(with-eval-after-load "prolog"
+(with-eval-after-load "ediprolog"
   (define-key prolog-mode-map (kbd "C-x C-e") #'ediprolog-dwim)
   (define-key prolog-mode-map (kbd "C-M-x") #'ediprolog-dwim)
 
