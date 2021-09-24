@@ -1836,6 +1836,14 @@ displaying TEST-BUFFER-P buffer."
     (push-mark))
   (funcall cmd arg))
 
+(defun ram-wrap-in-~ ()
+  "Insert \"~\" in front of a sexp and after it."
+  (interactive)
+  (backward-sexp 1)
+  (insert "~")
+  (backward-sexp -1)
+  (insert "~"))
+
 (with-eval-after-load "org"
   ;; originally, C-' runs the command org-cycle-agenda-files
   (define-key org-mode-map (kbd "C-'") nil)
@@ -1860,7 +1868,8 @@ displaying TEST-BUFFER-P buffer."
   (define-key org-mode-map (kbd "C-c z") 'ram-org-hide-block-toggle-all)
   ;; originally bound to 'org-table-copy-down
   (define-key org-mode-map (kbd "<S-return>") 'newline-and-indent)
-  (define-key org-mode-map (kbd "M-h") (lambda () (interactive) (push-mark) (org-mark-element))))
+  (define-key org-mode-map (kbd "M-h") (lambda () (interactive) (push-mark) (org-mark-element)))
+  (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~))
 
 ;;** org-mode: common settings
 
