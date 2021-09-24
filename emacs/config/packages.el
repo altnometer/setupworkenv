@@ -1913,8 +1913,12 @@ displaying TEST-BUFFER-P buffer."
 (setq org-hide-leading-stars nil)
 (setq org-confirm-babel-evaluate nil
       org-src-fontify-natively t
-      org-src-tab-acts-natively t
       org-return-follows-link t)
+;; do not indent code in code-blocks
+(setq org-edit-src-content-indentation 0
+      org-src-tab-acts-natively t
+      org-src-preserve-indentation t)
+
 (setq org-imenu-depth 7)
 
 ;; credit to https://stackoverflow.com/a/7165419/9913235
