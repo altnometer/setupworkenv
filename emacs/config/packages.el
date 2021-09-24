@@ -239,6 +239,8 @@
                                             (point))))))
 (run-with-idle-timer 1 nil #'set-displaying-eval-defun-result-inline)
 
+(define-key emacs-lisp-mode-map (kbd "<S-return>") 'newline-and-indent)
+
 ;;* shell
 
 ;; shell settings are based on
@@ -4622,7 +4624,6 @@ That is, remove a non kept dired from the recent list."
 (define-key global-map (kbd "<S-s-return>") 'smart-open-line-above)
 (with-eval-after-load 'clojure-mode
   (define-key clojure-mode-map (kbd "<S-return>") 'newline-and-indent))
-(define-key emacs-lisp-mode-map (kbd "<S-return>") 'newline-and-indent)
 
 ;;* xah-fly-keys
 
