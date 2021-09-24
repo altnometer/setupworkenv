@@ -2024,7 +2024,7 @@ displaying TEST-BUFFER-P buffer."
 ;;    '(git-gutter:statistic 1)))
 
 
-;;* outline
+;;* outline, headings, headlines
 
 ;;** outline: setup
 
