@@ -804,6 +804,15 @@ succession."
 (defvar ram-jump-to-outline-history nil "History for outlines to jump to.")
 (put 'ram-jump-to-outline-history 'history-length 20)
 
+(defun ram-make-duplicate-keys-unique (alist)
+  "Keep `concat' \"*\" to duplicate keys in `alist' until all keys are unique."
+  (cl-labels ((make-dups-unique (alist pair)
+                                (if (assoc (car pair) alist)
+                                    (cons (car alist) (make-dups-unique (cdr alist)
+                                                                        (cons (concat (car pair) "*") (cdr pair))))
+                                  (append (list pair) alist))))
+    (cl-reduce #'make-dups-unique alist :initial-value '())))
+
 (defun ram-jump-to-outline (outline &optional swap-history-p)
   "Jump to outline."
   (interactive
@@ -813,29 +822,23 @@ succession."
           (cond
            ((eq major-mode 'org-mode)
             "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
+           ((eq major-mode 'markdown-mode)
+            "^\\( *\\)\\(#+\\)\\(?: +\\(.*?\\)\\)?[[:blank:]]*$")
            ((eq major-mode 'python-mode)
-            ;; (group
-            ;;    (* space)                 ; 0 or more spaces
-            ;;    (one-or-more (syntax comment-start))
-            ;;    (one-or-more space)
-            ;;    ;; Heading level
-            ;;    (group (repeat 1 8 "\*")) ; Outline stars
-            ;;    (one-or-more space)
-            ;;    )
             (rx line-start
-                           (* space)
-                       ; 0 or more spaces
-                           ;; (group (one-or-more (syntax comment-start)))
-                           (group (+ (syntax comment-start)))
-                           ;; Heading level
-                           (+ space)
-                           (group (repeat 1 8 "\*"))
-                           (+ space)
-                           ;; heading text
-                           ;; Must be accessible with (match-string 3)
-                           (group (+? not-newline))
-                           (* space)
-                           line-end))
+                (* space)
+                                        ; 0 or more spaces
+                ;; (group (one-or-more (syntax comment-start)))
+                (group (+ (syntax comment-start)))
+                ;; Heading level
+                (+ space)
+                (group (repeat 1 8 "\*"))
+                (+ space)
+                ;; heading text
+                ;; Must be accessible with (match-string 3)
+                (group (+? not-newline))
+                (* space)
+                line-end))
            (t
             "^;;\\(?:;\\(;[^#]\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
@@ -843,16 +846,18 @@ succession."
      (define-key minibuffer-local-completion-map (kbd "<return>")
        (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-outline-history))
      (save-excursion
-       (goto-char (point-min))
-       (while (re-search-forward headline-regex nil t)
-         (cl-pushnew (match-string 3) headlines)))
-     (setq val (completing-read
-                (format-prompt
-                 "Find heading" (car ram-jump-to-outline-history))
-                headlines
-                nil t nil
-                'ram-jump-to-outline-history
-                (car ram-jump-to-outline-history)))
+       (goto-char (point-max))
+       (while (re-search-forward headline-regex nil t -1)
+         (setq headlines (cons (cons (match-string-no-properties 3) (point)) headlines))))
+     (setq headlines (ram-make-duplicate-keys-unique headlines))
+     (setq val (cdr (assoc (completing-read
+                            (format-prompt
+                             "Find heading" (car ram-jump-to-outline-history))
+                            headlines
+                            nil t nil
+                            'ram-jump-to-outline-history
+                            (car ram-jump-to-outline-history))
+                           headlines)))
      (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
      (list val
            ;; if two items are inserted, swap them so that the search str is first
@@ -861,25 +866,29 @@ succession."
              (and second-element (equal hist-item third-element))))))
 
   ;; reorder history so that the search string is fist and the input is second.
+  ;; Use it for different order when pressing <M-p> for previous history item.
   (when swap-history-p
     (setq ram-jump-to-outline-history
           (cons (cadr ram-jump-to-outline-history)
                 (cons (car ram-jump-to-outline-history)
                       (cddr ram-jump-to-outline-history)))))
-  (let ((default case-fold-search)
-        (case-fold-search nil))
-    (when (save-excursion
-            (goto-char (point-min))
-            (re-search-forward (format "^[^\r\n[:alpha:]]+%s$" outline) nil t))
-      (push-mark)
-      (goto-char (match-beginning 0))
-      (outline-show-entry)
-      (outline-show-branches))
-    (setq case-fold-search default)))
+  (when val
+    (push-mark)
+    (goto-char val)
+    (beginning-of-line)
+    (recenter)
+    (let ((default (if (boundp pulse-flag)
+                       pulse-flag
+                     nil)))
+      ;; pulse-iteration pulse-delay
+      (setq pulse-flag nil)
+      (pulse-momentary-highlight-one-line (point) 'isearch)
+      (setq pulse-flag default))))
 
-(eval-after-load "org"
-  '(define-key org-mode-map (kbd "<M-f5>") 'ram-jump-to-outline))
-(define-key emacs-lisp-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+;; (eval-after-load "org"
+;;   '(define-key org-mode-map (kbd "<M-f5>") 'ram-jump-to-outline))
+;; (define-key emacs-lisp-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+(define-key global-map (kbd "<M-f5>") 'ram-jump-to-outline)
 
 ;;*** minibuffer/functions: ram-jump-to-def
 
@@ -891,34 +900,41 @@ succession."
   (cond
    ((eq major-mode 'emacs-lisp-mode)
     (format "^(\\(def\\(?:un\\|var\\|ine-minor-mode\\) +%s\\)" name-regex))
-   (t (message (format "%s is not supported, add regex to `ram-jump-to-def'") major-mode))))
+   ((eq major-mode 'racket-mode)
+    (format "^(\\(def\\(?:ine\\) +%s\\)" name-regex))
+   (t (error (format "%s is not supported, add regex to `ram-jump-to-def'" major-mode)))))
 
-(defun ram-jump-to-def (outline &optional swap-history-p)
+(defun ram-jump-to-def (def-str &optional swap-history-p)
   "Jump to def."
   (interactive
    (let ((defs '())
-         (def-regex (ram-jump-to-def-get-regexs major-mode "\\([-[:alnum:]]+\\)"))
+         (def-regex (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f]+\\)"))
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
          (hist-item (car ram-jump-to-def-history))
-         (s (thing-at-point 'symbol)))
+         (str-at-point (thing-at-point 'symbol)))
      (define-key minibuffer-local-completion-map (kbd "<return>")
        (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-def-history))
      (save-excursion
-       (goto-char (point-min))
-       (while (re-search-forward def-regex nil t)
-         (cl-pushnew (match-string 1) defs)))
-     (setq val (icomplete-vertical-do ()
-                 (completing-read
-                  (if s
-                      (format-prompt "Jump to def" s)
-                    (format-prompt "Jump to def" nil))
-                 defs
-                 nil t nil
-                 'ram-jump-to-def-history
-                 s
-                 ;; (car ram-jump-to-def-history)
-                 )))
+       (goto-char (point-max))
+       (while (re-search-forward def-regex nil t -1)
+         ;; (cl-pushnew (match-string 1) defs)
+         ;; completing-read does not display duplicates,
+         ;; modify duplicate string to make it unique
+         (setq defs (cons (cons (match-string-no-properties 1) (point)) defs))))
+     ;; make duplicates unique adding "*" , otherwise, completing-read would not show them.
+     (setq defs (ram-make-duplicate-keys-unique defs))
+     (setq val (cdr (assoc (completing-read
+                            (if str-at-point
+                                (format-prompt "Jump to def" str-at-point)
+                              (format-prompt "Jump to def" nil))
+                            defs
+                            nil t nil
+                            'ram-jump-to-def-history
+                            str-at-point)
+                            ;; (car ram-jump-to-def-history)
+                           defs)))
      (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
+     ;; (print (format "val is: %s" val))
      (list val
            ;; if two items are inserted, swap them so that the search str is first
            (let ((third-element (caddr ram-jump-to-def-history))
@@ -926,21 +942,24 @@ succession."
              (and second-element (equal hist-item third-element))))))
 
   ;; reorder history so that the search string is fist and the input is second.
+  ;; Use it for different order when pressing <M-p> for previous history item.
   (when swap-history-p
     (setq ram-jump-to-def-history
           (cons (cadr ram-jump-to-def-history)
                 (cons (car ram-jump-to-def-history)
                       (cddr ram-jump-to-def-history)))))
-  (let ((default case-fold-search)
-        (def-regex (format "^[^\r\n[:alpha:]]+%s" outline))
-        (case-fold-search nil))
-    (when (save-excursion
-            (goto-char (point-min))
-            (re-search-forward def-regex nil t))
-      (push-mark)
-      (goto-char (match-beginning 0))
-      (recenter))
-    (setq case-fold-search default)))
+  (when val
+    (push-mark)
+    (goto-char val)
+    (beginning-of-line)
+    (recenter)
+    (let ((default (if (boundp pulse-flag)
+                       pulse-flag
+                     nil)))
+      ;; pulse-iteration pulse-delay
+      (setq pulse-flag nil)
+      (pulse-momentary-highlight-one-line (point) 'isearch)
+      (setq pulse-flag default))))
 
 (define-key emacs-lisp-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
 
