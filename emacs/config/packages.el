@@ -4002,7 +4002,7 @@ Configure `orderless-matching-styles' for this command."
     (recenter)
     (pulse-momentary-highlight-one-line (point) 'modus-theme-intense-red)))
 
-(add-hook 'imenu-after-jump-hook #'prot/imenu-recenter-pulse)
+;; (add-hook 'imenu-after-jump-hook #'prot/imenu-recenter-pulse)
 (add-hook 'imenu-after-jump-hook (lambda ()
                                    (when (and (eq major-mode 'org-mode)
                                               (org-at-heading-p))
@@ -4018,12 +4018,12 @@ Configure `orderless-matching-styles' for this command."
           (lambda () (setq-local imenu-generic-expression
                                  '((nil "^\\s-*(\\(cl-def\\(?:generic\\|ine-compiler-macro\\|m\\(?:acro\\|ethod\\)\\|subst\\|un\\)\\|def\\(?:advice\\|generic\\|ine-\\(?:advice\\|compil\\(?:ation-mode\\|er-macro\\)\\|derived-mode\\|g\\(?:\\(?:eneric\\|lobal\\(?:\\(?:ized\\)?-minor\\)\\)-mode\\)\\|inline\\|m\\(?:ethod-combination\\|inor-mode\\|odify-macro\\)\\|s\\(?:etf-expander\\|keleton\\)\\)\\|m\\(?:acro\\|ethod\\)\\|s\\(?:etf\\|ubst\\)\\|un\\*?\\)\\|ert-deftest\\)\\s-+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)" 2)
                                   ;; vars
-                                  (nil "^\\s-*(\\(def\\(?:c\\(?:onst\\(?:ant\\)?\\|ustom\\)\\|ine-symbol-macro\\|parameter\\)\\)\\s-+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)" 2)
+                                   (nil "^\\s-*(\\(def\\(?:c\\(?:onst\\(?:ant\\)?\\|ustom\\)\\|ine-symbol-macro\\|parameter\\)\\)\\s-+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)" 2)
                                   ;; vars
-                                  (nil "^\\s-*(defvar\\(?:-local\\)?\\s-+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)[[:space:]
+                                   (nil "^\\s-*(defvar\\(?:-local\\)?\\s-+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)[[:space:]
 ]+[^)]" 1)
                                   ;; types
-                                  (nil "^\\s-*(\\(cl-def\\(?:struct\\|type\\)\\|def\\(?:class\\|face\\|group\\|ine-\\(?:condition\\|error\\|widget\\)\\|package\\|struct\\|t\\(?:\\(?:hem\\|yp\\)e\\)\\)\\)\\s-+'?\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)" 2)))))
+                                   (nil "^\\s-*(\\(cl-def\\(?:struct\\|type\\)\\|def\\(?:class\\|face\\|group\\|ine-\\(?:condition\\|error\\|widget\\)\\|package\\|struct\\|t\\(?:\\(?:hem\\|yp\\)e\\)\\)\\)\\s-+'?\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)" 2)))))
 
 
 ;;** packages: iy-go-to-char
@@ -4188,9 +4188,8 @@ That is, remove a non kept dired from the recent list."
 (defun ram-choose-from-recentf (arg)
   "Select a recently opened file from the `recentf-list'."
   (interactive "P")
-  (let ((f (icomplete-vertical-do ()
-             (completing-read "Recent files: "
-                              recentf-list nil t))))
+  (let ((f (completing-read "Recent files: "
+                            recentf-list nil t)))
     (if arg
         (progn
           (find-file-other-window f))
@@ -4226,9 +4225,9 @@ That is, remove a non kept dired from the recent list."
     :flags ("--hidden --glob=!.git --glob=!savehist --no-ignore-vcs"))
 
   (rg-define-search rg-word
-  :format literal
-  :flags ("--word-regexp")
-  :menu ("Custom" "w" "Word"))
+   :format literal
+   :flags ("--word-regexp")
+   :menu ("Custom" "w" "Word"))
 
   (defun prot/rg-save-search-as-name ()
     "Save `rg' search results."
@@ -4285,12 +4284,12 @@ That is, remove a non kept dired from the recent list."
   (define-key flyspell-mode-map (kbd "C-,") nil)
   (define-key global-map (kbd "s-M-c") 'ispell-word)
 
-  (define-key global-map (kbd "s-M-C") 'flyspell-check-next-highlighted-word)
+  (define-key global-map (kbd "s-M-C") 'flyspell-check-next-highlighted-word))
 
   ;; hyper key is disables in favor of f1, ... keys
   ;; (define-key global-map (kbd "C-H-e") 'flycheck-next-error)
   ;; (define-key global-map (kbd "C-H-E") 'flycheck-previous-error)
-  )
+
 
 ;;*** flyspell-goto-previous-error
 
@@ -4411,7 +4410,8 @@ That is, remove a non kept dired from the recent list."
       (progn
         (if (>= (x-display-pixel-width) large-sreen-width)
             (progn
-              (set-frame-parameter frame 'font "Operator Mono Medium-19")
+              ;; (set-frame-parameter frame 'font "-misc-operator mono medium-medium-r-normal--0-90-0-0-m-0-iso10646-1")
+              ;; (set-frame-parameter frame 'font "-adobe-courier-medium-r-normal--20-120-100-100-m-100-iso8859-1")
               (custom-set-faces
                '(font-lock-comment-face ((t (:family "Operator Mono Light-19")))))
               (custom-set-faces
@@ -4466,12 +4466,19 @@ That is, remove a non kept dired from the recent list."
 ;; (set-face-attribute 'default nil :font "UbuntuMono-20")
 
 ;; (set-face-attribute 'fixed-pitch nil :font "FiraCode-18")
-(set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium-19")
+;; (set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium-19")
+;; (set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium")
+(set-face-attribute 'fixed-pitch nil :family "Operator Mono Medium-19")
+;; (set-face-attribute 'fixed-pitch nil :font "-misc-operator mono medium-medium-r-normal--0-90-0-0-m-0-iso10646-1")
+(set-face-attribute 'fixed-pitch nil :font "-adobe-courier-medium-r-normal--25-180-100-100-m-150-iso10646-1")
+
+
+
 
 ;; (set-face-attribute 'variable-pitch nil :font "FiraGo-18")
 
 ;; (set-face-attribute 'variable-pitch nil :font "Calibri-20")
-(set-face-attribute 'variable-pitch nil :font "Verdana-19")
+(set-face-attribute 'variable-pitch nil :family "Verdana-19")
 
 (with-eval-after-load "org"
   (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
@@ -4617,9 +4624,9 @@ That is, remove a non kept dired from the recent list."
 ;;                                          (progn
 ;;                                            (modify-syntax-entry ?# "w" clojure-mode-syntax-table)))))
 (add-hook 'python-mode-hook (lambda () (progn
-                                         (modify-syntax-entry ?_ "w" python-mode-syntax-table)
+                                         (modify-syntax-entry ?_ "w" python-mode-syntax-table))))
                                          ;; (modify-syntax-entry ?- "w" python-mode-syntax-table)
-                                         )))
+
 
 ;;** system: tramp
 
@@ -4644,12 +4651,12 @@ That is, remove a non kept dired from the recent list."
 (defun unpop-to-mark-command ()
   "Unpop off mark ring. Does nothing if mark ring is empty."
   (interactive)
-      (when mark-ring
-        (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
-        (set-marker (mark-marker) (car (last mark-ring)) (current-buffer))
-        (when (null (mark t)) (ding))
-        (setq mark-ring (nbutlast mark-ring))
-        (goto-char (marker-position (car (last mark-ring))))))
+  (when mark-ring
+    (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
+    (set-marker (mark-marker) (car (last mark-ring)) (current-buffer))
+    (when (null (mark t)) (ding))
+    (setq mark-ring (nbutlast mark-ring))
+    (goto-char (marker-position (car (last mark-ring))))))
 
 ;; f11 is bound toggle-frame-full-screen by default
 (global-unset-key (kbd "<f11>"))
@@ -4758,14 +4765,14 @@ That is, remove a non kept dired from the recent list."
 
 (eval-after-load "org"
   '(define-key org-mode-map (kbd "M-/") (make-hippie-expand-function
-                                       '(
-                                         try-expand-all-abbrevs
-                                         try-expand-dabbrev-visible
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-expand-line) t)))
+                                         '(
+                                           try-expand-all-abbrevs
+                                           try-expand-dabbrev-visible
+                                           try-expand-dabbrev-all-buffers
+                                           try-expand-dabbrev
+                                           try-complete-file-name-partially
+                                           try-complete-file-name
+                                           try-expand-line) t)))
 
 ;; (
 ;;  try-expand-list
