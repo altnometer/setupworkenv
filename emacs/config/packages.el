@@ -104,7 +104,7 @@
                           (backward-char)
                           (looking-at-p ")"))))))
             (if between-closing-parens?
-                (insert ? )))))
+                (insert ?\ )))))
     (error nil)))
 
 (defun ram-up-list-backward (universal-arg)
@@ -116,8 +116,7 @@
             (up-list (- (+ 1 universal-arg)) t t)
           (up-list (- universal-arg) t t))
         ;; insert space
-        (insert ? ))
-
+        (insert ?\ ))
     (error nil)))
 
 (define-key global-map (kbd "s-t") 'ram-up-list)
