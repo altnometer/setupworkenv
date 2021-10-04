@@ -4084,6 +4084,12 @@ Configure `orderless-matching-styles' for this command."
 (keycast-mode)
 
 
+
+;;** packages: markdown-mode
+
+(straight-use-package
+ '(markdown-mode :type git :flavor melpa :host github :repo "jrblevin/markdown-mode"))
+
 ;;** packages: ocaml
 
 
