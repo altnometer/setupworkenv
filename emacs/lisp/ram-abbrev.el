@@ -16,7 +16,7 @@
     ("2t" "second")
     ("3t" "third")
     ("ty" "thank you")
-    ("ws" "⃞")))
+    ("ws" "□")))
 
 ;;* clojure
 (when (boundp 'clojure-mode-abbrev-table)
@@ -79,6 +79,7 @@
   racket-abbrevs)
 
 ;;* org
+
 (when (boundp 'org-mode-abbrev-table)
   (clear-abbrev-table org-mode-abbrev-table))
 
@@ -87,8 +88,11 @@
         ("~c" "~cons~")
         ("ab" "abstraction")
         ("ag" "argument")
+        ("alg" "algorithm")
+        ("algs" "algorithms")
         ("ags" "arguments")
         ("app" "application")
+        ("appd" "applied")
         ("bc" "because")
         ("bf" "before")
         ("bh" "behavior")
@@ -104,6 +108,7 @@
         ("con" "continuation")
         ("cm" "computer")
         ("comn" "computation")
+        ("comp" "compute")
 
         ("dec" "declare")
         ("decn" "declaration")
@@ -128,12 +133,16 @@
         ("exn" "execution")
 
         ("fn" "function")
+        ("fns" "functions")
+        ("fnl" "functional")
 
         ("lg" "language")
 
         ("imp" "implementation")
+        ("impd" "implemented")
         ("impt" "implement")
 
+        ("inf" "information")
         ("inz" "initialize")
         ("inzd" "initialized")
         ("inzg" "initializing")
@@ -141,6 +150,8 @@
         ("invd" "invoked")
         ("invg" "invoking")
         ("invn" "invocation")
+
+        ("lc" "logical consequence")
 
         ("mt" "manipulate")
         ("mtg" "manipulating")
@@ -152,6 +163,8 @@
         ("nms" "numbers")
 
         ("ob" "object")
+        ("occ" "occurrence")
+        ("occs" "occurrences")
 
         ("par" "parentheses")
         ("pg" "program")
@@ -162,24 +175,53 @@
         ("pri" "principle")
         ("prm" "parameter")
         ("prms" "parameters")
+        ("prec" "preceding")
         ("prev" "previous")
+
+        ("qr" "query")
+        ("qrs" "queries")
 
         ("rc" "recursive")
         ("rcl" "recursively")
         ("rcn" "recursion")
         ("recv" "receiver")
+
         ("rep" "represent")
+        ("reps" "represents")
+        ("repd" "represented")
         ("repn" "representation")
         ("repg" "representing")
+
+        ("rl" "relation")
+        ("rlp" "relationship")
         ("rn" "return")
         ("rnd" "returned")
+        ("rng" "returning")
         ("rns" "returns")
 
         ("sm" "symbol")
         ("sms" "symbols")
         ("st" "structure")
+        ("subs" "substitution")
+        ("subss" "substitutions")
+        ("subsg" "substituting")
         ("tq" "technique")
-        ("und" "understand")))
 
+        ("und" "understand")
+
+        ("val" "value")
+        ("vals" "values")
+        ("vl" "value")
+        ("vls" "values")
+        ("var" "variable")
+        ("vars" "variables")
+
+        ;; Greek
+
+        ("theta" "Θ")))
+
+;; gives error "circular list ..."
+;; (define-abbrev-table 'org-mode-abbrev-table
+;;   (nconc racket-abbrevs org-abbrevs))
 (define-abbrev-table 'org-mode-abbrev-table
-  (nconc racket-abbrevs org-abbrevs))
+  org-abbrevs)
