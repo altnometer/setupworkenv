@@ -4581,6 +4581,12 @@ That is, remove a non kept dired from the recent list."
 
 (setq eval-expression-print-length 100)
 
+;;*** system/general settings: errors, warnings
+
+(setq warning-minimum-level :error)
+;; (setq native-comp-async-report-warnings-errors 'silent)
+
+
 ;;** system: savehist
 
 (setq savehist-file "~/.emacs.d/savehist")
