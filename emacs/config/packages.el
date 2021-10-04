@@ -1827,8 +1827,16 @@ displaying TEST-BUFFER-P buffer."
 
 ;;* org-mode
 
+;; (straight-use-package
+;;  '(org :type git :repo "https://code.orgmode.org/bzg/org-mode.git" :local-repo "org"))
+
+;; this recipe takes very long time to clone
 (straight-use-package
- '(org :type git :repo "https://code.orgmode.org/bzg/org-mode.git" :local-repo "org"))
+ '(org :type git :repo "https://code.orgmode.org/bzg/org-mode.git" :local-repo "org"
+       :depth full          ; default value is full
+       :pre-build (straight-recipes-org-elpa--build)
+       ;; :branch "release_9.5"
+       :build (:not autoloads) :files (:defaults "lisp/*.el" ("etc/styles/" "etc/styles/*"))))
 
 ;;** org-mode: functions
 
