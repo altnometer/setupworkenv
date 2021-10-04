@@ -2341,6 +2341,11 @@ displaying TEST-BUFFER-P buffer."
                :host github :repo "greghendershott/racket-mode"))
 (require 'racket-mode)
 
+(with-eval-after-load 'racket-mode
+  (define-key racket-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+  (define-key racket-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
+  (define-key racket-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun))
+
 ;; breaks lispy-mode key bindings
 ;; (add-hook 'racket-mode-hook #'racket-unicode-input-method-enable)
 
@@ -3944,6 +3949,8 @@ With \\[universal-argument] do it for the current file instead."
 
 (straight-use-package
  '(eval-in-repl :type git :flavor melpa :host github :repo "kaz-yos/eval-in-repl"))
+(require 'racket-mode)
+(require 'eval-in-repl-racket)
 
 ;;** packages: expand-region
 (straight-use-package
