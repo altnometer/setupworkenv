@@ -43,6 +43,10 @@
 ;; https://github.com/raxod502/straight.el#integration-with-use-package
 ;; (setq straight-use-package-by-default t)
 
+(setq straight-recipe-overrides
+      '((nil . ((eval-in-repl :type git :host github
+                              :repo "altnometer/eval-in-repl")))))
+
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
 			 ;; ("melpa-stable" . "https://stable.melpa.org/packages/")
