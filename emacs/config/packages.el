@@ -4416,8 +4416,7 @@ That is, remove a non kept dired from the recent list."
       (progn
         (if (>= (x-display-pixel-width) large-sreen-width)
             (progn
-              ;; (set-frame-parameter frame 'font "-misc-operator mono medium-medium-r-normal--0-90-0-0-m-0-iso10646-1")
-              ;; (set-frame-parameter frame 'font "-adobe-courier-medium-r-normal--20-120-100-100-m-100-iso8859-1")
+              (set-frame-parameter frame 'font "Operator Mono Medium-19")
               (custom-set-faces
                '(font-lock-comment-face ((t (:family "Operator Mono Light-19")))))
               (custom-set-faces
@@ -4476,7 +4475,7 @@ That is, remove a non kept dired from the recent list."
 ;; (set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium")
 (set-face-attribute 'fixed-pitch nil :family "Operator Mono Medium-19")
 ;; (set-face-attribute 'fixed-pitch nil :font "-misc-operator mono medium-medium-r-normal--0-90-0-0-m-0-iso10646-1")
-(set-face-attribute 'fixed-pitch nil :font "-adobe-courier-medium-r-normal--25-180-100-100-m-150-iso10646-1")
+;(set-face-attribute 'fixed-pitch nil :font "-adobe-courier-medium-r-normal--25-180-100-100-m-150-iso10646-1")
 
 
 
