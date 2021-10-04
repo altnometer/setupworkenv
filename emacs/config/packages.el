@@ -4530,32 +4530,40 @@ That is, remove a non kept dired from the recent list."
 (setq scroll-conservatively 0)
 (setq auto-window-vscroll nil)
 
+
+;;*** system/general settings: hl (highlight) line
+
 ;; (setq nlinum-highlight-current-line t)
 ;; (setq-default display-line-numbers t)
 ;; highlght the current line only in gui.
-;; (when window-system (global-hl-line-mode t))
+
+(when window-system (global-hl-line-mode t))
 
 ;; (global-hl-line-mode)
+
+;;*** system/general settings: backup files
 
 ;; do not create backup files
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+
+;;*** system/general settings: show-paren
+
 ;; highlights matching parens
-;; disable in favor of mic-paren
+;; disable
+(show-paren-mode -1)
 
-;; (show-paren-mode 1)
-(setq show-paren-delay 0)
-(setq show-paren-style 'expression)
-(setq show-paren-style 'parenthesis)
-(set-face-background 'show-paren-match "#42444a")
+;; (setq show-paren-delay 0)
+;; (setq show-paren-style 'expression)
+;; (setq show-paren-style 'parenthesis)
+;; (set-face-background 'show-paren-match "#42444a")
 
-;; (set-face-attribute 'show-paren-match nil
-;;                     :foreground nil
-;;                     :weight 'normal :underline nil :overline nil :slant 'normal)
+;;*** system/general settings: misc
 
 ;; Default Browser
 (setq browse-url-browser-function 'browse-url-generic
     browse-url-generic-program "qutebrowser")
+
 ;; kill line and newline char
 (setq kill-whole-line t)
 
