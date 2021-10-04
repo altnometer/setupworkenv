@@ -464,9 +464,9 @@
               (set-window-fringes (selected-window) 0 0)
               ;; git-gutter adds right fringe
               (git-gutter-mode -1)
-              (exwm-layout-toggle-fullscreen)
+              (exwm-layout-toggle-fullscreen)))))
               ;; (setq mode-line-format nil)
-              ))))
+
 
 (setq exwm-manage-configurations
       '(((member exwm-instance-name '("qutebrowser"))
@@ -567,7 +567,7 @@
 (straight-use-package
  '(magit-section :type git
                  :files ("lisp/magit-section.el"
-                        "Documentation/magit-section.texi")
+                         "Documentation/magit-section.texi")
                  :host github
                  :repo "magit/magit"))
 
