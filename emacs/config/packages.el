@@ -4809,6 +4809,50 @@ That is, remove a non kept dired from the recent list."
 
 (define-key global-map (kbd "<M-f16>") #'copy-line)
 
+;;** custom: ram-insert-space
+
+;; when inside sexp, ram-insert-space jumps out of the sexp and insert
+;; space.
+
+(defun ram-insert-space ()
+  "When inside a sexp, jump out of it and insert space."
+  (interactive)
+  (let ((inside-str (nth 3 (syntax-ppss)))
+        (inside-parens (nth 1 (syntax-ppss))))
+    (cond
+     (inside-str
+      (backward-up-list -1 t t)
+      (insert " "))
+     ;; same as 'inside-str only removes white space between parens
+     (inside-parens
+       (let ((move-in-this-direction
+              (cond
+               ((and (= (char-after) ?\))
+                     (= (char-before) ? )) #'backward-char)
+               ((and (= (char-before) ?\))
+                     (= (char-after) ? )) #'forward-char)
+               ('else nil)))
+             last-white-spc-point)
+         (cl-labels ((white-spc-between-closing-parens? ()
+                                                        (when move-in-this-direction
+                                                          (funcall move-in-this-direction)
+                                                          (cond
+                                                           ((= (char-after) ?\)) (point))
+                                                           ((= (char-before) ?\)) (point))
+                                                           ((and (= (char-after) ?\ )
+                                                                 (= (char-before) ?\ ))
+                                                            (white-spc-between-closing-parens?))
+                                                           ('else nil)))))
+           (setq last-white-spc-point
+                 (save-excursion (white-spc-between-closing-parens?)))
+           (when last-white-spc-point
+             (delete-char (- last-white-spc-point (point))))))
+       (backward-up-list -1 t t)
+       (insert " ")))))
+
+(define-key global-map (kbd "S-SPC") #'ram-insert-space)
+
+
 ;;** custom: narrow
 
 (defun ram-toggle-narrow-to-defun ()
