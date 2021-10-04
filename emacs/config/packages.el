@@ -1017,10 +1017,12 @@ succession."
 
 ;;**** minibuffer/completion/icomplete: icomplete-vertical
 
-(straight-use-package
- '(icomplete-vertical :type git :flavor melpa :host github :repo "oantolin/icomplete-vertical"))
-(setq icomplete-vertical-prospects-height (/ (frame-height) 6))
-(icomplete-vertical-mode -1)
+(icomplete-vertical-mode 1)
+
+;; (straight-use-package
+;;  '(icomplete-vertical :type git :flavor melpa :host github :repo "oantolin/icomplete-vertical"))
+;; (setq icomplete-vertical-prospects-height (/ (frame-height) 6))
+;; (icomplete-vertical-mode -1)
 
 ;; credit to https://gitlab.com/protesilaos/dotfiles/-/blob/e8d6268866fb77c0aec6a6b68c9e7183daa65347/emacs/.emacs.d/emacs-init.org
 
