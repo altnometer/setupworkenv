@@ -918,13 +918,14 @@ else:
 ## Font used in the tab bar.
 ## Type: QtFont
 # c.fonts.tabs = '12pt monospace'
-# c.fonts.tabs = 'bold 12pt SFNS Display'
-if is_large_screen:
-    c.fonts.tabs.selected = '18pt \'SFNS Display\''
-    c.fonts.tabs.unselected = '18pt \'SFNS Display\''
-else:
-    c.fonts.tabs.selected = '10pt \'SFNS Display\''
-    c.fonts.tabs.unselected = '10pt \'SFNS Display\''
+c.fonts.tabs = 'bold 18pt SFNS Display'
+
+# if is_large_screen:
+#     c.fonts.tabs.selected = '18pt \'SFNS Display\''
+#     c.fonts.tabs.unselected = '18pt \'SFNS Display\''
+# else:
+#     c.fonts.tabs.selected = '10pt \'SFNS Display\''
+#     c.fonts.tabs.unselected = '10pt \'SFNS Display\''
 
 ## Font family for cursive fonts.
 ## Type: FontFamily
