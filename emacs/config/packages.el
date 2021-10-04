@@ -1216,9 +1216,9 @@ instead."
   ;;         orderless-prefixes
   ;;         orderless-literal))
   (setq orderless-matching-styles
-        '(orderless-regexp
+        '(orderless-regexp))
           ;; orderless-initialism
-          ))
+
 
   (defun prot/orderless-literal-dispatcher (pattern _index _total)
     (when (string-suffix-p "=" pattern)
@@ -1292,12 +1292,12 @@ Then, quit other window."
 (require 'windmove)
 
 (defun buf-move-left ()
-"Swap the current buffer and the buffer on the left of the split.
+ "Swap the current buffer and the buffer on the left of the split.
 If there is no split, ie now window on the left of the current
 one, an error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'left))
-	 (buf-this-buf (window-buffer (selected-window))))
+         (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
         (error "No left split")
       ;; swap top with this one
@@ -1307,12 +1307,12 @@ one, an error is signaled."
       (select-window other-win))))
 
 (defun buf-move-right ()
-"Swap the current buffer and the buffer on the right of the split.
+ "Swap the current buffer and the buffer on the right of the split.
 If there is no split, ie now window on the right of the current
 one, an error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'right))
-	 (buf-this-buf (window-buffer (selected-window))))
+         (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
         (error "No right split")
       ;; swap top with this one
