@@ -4040,7 +4040,7 @@ Configure `orderless-matching-styles' for this command."
 (define-key global-map (kbd "s-d") #'iy-go-up-to-char)
 (define-key global-map (kbd "s-D") #'iy-go-to-char-backward)
 (define-key global-map (kbd "C-s-d") #'iy-go-to-or-up-to-continue)
-(define-key global-map (kbd "M-s-d") #'iy-go-to-or-up-to-continue-backward)
+(define-key global-map (kbd "C-S-s-d") #'iy-go-to-or-up-to-continue-backward)
 
 
 ;;** packages: haskell-mode
