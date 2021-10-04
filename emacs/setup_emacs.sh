@@ -36,17 +36,22 @@ else
         feh mupdf zathura
     apt-get install -y silversearcher-ag ripgrep pass
     apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
-    echo -e "\n\x1b[33;01m add repositories for emacs docs ...  \x1b[39;49;00m\n" && sleep 1
-    # documentation is in non-free repository, inlcude these repositories to install docs.
+
+    # echo -e "\n\x1b[33;01m installing emacs docs ...  \x1b[39;49;00m\n" && sleep 1
+    # To insfall docs,
+    # You may need to include non-free repository to /etc/apt/sources.list
+    # deb http://deb.debian.org/debian/ buster main non-free contrib
+    # deb-src http://deb.debian.org/debian/ buster main non-free contrib
     # apt-get install -y emacs-common-non-dfsg
 
+    echo -e "\n\x1b[33;01m installing packages for compiling ...  \x1b[39;49;00m\n" && sleep 1
     # # tools for compiling
     # apt-get install -y autoconf make gcc texinfo xorg-dev libgtk-3-dev libgccjit-10-dev cmake libtool-bin\
     #         libjpeg-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev
 
     # tools for compiling
-    apt-get install -y autoconf make gcc texinfo libgccjit-10-dev cmake libtool-bin \
-            libjpeg-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev
+    apt-get install -y autoconf make gcc texinfo libgccjit-8-dev cmake libtool-bin \
+            libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev
 
     echo -e "\n\x1b[33;01m Installing, configuring emacs ...  \x1b[39;49;00m\n" && sleep 1
 
@@ -63,7 +68,7 @@ else
     sudo -u $SUDO_USER ./autogen.sh
     sudo -u $SUDO_USER ./configure --prefix=$EMACS_INSTALL_DIR \
            --with-native-compilation --with-sound=no --with-cairo \
-           --with-x=yes --with-x-toolkit=no \
+           --with-x=yes --with-x-toolkit=no --without-xft \
            --with-mailutils --without-toolkit-scroll-bars
     sudo -u $SUDO_USER make -j$(nproc)
     sudo -u $SUDO_USER make install
