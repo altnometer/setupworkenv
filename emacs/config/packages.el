@@ -2057,6 +2057,25 @@ displaying TEST-BUFFER-P buffer."
 ;;    '(git-gutter:statistic 1)))
 
 
+
+;;* org-roam
+
+;;** org-roam: init
+
+(setq org-roam-v2-ack t)
+
+;;** org-roam: installation
+
+(straight-use-package
+ '(org-roam :type git :flavor melpa :host github :repo "org-roam/org-roam"))
+
+;;** org-roam: settings
+
+(with-eval-after-load "org-roam"
+  (setq org-roam-directory (file-truename "~/backup/org/org-roam/notes/"))
+  (org-roam-db-autosync-mode))
+
+
 ;;* outline, headings, headlines
 
 ;;** outline: setup
