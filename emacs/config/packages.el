@@ -1881,11 +1881,11 @@ displaying TEST-BUFFER-P buffer."
   (define-key org-mode-map (kbd "C-'") nil)
 
   (define-key org-mode-map (kbd "<M-f19>") (lambda (arg) (interactive "p")
-                                         (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)))
+                                            (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)))
   (define-key org-mode-map (kbd "C-c M-f") (lambda (arg) (interactive "p")
                                              (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)))
   (define-key org-mode-map (kbd "<M-f20>") (lambda (arg) (interactive "p")
-                                         (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)))
+                                            (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)))
   (define-key org-mode-map (kbd "C-c M-b") (lambda (arg) (interactive "p")
                                              (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)))
 
@@ -1918,8 +1918,8 @@ displaying TEST-BUFFER-P buffer."
 ;; font-lock-string-face and font-lock-doc-face that are set to light.
 (with-eval-after-load "org"
   (set-face-attribute
- 'org-block nil
- :family "Operator Mono Medium"))
+   'org-block nil
+   :family "Operator Mono Medium"))
 
 ;;** org-mode: emphasis
 
@@ -1931,7 +1931,7 @@ displaying TEST-BUFFER-P buffer."
 ;; (with-eval-after-load
 ;;     (add-to-list 'org-emphasis-alist '("/" (:background "green"))))
 (setq org-emphasis-alist
-  '(("*" (bold :foreground "Grey" ))
+  '(("*" (bold :foreground "Grey"))
     ("/" (:family "Operator Mono Light" :slant italic))
     ("_" underline)
     ("=" org-verbatim verbatim)
@@ -2024,10 +2024,11 @@ displaying TEST-BUFFER-P buffer."
 (with-eval-after-load "ob"
   (require 'eval-in-repl-racket)
   (require 'org-babel-eval-in-repl)
-  (add-to-list 'ober-org-babel-type-list '("prolog" . (ediprolog ediprolog-dwim )))
+  (add-to-list 'ober-org-babel-type-list '("prolog" . (ediprolog ediprolog-dwim)))
+  (add-to-list 'ober-org-babel-type-list '("racket" . (eval-in-repl-racket eir-eval-in-racket)))
   (define-key ram-leader-map-tap-org (kbd "e") #'ober-eval-block-in-repl)
-  (define-key ram-leader-map-tap-org (kbd "E") #'ober-eval-in-repl)
-  )
+  (define-key ram-leader-map-tap-org (kbd "E") #'ober-eval-in-repl))
+
 
 (with-eval-after-load "org-babel-eval-in-repl"
   (setq eir-jump-after-eval nil))
@@ -2377,36 +2378,36 @@ heading to appear."
     (save-excursion
       (org-back-to-heading t)
       (let* ((current-level (funcall outline-level))
-	     (max-level (org-get-valid-level
-			 current-level
-			 (if level (prefix-numeric-value level) 1)))
-	     (end (save-excursion (org-end-of-subtree t t)))
-	     ;; (regexp-fmt "^\\*\\{%d,%s\\}\\(?: \\|$\\)")
-             ;; (regexp-fmt lispy-outline)
+             (max-level (org-get-valid-level
+                         current-level
+                         (if level (prefix-numeric-value level) 1)))
+             (end (save-excursion (org-end-of-subtree t t)))
+                	     ;; (regexp-fmt "^\\*\\{%d,%s\\}\\(?: \\|$\\)")
+                     ;; (regexp-fmt lispy-outline)
              (regexp-fmt "^;;\\(?:;[^#]\\|\\*+\\)\\|^\\*\\{%d,%s\\}\\(?: \\|$\\)")
-	     (past-first-child nil)
-	     ;; Make sure to skip inlinetasks.
-	     (re (format regexp-fmt
-			 current-level
-			 (cond
-			  ((not (featurep 'org-inlinetask)) "")
-			  (org-odd-levels-only (- (* 2 org-inlinetask-min-level)
-						  3))
-			  (t (1- org-inlinetask-min-level))))))
-	;; Display parent heading.
-	(outline-flag-region (line-end-position 0) (line-end-position) nil)
-	(forward-line)
-	;; Display children.  First child may be deeper than expected
-	;; MAX-LEVEL.  Since we want to display it anyway, adjust
-	;; MAX-LEVEL accordingly.
-	(while (re-search-forward re end t)
-	  (unless past-first-child
-	    (setq re (format regexp-fmt
-			     current-level
-			     (max (funcall outline-level) max-level)))
-	    (setq past-first-child t))
-	  (outline-flag-region
-	   (line-end-position 0) (line-end-position) nil))))))
+             (past-first-child nil)
+                	     ;; Make sure to skip inlinetasks.
+             (re (format regexp-fmt
+                  current-level
+                  (cond
+                         ((not (featurep 'org-inlinetask)) "")
+                         (org-odd-levels-only (- (* 2 org-inlinetask-min-level)
+                                               3))
+                         (t (1- org-inlinetask-min-level))
+                	;; Display parent heading.
+                   	(outline-flag-region (line-end-position 0) (line-end-position) nil)
+                   	(forward-line)
+                	;; Display children.  First child may be deeper than expected
+                	;; MAX-LEVEL.  Since we want to display it anyway, adjust
+                	;; MAX-LEVEL accordingly.
+                   	(while (re-search-forward re end t)
+                       (unless past-first-child
+                           (setq re (format regexp-fmt
+                                     current-level
+                                     (max (funcall outline-level) max-level)))
+                           (setq past-first-child t))
+                       (outline-flag-region
+                          (line-end-position 0) (line-end-position) nil))))))))))
 
 ;; https://github.com/abo-abo/lispy/issues/57
 ;;** lispy: lispy-mode-map-special
@@ -2566,7 +2567,7 @@ heading to appear."
   (lispy-parens current-prefix-arg))
 
 (with-eval-after-load "lispy"
-  (define-key lispy-mode-map (kbd "(") #'ram-expand-abbrev-call-lispy-parens)) ()
+  (define-key lispy-mode-map (kbd "(") #'ram-expand-abbrev-call-lispy-parens))
 
 ;;* avy
 
@@ -2689,9 +2690,9 @@ only for the selected window."
      (defun ram-avy--done ()
        "Clean up overlays."
        (mapc #'delete-overlay ram-avy--overlays-back)
-       (setq ram-avy--overlays-back nil)
+       (setq ram-avy--overlays-back nil))
        ;; (avy--remove-leading-chars)
-       )
+
 
      (defun ram-avy--keyboard-advice (fn &rest args)
        (unwind-protect
@@ -2780,8 +2781,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
      (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
      (define-key global-map (kbd "s-R") 'avy-goto-top-paren)
      ;; (define-key global-map (kbd "s-d") 'avy-goto-char-in-line)
-     (define-key global-map (kbd "s-N") 'avy-resume)
-     ))
+     (define-key global-map (kbd "s-N") 'avy-resume)))
+
 
 ;;* projectile
 
@@ -2869,10 +2870,9 @@ If there is no Clojure REPL, send warning."
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
-  (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
-  (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
+  (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl))
   ;; (require 'flycheck-clj-kondo)
-  )
+
 
 ;;* python
 
@@ -2932,11 +2932,11 @@ If there is no Clojure REPL, send warning."
 (add-hook 'python-mode-hook 'python-mode-outline-hook)
 
 (with-eval-after-load 'python
-  (define-key python-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+  (define-key python-mode-map (kbd "<M-f5>") 'ram-jump-to-outline))
   ;; (define-key python-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   ;; (define-key python-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
   ;; (require 'flycheck-clj-kondo)
-  )
+
 
 ;;* prolog
 
@@ -3499,13 +3499,13 @@ been modified since its last check-in."
 
            ;; If under version-control decode the -:@ character
            ((string-match "\\` ?\\(?:CVS\\|Git\\)\\([-:@]\\)\\([^^:~ \x00-\x1F\\\\]+\\)?" vc-mode)
-            (match-string-no-properties 1 vc-mode))
+            (match-string-no-properties 1 vc-mode))))
 
 
            ;;  ;; Otherwise, indicate confusion
            ;;  (t
            ;;   "?")
-           ))
+
 
          (branch
           (if (member class '("-" ":" "@"))
@@ -3702,7 +3702,7 @@ With \\[universal-argument] match files by contents.  This
 requires the command-line executable called 'rg' or 'ripgrep'."
     (interactive "P")
     (let* ((default-directory (file-name-directory
-                               (or (locate-dominating-file "." ".git" )
+                               (or (locate-dominating-file "." ".git")
                                    default-directory))))
       (if arg
           (let* ((regexp (read-regexp
@@ -3793,7 +3793,7 @@ confines of word boundaries (e.g. multiple words)."
 (define-key global-map (kbd "M-s M-o") 'multi-occur)
 (define-key isearch-mode-map (kbd "C-SPC")  'prot/isearch-mark-and-exit)
 (define-key isearch-mode-map (kbd "DEL")  'contrib/isearchp-remove-failed-part-or-last-char)
-(define-key isearch-mode-map (kbd "<C-return>")  'contrib/isearch-done-opposite-end )
+(define-key isearch-mode-map (kbd "<C-return>")  'contrib/isearch-done-opposite-end)
 
 ;; Prevents issue where you have to press backspace twice when
 ;; trying to remove the first character that fails a search
@@ -3816,9 +3816,9 @@ confines of word boundaries (e.g. multiple words)."
   (funcall #'isearch-done nopush edit)
   (if (and
     ;; depth in parens is greater than 0
-    (> (nth 0 (syntax-ppss)) 0)
+       (> (nth 0 (syntax-ppss)) 0)
     ;; not in string
-    (not (nth 3 (syntax-ppss))))
+       (not (nth 3 (syntax-ppss))))
       (backward-up-list 1)))
 
 (defun ram-isearch-done-to-close-paren (&optional nopush edit)
@@ -3827,9 +3827,9 @@ confines of word boundaries (e.g. multiple words)."
   (funcall #'isearch-done nopush edit)
   (if (and
     ;; depth in parens is greater than 0
-    (> (nth 0 (syntax-ppss)) 0)
+       (> (nth 0 (syntax-ppss)) 0)
     ;; not in string
-    (not (nth 3 (syntax-ppss))))
+       (not (nth 3 (syntax-ppss))))
       (backward-up-list -1)))
 
 (define-key isearch-mode-map (kbd "[") #'ram-isearch-done-to-open-paren)
@@ -3922,6 +3922,7 @@ With \\[universal-argument] do it for the current file instead."
  '(esup :type git :flavor melpa :host github :repo "jschaf/esup"))
 
 ;;** packages: eval-in-repl
+
 (straight-use-package
  '(eval-in-repl :type git :flavor melpa :host github :repo "kaz-yos/eval-in-repl"))
 
