@@ -2075,6 +2075,12 @@ displaying TEST-BUFFER-P buffer."
   (setq org-roam-directory (file-truename "~/backup/org/org-roam/notes/"))
   (org-roam-db-autosync-mode))
 
+;;** org-roam: bindings
+
+(define-key global-map (kbd "C-c n f") #'org-roam-node-find)
+(define-key global-map (kbd "C-c n i") #'org-roam-node-insert)
+(define-key global-map (kbd "C-c n l") #'org-roam-buffer-toggle)
+(define-key global-map (kbd "C-c n g") #'org-roam-graph)
 
 ;;* outline, headings, headlines
 
