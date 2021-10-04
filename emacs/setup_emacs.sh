@@ -51,7 +51,8 @@ else
 
     # tools for compiling
     apt-get install -y autoconf make gcc texinfo libgccjit-8-dev cmake libtool-bin \
-            libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev
+            libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev \
+            libcairo2-dev libharfbuzz-dev
 
     echo -e "\n\x1b[33;01m Installing, configuring emacs ...  \x1b[39;49;00m\n" && sleep 1
 
@@ -67,9 +68,10 @@ else
 
     sudo -u $SUDO_USER ./autogen.sh
     sudo -u $SUDO_USER ./configure --prefix=$EMACS_INSTALL_DIR \
-           --with-native-compilation --with-sound=no --with-cairo \
-           --with-x=yes --with-x-toolkit=no --without-xft \
-           --with-mailutils --without-toolkit-scroll-bars
+         --with-native-compilation --with-sound=no \
+         --with-cairo --with-harfbuzz \
+         --with-x=yes --with-x-toolkit=no --with-xft \
+         --with-mailutils --without-toolkit-scroll-bars
     sudo -u $SUDO_USER make -j$(nproc)
     sudo -u $SUDO_USER make install
     #make clean
