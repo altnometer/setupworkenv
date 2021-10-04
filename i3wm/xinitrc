@@ -28,8 +28,10 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 #export QT_IM_MODULE=xim
 #export CLUTTER_IM_MODULE=xim
 
-#xrandr --setmonitor HDMI-1-1 1920/300x2160/340+0+0 HDMI-1
-#xrandr --setmonitor HDMI-1-2 1920/300x2160/340+1920+0 none
+xset +fp /home/sam/.local/share/fonts/operator-mono
+
+xrandr --setmonitor HDMI-1-1 1920/300x2160/340+0+0 HDMI-1
+xrandr --setmonitor HDMI-1-2 1920/300x2160/340+1920+0 none
 
 # Finally start Emacs
 if [ ! "$DBUS_SESSION_BUS_ADDRESS" ] && have dbus-launch; then
