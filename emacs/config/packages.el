@@ -2171,12 +2171,37 @@ it can be passed in POS."
 (with-eval-after-load "org-roam"
   (org-roam-db-autosync-mode))
 
-;;** org-roam: bindings
+;;** org-roam: dailies
 
-(define-key global-map (kbd "C-c n f") #'org-roam-node-find)
-(define-key global-map (kbd "C-c n i") #'org-roam-node-insert)
-(define-key global-map (kbd "C-c n l") #'org-roam-buffer-toggle)
-(define-key global-map (kbd "C-c n g") #'org-roam-graph)
+;; relative to org-roam-directory
+(with-eval-after-load "org-roam-dailies"
+  (setq org-roam-dailies-directory "../daily")
+  ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry "* %?"
+           :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n")))))
+
+;; these command are ###autoload and 'org-roam-dailies-map is not
+;; (with-eval-after-load "org-roam-dailies"
+;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
+(define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
+(define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
+(define-key global-map (kbd "s-c .") #'org-roam-dailies-find-directory)
+(define-key global-map (kbd "s-c f") #'org-roam-dailies-goto-next-note)
+(define-key global-map (kbd "s-c b") #'org-roam-dailies-goto-previous-note)
+(define-key global-map (kbd "s-c c") #'org-roam-dailies-goto-date)
+(define-key global-map (kbd "s-c v") #'org-roam-dailies-capture-date)
+(define-key global-map (kbd "s-c t") #'org-roam-dailies-goto-tomorrow)
+(define-key global-map (kbd "s-c y") #'org-roam-dailies-goto-yesterday)
+
+;; org-roam-dailies-capture-today
+;; org-roam-dailies-goto-today
+;; you can navigate to it with note-find
+;; org-roam-dailies-capture-date
+;; org-roam-dailies-goto-date
+;; org-roam-dailies-goto-next-note
+;; org-roam-dailies-goto-previous-note
+;; bind-key-map org-roam-dailies-map
 
 ;;* outline, headings, headlines
 
