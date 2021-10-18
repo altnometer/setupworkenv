@@ -4714,7 +4714,8 @@ That is, remove a non kept dired from the recent list."
 ;; (setq-default display-line-numbers t)
 ;; highlght the current line only in gui.
 
-(when window-system (global-hl-line-mode t))
+;; I disable line highlighting for the nth time already
+;; (when window-system (global-hl-line-mode t))
 
 ;; (global-hl-line-mode)
 
