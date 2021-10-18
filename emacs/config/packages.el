@@ -4736,6 +4736,10 @@ That is, remove a non kept dired from the recent list."
 ;; (setq show-paren-style 'parenthesis)
 ;; (set-face-background 'show-paren-match "#42444a")
 
+;;*** system/general settings: time
+
+(setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
+
 ;;*** system/general settings: misc
 
 ;; Default Browser
