@@ -419,14 +419,25 @@ Disable `icomplete-vertical-mode' for this command."
 ;; Global keybindings.
 (setq exwm-input-global-keys
       `(
+        (,(kbd "s-c n") . org-roam-dailies-capture-today)
+        (,(kbd "s-c d") . org-roam-dailies-goto-today)
+        (,(kbd "s-c .") . org-roam-dailies-find-directory)
+        (,(kbd "s-c f") . org-roam-dailies-goto-next-note)
+        (,(kbd "s-c b") . org-roam-dailies-goto-previous-note)
+        (,(kbd "s-c c") . org-roam-dailies-goto-date)
+        (,(kbd "s-c v") . org-roam-dailies-capture-date)
+        (,(kbd "s-c t") . org-roam-dailies-goto-tomorrow)
+        (,(kbd "s-c y") . org-roam-dailies-goto-yesterday)
+
         (,(kbd "C-g") . keyboard-quit)
+        ;; (,(kbd "C-h") . help-command)
         ([?\s-q] . kill-buffer-and-window)
         ;; ([?\s-Q] . save-buffers-kill-emacs)
 
         ([?\s-n] . switch-to-next-buffer)
         ([?\s-p] . switch-to-prev-buffer)
         ([?\s-f] . ram-choose-from-recentf)
-        ([?\s-b] . switch-to-buffer)
+        ([?\s-b] . ram-switch-to-buffer)
         ([?\s-B] . switch-to-buffer-other-window)
         ([?\s-e] . ram-open-eshell)
         ([?\s-o] . other-window)
@@ -439,9 +450,11 @@ Disable `icomplete-vertical-mode' for this command."
         (,(kbd "<M-f15>") . ram-other-workspace)
         (,(kbd "<f15>") . ram-other-workspace)
 
+        ([?\s-t] . org-roam-node-find)
+
         ;; ([?\s-z] . exwm-layout-toggle-fullscreen)
         ;; ([?\s-/] . exwm-layout-toggle-mode-line)
-        ;; ([?\s-y] . exwm-workspace-toggle-minibuffer)
+        ;; ([?\s-y] . exwm-workspace-toggle-buffer)
         ;; ([?\s-h] . exwm-window-*focus left*)
         ;; ([?\s-j] . exwm-window-*focus down*)
         ;; ([?\s-H] . exwm-window-*move left*)
@@ -461,13 +474,11 @@ Disable `icomplete-vertical-mode' for this command."
         ;; (,(kbd "<f7>") . (lambda () (interactive) (exwm-workspace-switch-create 7)))
         ;; 's-N': Switch to certain workspace.
         (\,@ (mapcar (lambda (i)
-                       `(,(kbd (format "s-%d" i)) .
-                         (lambda ()
-                           (interactive)
-                           (exwm-workspace-switch-create ,i))))
-                     (number-sequence 0 9)))))
-
-
+                        `(,(kbd (format "s-%d" i)) .
+                          (lambda ()
+                            (interactive)
+                            (exwm-workspace-switch-create ,i))))
+                      (number-sequence 0 9)))))
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
