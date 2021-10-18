@@ -2121,12 +2121,45 @@ it can be passed in POS."
 ;;    '(git-gutter:statistic 1)))
 
 
+;;* org-agenda
+
+;;* org-agenda: bindings
+
+(define-key global-map (kbd "s-a") #'org-agenda)
+
+;;* org-agenda: settings
+
+;; (setq org-agenda-files "~/backup/org/org-roam/notes/")
+(setq org-agenda-files '("~/backup/org/org-roam/"))
+(setq org-agenda-files '("~/backup/org/org-roam/notes/20211002191735-org_roam_category.org"))
 
 ;;* org-roam
+
+;;** org-roam: bindings
+
+(define-key global-map (kbd "C-c n f") #'org-roam-node-find)
+(define-key global-map (kbd "C-c n i") #'org-roam-node-insert)
+(define-key global-map (kbd "C-c n l") #'org-roam-buffer-toggle)
+(define-key global-map (kbd "C-c n g") #'org-roam-graph)
+(define-key global-map (kbd "s-t") #'org-roam-node-find)
+(define-key global-map (kbd "s-T") #'org-roam-node-insert)
+(define-key ram-leader-map-tap-global (kbd "/") #'org-roam-node-find)
+(define-key ram-leader-map-tap-global (kbd "'") #'org-roam-node-insert)
+
+;;** org-roam: capture-templates
+
+(with-eval-after-load "org-roam"
+  (setq org-roam-capture-templates
+        '(("d" "default"
+           entry "* ${title}\n\n%?"
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n")
+           :unnarrowed t))))
+
 
 ;;** org-roam: init
 
 (setq org-roam-v2-ack t)
+(setq org-roam-directory (file-truename "~/backup/org/org-roam/notes/"))
 
 ;;** org-roam: installation
 
@@ -2136,7 +2169,6 @@ it can be passed in POS."
 ;;** org-roam: settings
 
 (with-eval-after-load "org-roam"
-  (setq org-roam-directory (file-truename "~/backup/org/org-roam/notes/"))
   (org-roam-db-autosync-mode))
 
 ;;** org-roam: bindings
