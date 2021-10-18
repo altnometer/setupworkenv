@@ -1206,6 +1206,7 @@ instead."
 (define-key completion-list-mode-map (kbd "p") #'previous-line)
 (define-key completion-list-mode-map (kbd "b") #'previous-completion)
 (define-key completion-list-mode-map (kbd "M-v") #'prot/focus-minibuffer)
+(define-key global-map (kbd "<f13>") #'prot/focus-minibuffer)
 
 ;;*** minibuffer/completion: styles
 
