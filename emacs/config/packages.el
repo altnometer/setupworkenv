@@ -4765,7 +4765,7 @@ That is, remove a non kept dired from the recent list."
   (interactive)
   (switch-to-buffer "*scratch*"))
 
-(define-key ram-leader-map-tap-global (kbd "'") 'ram-switch-to-scratch)
+;; (define-key ram-leader-map-tap-global (kbd "'") 'ram-switch-to-scratch)
 
 ;;*** system/general settings: eval
 
@@ -4803,6 +4803,11 @@ That is, remove a non kept dired from the recent list."
           (lambda () (setq-local evil-shift-width 2)))
 (add-hook 'lisp-interaction-mode-hook
           (lambda () (setq-local evil-shift-width 2)))
+
+;;** system: ispell
+
+(setq ispell-personal-dictionary "~/backup/emacs/.ispell_default")
+(setq ispell-silently-savep t)
 
 ;;** system: syntax
 
