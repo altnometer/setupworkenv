@@ -3779,7 +3779,9 @@ been modified since its last check-in."
                                 (window-at-side-p (get-buffer-window) 'left))
                            (propertize (format " %s " (exwm-workspace--position
                                                        (window-frame (get-buffer-window))))
-                                       'face '((:foreground "green4")))
+                                       'face (if (eq ram-selwin (get-buffer-window))
+                                                 '((:foreground "green1"))
+                                               '((:foreground "green4"))))
                          "   "))
                 (:eval (when (buffer-narrowed-p)
                          (progn (propertize " %n " 'face '((:background "green"))))))
