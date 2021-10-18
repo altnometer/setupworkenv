@@ -136,8 +136,8 @@ Disable `icomplete-vertical-mode' for this command."
         (insert ?\ ))
     (error nil)))
 
-(define-key global-map (kbd "s-t") 'ram-up-list)
-(define-key global-map (kbd "s-c") 'ram-up-list-backward)
+;; (define-key global-map (kbd "s-t") 'ram-up-list)
+;; (define-key global-map (kbd "s-c") 'ram-up-list-backward)
 
 ;;* company
 
