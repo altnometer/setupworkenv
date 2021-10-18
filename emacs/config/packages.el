@@ -41,15 +41,21 @@
   "Invoke builtin `switch-to-buffer' or `switch-to-buffer-other-window' depending on N.
 Disable `icomplete-vertical-mode' for this command."
   (interactive "p")
-  (let ((default icomplete-vertical-mode))
+  (let ((default (default-value 'icomplete-vertical-mode)))
     (icomplete-vertical-mode -1)
-    (if (= n 0)
-        (call-interactively 'switch-to-buffer)
-      (call-interactively 'switch-to-buffer-other-window))
+    (condition-case err
+        (if (= n 1)
+            (call-interactively #'switch-to-buffer)
+          (call-interactively #'switch-to-buffer-other-window))
+      (error
+       (icomplete-vertical-mode default)
+       (signal (car err) (cdr err)))
+      (quit
+       (icomplete-vertical-mode default)
+       (signal 'quit nil)))
     (icomplete-vertical-mode default)))
 
 (define-key global-map (kbd "s-b") #'ram-switch-to-buffer)
-(define-key global-map (kbd "s-B") #'switch-to-buffer-other-window)
 (define-key global-map (kbd "C-s-b") 'display-buffer)
 (define-key global-map (kbd "<M-f3>") #'ibuffer)
 
