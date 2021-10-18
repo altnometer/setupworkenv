@@ -2251,7 +2251,10 @@ it can be passed in POS."
   "Toggle narrow and widen from anywhere in subtree."
   (interactive "p")
   (if (buffer-narrowed-p)
-      (foldout-exit-fold arg)
+      (progn
+        (widen)
+        (recenter 0))
+    ;; (foldout-exit-fold arg)
     (when (not (outline-on-heading-p))
       (outline-next-visible-heading (- 1)))
     (foldout-zoom-subtree)))
