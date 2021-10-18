@@ -3149,7 +3149,37 @@ If there is no Clojure REPL, send warning."
   (add-to-list 'super-save-triggers 'winner-undo)
   (add-to-list 'super-save-triggers 'winner-redo)
   (add-to-list 'super-save-triggers 'counsel-M-x)
-  (add-to-list 'super-save-triggers 'ram-edit-abbrev-file))
+  (add-to-list 'super-save-triggers 'ram-edit-abbrev-file)
+
+  (add-to-list 'super-save-triggers #'org-roam-node-insert))
+
+(with-eval-after-load 'super-save
+  (add-hook 'after-init-hook 'super-save-mode)
+  ;; save on find-file
+  (add-to-list 'super-save-hook-triggers 'find-file-hook)
+  ;; TODO: the following does not seem to have an effect
+  (add-to-list 'super-save-triggers 'execute-extended-command)
+  (add-to-list 'super-save-triggers 'switch-to-prev-buffer)
+  (add-to-list 'super-save-triggers 'switch-to-next-buffer)
+  (add-to-list 'super-save-triggers 'winner-undo)
+  (add-to-list 'super-save-triggers 'winner-redo)
+  (add-to-list 'super-save-triggers 'counsel-M-x)
+  (add-to-list 'super-save-triggers 'ram-edit-abbrev-file)
+
+  (add-to-list 'super-save-triggers #'org-roam-node-insert)
+  (add-to-list 'super-save-triggers #'org-roam-node-find)
+
+  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-today)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-tomorrow)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-yesterday)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-date)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-next-note)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-previous-note)
+
+  (add-to-list 'super-save-triggers #'org-roam-dailies-capture-today)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-capture-tomorrow)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-capture-yesterday)
+  (add-to-list 'super-save-triggers #'org-roam-dailies-capture-date))
 
 ;;* ivy, swiper, counsel:
 ;; https://oremacs.com/swiper/
