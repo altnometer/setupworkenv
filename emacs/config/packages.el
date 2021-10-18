@@ -958,7 +958,8 @@ succession."
                             defs
                             nil t nil
                             'ram-jump-to-def-history
-                            str-at-point)
+                            `,(if str-at-point str-at-point nil)
+                            nil)
                             ;; (car ram-jump-to-def-history)
                            defs)))
      (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
