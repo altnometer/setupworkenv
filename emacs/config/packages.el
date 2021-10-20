@@ -2154,6 +2154,39 @@ it can be passed in POS."
 
 (define-key global-map (kbd "s-a") #'org-agenda)
 
+;;* org-agenda: functions
+
+;; credit to https://d12frosted.io/posts/2020-06-24-task-management-with-roam-vol2.html
+(defun ram-make-org-doc-category-identifier (&optional len)
+  "Create a string 'category' identifier for an org buffer.
+
+Make the identifier base on either:
+
+- TITLE property
+- CATEGORY property
+- filename
+
+This function is created to identify TODO items in agenda buffers.
+"
+  (let* ((file-name (when buffer-file-name
+                      (file-name-sans-extension
+                       (file-name-nondirectory buffer-file-name))))
+         (title (vulpea-buffer-prop-get "title"))
+         (category (org-get-category))
+         (result (or title category file-name "")))
+    (if (numberp len)
+        (s-truncate len (s-pad-right len " " result))
+      result)))
+
+(defun vulpea-buffer-prop-get (name)
+  "Get a buffer property called NAME as a string."
+  (org-with-point-at 1
+    (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
+                             (point-max) t)
+      (buffer-substring-no-properties
+       (match-beginning 1)
+       (match-end 1)))))
+
 ;;* org-agenda: settings
 
 (setq org-agenda-prefix-format
