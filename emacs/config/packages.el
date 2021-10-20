@@ -1870,6 +1870,17 @@ displaying TEST-BUFFER-P buffer."
 
 ;;** org-mode: functions
 
+;; credit to https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
+(defun ram-org-buffer-contains-todos ()
+  "Return non-nil if current org buffer contains any todo entries."
+  (org-element-map
+      (org-element-parse-buffer 'headline)
+      'headline
+    (lambda (h)
+      (eq (org-element-property :todo-type h)
+          'todo))
+    nil 'first-match))
+
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
 (defun zp/org-find-time-file-property (property &optional anywhere)
   "Return the position of the time file PROPERTY if it exists.
@@ -1979,6 +1990,9 @@ it can be passed in POS."
   (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~))
 
 ;;** org-mode: common settings
+
+(with-eval-after-load "org"
+  (add-to-list 'org-tags-exclude-from-inheritance "project"))
 
 (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
@@ -2142,9 +2156,15 @@ it can be passed in POS."
 
 ;;* org-agenda: settings
 
+(setq org-agenda-prefix-format
+      '((agenda . " %i %(ram-make-org-doc-category-identifier 16)%?-12t% s")
+        (todo . " %i %(ram-make-org-doc-category-identifier 16) ")
+        (tags . " %i %(ram-make-org-doc-category-identifier 16) ")
+        (search . " %i %(ram-make-org-doc-category-identifier 16) ")))
+
 ;; (setq org-agenda-files "~/backup/org/org-roam/notes/")
-(setq org-agenda-files '("~/backup/org/org-roam/"))
-(setq org-agenda-files '("~/backup/org/org-roam/notes/20211002191735-org_roam_category.org"))
+(setq org-agenda-files '("~/backup/org/org-roam/notes/" "~/backup/org/org-roam/daily/"))
+;; (setq org-agenda-files '("~/backup/org/org-roam/notes/20211002191735-org_roam_category.org"))
 
 ;;* org-roam
 
@@ -2158,6 +2178,21 @@ it can be passed in POS."
 (define-key global-map (kbd "s-T") #'org-roam-node-insert)
 (define-key ram-leader-map-tap-global (kbd "/") #'org-roam-node-find)
 (define-key ram-leader-map-tap-global (kbd "'") #'org-roam-node-insert)
+
+;;** org-roam: functions
+
+(defun ram-buffer-is-from-roam-directory-p ()
+  "Return non-nil if the currently visited buffer is from `org-roam-directory'."
+  (and buffer-file-name
+       (string-prefix-p
+        (expand-file-name (file-name-as-directory org-roam-directory))
+        (file-name-directory buffer-file-name))))
+
+(defun ram-update-org-roam-tag-if-contains-todos ()
+  "Add or remove PROJECT tag if buffer contains todos."
+  (when (and (not (active-minibuffer-window))
+             (ram-buffer-is-from-roam-directory-p)
+             (ram-buffer-is-from-roam-dailies-directory-p))))
 
 ;;** org-roam: capture-templates
 
@@ -2185,6 +2220,15 @@ it can be passed in POS."
   (org-roam-db-autosync-mode))
 
 ;;** org-roam: dailies
+
+;;** org-roam: dailies: functions
+
+(defun ram-buffer-is-from-roam-dailies-directory-p ()
+  "Return non-nil if the currently visited buffer is from `org-roam-dailies-directory'."
+  (and buffer-file-name
+       (string-prefix-p
+        (expand-file-name (file-name-as-directory org-roam-dailies-directory))
+        (file-name-directory buffer-file-name))))
 
 ;; relative to org-roam-directory
 (with-eval-after-load "org-roam-dailies"
