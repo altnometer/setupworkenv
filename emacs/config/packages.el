@@ -4639,6 +4639,10 @@ That is, remove a non kept dired from the recent list."
 (define-key global-map (kbd "s-k") #'ram-next-comment)
 (define-key global-map (kbd "s-K") #'ram-previous-comment)
 
+;;** system: calendar
+
+(setq calendar-week-start-day 1)
+
 ;;** system: cursor
 
 (set-default 'cursor-type 'box)
