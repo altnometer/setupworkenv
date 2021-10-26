@@ -2507,6 +2507,20 @@ If the property is already set, replace its value."
     (outline-up-heading 1 t)
     (outline-forward-same-level 1))
 
+(defun ram-outline-up-heading (arg &optional invisible-ok)
+  "Like `outline-up-heading' but do not raise error.
+
+Call `outline-backward-same-level' instead of raising"
+"Already at top level of the outline"
+(interactive "p")
+(condition-case err
+    (outline-up-heading 1 t)
+  (error (if (string= (error-message-string err)
+                      "Already at top level of the outline")
+             (outline-backward-same-level arg)
+           (signal (car err) (cdr err))))))
+;; (error "Already at top level of the outline")
+
 ;;** outline: bindings
 
 (with-eval-after-load "outline"
@@ -2518,7 +2532,7 @@ If the property is already set, replace its value."
 (define-key ram-leader-map-tap-global (kbd "b") #'outline-backward-same-level)
 (define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
 (define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
-(define-key ram-leader-map-tap-global (kbd "u") #'outline-up-heading)
+(define-key ram-leader-map-tap-global (kbd "u") #'ram-outline-up-heading)
 (define-key ram-leader-map-tap-global (kbd "d") #'prot/outline-down-heading)
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-outline-heading)
 
