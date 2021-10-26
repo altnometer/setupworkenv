@@ -207,6 +207,7 @@
         ("subsg" "substituting")
         ("tq" "technique")
 
+        ("todo" "TODO")
         ("und" "understand")
 
         ("val" "value")
