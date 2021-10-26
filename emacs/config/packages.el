@@ -2053,6 +2053,11 @@ it can be passed in POS."
 
 ;; (add-hook 'text-mode-hook 'add-quotes-to-font-lock-keywords)
 
+;;** org-mode: syntax-table
+
+(with-eval-after-load "org"
+  (modify-syntax-entry ?' "'" org-mode-syntax-table))
+
 ;;** org-mode: structure-templates
 
 ;; https://orgmode.org/manual/Structure-Templates.html
@@ -2150,11 +2155,11 @@ it can be passed in POS."
 
 ;;* org-agenda
 
-;;* org-agenda: bindings
+;;** org-agenda: bindings
 
 (define-key global-map (kbd "s-a") #'org-agenda)
 
-;;* org-agenda: functions
+;;** org-agenda: functions
 
 ;; credit to https://d12frosted.io/posts/2020-06-24-task-management-with-roam-vol2.html
 (defun ram-make-org-doc-category-identifier (&optional len)
