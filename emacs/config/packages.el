@@ -2074,6 +2074,11 @@ it can be passed in POS."
 
 ;; (add-hook 'text-mode-hook 'add-quotes-to-font-lock-keywords)
 
+;;** org-mode: syntax-table
+
+(with-eval-after-load "org"
+  (modify-syntax-entry ?' "'" org-mode-syntax-table))
+
 ;;** org-mode: structure-templates
 
 ;; https://orgmode.org/manual/Structure-Templates.html
