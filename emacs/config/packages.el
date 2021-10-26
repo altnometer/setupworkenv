@@ -2431,7 +2431,7 @@ If the property is already set, replace its value."
 ;;*** org-roam: dailies: settings
 
 ;; relative to org-roam-directory
-(setq org-roam-dailies-directory "../daily")
+(setq org-roam-dailies-directory "../daily/")
 
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
@@ -4559,6 +4559,8 @@ Configure `orderless-matching-styles' for this command."
 (recentf-mode 1)
 (setq recentf-max-saved-items 4000)
 (run-at-time nil (* 1 60) 'recentf-save-list)
+(add-to-list 'recentf-exclude (format "%s.+" (expand-file-name org-roam-dailies-directory org-roam-directory)))
+(add-to-list 'recentf-exclude (format "%s.+" (expand-file-name org-roam-directory)))
 
 ;; do not show message in minibuffer
 ;; credit to
