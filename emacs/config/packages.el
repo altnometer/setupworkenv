@@ -419,9 +419,10 @@ Disable `icomplete-vertical-mode' for this command."
 ;; Global keybindings.
 (setq exwm-input-global-keys
       `(
+        (,(kbd "s-a") . org-agenda)
+
         (,(kbd "s-c n") . org-roam-dailies-capture-today)
         (,(kbd "s-c d") . org-roam-dailies-goto-today)
-        (,(kbd "s-c .") . org-roam-dailies-find-directory)
         (,(kbd "s-c f") . org-roam-dailies-goto-next-note)
         (,(kbd "s-c b") . org-roam-dailies-goto-previous-note)
         (,(kbd "s-c c") . org-roam-dailies-goto-date)
