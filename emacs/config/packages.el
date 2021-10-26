@@ -1871,15 +1871,35 @@ displaying TEST-BUFFER-P buffer."
 ;;** org-mode: functions
 
 ;; credit to https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
-(defun ram-org-buffer-contains-todos ()
-  "Return non-nil if current org buffer contains any todo entries."
-  (org-element-map
-      (org-element-parse-buffer 'headline)
-      'headline
-    (lambda (h)
-      (eq (org-element-property :todo-type h)
-          'todo))
-    nil 'first-match))
+(defun ram-org-buffer-contains-todos-p (&optional file)
+  "Return non-nil if FILE buffer contains any to-dos.
+
+If no arg provided, default to the current buffer.
+"
+  (let (buffer kill-buffer-p contains-todos-p)
+    (if file
+        (setq buffer (let ((buffer (find-buffer-visiting file)))
+                       (when buffer
+                         ;; the file visited, do not closed it
+                         (setq kill-buffer-p nil)
+                         buffer)
+                       ;; the file was not visited, close it
+                       (setq buffer (find-file-noselect file))
+                       (setq kill-buffer-p t)
+                       buffer))
+      (setq buffer (current-buffer)))
+
+    (setq contains-todos-p
+          (with-current-buffer buffer
+            (org-element-map
+                (org-element-parse-buffer 'headline)
+                'headline
+              (lambda (h)
+                (eq (org-element-property :todo-type h)
+                    'todo))
+              nil 'first-match)))
+    (when kill-buffer-p (kill-buffer buffer))
+    contains-todos-p))
 
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
 (defun zp/org-find-time-file-property (property &optional anywhere)
@@ -2053,11 +2073,6 @@ it can be passed in POS."
 
 ;; (add-hook 'text-mode-hook 'add-quotes-to-font-lock-keywords)
 
-;;** org-mode: syntax-table
-
-(with-eval-after-load "org"
-  (modify-syntax-entry ?' "'" org-mode-syntax-table))
-
 ;;** org-mode: structure-templates
 
 ;; https://orgmode.org/manual/Structure-Templates.html
@@ -2192,7 +2207,17 @@ This function is created to identify TODO items in agenda buffers.
        (match-beginning 1)
        (match-end 1)))))
 
-;;* org-agenda: settings
+(defun ram-update-agenda-files (&rest _)
+  "Update the value of `org-agenda-files'."
+  (message "Updating org-agenda-files ...")
+  (let ((inhibit-message t)
+        (message-log-max nil))
+    (setq org-agenda-files (seq-uniq (append (vulpea-project-files) (ram-daily-tagged-poject-files))))
+    nil)
+  (message "... org-agenda-files updated.")
+  nil)
+
+;;** org-agenda: settings
 
 (setq org-agenda-prefix-format
       '((agenda . " %i %(ram-make-org-doc-category-identifier 16)%?-12t% s")
@@ -2200,8 +2225,14 @@ This function is created to identify TODO items in agenda buffers.
         (tags . " %i %(ram-make-org-doc-category-identifier 16) ")
         (search . " %i %(ram-make-org-doc-category-identifier 16) ")))
 
+;;** org-agenda: hooks, advice, timers
+
 ;; (setq org-agenda-files "~/backup/org/org-roam/notes/")
-(setq org-agenda-files '("~/backup/org/org-roam/notes/" "~/backup/org/org-roam/daily/"))
+;; (setq org-agenda-files '("~/backup/org/org-roam/notes/" "~/backup/org/org-roam/daily/"))
+
+(advice-add 'org-agenda :before #'ram-update-agenda-files)
+;; (advice-remove 'org-agenda #'ram-update-agenda-files)
+
 ;; (setq org-agenda-files '("~/backup/org/org-roam/notes/20211002191735-org_roam_category.org"))
 
 ;;* org-roam
@@ -2226,11 +2257,134 @@ This function is created to identify TODO items in agenda buffers.
         (expand-file-name (file-name-as-directory org-roam-directory))
         (file-name-directory buffer-file-name))))
 
+;; credit to https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
+(defun vulpea-project-files ()
+  "Return a list of note files containing 'project' tag." ;
+  (require 'org-roam-db)
+  (seq-uniq
+   (seq-map
+    #'car
+    (org-roam-db-query
+     [:select [nodes:file]
+      :from tags
+      :left-join nodes
+      :on (= tags:node-id nodes:id)
+      :where (like tag (quote "%\"project\"%"))]))))
+
+(defun ram-daily-tagged-poject-files ()
+  "Return daily notes marked with 'project' tag.
+
+Consider both org-roam notes and dailies."
+  (seq-filter #'ram-org-buffer-contains-todos-p
+              (directory-files
+               (expand-file-name org-roam-dailies-directory org-roam-directory)
+               'absolute-path
+               "^.*org$")))
+
 (defun ram-update-org-roam-tag-if-contains-todos ()
   "Add or remove PROJECT tag if buffer contains todos."
+  (require 'org-roam)
   (when (and (not (active-minibuffer-window))
-             (ram-buffer-is-from-roam-directory-p)
-             (ram-buffer-is-from-roam-dailies-directory-p))))
+             (org-roam-file-p)
+             (save-excursion
+               (goto-char (point-min))
+               (org-roam-db-node-p)))
+
+    (if (ram-org-buffer-contains-todos-p)
+        (org-roam-tag-add '("project"))
+      (condition-case err
+          (org-roam-tag-remove '("project"))
+        (user-error (if (not (string= (error-message-string err)
+                                      "No tag to remove"))
+                        (signal (car err) (cdr err))))
+        (error (signal (car err) (cdr err)))))
+
+    ;; (save-excursion
+    ;;   (goto-char (point-min))
+    ;;   (let* ((tags (let ((value (vulpea-buffer-prop-get "FILETAGS")))
+    ;;                  (when (and value
+    ;;                             (not (string-empty-p value)))
+    ;;                    (split-string-and-unquote value))))
+    ;;          (original-tags tags))
+    ;;     (if (ram-org-buffer-contains-todos-p)
+    ;;         (setq tags (cons "project" tags))
+    ;;       (setq tags (remove "project"
+    ;;                          ;; cleanup duplicates
+    ;;                          (setq tags (seq-uniq tags)))))
+    ;;     ;; update tags if changed
+    ;;     (when (or (seq-difference tags original-tags)
+    ;;               (seq-difference original-tags tags))
+    ;;       (vulpea-buffer-prop-set "FILETAGS" (string-join tags " ")))))
+    ))
+
+(defun vulpea-buffer-prop-set (name value)
+  "Set a file property called NAME to VALUE in buffer file.
+If the property is already set, replace its value."
+  (setq name (downcase name))
+  (org-with-point-at 1
+    (let ((case-fold-search t))
+      (if (re-search-forward (concat "^#\\+" name ":\\(.*\\)")
+                             (point-max) t)
+          (replace-match (concat "#+" name ": " value) 'fixedcase)
+        (while (and (not (eobp))
+                    (looking-at "^[#:]"))
+          (if (save-excursion (end-of-line) (eobp))
+              (progn
+                (end-of-line)
+                (insert "\n"))
+            (forward-line)
+            (beginning-of-line)))
+        (insert "#+" name ": " value "\n")))))
+
+;;
+;; run only once after starting Emacs. it will update the note tag to
+;; reflect if it contains TODO items.
+
+;; credit to https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
+
+(defun ram-update-all-org-roam-files-for-todo-items ()
+  "Run `ram-update-org-roam-tag-if-contains-todos' for all files."
+  (interactive)
+  (require 'org-roam)
+  (message "Updating all org-roam notes and dailies for todos ...")
+  (let ((inhibit-message t)
+        (message-log-max nil))
+    (dolist (file (append
+                   ;; notes
+                   (org-roam-list-files)
+                   ;; (directory-files
+                   ;;  (expand-file-name org-roam-directory)
+                   ;;  'absolute-path
+                   ;;  "^[^\\(.#\\)].*org$")
+                   ;; (.#) excludes lock files (info "emacs#Interlocking")
+                   ;; dailies
+                   (directory-files
+                    (expand-file-name org-roam-dailies-directory org-roam-directory)
+                    'absolute-path
+                    "^[^\\(.#\\)].*org$")))
+      (let ((buffer (find-buffer-visiting file)))
+        (if buffer
+            (with-current-buffer buffer
+              (when (ram-update-org-roam-tag-if-contains-todos)
+                (save-buffer)))
+          (let ((buffer (find-file-noselect file)))
+            (with-current-buffer buffer
+              (when (ram-update-org-roam-tag-if-contains-todos)
+                (save-buffer)))
+            (kill-buffer buffer)))))
+    nil)
+  (message "... finished updating all org-roam notes and dailies for todos.")
+  nil)
+
+;;** org-roam: hooks, advice, timers
+
+;; current implementation of X'ram-update-all-org-roam-files-for-todo-items
+;; would crush Emacs at startup if run with #'run-at-time
+;;(run-at-time 2 nil #'ram-update-all-org-roam-files-for-todo-items)
+
+;; adding to this hook fails creating new notes, see daily notes for 2021-10-24
+(add-hook 'find-file-hook #'ram-update-org-roam-tag-if-contains-todos)
+(add-hook 'before-save-hook #'ram-update-org-roam-tag-if-contains-todos)
 
 ;;** org-roam: capture-templates
 
@@ -2251,7 +2405,7 @@ This function is created to identify TODO items in agenda buffers.
 
 (straight-use-package
  '(org-roam :type git :flavor melpa :host github :repo "org-roam/org-roam"))
-
+;(require 'org-roam)
 ;;** org-roam: settings
 
 (with-eval-after-load "org-roam"
@@ -2259,7 +2413,7 @@ This function is created to identify TODO items in agenda buffers.
 
 ;;** org-roam: dailies
 
-;;** org-roam: dailies: functions
+;;*** org-roam: dailies: functions
 
 (defun ram-buffer-is-from-roam-dailies-directory-p ()
   "Return non-nil if the currently visited buffer is from `org-roam-dailies-directory'."
@@ -2268,9 +2422,12 @@ This function is created to identify TODO items in agenda buffers.
         (expand-file-name (file-name-as-directory org-roam-dailies-directory))
         (file-name-directory buffer-file-name))))
 
+;;*** org-roam: dailies: settings
+
 ;; relative to org-roam-directory
+(setq org-roam-dailies-directory "../daily")
+
 (with-eval-after-load "org-roam-dailies"
-  (setq org-roam-dailies-directory "../daily")
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry "* %?"
