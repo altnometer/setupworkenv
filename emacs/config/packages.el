@@ -2375,8 +2375,8 @@ If the property is already set, replace its value."
                 (save-buffer)))
           (let ((buffer (find-file-noselect file)))
             (with-current-buffer buffer
-              (when (ram-update-org-roam-tag-if-contains-todos)
-                (save-buffer)))
+              (ram-update-org-roam-tag-if-contains-todos)
+              (save-buffer))
             (kill-buffer buffer)))))
     nil)
   (message "... finished updating all org-roam notes and dailies for todos.")
