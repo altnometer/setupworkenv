@@ -4005,7 +4005,7 @@ been modified since its last check-in."
 ;;** mode-line: timer
 
 ;; (cancel-timer mode-line-timer)
-(run-at-time 1 nil '(lambda () (force-mode-line-update t)))
+(run-at-time 1 nil #'(lambda () (force-mode-line-update t)))
 (defvar mode-line-timer
   (run-with-timer 2 4 #'(lambda () (force-mode-line-update t))))
 (defvar mode-line-cpu-temp-timer
@@ -4711,8 +4711,8 @@ That is, remove a non kept dired from the recent list."
                 python-mode-hook
                 js-mode-hook))
   (add-hook hook
-            '(lambda ()
-               (flyspell-prog-mode))))
+            #'(lambda ()
+                (flyspell-prog-mode))))
 
 (defun flyspell-check-next-highlighted-word ()
   "Custom function to spell check next highlighted word"
@@ -5103,10 +5103,10 @@ That is, remove a non kept dired from the recent list."
 
 (setq-default
  show-trailing-whitespace t)
-(add-hook 'cider-test-report-mode-hook '(lambda () (setq-default show-trailing-whitespace nil)))
-(add-hook 'buffer-menu-mode-hook '(lambda () (setq-default show-trailing-whitespace nil)))
-(add-hook 'minibuffer-setup-hook '(lambda () (setq-default show-trailing-whitespace nil)))
-(add-hook 'eshell-mode-hook '(lambda () (setq-default show-trailing-whitespace t)))
+(add-hook 'cider-test-report-mode-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
+(add-hook 'buffer-menu-mode-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
+(add-hook 'minibuffer-setup-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
+(add-hook 'eshell-mode-hook #'(lambda () (setq-default show-trailing-whitespace t)))
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;* Navigate marks
