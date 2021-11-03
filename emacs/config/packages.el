@@ -953,7 +953,7 @@ succession."
   "Return regex to capture definitions for MAJOR-MODE."
   (cond
    ((eq major-mode 'emacs-lisp-mode)
-    (format "^(\\(def\\(?:un\\|var\\|ine-minor-mode\\) +%s\\)" name-regex))
+    (format "^(\\(def\\(?:un\\|var\\|ine-minor-mode\\|macro\\) +%s\\)" name-regex))
    ((eq major-mode 'racket-mode)
     (format "^(\\(def\\(?:ine\\) +%s\\)" name-regex))
    (t (error (format "%s is not supported, add regex to `ram-jump-to-def'" major-mode)))))
@@ -5202,7 +5202,9 @@ That is, remove a non kept dired from the recent list."
 (add-hook 'buffer-menu-mode-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
 (add-hook 'minibuffer-setup-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
 (add-hook 'eshell-mode-hook #'(lambda () (setq-default show-trailing-whitespace t)))
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
+(remove-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;* Navigate marks
 
