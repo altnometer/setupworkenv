@@ -619,6 +619,31 @@ Disable `icomplete-vertical-mode' for this command."
 (define-key global-map (kbd "s-M") 'magit-file-dispatch)
 (define-key global-map (kbd "M-s-m") 'magit-dispatch)
 
+;;* macros
+
+;; credit to https://stackoverflow.com/a/14946682/9913235
+(defmacro ram-eval-exp-with-modified-hooks (exp &rest hooks)
+  "Set hooks with HOOK and run EXP.
+
+HOOK is of the form: '((before-save-hook (my-fn1, my-fn2)) (after-save-hook '()))."
+  `(let ((b (current-buffer)))          ; memorize the buffer
+     (with-temp-buffer ; new temp buffer to bind the global value of hooks
+       (let ,@hooks
+         (with-current-buffer b ; go back to the current buffer, hooks are now buffer-local
+           (let ,@hooks
+             ,exp))))))
+
+;; credit to https://stackoverflow.com/a/14946682/9913235
+(defmacro ram-with-hooks-reset-in-buffer (hooks buffer &rest body)
+  "Reset global and local hooks, eval BODY in BUFFER.
+
+HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (after-save-hook '()) ...)."
+  `(with-temp-buffer ; new temp buffer to bind the global value of hooks
+     (let ,hooks
+       (with-current-buffer ,buffer ; go back to the current buffer, hooks are now buffer-local
+         (let ,hooks
+           ,@body)))))
+
 ;;* minibuffer
 
 ;;** minibuffer: settings
@@ -1912,23 +1937,25 @@ displaying TEST-BUFFER-P buffer."
 ;;** org-mode: functions
 
 ;; credit to https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
-(defun ram-org-buffer-contains-todos-p (&optional file)
+(defun ram-org-buffer-contains-todos-p (&optional file-path)
   "Return non-nil if FILE buffer contains any to-dos.
 
 If no arg provided, default to the current buffer.
 "
+  (setq file-path (or file-path (buffer-file-name (buffer-base-buffer))))
   (let (buffer kill-buffer-p contains-todos-p)
-    (if file
-        (setq buffer (let ((buffer (find-buffer-visiting file)))
-                       (when buffer
-                         ;; the file visited, do not closed it
-                         (setq kill-buffer-p nil)
-                         buffer)
-                       ;; the file was not visited, close it
-                       (setq buffer (find-file-noselect file))
-                       (setq kill-buffer-p t)
-                       buffer))
-      (setq buffer (current-buffer)))
+    (setq buffer (let ((buffer (find-buffer-visiting file-path)))
+                   (if buffer
+                       ;; the file visited, do not closed it
+                       (progn (setq kill-buffer-p nil)
+                              buffer)
+                     ;; the file was not visited, close it
+                     (setq kill-buffer-p t)
+                     (setq buffer (ram-eval-exp-with-modified-hooks
+                                   (find-file-noselect file-path)
+                                   ((find-file-hook '())
+                                    (org-mode-hook '()))))
+                     buffer)))
 
     (setq contains-todos-p
           (with-current-buffer buffer
@@ -1939,7 +1966,11 @@ If no arg provided, default to the current buffer.
                 (eq (org-element-property :todo-type h)
                     'todo))
               nil 'first-match)))
-    (when kill-buffer-p (kill-buffer buffer))
+    (when kill-buffer-p
+      (ram-eval-exp-with-modified-hooks
+       (kill-buffer buffer)
+       ((before-save-hook nil)
+        (after-save-hook nil))))
     contains-todos-p))
 
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
@@ -2059,7 +2090,10 @@ it can be passed in POS."
 (add-hook 'org-mode-hook 'org-hide-block-all)
 (add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
-(add-hook 'org-mode-hook #'zp/org-set-last-modified)
+(defun ram-org-set-last-modified-in-save-hook ()
+  (when (derived-mode-p 'org-mode)
+    (zp/org-set-last-modified)))
+(add-hook 'before-save-hook #'ram-org-set-last-modified-in-save-hook)
 
 ;;** org-mode: faces, fonts
 
@@ -2083,7 +2117,7 @@ it can be passed in POS."
 ;; (with-eval-after-load
 ;;     (add-to-list 'org-emphasis-alist '("/" (:background "green"))))
 (setq org-emphasis-alist
-  '(("*" (bold :foreground "Grey"))
+  '(("*" (bold :foreground "grey60"))
     ("/" (:family "Operator Mono Light" :slant italic))
     ("_" underline)
     ("=" org-verbatim verbatim)
@@ -2256,12 +2290,20 @@ This function is created to identify TODO items in agenda buffers.
 (defun ram-update-agenda-files (&rest _)
   "Update the value of `org-agenda-files'."
   (message "Updating org-agenda-files ...")
-  (let ((inhibit-message t)
-        (message-log-max nil))
+  (let ((inhibit-message nil)
+        (message-log-max 1000))
     (setq org-agenda-files (seq-uniq (append (vulpea-project-files) (ram-daily-tagged-poject-files))))
     nil)
   (message "... org-agenda-files updated.")
   nil)
+
+(defun ram-agenda-files-add (file-path)
+  "Add FILE-PATH to `org-agenda-files'."
+  (cl-pushnew file-path org-agenda-files :test #'string=))
+
+(defun ram-agenda-files-remove (file-path)
+  "Remove FILE-PATH from `org-agenda-files'."
+  (setq org-agenda-files (remove file-path org-agenda-files)))
 
 ;;** org-agenda: settings
 
@@ -2325,9 +2367,9 @@ Consider both org-roam notes and dailies."
               (directory-files
                (expand-file-name org-roam-dailies-directory org-roam-directory)
                'absolute-path
-               "^.*org$")))
+               "^[^\\(.#\\)].*org$")))
 
-(defun ram-update-org-roam-tag-if-contains-todos ()
+(defun ram-update-org-roam-tag-if-contains-todos (&optional file-path)
   "Add or remove PROJECT tag if buffer contains todos."
   (require 'org-roam)
   (when (and (not (active-minibuffer-window))
@@ -2336,14 +2378,36 @@ Consider both org-roam notes and dailies."
                (goto-char (point-min))
                (org-roam-db-node-p)))
 
-    (if (ram-org-buffer-contains-todos-p)
-        (org-roam-tag-add '("project"))
-      (condition-case err
-          (org-roam-tag-remove '("project"))
-        (user-error (if (not (string= (error-message-string err)
-                                      "No tag to remove"))
-                        (signal (car err) (cdr err))))
-        (error (signal (car err) (cdr err)))))
+    (setq file-path (or file-path (buffer-file-name (buffer-base-buffer))))
+
+    ;; check if file was modified (e.g., to-do is added)
+    ;; by comparing file hashes.
+    ;; nice idea, but not familiar with org-roam-db-autosync-mode internals yet, so
+    ;; leave it out for now.
+    ;; (let ((content-hash (org-roam-db--file-hash file-path))
+    ;;       (db-hash (caar (org-roam-db-query [:select hash :from files
+    ;;                                                  :where (= file $s1)] file-path))))
+    ;;   (unless (string= content-hash db-hash)))
+
+    (save-excursion
+      (goto-char (point-min))
+      (if (ram-org-buffer-contains-todos-p)
+          (progn
+            (org-roam-tag-add '("project"))
+            (ram-agenda-files-add file-path))
+        (condition-case err
+            (org-roam-tag-remove '("project"))
+          (user-error (if (not (string= (error-message-string err)
+                                        "No tag to remove"))
+                          (signal (car err) (cdr err))))
+          (error (signal (car err) (cdr err)))
+          (:success
+           (ram-agenda-files-remove file-path)))))
+
+    (when (buffer-modified-p)
+      (ram-eval-exp-with-modified-hooks (save-buffer)
+                                        ((before-save-hook nil)
+                                         (after-save-hook nil))))
 
     ;; (save-excursion
     ;;   (goto-char (point-min))
@@ -2393,34 +2457,39 @@ If the property is already set, replace its value."
   (interactive)
   (require 'org-roam)
   (message "Updating all org-roam notes and dailies for todos ...")
-  (let ((inhibit-message t)
-        (message-log-max nil))
-    (dolist (file (append
-                   ;; notes
-                   (org-roam-list-files)
-                   ;; (directory-files
-                   ;;  (expand-file-name org-roam-directory)
-                   ;;  'absolute-path
-                   ;;  "^[^\\(.#\\)].*org$")
-                   ;; (.#) excludes lock files (info "emacs#Interlocking")
-                   ;; dailies
-                   (directory-files
-                    (expand-file-name org-roam-dailies-directory org-roam-directory)
-                    'absolute-path
-                    "^[^\\(.#\\)].*org$")))
-      (let ((buffer (find-buffer-visiting file)))
-        (if buffer
-            (with-current-buffer buffer
-              (when (ram-update-org-roam-tag-if-contains-todos)
-                (save-buffer)))
-          (let ((buffer (find-file-noselect file)))
-            (with-current-buffer buffer
-              (ram-update-org-roam-tag-if-contains-todos)
-              (save-buffer))
-            (kill-buffer buffer)))))
-    nil)
-  (message "... finished updating all org-roam notes and dailies for todos.")
-  nil)
+  (let ((time (current-time)))
+    (let ((inhibit-message nil)
+          (message-log-max 1000))
+      (dolist (file (seq-uniq (append
+                               ;; notes
+                               (org-roam-list-files)
+                               ;; (directory-files
+                               ;;  (expand-file-name org-roam-directory)
+                               ;;  'absolute-path
+                               ;;  "^[^\\(.#\\)].*org$")
+                               ;; (.#) excludes lock files (info "emacs#Interlocking")
+                               ;; dailies
+                               (directory-files
+                                (expand-file-name org-roam-dailies-directory org-roam-directory)
+                                'absolute-path
+                                "^[^\\(.#\\)].*org$"))))
+        (let ((buffer (find-buffer-visiting file)))
+          (if buffer
+              (with-current-buffer buffer
+                (ram-update-org-roam-tag-if-contains-todos))
+            (let ((buffer
+                   (ram-eval-exp-with-modified-hooks
+                    (find-file-noselect file)
+                    ((find-file-hook nil)
+                     (org-mode-hook nil)))))
+              (with-current-buffer buffer
+                (ram-update-org-roam-tag-if-contains-todos))
+              (ram-eval-exp-with-modified-hooks
+               (kill-buffer buffer)
+               ((before-save-hook nil)
+                (after-save-hook nil)))))))
+      nil)
+    (message "finished updating all org-roam notes and dailies in %.01f sec" (float-time (time-since time)))))
 
 ;;** org-roam: hooks, advice, timers
 
@@ -2471,7 +2540,7 @@ If the property is already set, replace its value."
 ;;*** org-roam: dailies: settings
 
 ;; relative to org-roam-directory
-(setq org-roam-dailies-directory "../daily/")
+(setq org-roam-dailies-directory "./daily/")
 
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
@@ -3466,22 +3535,6 @@ If there is no Clojure REPL, send warning."
   (add-to-list 'super-save-triggers 'counsel-M-x)
   (add-to-list 'super-save-triggers 'ram-edit-abbrev-file)
 
-  (add-to-list 'super-save-triggers #'org-roam-node-insert))
-
-(with-eval-after-load 'super-save
-  (add-hook 'after-init-hook 'super-save-mode)
-  ;; save on find-file
-  (add-to-list 'super-save-hook-triggers 'find-file-hook)
-  ;; TODO: the following does not seem to have an effect
-  (add-to-list 'super-save-triggers 'execute-extended-command)
-  (add-to-list 'super-save-triggers 'switch-to-prev-buffer)
-  (add-to-list 'super-save-triggers 'switch-to-next-buffer)
-  (add-to-list 'super-save-triggers 'winner-undo)
-  (add-to-list 'super-save-triggers 'winner-redo)
-  (add-to-list 'super-save-triggers 'counsel-M-x)
-  (add-to-list 'super-save-triggers 'ram-edit-abbrev-file)
-
-  (add-to-list 'super-save-triggers #'org-roam-node-insert)
   (add-to-list 'super-save-triggers #'org-roam-node-find)
 
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-today)
@@ -3494,7 +3547,9 @@ If there is no Clojure REPL, send warning."
   (add-to-list 'super-save-triggers #'org-roam-dailies-capture-today)
   (add-to-list 'super-save-triggers #'org-roam-dailies-capture-tomorrow)
   (add-to-list 'super-save-triggers #'org-roam-dailies-capture-yesterday)
-  (add-to-list 'super-save-triggers #'org-roam-dailies-capture-date))
+  (add-to-list 'super-save-triggers #'org-roam-dailies-capture-date)
+
+  (add-to-list 'super-save-triggers #'org-agenda))
 
 ;;* ivy, swiper, counsel:
 ;; https://oremacs.com/swiper/
