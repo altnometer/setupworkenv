@@ -1655,6 +1655,36 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
                 (exwm-workspace-switch selected-frm)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
+(defun ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element (test-buffer-p workspace-idx)
+  "Return an element to be added to `display-buffer-alist'.
+
+TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION). The
+ACTION part returns a `exwm-mode' WORKSPACE-IDX window to display
+the buffer.
+
+It splits the window horizontally if TEST-BUFFER-P is not
+visible."
+  (list test-buffer-p
+        `(lambda (buffer alist)
+           ,(format "Display BUFFER in workspace %d in a horizontal split." workspace-idx)
+           (let* ((target-frame (exwm-workspace--workspace-from-frame-or-index ,workspace-idx))
+                  (target-window (frame-selected-window target-frame))
+                  (next-to-target-window (next-window target-window 'nomini target-frame)))
+             (cond
+              ;; reuse target-window displaying same buffer
+              ((string= (buffer-name (window-buffer target-window))
+                        (if (stringp buffer) buffer (buffer-name buffer)))
+               (window--display-buffer buffer target-window 'reuse alist))
+              ;; reuse next-to-target-window
+              ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
+               (window--display-buffer buffer next-to-target-window 'reuse alist))
+              ;; split unconditionally
+              (t (let ((new-window (split-window-no-error target-window nil 'below)))
+                   (when new-window
+                     (setq new-window (window--display-buffer buffer new-window 'window alist))
+                     (balance-windows-area)
+                     new-window))))))))
+
 (defun ram-create-display-buffer-in-same-monitor-horiz-split-alist-element (test-buffer-p)
   "Return an element to be added to `display-buffer-alist'.
 
@@ -1816,6 +1846,16 @@ displaying TEST-BUFFER-P buffer."
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
                   (eq 'org-mode mode)))
               8 2))
+
+;;****** buffers/display/alist: org-roam dailies
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (or (string-match-p "^CAPTURE-[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org" buf-name)
+                      (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org" buf-name))))
+              7))
 
 ;;****** buffers/display/alist: eshell, dired
 
