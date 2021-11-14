@@ -956,7 +956,22 @@ succession."
   "Return regex to capture definitions for MAJOR-MODE."
   (cond
    ((eq major-mode 'emacs-lisp-mode)
-    (format "^(\\(def\\(?:un\\|var\\|ine-minor-mode\\|macro\\) +%s\\)" name-regex))
+    (rx line-start
+        (or
+         (seq "("
+              (group (or
+                      "defconst"
+                      "defcustom"
+                      "define-abbrev-table"
+                      "define-error"
+                      "defun"
+                      "defvar"
+                      "define-minor-mode"
+                      "defmacro"
+                      "cl-defstruct"
+                      "cl-defmethod")
+                     (+ space)          ; 1 or more whitespaces
+                     (regexp name-regex))))))
    ((eq major-mode 'racket-mode)
     (format "^(\\(def\\(?:ine\\) +%s\\)" name-regex))
    (t (error (format "%s is not supported, add regex to `ram-jump-to-def'" major-mode)))))
@@ -965,7 +980,7 @@ succession."
   "Jump to def."
   (interactive
    (let ((defs '())
-         (def-regex (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f]+\\)"))
+         (def-regex (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)"))
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
          (hist-item (car ram-jump-to-def-history))
          (str-at-point (thing-at-point 'symbol)))
