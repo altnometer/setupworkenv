@@ -108,6 +108,7 @@ python-*-docs-html
 .mc-lists.el
 transient/
 racket-mode/
+abbrev-defs
 
 # Private directory
 private/
