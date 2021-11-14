@@ -2613,14 +2613,26 @@ If the property is already set, replace its value."
 (define-key global-map (kbd "s-c t") #'org-roam-dailies-goto-tomorrow)
 (define-key global-map (kbd "s-c y") #'org-roam-dailies-goto-yesterday)
 
-;; org-roam-dailies-capture-today
-;; org-roam-dailies-goto-today
-;; you can navigate to it with note-find
-;; org-roam-dailies-capture-date
-;; org-roam-dailies-goto-date
-;; org-roam-dailies-goto-next-note
-;; org-roam-dailies-goto-previous-note
-;; bind-key-map org-roam-dailies-map
+;;** org-roam: weeklies
+
+;;** org-roam/ram-weeklies: settings
+
+(setq ram-org-roam-weeklies-directory "./weekly/")
+(defun ram-org-roam-weeklies--capture (time &optional goto)
+  "Capture an entry in a weekly-note for TIME, creating it if necessary.
+When GOTO is non-nil, go to the note without creating an entry."
+  (let ((org-roam-directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
+    (org-roam-capture- :goto (when goto '(4))
+                       :node (org-roam-node-create)
+                       :templates ram-org-roam-weeklies-capture-templates
+                       :props (list :override-default-time time))
+    ;; (when goto (run-hooks 'ram-org-roam-dailies-find-file-hook))
+    ))
+
+(setq ram-org-roam-weeklies-capture-templates
+      '(("d" "default" entry "* %?"
+         :target (file+head "%<%Y-%U>.org" "#+TITLE: %<%Y-%U>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n"))))
+
 
 ;;* outline, headings, headlines
 
