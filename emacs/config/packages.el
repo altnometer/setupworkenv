@@ -5269,15 +5269,14 @@ That is, remove a non kept dired from the recent list."
 
 ;;** system: whitespace
 
-(setq-default
- show-trailing-whitespace t)
-(add-hook 'cider-test-report-mode-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
-(add-hook 'buffer-menu-mode-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
-(add-hook 'minibuffer-setup-hook #'(lambda () (setq-default show-trailing-whitespace nil)))
-(add-hook 'eshell-mode-hook #'(lambda () (setq-default show-trailing-whitespace t)))
+(setq-default show-trailing-whitespace t)
+(add-hook 'cider-test-report-mode-hook #'(lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'buffer-menu-mode-hook #'(lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'minibuffer-setup-hook #'(lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'eshell-mode-hook #'(lambda () (setq show-trailing-whitespace t)))
 
 ;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
-(remove-hook 'before-save-hook 'delete-trailing-whitespace)
+;; (remove-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;;* Navigate marks
 
