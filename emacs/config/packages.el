@@ -385,16 +385,6 @@ Disable `icomplete-vertical-mode' for this command."
 
 (define-key ram-leader-map-tap-global (kbd "n") 'comint-dynamic-complete-filename)
 
-(defun ram-edit-abbrev-file ()
-  "Open ram-abbrev.el file. If it is current, close it."
-  (interactive)
-  (if (string= "ram-abbrev.el" (buffer-name (window-buffer (selected-window))))
-      (if (= 1 (count-windows nil))
-          (switch-to-prev-buffer)
-        (delete-window))
-    (find-file "~/.emacs.d/lisp/ram-abbrev.el")))
-
-(define-key ram-leader-map-tap-global (kbd "a") #'ram-edit-abbrev-file)
 (define-key ram-leader-map-tap-global (kbd "i") 'completion-at-point)
 (define-key ram-leader-map-tap-global (kbd "w") #'widen)
 
