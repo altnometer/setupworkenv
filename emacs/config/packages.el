@@ -2109,10 +2109,26 @@ it can be passed in POS."
   (define-key org-mode-map (kbd "M-h") (lambda () (interactive) (push-mark) (org-mark-element)))
   (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~))
 
-;;** org-mode: common settings
+;;** org-mode: settings
+
+;; toggle it with "C-c C-x \" or "M-x org-toggle-pretty-entities"
+(setq org-pretty-entities t)
 
 (with-eval-after-load "org"
   (add-to-list 'org-tags-exclude-from-inheritance "project"))
+
+;;*** org-mode/settings: tags
+
+(setq org-tag-alist '((:startgroup . nil)
+                      ("@work" . ?w) ("@home" . ?h)
+                      ("@tennisclub" . ?t)
+                      (:endgroup . nil)
+                      (:newline . nil)
+                      ("learn" . ?l) ("pc" . ?p)))
+(setq org-fast-tag-selection-single-key 'expert)
+
+
+;;** org-mode: hooks, advice, timers
 
 (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
@@ -2122,6 +2138,17 @@ it can be passed in POS."
   (when (derived-mode-p 'org-mode)
     (zp/org-set-last-modified)))
 (add-hook 'before-save-hook #'ram-org-set-last-modified-in-save-hook)
+
+;;** org-mode: syntax-table
+
+(defun ram-org-mode-syntax-table-update ()
+  "Update `org-mode-syntax-table'."
+  ;; the default is word constituent, breaks expansion
+  (modify-syntax-entry ?' "'" org-mode-syntax-table)
+  ;; the default is symbol constituent, breaks expansion
+  (modify-syntax-entry ?~ "'" org-mode-syntax-table))
+
+(add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
 
 ;;** org-mode: faces, fonts
 
@@ -2175,11 +2202,6 @@ it can be passed in POS."
 ;;   (font-lock-add-keywords nil '(("\"\\(\\(?:.\\|\n\\)*?[^\\]\\)\"" 0 font-lock-string-face))))
 
 ;; (add-hook 'text-mode-hook 'add-quotes-to-font-lock-keywords)
-
-;;** org-mode: syntax-table
-
-(with-eval-after-load "org"
-  (modify-syntax-entry ?' "'" org-mode-syntax-table))
 
 ;;** org-mode: structure-templates
 
@@ -2340,6 +2362,8 @@ This function is created to identify TODO items in agenda buffers.
         (todo . " %i %(ram-make-org-doc-category-identifier 16) ")
         (tags . " %i %(ram-make-org-doc-category-identifier 16) ")
         (search . " %i %(ram-make-org-doc-category-identifier 16) ")))
+
+(setq org-agenda-restore-windows-after-quit t)
 
 ;;** org-agenda: hooks, advice, timers
 
