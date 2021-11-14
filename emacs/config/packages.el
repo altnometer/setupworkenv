@@ -4862,11 +4862,11 @@ That is, remove a non kept dired from the recent list."
  '(which-key :type git :flavor melpa :host github :repo "justbur/emacs-which-key"))
 (run-with-idle-timer 1 nil (lambda () (which-key-mode t)))
 
-;;* Spelling
+;;* spelling
 
-;;** flycheck
+;;** spelling: flycheck
 
-;;*** flycheck settings
+;;*** spelling/flycheck: settings
 
 ;; credit to https://joelkuiper.eu/spellcheck_emacs
 (dolist (hook '(text-mode-hook
@@ -4887,7 +4887,7 @@ That is, remove a non kept dired from the recent list."
   (flyspell-goto-next-error)
   (ispell-word))
 
-;;*** flycheck bindings
+;;*** spelling/flycheck: binding
 
 (with-eval-after-load "flyspell"
   (define-key flyspell-mode-map (kbd "C-,") nil)
@@ -4900,7 +4900,7 @@ That is, remove a non kept dired from the recent list."
   ;; (define-key global-map (kbd "C-H-E") 'flycheck-previous-error)
 
 
-;;*** flyspell-goto-previous-error
+;;*** spelling/flycheck: functions
 
 ;; move point to previous error
 ;; based on code by hatschipuh at
@@ -4945,6 +4945,7 @@ That is, remove a non kept dired from the recent list."
 
 (define-key global-map (kbd "<M-f11>") 'flyspell-goto-previous-error)
 
+;;*** spelling: auto-correct with ispell and abbrev
 ;;* System
 
 ;;** system: associate major-mode with file names
