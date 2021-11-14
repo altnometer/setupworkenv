@@ -1,5 +1,8 @@
 ;; packages.el --- Package configuration -*- lexical-binding: t -*-
 
+(set-language-environment "UTF-8")
+;; (set-language-environment "Latin-1")
+
 (defconst large-sreen-width 3840
   "`large-sreen-width' value indicates when to use settings for large screens")
 
