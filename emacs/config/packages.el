@@ -2594,11 +2594,19 @@ If the property is already set, replace its value."
 ;; relative to org-roam-directory
 (setq org-roam-dailies-directory "./daily/")
 
+;;*** org-roam: dailies: capture-templates
+
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry "* %?"
-           :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n")))))
+           :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n")
+           :properties (:empty-lines-before 1
+                                            :empty-lines 1
+                                            :unnarrowed t
+                                            :kill-buffer nil
+                                            :no-save nil)))))
+
 
 ;; these command are ###autoload and 'org-roam-dailies-map is not
 ;; (with-eval-after-load "org-roam-dailies"
