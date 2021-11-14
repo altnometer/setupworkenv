@@ -5187,8 +5187,10 @@ That is, remove a non kept dired from the recent list."
 
 ;;*** system/general settings: language
 
-(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
 
 ;;*** system/general settings: *scratch*
 
