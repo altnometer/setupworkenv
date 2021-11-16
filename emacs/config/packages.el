@@ -2886,7 +2886,7 @@ If the property is already set, replace its value."
 
 ;;** org-roam: dailies
 
-;;*** org-roam: dailies: functions
+;;*** org-roam/dailies: functions
 
 (defun ram-buffer-is-from-roam-dailies-directory-p ()
   "Return non-nil if the currently visited buffer is from `org-roam-dailies-directory'."
@@ -2895,12 +2895,12 @@ If the property is already set, replace its value."
         (expand-file-name (file-name-as-directory org-roam-dailies-directory))
         (file-name-directory buffer-file-name))))
 
-;;*** org-roam: dailies: settings
+;;*** org-roam/dailies: settings
 
 ;; relative to org-roam-directory
 (setq org-roam-dailies-directory "./daily/")
 
-;;*** org-roam: dailies: capture-templates
+;;*** org-roam/dailies: capture-templates
 
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
@@ -2913,6 +2913,7 @@ If the property is already set, replace its value."
                                             :kill-buffer nil
                                             :no-save nil)))))
 
+;;*** org-roam/dailies: bindings
 
 ;; these command are ###autoload and 'org-roam-dailies-map is not
 ;; (with-eval-after-load "org-roam-dailies"
