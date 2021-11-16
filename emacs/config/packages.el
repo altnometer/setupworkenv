@@ -2920,13 +2920,14 @@ If the property is already set, replace its value."
 ;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
-(define-key global-map (kbd "s-c .") #'org-roam-dailies-find-directory)
 (define-key global-map (kbd "s-c f") #'org-roam-dailies-goto-next-note)
 (define-key global-map (kbd "s-c b") #'org-roam-dailies-goto-previous-note)
 (define-key global-map (kbd "s-c c") #'org-roam-dailies-goto-date)
-(define-key global-map (kbd "s-c v") #'org-roam-dailies-capture-date)
+(define-key global-map (kbd "s-c C") #'org-roam-dailies-capture-date)
 (define-key global-map (kbd "s-c t") #'org-roam-dailies-goto-tomorrow)
+(define-key global-map (kbd "s-c T") #'org-roam-dailies-capture-tomorrow)
 (define-key global-map (kbd "s-c y") #'org-roam-dailies-goto-yesterday)
+(define-key global-map (kbd "s-c T") #'org-roam-dailies-capture-yesterday)
 
 ;;** org-roam: weeklies
 
