@@ -4627,39 +4627,20 @@ been modified since its last check-in."
   "Run `after-load-theme-hook'."
   (run-hooks 'after-load-theme-hook))
 
-;;* themes: doom
-;; (straight-use-package
-;;  '(doom-themes :type git :flavor melpa :files (:defaults "themes/*.el" "doom-themes-pkg.el") :host github :repo "hlissner/emacs-doom-themes"))
-;; Global settings (defaults)
-;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-;;       doom-themes-enable-italic t)
-                                        ; if nil, italics is universally disabled
-;; (load-theme 'doom-one t)
+;;** themes: modus-themes
 
-;; Corrects (and improves) org-mode's native fontification.
-;; (doom-themes-org-config)
+;; consult https://protesilaos.com/emacs/modus-themes for customization
+;; starting Emacs 28.1 the Modus themes are built in.
 
-;; Enable flashing mode-line on errors
-;; (doom-themes-visual-bell-config)
-
-;;* themes: sanityinc-tomorrow-night
-;; check enabled themes in custom-enabled-themes
-(straight-use-package
- '(color-theme-sanityinc-tomorrow :type git :flavor melpa :host github :repo "purcell/color-theme-sanityinc-tomorrow"))
-;; (load-theme 'sanityinc-tomorrow-night t nil)
-;; (load-theme 'sanityinc-tomorrow-day t)
-
-;;* themes: modus-vivendi-theme
-(straight-use-package
- '(modus-operandi-theme :type git :flavor melpa :files
-                       ("modus-operandi-theme.el" "modus-operandi-theme-pkg.el") :host gitlab :repo "protesilaos/modus-themes"))
-
-;; (load-theme 'modus-vivendi t)
 (progn
   ;; (setq modus-operandi-theme-diffs nil)
   (setq modus-operandi-theme-diffs 'desaturated)
   ;; (setq modus-operandi-theme-diffs 'fg-only)
- (load-theme 'modus-operandi t))
+  ;; (setq modus-themes-hl-line '(accented intense underline))
+  (setq modus-themes-hl-line '(accented underline))
+  (load-theme 'modus-operandi)
+  ;; (load-theme 'modus-vivendi)
+  )
 
 ;;* search
 
