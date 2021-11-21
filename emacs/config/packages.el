@@ -527,7 +527,8 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;;* emacs-lisp elisp
 
-(add-hook 'emacs-lisp-mode-hook (lambda () (outline-hide-sublevels 1)))
+;; (add-hook 'emacs-lisp-mode-hook #'(lambda () (outline-hide-sublevels 1)))
+(add-hook 'emacs-lisp-mode-hook #'ram-remap-hl-line-face-in-find-file-hook)
 (define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
 
 ;; display eval result inline, use cider for that
@@ -2851,13 +2852,20 @@ If the property is already set, replace its value."
 
 ;;** org-roam: hooks, advice, timers
 
-;; current implementation of X'ram-update-all-org-roam-files-for-todo-items
-;; would crush Emacs at startup if run with #'run-at-time
-;;(run-at-time 2 nil #'ram-update-all-org-roam-files-for-todo-items)
+;; !!! 'org-capture-before-finalize-hook is set to nil in org-capture-kill
+;; (add-hook 'org-capture-before-finalize-hook #'ram-remove-face-remapping)
+(add-hook 'org-capture-prepare-finalize-hook #'ram-remove-face-remapping)
 
-;; adding to this hook fails creating new notes, see daily notes for 2021-10-24
+;; !!! why not use hooks specific to org or org-roam buffers
 (add-hook 'find-file-hook #'ram-update-org-roam-tag-if-contains-todos)
 (add-hook 'before-save-hook #'ram-update-org-roam-tag-if-contains-todos)
+
+;; it fires even when you open a daily note (or yesterday)
+;; (add-hook 'org-roam-capture-new-node-hook #'ram-set-face-remapping-alist-capture-new-node)
+
+(add-hook 'org-roam-find-file-hook #'ram-remap-hl-line-face-in-find-file-hook)
+
+(add-hook 'org-capture-mode-hook #'ram-add-remap-face-to-hl-line-in-capture-hook)
 
 ;;** org-roam: capture-templates
 
@@ -5502,13 +5510,78 @@ That is, remove a non kept dired from the recent list."
 
 ;;*** system/general settings: hl (highlight) line
 
+(defun ram-remap-hl-line-face-in-find-file-hook ()
+  "Add face remap for `hl-line' face.
+
+This face remap is supposed to identify different buffer types.
+
+Call this function from a \".*-mode-hook\" type
+of hooks."
+  (when (not (boundp 'ram-face-remapping-cookie))
+    (defvar ram-face-remapping-cookie nil
+      "Hold the return value of `face-remap-add-relative'."))
+  (make-local-variable 'ram-face-remapping-cookie)
+  (cond
+   ;; org-roam dailies note
+   ((string-match "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org$" (buffer-name))
+    (let ((new-face '(:background "LightSteelBlue1" :underline "LightSteelBlue3" :extend t)))
+      (when (not (member new-face (cdr (assoc 'hl-line face-remapping-alist))))
+        (face-remap-add-relative 'hl-line new-face))))
+   ;; org-roam note
+   ((string-match "^20[0-9]\\{12\\}-[^[:space:]]+\\.org$" (buffer-name))
+    (let ((new-face '(:background "DarkSeaGreen1" :underline "DarkSeaGreen3" :extend t)))
+      (when (not (member new-face (cdr (assoc 'hl-line face-remapping-alist))))
+        (face-remap-add-relative 'hl-line new-face))))
+   ((derived-mode-p 'prog-mode)
+    (let ((new-face '(:background "LemonChiffon1" :underline "LemonChiffon3" :extend t)))
+      (when (not (member new-face (cdr (assoc 'hl-line face-remapping-alist))))
+        (face-remap-add-relative 'hl-line new-face))))
+   ;; (t (message "hl-line face remapping is not define for %s buffer modes" (buffer-local-value 'major-mode (current-buffer))))
+   (t (message "hl-line face remapping is not define for \"%s\" buffer modes" major-mode))))
+
+(defun ram-add-remap-face-to-hl-line-in-capture-hook ()
+  "Add face remap for `hl-line' face.
+
+This face remap is supposed to identify buffers where
+`org-capture-mode' is a minor mode.
+
+The function sets buffer-local `ram-face-remapping-cookie'
+variable to the `face-remap-add-relative' return value. Use this
+variable to remove the face."
+  (when (not (boundp 'ram-face-remapping-cookie))
+    (defvar ram-face-remapping-cookie nil
+      "Hold the return value of `face-remap-add-relative'."))
+  (make-local-variable 'ram-face-remapping-cookie)
+  (setq ram-face-remapping-cookie
+        (face-remap-add-relative 'hl-line
+                                 '(:background "thistle1"
+                                               :underline "thistle3"
+                                               :extend t))))
+
+(defun ram-remove-face-remapping ()
+  "Removes remap face identified by `ram-face-remapping-cookie'.
+
+Call `face-remap-remove-relative' with a value stored in
+buffer-local `ram-face-remapping-cookie'."
+  (when (not (boundp 'ram-face-remapping-cookie))
+    (defvar ram-face-remapping-cookie nil
+      "Hold the return value of `face-remap-add-relative'."))
+  (make-local-variable 'ram-face-remapping-cookie)
+  (when ram-face-remapping-cookie
+    (face-remap-remove-relative ram-face-remapping-cookie)
+    (setq ram-face-remapping-cookie nil)))
+
 ;; (setq nlinum-highlight-current-line t)
 ;; (setq-default display-line-numbers t)
-;; highlght the current line only in gui.
 
-;; I disable line highlighting for the nth time already
-;; (when window-system (global-hl-line-mode t))
-
+;; (setq hl-line-range-function #'(lambda () (cons (line-beginning-position) (line-beginning-position 2))))
+;; (set-face-attribute 'hl-line nil :inherit nil :background "LightCyan1" :underline "LightCyan3" :extend t)
+;; !!! exwm would no load if this option is
+;; apparently a backtrace is displayed which is off screen,
+;; pressing 'q' or 'C-x k' would continue exwm loading. But it will load with limited functionality.
+;; (add-hook 'after-load-theme-hook
+;;           (set-face-attribute 'hl-line nil :inherit nil :background "LemonChiffon1" :underline "LemonChiffon3" :extend t))
+(when window-system (global-hl-line-mode 1))
 ;; (global-hl-line-mode)
 
 ;;*** system/general settings: backup files
