@@ -1259,13 +1259,14 @@ succession."
     (goto-char val)
     (beginning-of-line)
     (recenter)
-    (let ((default (if (boundp pulse-flag)
-                       pulse-flag
-                     nil)))
-      ;; pulse-iteration pulse-delay
-      (setq pulse-flag nil)
-      (pulse-momentary-highlight-one-line (point) 'isearch)
-      (setq pulse-flag default))))
+    ;; (let ((default (if (boundp pulse-flag)
+    ;;                    pulse-flag
+    ;;                  nil)))
+    ;;   ;; pulse-iteration pulse-delay
+    ;;   (setq pulse-flag nil)
+    ;;   (pulse-momentary-highlight-one-line (point) 'isearch)
+    ;;   (setq pulse-flag default))
+    ))
 
 ;; (eval-after-load "org"
 ;;   '(define-key org-mode-map (kbd "<M-f5>") 'ram-jump-to-outline))
@@ -1351,13 +1352,16 @@ succession."
     (goto-char val)
     (beginning-of-line)
     (recenter)
-    (let ((default (if (boundp pulse-flag)
-                       pulse-flag
-                     nil)))
-      ;; pulse-iteration pulse-delay
-      (setq pulse-flag nil)
-      (pulse-momentary-highlight-one-line (point) 'isearch)
-      (setq pulse-flag default))))
+
+    ;; (let ((default (if (boundp pulse-flag)
+    ;;                    pulse-flag
+    ;;                  nil)))
+    ;;   ;; pulse-iteration pulse-delay
+    ;;   (setq pulse-flag nil)
+    ;;   (pulse-momentary-highlight-one-line (point) 'isearch)
+    ;;   (setq pulse-flag default))
+
+    ))
 
 (define-key emacs-lisp-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
 
