@@ -2436,7 +2436,12 @@ it can be passed in POS."
   ;; originally bound to 'org-table-copy-down
   (define-key org-mode-map (kbd "<S-return>") 'newline-and-indent)
   (define-key org-mode-map (kbd "M-h") (lambda () (interactive) (push-mark) (org-mark-element)))
-  (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~))
+  (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~)
+
+  (define-key org-mode-map (kbd "s-R") #'ram-avy-goto-org-heading)
+
+  (define-key org-mode-map (kbd "C-c C-S-L") #'org-store-link)
+  (define-key org-mode-map (kbd "C-c C-l") #'org-insert-link))
 
 ;;** org-mode: settings
 
@@ -2456,10 +2461,17 @@ it can be passed in POS."
                       ("learn" . ?l) ("pc" . ?p)))
 (setq org-fast-tag-selection-single-key 'expert)
 
+;;*** org-mode/settings: tags
+
+;; enable org-indent-mode for every file
+;; per file sittings: #+STARTUP: indent, #+STARTUP: noindent
+(setq org-startup-indented t)
+(setq org-indent-mode-turns-on-hiding-stars nil)
+(setq org-indent-mode-turns-off-org-adapt-indentation t)
 
 ;;** org-mode: hooks, advice, timers
 
-(add-hook 'org-mode-hook 'org-indent-mode)
+;; (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
 (add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
