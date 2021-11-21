@@ -1294,6 +1294,7 @@ succession."
                       "defvar"
                       "define-minor-mode"
                       "defmacro"
+                      "cl-defun"
                       "cl-defstruct"
                       "cl-defmethod")
                      (+ space)          ; 1 or more whitespaces
