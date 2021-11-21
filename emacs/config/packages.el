@@ -1621,7 +1621,7 @@ instead."
   ;;         orderless-literal))
   (setq orderless-matching-styles
         '(orderless-regexp))
-          ;; orderless-initialism
+  ;; orderless-initialism
 
 
   (defun prot/orderless-literal-dispatcher (pattern _index _total)
@@ -1634,9 +1634,7 @@ instead."
 
   (setq orderless-style-dispatchers
         '(prot/orderless-literal-dispatcher
-          prot/orderless-initialism-dispatcher))
-  (add-hook 'minibuffer-exit-hook
-            'orderless-remove-transient-configuration))
+          prot/orderless-initialism-dispatcher)))
 
 ;;* frame, window, buffer, sentence
 
