@@ -2969,7 +2969,15 @@ If the property is already set, replace its value."
 (define-key global-map (kbd "s-c t") #'org-roam-dailies-goto-tomorrow)
 (define-key global-map (kbd "s-c T") #'org-roam-dailies-capture-tomorrow)
 (define-key global-map (kbd "s-c y") #'org-roam-dailies-goto-yesterday)
-(define-key global-map (kbd "s-c T") #'org-roam-dailies-capture-yesterday)
+(define-key global-map (kbd "s-c Y") #'org-roam-dailies-capture-yesterday)
+
+;;** org-roam/dailies: hooks, advice, timers
+
+;; (add-hook 'find-file-hook #'ram-set-face-remapping-alist)
+;; (remove-hook 'find-file-hook #'ram-set-face-remapping-alist)
+
+;; (add-hook 'org-roam-dailies-find-file-hook #'ram-set-face-remapping-alist)
+;; (remove-hook 'org-roam-dailies-find-file-hook #'ram-set-face-remapping-alist)
 
 ;;** org-roam: weeklies
 
