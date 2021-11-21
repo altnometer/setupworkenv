@@ -4824,60 +4824,6 @@ confines of word boundaries (e.g. multiple words)."
 
 (define-key global-map (kbd "s-c S") #'deft)
 (define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
-;;** packages: ace-link
-
-(straight-use-package
- '(ace-link :type git :flavor melpa :host github :repo "abo-abo/ace-link"))
-
-;;** packages: deft
-
-;; https://github.com/jrblevin/deft
-;; deft is for quickly browsing, filtering, and editing directories of notes.
-
-;;*** packages/deft: settings
-
-;;**** packages/deft/settings: basic
-
-;; https://github.com/jrblevin/deft#basic-customization
-
-(setq deft-extensions '("org"))
-(setq deft-directory org-roam-directory)
-;; (setq deft-ignore-file-regexp "your regex here")
-;; (setq deft-recursive t)
-(setq deft-recursive nil)
-;; (setq deft-recursive-ignore-dir-regex "daily")
-;; (setq deft-strip-title-regexp "your regex here")
-
-;;**** packages/deft/settings: reading files
-
-;; https://github.com/jrblevin/deft#reading-files
-
-;; (setq deft-parse-title-function 'your-title-parsing-function)
-;; (setq deft-use-filename-as-title t)
-;; (setq deft-strip-summary-regexp "your regex here")
-
-;;**** packages/deft/settings: other
-
-;; deft-toggle-sort-method
-;; (setq deft-current-sort-method 'title)
-
-;; nil would make regexp search
-;; (setq deft-incremental-search t)
-
-(straight-use-package
- '(deft :type git :flavor melpa :host github :repo "jrblevin/deft"))
-
-;;**** packages/deft: functions
-
-(defun ram-deft-search-daily-notes ()
-  "Invoke `deft' after setting `deft-directory' to `org-roam-dailies-directory'"
-  (interactive)
-  (let ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
-    (call-interactively 'deft)))
-
-
-(define-key global-map (kbd "s-c S") #'deft)
-(define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
 
 ;;** packages: diff
 
