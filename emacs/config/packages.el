@@ -83,16 +83,16 @@ abort completely with `C-g'."
 
 ;; credit to http://ergoemacs.org/emacs/emacs_abbrev_mode.html
 
-(clear-abbrev-table global-abbrev-table)
+;; (clear-abbrev-table global-abbrev-table)
 
-(define-abbrev-table 'global-abbrev-table
-  '(
-    ;; net addrev
-    ("1t" "first")
-    ("2d" "second")
-    ("3d" "third")
-    ("ty" "thank you")
-    ("ws" "□")))
+;; (define-abbrev-table 'global-abbrev-table
+;;   '(
+;;     ;; net addrev
+;;     ("1t" "first")
+;;     ("2d" "second")
+;;     ("3d" "third")
+;;     ("ty" "thank you")
+;;     ("ws" "□")))
 
 ;;** abbrev: clojure-mode-abbrev-table
 
@@ -176,6 +176,9 @@ abort completely with `C-g'."
           ("ags" "arguments")
           ("app" "application")
           ("appd" "applied")
+
+          ("bl" "buffer-local")
+
           ("bc" "because")
           ("bf" "before")
           ("bh" "behavior")
@@ -188,16 +191,26 @@ abort completely with `C-g'."
           ("charz" "characterize")
           ("charzd" "characterized")
           ("charc" "characteristic")
-          ("con" "continuation")
           ("cm" "computer")
+
           ("comn" "computation")
           ("comp" "compute")
+          ("comd" "command")
+
+          ("comds" "commands")
+
+          ("con" "continuation")
+
+          ("conf" "configure")
+          ("confd" "configured")
+          ("confn" "configuration")
 
           ("dec" "declare")
           ("decn" "declaration")
           ("def" "definition")
           ("df" "different")
           ("dfc" "difference")
+          ("dfl" "default")
 
           ("el" "element")
           ("els" "elements")
@@ -253,10 +266,12 @@ abort completely with `C-g'."
           ("occ" "occurrence")
           ("occs" "occurrences")
 
+          ("oa" "org-agenda")
+
           ("par" "parentheses")
           ("pg" "program")
           ("pgn" "programming")
-        
+
           ("pr" "procedure")
           ("prs" "procedures")
           ("prop" "property")
@@ -290,6 +305,9 @@ abort completely with `C-g'."
           ("rnd" "returned")
           ("rng" "returning")
           ("rns" "returns")
+
+          ("spec" "specification")
+          ("specs" "specifications")
 
           ("sm" "symbol")
           ("sms" "symbols")
