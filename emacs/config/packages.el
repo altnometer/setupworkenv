@@ -3950,7 +3950,6 @@ If there is no Clojure REPL, send warning."
   (add-to-list 'super-save-triggers 'winner-undo)
   (add-to-list 'super-save-triggers 'winner-redo)
   (add-to-list 'super-save-triggers 'counsel-M-x)
-  (add-to-list 'super-save-triggers 'ram-edit-abbrev-file)
 
   (add-to-list 'super-save-triggers #'org-roam-node-find)
 
