@@ -3052,10 +3052,10 @@ When GOTO is non-nil, go to the note without creating an entry."
     (outline-forward-same-level 1))
 
 (defun ram-outline-up-heading (arg &optional invisible-ok)
-  "Like `outline-up-heading' but do not raise error.
+  "Call `outline-up-heading' and ignore the error.
 
-Call `outline-backward-same-level' instead of raising"
-"Already at top level of the outline"
+Ignore \"Already at top level of the outline\" error, call
+`outline-backward-same-level' instead."
 (interactive "p")
 (condition-case err
     (outline-up-heading 1 t)
@@ -3063,7 +3063,19 @@ Call `outline-backward-same-level' instead of raising"
                       "Already at top level of the outline")
              (outline-backward-same-level arg)
            (signal (car err) (cdr err))))))
-;; (error "Already at top level of the outline")
+
+(defun ram-outline-forward-same-level (arg &optional invisible-ok)
+  "Call `outline-forward-same-level' and ignore the error.
+
+Ignore \"No following same-level heading\" error, call
+`prot/outline-down-heading' instead."
+  (interactive "p")
+  (condition-case err
+      (outline-forward-same-level arg)
+    (error (if (string= (error-message-string err)
+                        "No following same-level heading")
+               (prot/outline-down-heading)
+             (signal (car err) (cdr err))))))
 
 ;;** outline: bindings
 
@@ -3072,7 +3084,7 @@ Call `outline-backward-same-level' instead of raising"
 
 (define-key ram-leader-map-tap-global (kbd "n") #'outline-next-visible-heading)
 (define-key ram-leader-map-tap-global (kbd "p") #'outline-previous-visible-heading)
-(define-key ram-leader-map-tap-global (kbd "f") #'outline-forward-same-level)
+(define-key ram-leader-map-tap-global (kbd "f") #'ram-outline-forward-same-level)
 (define-key ram-leader-map-tap-global (kbd "b") #'outline-backward-same-level)
 (define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
 (define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
