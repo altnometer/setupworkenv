@@ -3547,17 +3547,6 @@ heading to appear."
 
 ;;* avy
 
-;;   (setq avy-orders-alist
-;;         '((avy-goto-char . avy-order-closest)
-;;           (avy-goto-char-2 . avy-order-closest)
-;;           (avy-goto-word-1 . avy-order-closest)
-;;           (lispy-ace-paren . ram-avy-order-furthest)
-;;           (lispy-ace-char . avy-order-closest)
-;;           (lispy-ace-symbol . avy-order-closest)
-;;           (lispy-ace-subword . avy-order-closest)
-;;           (ram-avy-goto-subword-2 . avy-order-closest)
-;;           (ram-avy-goto-paragraph-start . ram-avy-order-furthest)))
-
 ;;   (setq avy-dispatch-alist
 ;;         '((?- . avy-action-kill-move)
 ;;           (?! . avy-action-kill-stay)
@@ -3571,159 +3560,184 @@ heading to appear."
 (straight-use-package
  '(avy :type git :flavor melpa :host github :repo "abo-abo/avy"))
 
-(with-eval-after-load 'avy
-  (setq avy-all-windows nil)
-  ;; avy-lead-face-0
-  ;; Dim all windows when displaying overlay for targets
-  (setq avy-background t)
-  (setq avy-timeout-seconds 0.4)
-  ;; (setq highlight-first t)
-  ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-keys-alist#avy-keys
-  (setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d))
-  ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-style
-  (setq avy-style 'at-full)
-  (setq avy-styles-alist '(
-                           ;; (avy-goto-char-2 . post)
-                           (avy-goto-word-1 . at-full)
-                           ;; (avy-goto-char-2 . pre)
-                           (avy-goto-char-2 . at-full)
-                           (avy-goto-char-timer . at-full)
-                           (ram-avy-goto-subword-2 . at-full)
-                           (ram-avy-goto-paragraph-start . post)))
+(setq avy-all-windows nil)
+;; avy-lead-face-0
+;; Dim all windows when displaying overlay for targets
+(setq avy-background t)
+(setq avy-timeout-seconds 0.4)
+;; (setq highlight-first t)
+;; https://github.com/abo-abo/avy/wiki/defcustom#avy-keys-alist#avy-keys
+(setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d))
+;; https://github.com/abo-abo/avy/wiki/defcustom#avy-style
+(setq avy-style 'at-full)
+(setq avy-styles-alist '(
+                         ;; (avy-goto-char-2 . post)
+                         (avy-goto-word-1 . at-full)
+                         ;; (avy-goto-char-2 . pre)
+                         (avy-goto-char-2 . at-full)
+                         (avy-goto-char-timer . at-full)
+                         (ram-avy-goto-paragraph-start . post)))
 
-  ;; (setq avy-keys (nconc
-  ;;                     (number-sequence ?1 ?9)
-  ;;                     '(?0)))
+;; (setq avy-keys (nconc
+;;                     (number-sequence ?1 ?9)
+;;                     '(?0)))
 
-  (setq avy-orders-alist
-        '((avy-goto-char . avy-order-closest)
-          (avy-goto-char-2 . avy-order-closest)
-          (avy-goto-word-1 . avy-order-closest)
-          ;; (lispy-ace-paren . ram-avy-order-furthest)
-          ;; (lispy-ace-paren . ram-avy-order-from-beg-of-defun)
-          (lispy-ace-paren . ram-avy-order-from-end-of-defun)
-          (lispy-ace-char . avy-order-closest)
-          (lispy-ace-symbol . avy-order-closest)
-          (lispy-ace-subword . avy-order-closest)
-          (ram-avy-goto-subword-2 . avy-order-closest)
-          (ram-avy-goto-paragraph-start . ram-avy-order-furthest)))
+(setq avy-orders-alist
+      '((avy-goto-char . avy-order-closest)
+        (avy-goto-char-2 . avy-order-closest)
+        (avy-goto-word-1 . avy-order-closest)
+        ;; (lispy-ace-paren . ram-avy-order-furthest)
+        ;; (lispy-ace-paren . ram-avy-order-from-beg-of-defun)
+        (lispy-ace-paren . ram-avy-order-from-end-of-defun)
+        (lispy-ace-char . avy-order-closest)
+        (lispy-ace-symbol . avy-order-closest)
+        (lispy-ace-subword . avy-order-closest)
+        (ram-avy-goto-subword-2 . avy-order-closest)
+        (ram-avy-goto-paragraph-start . ram-avy-order-furthest)))
 
-  (setq avy-dispatch-alist
-        '((?- . avy-action-kill-move)
-          (?! . avy-action-kill-stay)
-          (?\' . avy-action-teleport)
-          (?` . avy-action-mark)
-          (?/ . avy-action-copy)
-          (?? . avy-action-yank)
-          (?. . avy-action-ispell)
-          (?# . avy-action-zap-to-char))))
+(setq avy-dispatch-alist
+      '((?- . avy-action-kill-move)
+        (?! . avy-action-kill-stay)
+        (?\' . avy-action-teleport)
+        (?` . avy-action-mark)
+        (?/ . avy-action-copy)
+        (?? . avy-action-yank)
+        (?. . avy-action-ispell)
+        (?# . avy-action-zap-to-char)))
 
 ;;** avy: custom commands
 ;; https://github.com/abo-abo/avy/wiki/custom-commands
-(with-eval-after-load "avy"
-  (defvar ram-avy--overlays-background nil
-    "Hold dimmed background overlays enabled before avy-goto-* commands.")
+(declare-function avy-prosses "avy")
+(defvar avy-background)
+(declare-function avy-jump "avy")
+(declare-function avy-goto-subword-0 "avy")
+;; this is the default value
+(defface avy-background-face
+  '((t (:foreground "gray40")))
+  "Face for whole window background during selection.")
 
-  (defun ram-avy-order-furthest (x)
-    "The furthest from the point gets the lowest value. Works
+(defvar ram-avy--overlays-background nil
+  "Hold dimmed background overlays enabled before avy-goto-* commands.")
+
+(defun ram-avy-order-furthest (x)
+  "The furthest from the point gets the lowest value. Works
 only for the selected window."
-    (- (max (abs (- (point) (window-start))) (abs (- (point) (window-end))))
-       (abs (- (caar x) (point)))))
+  (- (max (abs (- (point) (window-start))) (abs (- (point) (window-end))))
+     (abs (- (caar x) (point)))))
 
-  (defun ram-avy-order-from-beg-of-defun (x)
-    "Order from beginning of `defun'."
-    (abs (- (caar x) (save-excursion (beginning-of-defun) (point)))))
+(defun ram-avy-order-from-beg-of-defun (x)
+  "Order from beginning of `defun'."
+  (abs (- (caar x) (save-excursion (beginning-of-defun) (point)))))
 
-  (defun ram-avy-order-from-end-of-defun (x)
-    "Order from end of `defun'."
-    (abs (- (caar x) (save-excursion (end-of-defun) (point)))))
+(defun ram-avy-order-from-end-of-defun (x)
+  "Order from end of `defun'."
+  (abs (- (caar x) (save-excursion (end-of-defun) (point)))))
 
-  (defun ram-avy--done ()
-    "Clean up overlays."
-    (mapc #'delete-overlay ram-avy--overlays-background)
-    (setq ram-avy--overlays-background nil))
-  ;; (avy--remove-leading-chars)
+(defun ram-avy--done ()
+  "Clean up overlays."
+  (mapc #'delete-overlay ram-avy--overlays-background)
+  (setq ram-avy--overlays-background nil))
+;; (avy--remove-leading-chars)
 
 
-  (defun ram-avy--keyboard-quit-advice (fn &rest args)
-    (unwind-protect
-        (apply fn args)
-      (when ram-avy--overlays-background
-        (ram-avy--done))))
+(defun ram-avy--keyboard-quit-advice (fn &rest args)
+  (unwind-protect
+      (apply fn args)
+    (when ram-avy--overlays-background
+      (ram-avy--done))))
 
-  (advice-add 'keyboard-quit :around #'ram-avy--keyboard-quit-advice)
-  ;; (advice-add 'minibuffer-keyboard-quit :before #'ram-avy--done)
+(advice-add 'keyboard-quit :around #'ram-avy--keyboard-quit-advice)
+;; (advice-add 'minibuffer-keyboard-quit :before #'ram-avy--done)
 
-  (defun ram-avy--make-backgrounds ()
-    "Create dim a background overlay for selected window"
-    (when avy-background
-      (setq ram-avy--overlays-background
-            (mapcar (lambda (w)
-                      (let ((ol (make-overlay
-                                 (window-start w)
-                                 (window-end w)
-                                 (window-buffer w))))
-                        (overlay-put ol 'face 'avy-background-face)
-                        (overlay-put ol 'window w)
-                        ol))
-                    (list (selected-window))))))
+(defun ram-avy--make-backgrounds ()
+  "Create dim a background overlay for selected window"
+  (when avy-background
+    (setq ram-avy--overlays-background
+          (mapcar (lambda (w)
+                    (let ((ol (make-overlay
+                               (window-start w)
+                               (window-end w)
+                               (window-buffer w))))
+                      (overlay-put ol 'face 'avy-background-face)
+                      (overlay-put ol 'window w)
+                      ol))
+                  (list (selected-window))))))
 
-  (defun ram-avy-goto-subword-2 (char1 char2 &optional arg)
-    "Jump to the currently visible CHAR at a subword start.
+(defun ram-avy-goto-subword-2 (char1 char2 &optional arg)
+  "Jump to the currently visible CHAR at a subword start.
 The window scope is determined by `avy-all-windows' (ARG negates it)."
-    (interactive (list (read-char "char 1: " t)
-                       (read-char "char 2: " t)
-                       current-prefix-arg))
-    (avy-with ram-avy-goto-subword-2
-      (let ((char1 (downcase char1))
-            (char2 (downcase char2)))
-        (avy-goto-subword-0
-         arg (lambda ()
-               (and (char-after)
-                    (eq (downcase (char-after)) char1)
-                    (if (eq char2 ?*)
-                        t
-                      (save-excursion (forward-char) (eq (downcase (char-after)) char2)))))))))
-  ;; (add-to-list 'avy-styles-alist '(ram-avy-goto-subword-2 . at-full))
-  ;; (add-to-list 'avy-orders-alist '(ram-avy-goto-subword-2 . avy-orders-closest))
+  (interactive (list (read-char "char 1: " t)
+                     (read-char "char 2: " t)
+                     current-prefix-arg))
+  (let ((char1 (downcase char1))
+        (char2 (downcase char2))
+        (avy-style 'at-full)
+        (avy-command 'ram-avy-goto-subword-2))
+    (avy-goto-subword-0
+     arg (lambda ()
+           (and (char-after)
+                (eq (downcase (char-after)) char1)
+                (if (eq char2 ?*)
+                    t
+                  (save-excursion (forward-char) (eq (downcase (char-after)) char2))))))))
 
-  (defun ram-avy-goto-top-paren ()
-    (interactive)
-    (avy-jump "^(" :window-flip nil :beg (window-start) :end (window-end)))
+(defun ram-avy-goto-top-paren ()
+  (interactive)
+  (avy-jump "^(" :window-flip nil :beg (window-start) :end (window-end)))
 
-  (defun ram-avy-goto-paragraph-start ()
-    (interactive)
-    (ram-avy--make-backgrounds)
-    (avy-with ram-avy-goto-paragraph-start
-      (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg (window-start) :end (window-end))
-      (re-search-forward "[[:graph:]]" (window-end) t 1)
-      (backward-char))
-    (ram-avy--done))
+(defun ram-avy-goto-paragraph-start ()
+  (interactive)
+  (ram-avy--make-backgrounds)
+  (let ((avy-style 'post)
+        (avy-command 'ram-avy-goto-paragraph-start))
+    (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg (window-start) :end (window-end)))
+  (re-search-forward "[[:graph:]]" (window-end) t 1)
+  (backward-char)
+  (ram-avy--done))
 
-  (defun ram-avy-goto-org-heading ()
-    (interactive)
-    (avy-with ram-avy-goto-org-heading
-      (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg (window-start) :end (window-end)))
-    (re-search-forward "[^*[:space:]]" (window-end) t 1)
-    (forward-char -1))
+(defun ram-avy-goto-org-heading ()
+  (interactive)
+  (let ((avy-style 'post))
+    (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg (window-start) :end (window-end)))
+  (re-search-forward "[^*[:space:]]" (window-end) t 1)
+  (forward-char -1))
 
-  (declare-function outline-invisible-p "outline")
-  (declare-function ace-link--org-collect "ace-link")
-  (defvar org-link-any-re)
+(declare-function outline-invisible-p "outline")
+(declare-function ace-link--org-collect "ace-link")
+(defvar org-link-any-re)
 
-  (defun ram-avy-goto-org-link-down ()
-    (interactive)
-    (avy-with ram-avy-goto-org-link-down
-      ;; (goto-char (window-start))
-      ;; (re-search-forward org-link-any-re (window-end) t)
-      (mapcar #'cdr (ace-link--org-collect)))
-    ;; (avy-jump org-link-any-re :window-flip nil  :beg (window-start) :end (window-end))
-    ;; (re-search-forward "[^*[:space:]]" nil t 1)
-    )
+(defun ram-avy-goto-org-link-down ()
+  (interactive)
+  ;; (goto-char (window-start))
+  ;; (re-search-forward org-link-any-re (window-end) t)
+  (mapcar #'cdr (ace-link--org-collect))
+  ;; (avy-jump org-link-any-re :window-flip nil  :beg (window-start) :end (window-end))
+  ;; (re-search-forward "[^*[:space:]]" nil t 1)
+  )
 
-  (add-to-list 'avy-styles-alist '(ram-avy-goto-paragraph-start . post))
-  (add-to-list 'avy-orders-alist '(ram-avy-goto-paragraph-start . ram-avy-order-furthest))
-  (add-to-list 'avy-styles-alist '(ram-avy-goto-org-heading . post)))
+;; copied from  https://github.com/abo-abo/ace-link
+(defun ace-link--org-collect ()
+  (let ((end (window-end))
+        res)
+    (save-excursion
+      (goto-char (window-start))
+      (while (re-search-forward org-link-any-re end t)
+        ;; Check that the link is visible. Look at the last character
+        ;; position in the link ("...X]]") to cover links with and
+        ;; without a description.
+        (when (not (outline-invisible-p (- (match-end 0) 3)))
+          (push
+           (cons
+            (buffer-substring-no-properties
+             (match-beginning 0)
+             (match-end 0))
+            (match-beginning 0))
+           res)))
+      (nreverse res))))
+
+  (defun ram-avy-goto-org-link ()
+    "Jump to org-mode links using `avy'."
+    (avy-prosses))
 
 ;;** avy: bindings
 
