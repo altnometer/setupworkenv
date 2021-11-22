@@ -4809,6 +4809,9 @@ confines of word boundaries (e.g. multiple words)."
 ;; https://github.com/jrblevin/deft
 ;; deft is for quickly browsing, filtering, and editing directories of notes.
 
+(straight-use-package
+ '(deft :type git :flavor melpa :host github :repo "jrblevin/deft"))
+
 ;;*** packages/deft: settings
 
 ;;**** packages/deft/settings: basic
@@ -4816,7 +4819,8 @@ confines of word boundaries (e.g. multiple words)."
 ;; https://github.com/jrblevin/deft#basic-customization
 
 (setq deft-extensions '("org"))
-(setq deft-directory org-roam-directory)
+(with-eval-after-load "deft"
+  (setq deft-directory org-roam-directory))
 ;; (setq deft-ignore-file-regexp "your regex here")
 ;; (setq deft-recursive t)
 (setq deft-recursive nil)
@@ -4842,13 +4846,15 @@ confines of word boundaries (e.g. multiple words)."
 (straight-use-package
  '(deft :type git :flavor melpa :host github :repo "jrblevin/deft"))
 
-;;**** packages/deft: functions
+;;*** packages/deft: functions
 
 (defun ram-deft-search-daily-notes ()
   "Invoke `deft' after setting `deft-directory' to `org-roam-dailies-directory'"
   (interactive)
+  ;; avoid (error "Defining as dynamic an already lexical var") with #'require
+  (require 'deft)
   (let ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
-    (call-interactively 'deft)))
+    (deft)))
 
 
 (define-key global-map (kbd "s-c S") #'deft)
