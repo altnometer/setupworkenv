@@ -2257,8 +2257,6 @@ displaying TEST-BUFFER-P buffer."
                 (string-match-p (regexp-quote "*scratch*")
                                 (if (stringp buffer) buffer (buffer-name buffer)))) 0))
 
-(define-key lisp-interaction-mode-map (kbd "<S-return>") 'newline-and-indent)
-
 ;; (add-to-list 'display-buffer-alist
 ;;              `("*"
 ;;                ((lambda (buf alist) (progn (print
@@ -5672,6 +5670,8 @@ buffer-local `ram-face-remapping-cookie'."
 (defun ram-switch-to-scratch ()
   (interactive)
   (switch-to-buffer "*scratch*"))
+
+(define-key lisp-interaction-mode-map (kbd "<S-return>") 'newline-and-indent)
 
 ;; (define-key ram-leader-map-tap-global (kbd "'") 'ram-switch-to-scratch)
 
