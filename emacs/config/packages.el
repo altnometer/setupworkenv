@@ -2446,7 +2446,7 @@ it can be passed in POS."
   (define-key org-mode-map (kbd "s-R") #'ram-avy-goto-org-heading)
   (define-key org-mode-map (kbd "s-S") #'ram-avy-goto-org-link)
 
-  (define-key org-mode-map (kbd "C-c C-S-L") #'org-store-link)
+  (define-key global-map (kbd "C-c C-S-L") #'org-store-link)
   (define-key org-mode-map (kbd "C-c C-l") #'org-insert-link))
 
 ;;** org-mode: settings
