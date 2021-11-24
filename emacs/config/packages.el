@@ -2795,9 +2795,9 @@ Consider both org-roam notes and dailies."
             (ram-agenda-files-add file-path))
         (condition-case err
             (org-roam-tag-remove '("project"))
-          (user-error (if (not (string= (error-message-string err)
-                                        "No tag to remove"))
-                          (signal (car err) (cdr err))))
+          (user-error (when (not (string= (error-message-string err)
+                                          "No tag to remove"))
+                        (signal (car err) (cdr err))))
           (error (signal (car err) (cdr err)))
           (:success
            (ram-agenda-files-remove file-path)))))
