@@ -2444,6 +2444,7 @@ it can be passed in POS."
   (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~)
 
   (define-key org-mode-map (kbd "s-R") #'ram-avy-goto-org-heading)
+  (define-key org-mode-map (kbd "s-S") #'ram-avy-goto-org-link)
 
   (define-key org-mode-map (kbd "C-c C-S-L") #'org-store-link)
   (define-key org-mode-map (kbd "C-c C-l") #'org-insert-link))
@@ -3581,8 +3582,7 @@ heading to appear."
                          (avy-goto-word-1 . at-full)
                          ;; (avy-goto-char-2 . pre)
                          (avy-goto-char-2 . at-full)
-                         (avy-goto-char-timer . at-full)
-                         (ram-avy-goto-paragraph-start . post)))
+                         (avy-goto-char-timer . at-full)))
 
 ;; (setq avy-keys (nconc
 ;;                     (number-sequence ?1 ?9)
@@ -3609,12 +3609,19 @@ heading to appear."
         (?/ . avy-action-copy)
         (?? . avy-action-yank)
         (?. . avy-action-ispell)
-        (?# . avy-action-zap-to-char)))
+        (?# . avy-action-zap-to-char)
+        (?> . ace-link--org-action)))
 
 ;;** avy: custom commands
+
 ;; https://github.com/abo-abo/avy/wiki/custom-commands
-(declare-function avy-prosses "avy")
+
+(defvar org-link-any-re)
 (defvar avy-background)
+(declare-function org-open-at-point "org")
+(declare-function outline-invisible-p "outline")
+(declare-function ace-link--org-collect "ace-link")
+(declare-function avy-process "avy")
 (declare-function avy-jump "avy")
 (declare-function avy-goto-subword-0 "avy")
 ;; this is the default value
@@ -3679,6 +3686,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
         (char2 (downcase char2))
         (avy-style 'at-full)
         (avy-command 'ram-avy-goto-subword-2))
+    (setq avy-action nil)
     (avy-goto-subword-0
      arg (lambda ()
            (and (char-after)
@@ -3689,13 +3697,16 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 (defun ram-avy-goto-top-paren ()
   (interactive)
-  (avy-jump "^(" :window-flip nil :beg (window-start) :end (window-end)))
+  (let ((avy-command 'ram-avy-goto-top-paren))
+    (setq avy-action nil)
+    (avy-jump "^(" :window-flip nil :beg (window-start) :end (window-end))))
 
 (defun ram-avy-goto-paragraph-start ()
   (interactive)
   (ram-avy--make-backgrounds)
   (let ((avy-style 'post)
         (avy-command 'ram-avy-goto-paragraph-start))
+    (setq avy-action nil)
     (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg (window-start) :end (window-end)))
   (re-search-forward "[[:graph:]]" (window-end) t 1)
   (backward-char)
@@ -3703,23 +3714,18 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 (defun ram-avy-goto-org-heading ()
   (interactive)
-  (let ((avy-style 'post))
+  (let ((avy-style 'post)
+        (avy-command 'ram-avy-goto-org-heading))
+    (setq avy-action nil)
     (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg (window-start) :end (window-end)))
   (re-search-forward "[^*[:space:]]" (window-end) t 1)
   (forward-char -1))
 
-(declare-function outline-invisible-p "outline")
-(declare-function ace-link--org-collect "ace-link")
-(defvar org-link-any-re)
-
-(defun ram-avy-goto-org-link-down ()
+(defun ram-avy-goto-org-link ()
   (interactive)
-  ;; (goto-char (window-start))
-  ;; (re-search-forward org-link-any-re (window-end) t)
-  (mapcar #'cdr (ace-link--org-collect))
-  ;; (avy-jump org-link-any-re :window-flip nil  :beg (window-start) :end (window-end))
-  ;; (re-search-forward "[^*[:space:]]" nil t 1)
-  )
+  (let ((avy-command 'ram-avy-goto-org-link))
+    (setq avy-action nil)
+    (avy-process (mapcar #'cdr (ace-link--org-collect)))))
 
 ;; copied from  https://github.com/abo-abo/ace-link
 (defun ace-link--org-collect ()
@@ -3741,9 +3747,11 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
            res)))
       (nreverse res))))
 
-  (defun ram-avy-goto-org-link ()
-    "Jump to org-mode links using `avy'."
-    (avy-prosses))
+;; copied from  https://github.com/abo-abo/ace-link
+(defun ace-link--org-action (pt)
+  (when (numberp pt)
+    (goto-char pt)
+    (org-open-at-point)))
 
 ;;** avy: bindings
 
@@ -3766,7 +3774,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
      (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
      (define-key global-map (kbd "s-R") 'ram-avy-goto-top-paren)
      ;; (define-key global-map (kbd "s-d") 'avy-goto-char-in-line)
-     (define-key global-map (kbd "s-N") 'avy-resume)))
+     ;; (define-key global-map (kbd "s-N") 'avy-resume)
+     ))
 
 ;;* projectile
 
