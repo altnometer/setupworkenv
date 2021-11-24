@@ -4870,30 +4870,30 @@ confines of word boundaries (e.g. multiple words)."
 (defun ram-get-deft-strip-summary-regexp-for-notes ()
   "Return a regexp to exclude from note content."
   (concat "\\(?:"
-              "[[:space:]]+"            ; blank
-              "\\|"
-              "^:PROPERTIES:.*$"
-              "\\|"
-              "^:ID:.*$"
-              "\\|"
-              "^:END:.*$"
-              "\\|"
-              "^#\\+[^[:blank:]]+:.*$"  ; org-mode metadata
-              "\\|"
-              "^[[:blank:]-]*tags.*$"   ; tags
-              "\\|"
-              "^[[:blank:]-]*source " ; source
-              "\\|"
-              "\\[\\[\\(?:\\(id\\)\\|\\(info\\)\\|\\(file\\)\\)[^]]+\\]" ; links
-              "\\|"
-              "\\][^]]"
-              "\\|"
-              "\\(?:^\\*\\*+[[:blank:]]+.*$\\)" ; any headline that is not top level
-              "\\|"
-              "\\(?:^[^*]\\{1,\\}.*$\\)" ; anything that is not headline
-              "\\|"
-              org-list-full-item-re
-              "\\)"))
+          "[[:space:]]+"                ; blank
+          "\\|"
+          "^:PROPERTIES:.*$"
+          "\\|"
+          "^:ID:.*$"
+          "\\|"
+          "^:END:.*$"
+          "\\|"
+          "^#\\+[^[:blank:]]+:.*$"      ; org-mode metadata
+          "\\|"
+          "^- tags $"                   ; tags
+          "\\|"
+          "^-source .*$"                ; source
+          "\\|"
+          "\\[\\[\\(?:\\(id\\)\\|\\(info\\)\\|\\(file\\)\\)[^]]+\\]" ; links
+          "\\|"
+          "\\][^]]"                     ; ']' from link
+          "\\|"
+          "\\(?:^\\*\\*+[[:blank:]]+.*$\\)" ; any headline that is not top level
+          "\\|"
+          "\\(?:^[^*]\\{1,\\}.*$\\)"   ; anything that is not headline
+          "\\|"
+          org-list-full-item-re         ; org list items
+          "\\)"))
 
 (setq deft-file-limit 65)
 
