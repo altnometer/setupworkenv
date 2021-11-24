@@ -5575,8 +5575,8 @@ of hooks."
     (let ((new-face '(:background "LemonChiffon1" :underline "LemonChiffon3" :extend t)))
       (when (not (member new-face (cdr (assoc 'hl-line face-remapping-alist))))
         (face-remap-add-relative 'hl-line new-face))))
-   ;; (t (message "hl-line face remapping is not define for %s buffer modes" (buffer-local-value 'major-mode (current-buffer))))
-   (t (message "hl-line face remapping is not define for \"%s\" buffer modes" major-mode))))
+   ;; (t (message "hl-line face remapping is not defined for %s buffer modes" (buffer-local-value 'major-mode (current-buffer))))
+   (t (message "hl-line face remapping is not defined for \"%s\" buffer modes" major-mode))))
 
 (defun ram-add-remap-face-to-hl-line-in-capture-hook ()
   "Add face remap for `hl-line' face.
