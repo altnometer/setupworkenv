@@ -4905,7 +4905,7 @@ confines of word boundaries (e.g. multiple words)."
           "\\|"
           "\\(?:^[^*]\\{1,\\}.*$\\)"   ; anything that is not headline
           "\\|"
-          org-list-full-item-re         ; org list items
+          (regexp-quote org-list-full-item-re) ; org list items
           "\\)"))
 
 (setq deft-file-limit 65)
