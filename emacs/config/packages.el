@@ -2468,14 +2468,14 @@ it can be passed in POS."
 ;;*** org-mode/settings: tags
 
 (setq org-tag-alist '((:startgroup . nil)
-                      ("@work" . ?w) ("@home" . ?h)
-                      ("@tennisclub" . ?t)
+                      ;; ("@work" . ?w)
+                      ;; ("@home" . ?h)
                       (:endgroup . nil)
                       (:newline . nil)
-                      ("learn" . ?l) ("pc" . ?p)))
+                      ("continue" . ?c)
+                      ("learn" . ?l)
+                      ("write" . ?w)))
 (setq org-fast-tag-selection-single-key 'expert)
-
-;;*** org-mode/settings: tags
 
 ;; enable org-indent-mode for every file
 ;; per file sittings: #+STARTUP: indent, #+STARTUP: noindent
