@@ -5325,6 +5325,7 @@ That is, remove a non kept dired from the recent list."
 (defun ram-choose-from-recentf (arg)
   "Select a recently opened file from the `recentf-list'."
   (interactive "P")
+  (require 'orderless)
   (let ((f (completing-read "Recent files: "
                             recentf-list nil t)))
     (if arg
