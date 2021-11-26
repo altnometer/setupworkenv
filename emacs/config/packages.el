@@ -1288,22 +1288,25 @@ succession."
   (cond
    ((eq major-mode 'emacs-lisp-mode)
     (rx line-start
-        (or
-         (seq "("
-              (group (or
-                      "defconst"
-                      "defcustom"
-                      "define-abbrev-table"
-                      "define-error"
-                      "defun"
-                      "defvar"
-                      "define-minor-mode"
-                      "defmacro"
-                      "cl-defun"
-                      "cl-defstruct"
-                      "cl-defmethod")
-                     (+ space)          ; 1 or more whitespaces
-                     (regexp name-regex))))))
+        (* space)
+        (seq "("
+             (group (or
+                     "defconst"
+                     "defcustom"
+                     "define-abbrev-table"
+                     "define-error"
+                     "defun"
+                     "defvar"
+                     "define-minor-mode"
+                     "defmacro"
+                     "cl-defun"
+                     "cl-defstruct"
+                     "cl-defmethod"
+                     "set"
+                     "setq"
+                     "set-default")
+                    (+ space)           ; 1 or more whitespaces
+                    (regexp name-regex)))))
    ((eq major-mode 'racket-mode)
     (format "^(\\(def\\(?:ine\\) +%s\\)" name-regex))
    (t (error (format "%s is not supported, add regex to `ram-jump-to-def'" major-mode)))))
