@@ -5798,6 +5798,11 @@ buffer-local `ram-face-remapping-cookie'."
 
 (setq eval-expression-print-length 100)
 
+;;*** system/general settings: info/manual
+
+(define-key Info-mode-map (kbd "s-S") #'ace-link)
+
+
 ;;*** system/general settings: errors, warnings
 
 (setq warning-minimum-level :error)
