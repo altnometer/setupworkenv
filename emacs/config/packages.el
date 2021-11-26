@@ -4976,10 +4976,17 @@ confines of word boundaries (e.g. multiple words)."
              (signal (car err) (cdr err))))
     (:success
      (message "Killed org-roam dailies *Deft* buffer")))
-  (let ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-        (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes)))
+  (cl-letf ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+            (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
+            ((symbol-function 'deft-sort-files)
+             (lambda (files)
+               (sort files (lambda (f1 f2)
+                             (let ((t1 (deft-file-title f1))
+                                   (t2 (deft-file-title f2)))
+                               (string-greaterp
+                                (and t1 (downcase t1))
+                                (and t2 (downcase t2)))))))))
     (deft)))
-
 
 (define-key global-map (kbd "s-c S") #'ram-deft-search-org-roam-notes)
 (define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
