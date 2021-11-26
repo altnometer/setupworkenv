@@ -4925,17 +4925,41 @@ confines of word boundaries (e.g. multiple words)."
     (:success
      (message "Killed org-roam dailies *Deft* buffer")))
   (let ((deft-directory (expand-file-name org-roam-directory))
-        (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
+        ;; (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
         (deft-current-sort-method 'title)
         ;; (deft-recursive t)
         ;; (deft-recursive-ignore-dir-regexp "\\(?:\\.\\|\\.\\.\\)$\\|\\(?:/daily\\)")
-        )
-    (cl-letf (((symbol-function 'deft-parse-title)
-               (lambda (file contents)
-                 (let ((begin (string-match "^\\*[[:blank:]]+\\(.*\\)$" contents)))
-                   (if begin
-                       (substring contents (match-beginning 1) (match-end 1))
-                     (replace-in-string (deft-base-filename file) "^[0-9]\\{14\\}-" ""))))))
+        (title-match "second_brain"))
+    (cl-letf* (;; (list title-match)
+               ((symbol-function 'deft-parse-title)
+                (lambda (file contents)
+                  (let (
+                        ;; first headline
+                        ;; (begin (string-match "^\\*[[:blank:]]+\\(.*\\)$" contents))
+                        ;; title
+                        (begin (string-match "^#\\+TITLE: \\(.*\\)$" contents)))
+                    (if begin
+                        (setq title-match (substring contents (match-beginning 1) (match-end 1)))
+                      (setq title-match (replace-in-string (deft-base-filename file) "^[0-9]\\{14\\}-" ""))))))
+
+               ((symbol-function 'deft-parse-summary)
+                (lambda (contets title)
+                  "Remove any line that contains `org-roam' note \"title\"."
+                  (let ((summary (let* ((case-fold-search nil)
+                                        ;; (begin (string-match "^#\\+TITLE: \\(.*\\)$" contents))
+                                        (title-regex (when (string-match "^#\\+TITLE: \\(.*\\)$" contents)
+                                                       (format "^.*%s.*$"
+                                                               (regexp-quote
+                                                                (string-replace "_" " "
+                                                                                (substring contents
+                                                                                           (match-beginning 1)
+                                                                                           (match-end 1)))))))
+                                        (strip-summary-regex (if title-regex
+                                                                 (concat (ram-get-deft-strip-summary-regexp-for-notes)
+                                                                         "\\|\\(?:" title-regex "\\)")
+                                                               (ram-get-deft-strip-summary-regexp-for-notes))))
+                                   (replace-regexp-in-string strip-summary-regex " " contents))))
+                    (deft-chomp summary)))))
       (deft))))
 
 (defun ram-deft-search-daily-notes ()
