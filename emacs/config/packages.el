@@ -340,6 +340,11 @@ abort completely with `C-g'."
   (abbrev-table-put org-mode-abbrev-table
                     :parents (list auto-correct-abbrev-table)))
 
+;;** abbrev: text-mode-abbrev-table
+
+(abbrev-table-put text-mode-abbrev-table
+                  :parents (list auto-correct-abbrev-table))
+
 ;;* Leader Key
 ;;** Definition
 ;; leader tap
