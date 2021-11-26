@@ -3567,7 +3567,10 @@ heading to appear."
 (straight-use-package
  '(avy :type git :flavor melpa :host github :repo "abo-abo/avy"))
 
+;;** avy: settings
+
 (setq avy-all-windows nil)
+(setq avy-all-windows-alt 'all-frames)
 ;; avy-lead-face-0
 ;; Dim all windows when displaying overlay for targets
 (setq avy-background t)
@@ -3608,7 +3611,9 @@ heading to appear."
         (?` . avy-action-mark)
         (?/ . avy-action-copy)
         (?? . avy-action-yank)
-        (?. . avy-action-ispell)
+        ;; (?. . avy-action-ispell)
+        ;; (?. . ace-link--org-action)
+        (?. . avy-action-goto)
         (?# . avy-action-zap-to-char)
         (?> . ace-link--org-action)))
 
@@ -3699,7 +3704,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (interactive)
   (let ((avy-command 'ram-avy-goto-top-paren))
     (setq avy-action nil)
-    (avy-jump "^(" :window-flip nil :beg (window-start) :end (window-end))))
+    (avy-jump "^(" :window-flip nil :beg nil :end nil)))
 
 (defun ram-avy-goto-paragraph-start ()
   (interactive)
@@ -3707,7 +3712,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (let ((avy-style 'post)
         (avy-command 'ram-avy-goto-paragraph-start))
     (setq avy-action nil)
-    (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg (window-start) :end (window-end)))
+    (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg nil :end nil))
   (re-search-forward "[[:graph:]]" (window-end) t 1)
   (backward-char)
   (ram-avy--done))
@@ -3717,14 +3722,15 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (let ((avy-style 'post)
         (avy-command 'ram-avy-goto-org-heading))
     (setq avy-action nil)
-    (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg (window-start) :end (window-end)))
+    (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg nil :end nil))
   (re-search-forward "[^*[:space:]]" (window-end) t 1)
   (forward-char -1))
 
 (defun ram-avy-goto-org-link ()
   (interactive)
   (let ((avy-command 'ram-avy-goto-org-link))
-    (setq avy-action nil)
+    ;; (setq avy-action nil)
+    (setq avy-action 'ace-link--org-action)
     (avy-process (mapcar #'cdr (ace-link--org-collect)))))
 
 ;; copied from  https://github.com/abo-abo/ace-link
