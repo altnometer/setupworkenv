@@ -3107,6 +3107,15 @@ Ignore \"No following same-level heading\" error, call
 (define-key ram-leader-map-tap-global (kbd "d") #'prot/outline-down-heading)
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-outline-heading)
 
+;;** outline: hooks, advice, timers
+
+(add-hook 'emacs-lisp-mode-hook (lambda ()
+                                  (setq-local outline-regexp "^;;\\(?:;[^#]\\|\\*+\\)")
+                                  (outline-minor-mode 1)))
+(add-hook 'clojure-mode-hook (lambda ()
+                                  (setq-local outline-regexp "^;;\\(?:;[^#]\\|\\*+\\)")
+                                  (outline-minor-mode 1)))
+
 ;;* hideshow
 
 (add-hook 'prog-mode-hook #'hs-minor-mode)
