@@ -3345,13 +3345,13 @@ Ignore \"No following same-level heading\" error, call
   (when (eq this-command 'eval-expression)
     (lispy-mode 1)))
 
-(add-hook 'lisp-interaction-mode-hook (lambda () (lispy-mode 1)))
-(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
-(add-hook 'clojure-mode-hook (lambda () (lispy-mode 1)))
-(add-hook 'cider-repl-mode-hook (lambda () (lispy-mode 1)))
-(add-hook 'minibuffer-setup-hook 'conditionally-enable-lispy)
-(add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
-(add-hook 'racket-repl-mode-hook (lambda () (lispy-mode 1)))
+;; (add-hook 'lisp-interaction-mode-hook (lambda () (lispy-mode 1)))
+;; (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+;; (add-hook 'clojure-mode-hook (lambda () (lispy-mode 1)))
+;; (add-hook 'cider-repl-mode-hook (lambda () (lispy-mode 1)))
+;; (add-hook 'minibuffer-setup-hook 'conditionally-enable-lispy)
+;; (add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
+;; (add-hook 'racket-repl-mode-hook (lambda () (lispy-mode 1)))
 
 ;;** lispy settings
 
@@ -5390,6 +5390,37 @@ Configure `orderless-matching-styles' for this command."
 ;; ;; (require 'merlin-company)
 
 ;; https://github.com/ocaml-ppx/ocamlformat#emacs-setup
+
+;;** packages: paredit
+
+(defvar electrify-return-match
+    "[\]}\)\"]"
+    "If this regexp matches the text after the cursor, do an \"electric\"
+  return.")
+
+(defun electrify-return-if-match (arg)
+    "If the text after the cursor matches `electrify-return-match' then
+  open and indent an empty line between the cursor and the text.  Move the
+  cursor to the new line."
+    (interactive "P")
+    (let ((case-fold-search nil))
+      (if (looking-at electrify-return-match)
+      (save-excursion (newline-and-indent)))
+      (newline arg)
+      (indent-according-to-mode)))
+
+(define-key paredit-mode-map (kbd "M-s") nil)
+(define-key paredit-mode-map (kbd "<f13>") #'paredit-splice-sexp)
+
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+(add-hook 'clojure-mode-hook #'enable-paredit-mode)
+(add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
+(add-hook 'minibuffer-setup-hook (lambda () (when (eq this-command 'eval-expression) (enable-paredit-mode))))
+(add-hook 'racket-mode-hook #'enable-paredit-mode)
+(add-hook 'racket-repl-mode-hook #'enable-paredit-mode)
+
+;; (define-key lisp-interaction-mode-map (kbd "RET" ) #'electrify-return-if-match)
 
 ;;** packages: recentf
 
