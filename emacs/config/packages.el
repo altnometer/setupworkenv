@@ -2595,6 +2595,8 @@ it can be passed in POS."
   (add-to-list 'org-structure-template-alist
                '("rac" . "src racket :lang racket/base :results output"))
   (add-to-list 'org-structure-template-alist
+               '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist
                '("n" . "name"))
   (add-to-list 'org-structure-template-alist
                '("ex" . "example"))
