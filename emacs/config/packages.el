@@ -418,7 +418,12 @@ Disable `icomplete-vertical-mode' for this command."
 ;;** bindings: general
 
 ;; default "M-a" #'backward-sentence, only with #'push-mark
-(define-key global-map (kbd "M-a") (lambda () (interactive) (push-mark) (backward-sentence)))
+(defun ram-back-sentence (&optional arg)
+  "Call `backward-sentence' after `push-mark'."
+  (interactive "^p")
+  (backward-sentence arg))
+
+(define-key global-map (kbd "M-a") #'ram-back-sentence)
 ;; "M-(" was originally bound to #'insert-parentheses
 (global-unset-key (kbd "M-("))
 (define-key global-map (kbd "C-%") #'repeat)
