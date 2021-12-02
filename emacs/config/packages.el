@@ -2466,6 +2466,9 @@ it can be passed in POS."
 
 ;;** org-mode: settings
 
+(setq org-blank-before-new-entry
+      '((heading . always) (plain-list-item . nil)))
+
 ;; toggle it with "C-c C-x \" or "M-x org-toggle-pretty-entities"
 (setq org-pretty-entities t)
 
@@ -2481,6 +2484,8 @@ it can be passed in POS."
                       (:newline . nil)
                       ("continue" . ?c)
                       ("learn" . ?l)
+                      ("read" . ?r)
+                      ("review" . ?v)
                       ("write" . ?w)))
 (setq org-fast-tag-selection-single-key 'expert)
 
