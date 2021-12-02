@@ -384,7 +384,7 @@ abort completely with `C-g'."
 Disable `icomplete-vertical-mode' for this command."
   (interactive "p")
   (let ((default (default-value 'icomplete-vertical-mode)))
-    (icomplete-vertical-mode -1)
+    (icomplete-vertical-mode 1)
     (condition-case err
         (if (= n 1)
             (call-interactively #'switch-to-buffer)
