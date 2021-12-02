@@ -6417,30 +6417,24 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;;** custom: jump to the end of top level sexp
 
-(defun ram-jump-to-last-bracket (&optional direction)
-  "Jump to the end of top level sexp."
-  (interactive)
-  (let* ((p (point))
-         (direction (or direction 1))
-         (beginning-of-defun-p (save-excursion
-                                 (end-of-defun -1)
-                                 (beginning-of-defun -1)
-                                 (= p (point)))))
-    (condition-case nil
-        (cond
-         ((and (= -1 direction) beginning-of-defun-p) (beginning-of-defun) (forward-sexp))
-         (beginning-of-defun-p (forward-sexp))
-         ((= -1 direction) (beginning-of-defun 2) (forward-sexp))
-         (t
-          (beginning-of-defun)
-          (forward-sexp)
-          (when (>= p (point))
-            (beginning-of-defun -1)
-            (forward-sexp))))
-      (error nil))))
+(defun ram-beg-of-top-sexp (&optional arg)
+  "Jump to the beginning of top level sexp ARG times."
+  (interactive "p")
+  (push-mark)
+  (let* ((point (point)))
+    (ram-up-list-forward 50)
+    (forward-sexp (- arg))))
+
+(defun ram-end-of-top-sexp (&optional arg)
+  "Jump to the end of top level sexp ARG times."
+  (interactive "p")
+  (push-mark)
+  (let* ((point (point)))
+    (ram-up-list-forward 50)
+    (if (= point (point))
+        (forward-sexp arg)
+      (forward-sexp (- arg 1)))))
 
 ;; "C-M-e" bound to end-of-defun by default
-(define-key global-map (kbd "<M-f2>") (lambda () (interactive) (push-mark) (ram-jump-to-last-bracket)))
-(define-key global-map (kbd "<M-S-f2>") (lambda () (interactive) (push-mark) (ram-jump-to-last-bracket -1)))
-(define-key global-map (kbd "<M-f1>") (lambda () (interactive) (push-mark) (beginning-of-defun)))
-(define-key global-map (kbd "<M-S-f1>") (lambda () (interactive) (push-mark) (beginning-of-defun -1)))
+(define-key prog-mode-map (kbd "M-a") #'ram-beg-of-top-sexp)
+(define-key prog-mode-map (kbd "M-e") #'ram-end-of-top-sexp)
