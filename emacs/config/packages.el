@@ -3979,9 +3979,14 @@ Return nil on failure, (point) otherwise."
 (define-key global-map (kbd "M-<f9>") #'mc/toggle-cursor-at-point)
 (define-key global-map (kbd "M-S-<f9>") 'multiple-cursors-mode)
 
-;;* brackets, parentheses, parens
+;;* brackets, parentheses, parens, sexps
 
-;;** ram-highlight-sexps
+;;** brackets, parentheses, parens, sexps: settings
+
+;; If true, #'paredit-blink-paren-match is slow
+(setq blink-matching-paren nil)
+
+;;** brackets, parentheses, parens, sexps: ram-highlight-sexps
 
 (autoload 'ram-highlight-sexps-mode "ram-highlight-sexps")
 
@@ -4969,9 +4974,9 @@ confines of word boundaries (e.g. multiple words)."
   (interactive)
   (funcall #'isearch-done nopush edit)
   (if (and
-    ;; depth in parens is greater than 0
+       ;; depth in parens is greater than 0
        (> (nth 0 (syntax-ppss)) 0)
-    ;; not in string
+       ;; not in string
        (not (nth 3 (syntax-ppss))))
       (backward-up-list 1)))
 
@@ -4980,9 +4985,9 @@ confines of word boundaries (e.g. multiple words)."
   (interactive)
   (funcall #'isearch-done nopush edit)
   (if (and
-    ;; depth in parens is greater than 0
+       ;; depth in parens is greater than 0
        (> (nth 0 (syntax-ppss)) 0)
-    ;; not in string
+       ;; not in string
        (not (nth 3 (syntax-ppss))))
       (backward-up-list -1)))
 
