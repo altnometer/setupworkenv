@@ -3034,9 +3034,6 @@ When GOTO is non-nil, go to the note without creating an entry."
 (straight-use-package
  '(bicycle :type git :flavor melpa :host github :repo "tarsius/bicycle"))
 
-(add-hook 'emacs-lisp-mode-hook #'outline-minor-mode)
-(add-hook 'clojure-mode-hook #'outline-minor-mode)
-
 ;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
 
 ;;** outline: functions
