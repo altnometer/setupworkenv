@@ -3576,6 +3576,26 @@ heading to appear."
 
 ;;* avy
 
+(straight-use-package
+ '(avy :type git :flavor melpa :host github :repo "abo-abo/avy"))
+
+;;** avy: actions
+
+;; credit to https://karthinks.com/software/avy-can-do-anything/
+(defun ram-avy-action-help (pt)
+  (save-excursion
+    (goto-char pt)
+    (let ((symbol (thing-at-point 'sexp)))
+      (cond
+       ((symbol-function symbol) (describe-function symbol))
+       ((special-form-p symbol) (describe-function symbol))
+       ((macrop symbol) (describe-function symbol))
+       ((and (boundp symbol) (symbol-value symbol)) (describe-variable symbol))
+       (t (message "The thing at point: \"%S\" is not bound to anything"  symbol)))))
+  (select-window
+   (cdr (ring-ref avy-ring 0)))
+  t)
+
 ;;   (setq avy-dispatch-alist
 ;;         '((?- . avy-action-kill-move)
 ;;           (?! . avy-action-kill-stay)
@@ -3586,8 +3606,19 @@ heading to appear."
 ;;           (?. . avy-action-ispell)
 ;;           (?# . avy-action-zap-to-char)))
 
-(straight-use-package
- '(avy :type git :flavor melpa :host github :repo "abo-abo/avy"))
+(setq avy-dispatch-alist
+      '((?- . avy-action-kill-move)
+        (?! . avy-action-kill-stay)
+        (?\' . avy-action-teleport)
+        (?M . avy-action-mark)
+        (?/ . avy-action-copy)
+        (?, . avy-action-yank)
+        ;; (?. . avy-action-ispell)
+        ;; (?. . ace-link--org-action)
+        (?. . avy-action-goto)
+        (?# . avy-action-zap-to-char)
+        (?> . ace-link--org-action)
+        (?H . ram-avy-action-help)))
 
 ;;** avy: settings
 
@@ -3599,7 +3630,10 @@ heading to appear."
 (setq avy-timeout-seconds 0.4)
 ;; (setq highlight-first t)
 ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-keys-alist#avy-keys
-(setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d))
+;; (setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d))
+;; (setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d ?0 ?9 ?8 ?7 ?6 ?5 ?4 ?3 ?2 ?1))
+(setq avy-keys '(?s ?a ?r ?e ?t ?i ?u ?n ?o ?p ?l ?m ?f ?- ?' ?/ ?h ?c ?g ?x ?b ?z ?w ?y ?v ?q ?j ?k ?d ?\( ?$ ?\) ?{ ?* ?} ?0 ?9 ?8 ?7 ?6 ?5 ?4 ?3 ?2 ?1))
+
 ;; https://github.com/abo-abo/avy/wiki/defcustom#avy-style
 (setq avy-style 'at-full)
 (setq avy-styles-alist '(
@@ -3625,19 +3659,6 @@ heading to appear."
         (lispy-ace-subword . avy-order-closest)
         (ram-avy-goto-subword-2 . avy-order-closest)
         (ram-avy-goto-paragraph-start . ram-avy-order-furthest)))
-
-(setq avy-dispatch-alist
-      '((?- . avy-action-kill-move)
-        (?! . avy-action-kill-stay)
-        (?\' . avy-action-teleport)
-        (?` . avy-action-mark)
-        (?/ . avy-action-copy)
-        (?? . avy-action-yank)
-        ;; (?. . avy-action-ispell)
-        ;; (?. . ace-link--org-action)
-        (?. . avy-action-goto)
-        (?# . avy-action-zap-to-char)
-        (?> . ace-link--org-action)))
 
 ;;** avy: custom commands
 
@@ -3779,10 +3800,112 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
       (nreverse res))))
 
 ;; copied from  https://github.com/abo-abo/ace-link
+(defun ram-up-list-forward (arg)
+  "Move forward out of one level of parentheses ARG times.
+Return nil on failure, (point) otherwise."
+  ;; move out of the string
+  (let ((s (syntax-ppss)))
+    (when (nth 3 s)
+      (goto-char (nth 8 s))))
+  (catch 'break
+    (dotimes (_i arg)
+      (if (ignore-errors (up-list) t)
+          (when (looking-at-p "[[({]")
+            (forward-list))
+        (throw 'break nil)))
+    (point)))
+
+
+;; copied from  https://github.com/abo-abo/ace-link
+(defun ram-up-list-backward (arg)
+  "Move backward out of one level of parentheses ARG times.
+Return nil on failure, (point) otherwise."
+  (let ((oldpt (point))
+        newpt)
+    (ram-up-list-forward arg)
+    (when (looking-back "[])}]" (line-beginning-position))
+      (forward-list -1))
+    (if (= oldpt (setq newpt (point)))
+        nil
+      newpt)))
+
 (defun ace-link--org-action (pt)
   (when (numberp pt)
     (goto-char pt)
     (org-open-at-point)))
+
+(defun ram-avy-goto-ace-paren ()
+  "Call `lispy-ace-paren'."
+  (interactive)
+  (require 'lispy)
+  (call-interactively 'lispy-ace-paren))
+
+(defun ram-avy-goto-paragraph-start ()
+  (interactive)
+  (ram-avy--make-backgrounds)
+  (let ((avy-command 'ram-avy-goto-paragraph-start)
+        (avy-style 'post)
+        (avy--overlay-offset -1))
+    (setq avy-action nil)
+    (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg nil :end nil))
+  (re-search-forward "[[:graph:]]" (window-end) t 1)
+  (backward-char)
+  (ram-avy--done))
+
+(defun ram-avy-goto-symbol-in-defun ()
+  "Call `lispy-ace-paren'."
+  (interactive)
+  (require 'lispy)
+  (let (beg end)
+    (save-excursion
+      (setq beg (or (ram-up-list-backward 50) (point)))
+      (setq end (forward-list)))
+    (let ((avy-command 'ram-avy-goto-symbol-in-defun)
+          ;; (avy-style 'at-full)
+          (avy-style 'at-full)
+          (avy--overlay-offset 0)
+          (cands (avy--regex-candidates
+                  ;; "\\_<\\(?:\\sw\\|\\s_\\[^\\s\.]\\)+\\_>"
+                  "[([{ ]\\(?:\\sw\\|\\s_\\|[\"'`#~,@]\\)"
+                  ;; "\\(?:\\s\".+?\\s\"\\)"
+                  beg end
+                  (lambda () (forward-char -1)
+                    (let* ((sp (syntax-ppss))
+                           (beg (nth 8 sp)))
+                      (not (when (or (eq (char-after beg) ?\") ; no strings
+                                     (nth 4 sp))  ; no comments
+                             beg)))) 0)))
+      (dolist (x cands)
+        (when (> (- (cdar x) (caar x)) 1)
+          (cl-incf (caar x))))
+      (setq avy-action nil)
+      (avy-process cands))))
+
+(defun ram-avy-goto-word-in-defun ()
+  "Call `lispy-ace-paren'."
+  (interactive)
+  (require 'lispy)
+  (let (beg end)
+    (save-excursion
+      (setq beg (ram-up-list-backward 50))
+      (setq end (forward-list)))
+    (cl-letf ((avy-command 'ram-avy-goto-word-in-defun)
+              (avy-style 'at-full)
+              (avy--overlay-offset 0)
+              (cands (avy--regex-candidates
+                      ;; "[([{ -/]\\(?:\\sw\\|\\s_\\|\\s(\\|[\"'`#]\\)"
+                      "\\<\\sw+\\>"
+                      beg end
+                      (lambda () (let ((sp (syntax-ppss)))
+                                   (not (nth 4 sp)))) nil)) ; no comments
+              ((symbol-function 'avy-action-mark)
+               (lambda (pt)
+                 (goto-char pt)
+                 (forward-word)
+                 (set-mark (point))
+                 (goto-char pt))))
+      (setq avy-action nil)
+      (avy-process cands))))
 
 ;;** avy: bindings
 
@@ -3800,6 +3923,10 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
      ;;                                      (avy-goto-word-or-subword-1)
      ;;                                      (ram-avy--done)))
      (define-key global-map (kbd "s-s") #'ram-avy-goto-subword-2-dim)
+     (define-key emacs-lisp-mode-map (kbd "s-s") #'ram-avy-goto-ace-paren)
+     ;; (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-subword-2-dim)
+     (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-symbol-in-defun)
+     (define-key emacs-lisp-mode-map (kbd "C-s-s") #'ram-avy-goto-word-in-defun)
 
      ;; (define-key global-map (kbd "s-s") 'avy-goto-char-2)
      (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
