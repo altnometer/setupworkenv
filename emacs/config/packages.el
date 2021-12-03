@@ -3933,7 +3933,7 @@ Return nil on failure, (point) otherwise."
      ;; (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-subword-2-dim)
      (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-symbol-in-defun)
      (define-key emacs-lisp-mode-map (kbd "C-s-s") #'ram-avy-goto-word-in-defun)
-
+     (define-key prog-mode-map (kbd "s-r") #'ram-avy-goto-top-paren)
      ;; (define-key global-map (kbd "s-s") 'avy-goto-char-2)
      (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
      (define-key global-map (kbd "s-R") 'ram-avy-goto-top-paren)
