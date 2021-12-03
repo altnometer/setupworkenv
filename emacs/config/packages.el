@@ -4008,8 +4008,34 @@ Return nil on failure, (point) otherwise."
 ;; "C-M-e" bound to end-of-defun by default
 (define-key prog-mode-map (kbd "M-a") #'ram-jump-backward-to-open-delimiter)
 (define-key prog-mode-map (kbd "M-e") #'ram-jump-forward-to-close-delimiter)
-
+(define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+(define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+(define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
+(define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
 ;;** brackets, parentheses, parens, sexps: functions
+
+(defun ram-forward-list ()
+  "Call `forward-list'. If at the end, call `backward-up-list' and continue."
+  (interactive)
+  (condition-case err
+      (forward-list)
+    (scan-error (condition-case err
+                    (progn
+                      (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
+                      (forward-list))
+                  (scan-error (forward-list))))
+    (:success (point))))
+
+(defun ram-backward-list ()
+  "Call `backward-list'. If at the end, call `backward-up-list' and continue."
+  (interactive)
+  (condition-case err
+      (forward-list -1)
+    (scan-error (condition-case err
+                    (progn
+                      (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING))
+                  (scan-error (forward-list -1))))
+    (:success (point))))
 
 (defun ram-jump-backward-to-open-delimiter ()
   "Jump backward to the open delimiter that is not in a string."
@@ -4023,6 +4049,21 @@ Return nil on failure, (point) otherwise."
                           (nth 4 s))
                       (back-to-delim)))))
     (back-to-delim)))
+
+(defun ram-jump-forward-to-open-delimiter ()
+  "Jump forward to the open delimiter that is not in a string."
+  (interactive)
+  (cl-labels ((forward-to-delim ()
+                "Jump forward to the open delimiter that is not in a string."
+                (re-search-forward "[[({]" nil t 1)
+                ;; skip matches in strings and comments
+                (let ((s (syntax-ppss)))
+                  (if (or (nth 3 s)
+                          (nth 4 s))
+                      (forward-to-delim)))))
+    (forward-char 1)
+    (forward-to-delim)
+    (forward-char -1)))
 
 (defun ram-jump-forward-to-close-delimiter ()
   "Jump forward to the close delimiter that is not in a string."
