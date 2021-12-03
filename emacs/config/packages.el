@@ -5513,6 +5513,12 @@ Configure `orderless-matching-styles' for this command."
 
 (define-key paredit-mode-map (kbd "M-s") nil)
 (define-key paredit-mode-map (kbd "<f13>") #'paredit-splice-sexp)
+;; slurp
+(define-key paredit-mode-map (kbd "<C-<right>") nil)
+(define-key paredit-mode-map (kbd "<C-M-<right>") nil)
+;; barf
+(define-key paredit-mode-map (kbd "<C-left>") nil)
+(define-key paredit-mode-map (kbd "<C-M-<left>") nil)
 
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
