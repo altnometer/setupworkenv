@@ -3866,7 +3866,10 @@ Return nil on failure, (point) otherwise."
   "Call `lispy-ace-paren'."
   (interactive)
   (require 'lispy)
-  (call-interactively 'lispy-ace-paren))
+  (let* ((avy-command 'ram-avy-goto-ace-paren)
+         (avy-style 'at-full)
+         (avy-orders-alist (list (cons avy-command 'ram-avy-order-from-beg-of-defun))))
+    (call-interactively 'lispy-ace-paren)))
 
 (defun ram-avy-goto-paragraph-start ()
   (interactive)
