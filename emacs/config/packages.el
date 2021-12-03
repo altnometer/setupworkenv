@@ -3981,11 +3981,13 @@ Return nil on failure, (point) otherwise."
 
 ;;* brackets, parentheses, parens, sexps
 
+;;** brackets, parentheses, parens, sexps: bindings
+
+;; "C-M-e" bound to end-of-defun by default
+(define-key prog-mode-map (kbd "M-a") #'ram-jump-backward-to-open-delimiter)
+(define-key prog-mode-map (kbd "M-e") #'ram-jump-forward-to-close-delimiter)
 
 ;;** brackets, parentheses, parens, sexps: functions
-
-
-;;** brackets, parentheses, parens, sexps: bindings
 
 (defun ram-jump-backward-to-open-delimiter ()
   "Jump backward to the open delimiter that is not in a string."
@@ -4027,11 +4029,6 @@ If cursor is not on a bracket, call `backward-up-list'."
      ((looking-back "[])}]" (max (- (point) 1) 1))
       (backward-sexp))
      (t (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)))))
-
-
-;; "C-M-e" bound to end-of-defun by default
-(define-key prog-mode-map (kbd "M-a") #'ram-jump-backward-to-open-delimiter)
-(define-key prog-mode-map (kbd "M-e") #'ram-jump-forward-to-close-delimiter)
 
 ;;** brackets, parentheses, parens, sexps: settings
 
