@@ -3981,6 +3981,58 @@ Return nil on failure, (point) otherwise."
 
 ;;* brackets, parentheses, parens, sexps
 
+
+;;** brackets, parentheses, parens, sexps: functions
+
+
+;;** brackets, parentheses, parens, sexps: bindings
+
+(defun ram-jump-backward-to-open-delimiter ()
+  "Jump backward to the open delimiter that is not in a string."
+  (interactive)
+  (cl-labels ((back-to-delim ()
+                "Jump backward to the open delimiter that is not in a string."
+                (re-search-forward "[[({]" nil t -1)
+                ;; skip matches in strings and comments
+                (let ((s (syntax-ppss)))
+                  (if (or (nth 3 s)
+                          (nth 4 s))
+                      (back-to-delim)))))
+    (back-to-delim)))
+
+(defun ram-jump-forward-to-close-delimiter ()
+  "Jump forward to the close delimiter that is not in a string."
+  (interactive)
+  (cl-labels ((forward-to-delim ()
+                "Jump forward to the close delimiter that is not in a string."
+                (re-search-forward "[])}]" nil t 1)
+                ;; skip matches in strings and comments
+                (let ((s (syntax-ppss)))
+                  (if (or (nth 3 s)
+                          (nth 4 s))
+                      (forward-to-delim)))))
+    (forward-to-delim)))
+
+;; credit to http://xahlee.info/emacs/emacs/emacs_navigating_keys_for_brackets.html
+(defun xah-goto-matching-bracket ()
+  "Move cursor to the matching bracket.
+If cursor is not on a bracket, call `backward-up-list'."
+  (interactive)
+  (if (nth 3 (syntax-ppss))
+      (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
+    (cond
+     ((eq (char-after) ?\") (forward-sexp))
+     ((eq (char-before) ?\") (backward-sexp ))
+     ((looking-at "[[({]") (forward-sexp))
+     ((looking-back "[])}]" (max (- (point) 1) 1))
+      (backward-sexp))
+     (t (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)))))
+
+
+;; "C-M-e" bound to end-of-defun by default
+(define-key prog-mode-map (kbd "M-a") #'ram-jump-backward-to-open-delimiter)
+(define-key prog-mode-map (kbd "M-e") #'ram-jump-forward-to-close-delimiter)
+
 ;;** brackets, parentheses, parens, sexps: settings
 
 ;; If true, #'paredit-blink-paren-match is slow
@@ -4000,6 +4052,23 @@ Return nil on failure, (point) otherwise."
 
 (with-eval-after-load "ram-highlight-sexps"
   (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
+
+;;** brackets, parentheses, parens, sexps: select-current-sexp
+
+;; credit to https://www.reddit.com/r/emacs/comments/gnika5/command_for_selecting_current_sexp/
+(defun night/backward-up-sexp (arg)
+  (interactive "p")
+  (let ((ppss (syntax-ppss)))
+    (cond ((elt ppss 3)
+           (goto-char (elt ppss 8))
+           (night/backward-up-sexp (1- arg)))
+          ((backward-up-list arg)))))
+
+(defun night/select-current-sexp (arg)
+  (interactive "p")
+  (night/backward-up-sexp arg)
+  (mark-sexp)
+  (setq deactivate-mark nil))
 
 ;;* linters
 
@@ -6450,5 +6519,5 @@ buffer-local `ram-face-remapping-cookie'."
       (forward-sexp (- arg 1)))))
 
 ;; "C-M-e" bound to end-of-defun by default
-(define-key prog-mode-map (kbd "M-a") #'ram-beg-of-top-sexp)
-(define-key prog-mode-map (kbd "M-e") #'ram-end-of-top-sexp)
+(define-key prog-mode-map (kbd "M-A") #'ram-beg-of-top-sexp)
+(define-key prog-mode-map (kbd "M-E") #'ram-end-of-top-sexp)
