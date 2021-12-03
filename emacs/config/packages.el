@@ -5143,8 +5143,10 @@ confines of word boundaries (e.g. multiple words)."
                                 (and t2 (downcase t2)))))))))
     (deft)))
 
-(define-key global-map (kbd "s-c S") #'ram-deft-search-org-roam-notes)
-(define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
+;;*** packages/deft: bindings
+
+(define-key global-map (kbd "C-c D") #'ram-deft-search-org-roam-notes)
+(define-key global-map (kbd "C-c d") #'ram-deft-search-daily-notes)
 
 ;;** packages: diff
 
