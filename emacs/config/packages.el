@@ -4029,6 +4029,30 @@ Return nil on failure, (point) otherwise."
                   (scan-error (forward-list))))
     (:success (point))))
 
+;; This behaves like ram-jump-forward-to-close-delimiter
+;; I'll keep to see if they differ for some edge cases.
+(defun ram-down-list ()
+  "Move down parenthesis groups. If cannot, move `forward-list'.
+If cannot move forward, go `up-list' and try again from there."
+  (interactive)
+  (cl-labels ((up-list-then-forward ()
+                "Move `up-list' then `forward-list', repeat on error."
+                (condition-case err
+                    (up-list)
+                  (scan-error (message "Call ram-forward-sexp (preserve the current open or close paren)"))
+                  (:success (condition-case err
+                                (forward-list)
+                              (scan-error (up-list-then-forward))
+                              (:success (backward-sexp)))))))
+    (condition-case err
+        (down-list)
+      (scan-error (scan-error (forward-list)))
+      (:success (progn
+                  (condition-case err
+                      (forward-list)
+                    (scan-error (up-list-then-forward))
+                    (:success (backward-sexp))))))))
+
 (defun ram-backward-list ()
   "Call `backward-list'. If at the end, call `backward-up-list' and continue."
   (interactive)
