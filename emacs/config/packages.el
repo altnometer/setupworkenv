@@ -3613,13 +3613,19 @@ heading to appear."
 (defun ram-avy-action-help (pt)
   (save-excursion
     (goto-char pt)
-    (let ((symbol (thing-at-point 'sexp)))
+    (if (looking-at "[[({]")
+        (forward-char))
+    (let (;; (symbol (thing-at-point 'sexp))
+          (symbol (symbol-at-point)))
       (cond
-       ((symbol-function symbol) (describe-function symbol))
-       ((special-form-p symbol) (describe-function symbol))
-       ((macrop symbol) (describe-function symbol))
-       ((and (boundp symbol) (symbol-value symbol)) (describe-variable symbol))
-       (t (message "The thing at point: \"%S\" is not bound to anything"  symbol)))))
+       ((derived-mode-p 'emacs-lisp-mode)
+        (cond
+         ((symbol-function symbol) (describe-function symbol))
+         ((special-form-p symbol) (describe-function symbol))
+         ((macrop symbol) (describe-function symbol))
+         ((and (boundp symbol) (symbol-value symbol)) (describe-variable symbol))
+         (t (message "The thing at point: \"%S\" is not bound to anything"  symbol))))
+       (t (message "The %s is not supported" major-mode)))))
   (select-window
    (cdr (ring-ref avy-ring 0)))
   t)
