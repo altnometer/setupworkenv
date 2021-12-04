@@ -414,7 +414,7 @@ repeating highlighting the same sexps in the same context.")
 ;;;###autoload
 (define-minor-mode ram-highlight-sexps-mode
   "Minor mode to highlight an expanding set of surrounding s-expressions."
-  nil " hl-s" nil
+  :init-valuer: nil :lighter " hl-s" :keymap nil
   (mapc 'delete-overlay hl-sexp-overlays)
   (mapc 'delete-overlay hl-sexp-overlays-when-at-del)
   (mapc 'delete-overlay hl-sexp-mask-whitespace-overlays)
@@ -464,7 +464,7 @@ repeating highlighting the same sexps in the same context.")
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-overlays) 'priority num)
       (overlay-put (car hl-sexp-overlays) 'priority nil)
-      (decf num))
+      (cl-decf num))
     (setq hl-sexp-overlays (nreverse hl-sexp-overlays))))
 
 (defun hl-sexp-create-overlays-when-at-del ()
@@ -487,7 +487,7 @@ repeating highlighting the same sexps in the same context.")
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-overlays-when-at-del) 'priority num)
       (overlay-put (car hl-sexp-overlays-when-at-del) 'priority nil)
-      (decf num))
+      (cl-decf num))
     (setq hl-sexp-overlays-when-at-del (nreverse hl-sexp-overlays-when-at-del))))
 
 (defun hl-sexp-create-paren-sibling-overlays ()
@@ -513,7 +513,7 @@ repeating highlighting the same sexps in the same context.")
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority num)
       (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority nil)
-      (decf num))))
+      (cl-decf num))))
 
 (defun hl-sexp-color-update ()
   (setq hl-sexp-background-colors-when-at-del
@@ -615,7 +615,7 @@ surrounding PT."
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority num)
       (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority nil)
-      (decf num))
+      (cl-decf num))
     (setq hl-sexp-mask-whitespace-overlays (nreverse hl-sexp-mask-whitespace-overlays))))
 
 (defun get-leading-space-positions (begin end)
@@ -682,7 +682,7 @@ trailing whitespace in the region delimited with BEGIN and END."
         (setq attributes (plist-put attributes :background (car bg))))
       (pop bg)
       (when (car attr)
-        (loop for (key . (val . _rest)) on (car attr) by #'cddr
+        (cl-loop for (key . (val . _rest)) on (car attr) by #'cddr
               do (setq attributes
                        (plist-put attributes key val))))
       (pop attr)
@@ -691,7 +691,7 @@ trailing whitespace in the region delimited with BEGIN and END."
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-overlays) 'priority num)
       (overlay-put (car hl-sexp-paren-overlays) 'priority 1)
-      (decf num))
+      (cl-decf num))
     (setq hl-sexp-paren-overlays (nreverse hl-sexp-paren-overlays))))
 
 (defun hl-sexp-create-paren-when-at-del-overlays ()
@@ -711,7 +711,7 @@ trailing whitespace in the region delimited with BEGIN and END."
         (setq attributes (plist-put attributes :background (car bg))))
       (pop bg)
       (when (car attr)
-        (loop for (key . (val . _rest)) on (car attr) by #'cddr
+        (cl-loop for (key . (val . _rest)) on (car attr) by #'cddr
               do (setq attributes
                        (plist-put attributes key val))))
       (pop attr)
@@ -720,7 +720,7 @@ trailing whitespace in the region delimited with BEGIN and END."
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority num)
       (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority 1)
-      (decf num))
+      (cl-decf num))
     (setq hl-sexp-paren-when-at-del-overlays (nreverse hl-sexp-paren-when-at-del-overlays))))
 
 ;;; highlight-sexps.el ends here
