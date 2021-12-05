@@ -3950,8 +3950,15 @@ Return nil on failure, (point) otherwise."
   "Dim window before Invoking `ram-avy-goto-subword-2'."
   (interactive)
   (ram-avy--make-backgrounds)
-  (call-interactively #'ram-avy-goto-subword-2)
-  (ram-avy--done))
+  (condition-case err
+      (call-interactively #'ram-avy-goto-subword-2)
+    (error
+     (ram-avy--done)
+     (signal (car err) (cdr err)))
+    (quit
+     (ram-avy--done)
+     (signal 'quit nil))
+    (:success (ram-avy--done))))
 
 (eval-after-load "avy"
   '(progn
