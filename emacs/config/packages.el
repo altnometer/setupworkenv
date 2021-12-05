@@ -2482,6 +2482,7 @@ it can be passed in POS."
                       (:endgroup . nil)
                       (:newline . nil)
                       ("continue" . ?c)
+                      ("emacs" . ?e)
                       ("learn" . ?l)
                       ("read" . ?r)
                       ("review" . ?v)
@@ -4028,6 +4029,7 @@ Return nil on failure, (point) otherwise."
 (define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
 (define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
 (define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
+
 ;;** brackets, parentheses, parens, sexps: functions
 
 (defun ram-forward-list ()
