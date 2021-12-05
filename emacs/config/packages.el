@@ -1139,7 +1139,9 @@ succession."
 (defun ram-describe-function (function &optional swap-history-p)
   "Describe function and store the search string and input to history."
   (interactive
-   (let ((fn (function-called-at-point))
+   (let ((fn (save-excursion
+               (when (looking-at "[[({]") (forward-char))
+               (function-called-at-point)))
          (enable-recursive-minibuffers t)
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
          (hist-item (car ram-describe-function-history))
@@ -1178,10 +1180,10 @@ succession."
 
   ;; reorder history so that the search string is fist and the input is second.
   (when swap-history-p
-      (setq ram-describe-function-history
-            (cons (cadr ram-describe-function-history)
-                  (cons (car ram-describe-function-history)
-                        (cddr ram-describe-function-history)))))
+    (setq ram-describe-function-history
+          (cons (cadr ram-describe-function-history)
+                (cons (car ram-describe-function-history)
+                      (cddr ram-describe-function-history)))))
 
   (let ((default history-add-new-input))
     (setq history-add-new-input nil)
