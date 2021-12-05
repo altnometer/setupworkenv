@@ -3799,8 +3799,9 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 (defun ram-avy-goto-org-heading ()
   (interactive)
-  (let ((avy-style 'post)
-        (avy-command 'ram-avy-goto-org-heading))
+  (let ((avy-style 'at-full)
+        (avy-command 'ram-avy-goto-org-heading)
+        (avy--overlay-offset 0))
     (setq avy-action nil)
     (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg nil :end nil))
   (re-search-forward "[^*[:space:]]" (window-end) t 1)
