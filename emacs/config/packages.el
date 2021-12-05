@@ -3645,7 +3645,7 @@ heading to appear."
         (?! . avy-action-kill-stay)
         (?\' . avy-action-teleport)
         (?M . avy-action-mark)
-        (?/ . avy-action-copy)
+        (?C . avy-action-copy)
         (?, . avy-action-yank)
         ;; (?. . avy-action-ispell)
         ;; (?. . ace-link--org-action)
