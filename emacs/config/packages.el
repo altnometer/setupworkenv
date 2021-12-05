@@ -1445,69 +1445,68 @@ succession."
 ;; credit to https://gitlab.com/protesilaos/dotfiles/-/blob/e8d6268866fb77c0aec6a6b68c9e7183daa65347/emacs/.emacs.d/emacs-init.org
 
 (defun prot/kill-ring-yank-complete ()
-    "Insert the selected `kill-ring' item directly at point.
+  "Insert the selected `kill-ring' item directly at point.
 When region is active, `delete-region'.
 
 Sorting of the `kill-ring' is disabled.  Items appear as they
 normally would when calling `yank' followed by `yank-pop'."
-    (interactive)
-    (let ((kills                    ; do not sort items
-           (lambda (string pred action)
-             (if (eq action 'metadata)
-                 '(metadata (display-sort-function . identity)
-                            (cycle-sort-function . identity))
-               (complete-with-action
-                action kill-ring string pred)))))
-      (icomplete-vertical-do
-          (:separator 'dotted-line :height (/ (frame-height) 4))
-        (when (use-region-p)
-          (delete-region (region-beginning) (region-end)))
-        (insert
-         (completing-read "Yank from kill ring: " kills nil t)))))
+  (interactive)
+  (let ((kills                          ; do not sort items
+         (lambda (string pred action)
+           (if (eq action 'metadata)
+               '(metadata (display-sort-function . identity)
+                          (cycle-sort-function . identity))
+             (complete-with-action
+              action kill-ring string pred)))))
+    (when (use-region-p)
+      (delete-region (region-beginning) (region-end)))
+    (insert
+     (completing-read "Yank from kill ring: " kills nil t))))
 
 (define-key global-map (kbd "C-s-y") #'prot/kill-ring-yank-complete)
 (define-key icomplete-minibuffer-map (kbd "C-v") #'icomplete-vertical-toggle)
 
 ;;**** minibuffer/completion/icomplete: minibuffer actions
 
-;; check Omar Antolín Camarena's "embark"
-;; library: https://github.com/oantolin/embark for more
+(defun ram-kill-ring-save-minibuffer-candidate ()
+  "Save completion candidate into the `kill-ring'."
+  (interactive)
+  (let ((candidate (car completion-all-sorted-completions)))
+    (when (and (minibufferp)
+               (bound-and-true-p icomplete-mode))
+      (kill-new candidate)
+      (message "Copied %s to kill-ring" (propertize candidate 'face 'success)))))
 
-(defmacro prot/minibuffer-completion-act (name doc &rest body)
-  `(defun ,name ()
-     ,doc
-     (interactive)
-     (let ((candidate (car completion-all-sorted-completions)))
-       (when (and (minibufferp)
-                  (bound-and-true-p icomplete-mode))
-         ,@body))))
+(defun ram-kill-minibuffer-candidate ()
+  "Save completion candidate into the `kill-ring' and exit minibuffer."
+  (interactive)
+  (let ((candidate (car completion-all-sorted-completions)))
+    (when (and (minibufferp)
+               (bound-and-true-p icomplete-mode))
+      (kill-new candidate)
+      (top-level))))
 
-(prot/minibuffer-completion-act
- prot/minibuffer-kill-completion
- "Place minibuffer candidate to the top of the `kill-ring'."
- (kill-new `,candidate)
- (message "Copied %s to kill-ring" (propertize `,candidate 'face 'success)))
-
-(prot/minibuffer-completion-act
- prot/minibuffer-insert-completion
- "Insert minibuffer candidate in last active window."
- (with-minibuffer-selected-window (insert `,candidate)))
-
-(prot/minibuffer-completion-act
- prot/minibuffer-insert-completion-exit
- "Like `prot/minibuffer-insert-completion' but exit minibuffer."
- (prot/minibuffer-insert-completion)
- (top-level))
+(defun ram-insert-minibuffer-candidate (arg)
+  "Insert completion candidate."
+  (interactive "p")
+  (let ((candidate (car completion-all-sorted-completions)))
+    (when (and (minibufferp)
+               (bound-and-true-p icomplete-mode))
+      (with-minibuffer-selected-window
+        (insert candidate)
+        ;; exit minibuffer when no universal or digital arg (other than default 1)
+        (when (= 1 arg)
+          (top-level))))))
 
 ;;**** minibuffer/completion/icomplete: bindings
 
-(define-prefix-command 'prot/minibuffer-completion-map)
+;;**** minibuffer/completion/icomplete/bindings: minibuffer-local-completion-map
 
-(define-key prot/minibuffer-completion-map (kbd "w") 'prot/minibuffer-kill-completion)
-(define-key prot/minibuffer-completion-map (kbd "i") 'prot/minibuffer-insert-completion)
-(define-key prot/minibuffer-completion-map (kbd "j") 'prot/minibuffer-insert-completion-exit)
+(define-key minibuffer-local-completion-map (kbd "M-w") #'ram-kill-ring-save-minibuffer-candidate)
+(define-key minibuffer-local-completion-map (kbd "C-w") #'ram-kill-minibuffer-candidate)
+(define-key minibuffer-local-completion-map (kbd "C-y") #'ram-insert-minibuffer-candidate)
 
-(define-key minibuffer-local-completion-map (kbd "M-o") prot/minibuffer-completion-map)
+;;**** minibuffer/completion/icomplete/bindings: icomplete-minibuffer-map
 
 (define-key icomplete-minibuffer-map (kbd "<tab>") #'icomplete-force-complete)
 ;; exit with completion
