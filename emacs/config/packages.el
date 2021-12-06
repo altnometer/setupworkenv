@@ -1136,7 +1136,7 @@ succession."
   "`ram-describe-function' history list.")
 (put 'ram-describe-function-history 'history-length 100)
 
-(defun ram-describe-function (function &optional swap-history-p)
+(defun ram-describe-function (fn-name &optional swap-history-p)
   "Describe function and store the search string and input to history."
   (interactive
    (let ((fn (save-excursion
@@ -1187,7 +1187,7 @@ succession."
 
   (let ((default history-add-new-input))
     (setq history-add-new-input nil)
-    (describe-function function)
+    (describe-function fn-name)
     (setq history-add-new-input default)))
 
 ;; (define-key ram-leader-map-tap-global "v" #'ram-describe-function)
