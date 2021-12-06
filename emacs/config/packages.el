@@ -3683,7 +3683,7 @@ heading to appear."
 ;;           (?# . avy-action-zap-to-char)))
 
 (setq avy-dispatch-alist
-      '((?- . avy-action-kill-move)
+      '((?K . avy-action-kill-move)
         (?! . avy-action-kill-stay)
         (?\' . avy-action-teleport)
         (?M . avy-action-mark)
