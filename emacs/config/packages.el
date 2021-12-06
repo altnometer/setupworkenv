@@ -196,6 +196,8 @@ abort completely with `C-g'."
           ("comn" "computation")
           ("comp" "compute")
           ("comd" "command")
+          ("compl" "completion")
+          ("complg" "completing")
 
           ("comds" "commands")
 
