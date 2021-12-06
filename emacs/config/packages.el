@@ -1018,6 +1018,82 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
                   ("([^(]+?\\(, default\\(?: is\\)? \\(.*\\)\\)):? \\'" 1)
                   ("\\( \\[.*\\]\\):? *\\'" 1))))
 
+
+;;** minibuffer: actions
+
+(defun ram-kill-ring-save-minibuffer-candidate ()
+  "Save completion candidate into the `kill-ring'."
+  (interactive)
+  (let ((candidate (car completion-all-sorted-completions)))
+    (when (and (minibufferp)
+               (bound-and-true-p icomplete-mode))
+      (kill-new candidate)
+      (message "Copied %s to kill-ring" (propertize candidate 'face 'success)))))
+
+(defun ram-kill-minibuffer-candidate ()
+  "Save completion candidate into the `kill-ring' and exit minibuffer."
+  (interactive)
+  (let ((candidate (car completion-all-sorted-completions)))
+    (when (and (minibufferp)
+               (bound-and-true-p icomplete-mode))
+      (kill-new candidate)
+      (top-level))))
+
+(defun ram-insert-minibuffer-candidate (arg)
+  "Insert completion candidate."
+  (interactive "p")
+  (let ((candidate (car completion-all-sorted-completions)))
+    (when (and (minibufferp)
+               (bound-and-true-p icomplete-mode))
+      (with-minibuffer-selected-window
+        (insert candidate)
+        ;; exit minibuffer when no universal or digital arg (other than default 1)
+        (when (= 1 arg)
+          (top-level))))))
+
+(defun ram-describe-function-from-minibuffer ()
+  "Call `ram-describe-function' and use previous minibuffer input."
+  (interactive)
+   (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol))))
+    (minibuffer-with-setup-hook
+        (lambda () (insert user-input))
+      (condition-case err
+          (call-interactively #'ram-describe-function)
+        (quit (abort-recursive-edit))
+        (:success (abort-recursive-edit))))))
+
+(defun ram-describe-variable-from-minibuffer ()
+  "Call `ram-describe-variable' and use previous minibuffer input."
+  (interactive)
+  (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol))))
+    (minibuffer-with-setup-hook
+        (lambda () (insert user-input))
+      (condition-case err
+          (call-interactively #'ram-describe-variable)
+        (quit (abort-recursive-edit))
+        (:success (abort-recursive-edit))))))
+
+(defun ram-describe-symbol-from-minibuffer ()
+  "Call `describe-symbol' and use previous minibuffer input."
+  (interactive)
+  (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol))))
+    (minibuffer-with-setup-hook
+        (lambda () (insert user-input))
+      (condition-case err
+          (call-interactively #'describe-symbol)
+        (quit (abort-recursive-edit))
+        (:success (abort-recursive-edit))))))
+
+;;** minibuffer: bindings: minibuffer-local-completion-map
+
+(define-key minibuffer-local-completion-map (kbd "C-h f") #'ram-describe-function-from-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "C-h v") #'ram-describe-variable-from-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "C-h o") #'ram-describe-symbol-from-minibuffer)
+
+(define-key minibuffer-local-completion-map (kbd "M-w") #'ram-kill-ring-save-minibuffer-candidate)
+(define-key minibuffer-local-completion-map (kbd "C-w") #'ram-kill-minibuffer-candidate)
+(define-key minibuffer-local-completion-map (kbd "C-y") #'ram-insert-minibuffer-candidate)
+
 ;;** minibuffer: functions
 
 ;;*** minibuffer/functions: supporting functions
@@ -1085,10 +1161,10 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
              (and second-element (equal hist-item third-element))))))
 
   (when swap-history-p
-      (setq ram-describe-variable-history
-            (cons (cadr ram-describe-variable-history)
-                  (cons (car ram-describe-variable-history)
-                        (cddr ram-describe-variable-history)))))
+    (setq ram-describe-variable-history
+          (cons (cadr ram-describe-variable-history)
+                (cons (car ram-describe-variable-history)
+                      (cddr ram-describe-variable-history)))))
 
   (let ((default history-add-new-input))
     (setq history-add-new-input nil)
@@ -1140,7 +1216,9 @@ succession."
   "Describe function and store the search string and input to history."
   (interactive
    (let ((fn (save-excursion
-               (when (looking-at "[[({]") (forward-char))
+               (cond
+                ((looking-at "[[({]") (forward-char))
+                ((looking-back "[])}]") (forward-sexp -1) (forward-char)))
                (function-called-at-point)))
          (enable-recursive-minibuffers t)
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
@@ -1346,7 +1424,9 @@ succession."
                             defs
                             nil t nil
                             'ram-jump-to-def-history
-                            `,(if str-at-point str-at-point nil)
+                            (if str-at-point
+                                str-at-point
+                              ram-jump-to-def-history)
                             nil)
                             ;; (car ram-jump-to-def-history)
                            defs)))
@@ -1468,47 +1548,7 @@ normally would when calling `yank' followed by `yank-pop'."
 (define-key global-map (kbd "C-s-y") #'prot/kill-ring-yank-complete)
 (define-key icomplete-minibuffer-map (kbd "C-v") #'icomplete-vertical-toggle)
 
-;;**** minibuffer/completion/icomplete: minibuffer actions
-
-(defun ram-kill-ring-save-minibuffer-candidate ()
-  "Save completion candidate into the `kill-ring'."
-  (interactive)
-  (let ((candidate (car completion-all-sorted-completions)))
-    (when (and (minibufferp)
-               (bound-and-true-p icomplete-mode))
-      (kill-new candidate)
-      (message "Copied %s to kill-ring" (propertize candidate 'face 'success)))))
-
-(defun ram-kill-minibuffer-candidate ()
-  "Save completion candidate into the `kill-ring' and exit minibuffer."
-  (interactive)
-  (let ((candidate (car completion-all-sorted-completions)))
-    (when (and (minibufferp)
-               (bound-and-true-p icomplete-mode))
-      (kill-new candidate)
-      (top-level))))
-
-(defun ram-insert-minibuffer-candidate (arg)
-  "Insert completion candidate."
-  (interactive "p")
-  (let ((candidate (car completion-all-sorted-completions)))
-    (when (and (minibufferp)
-               (bound-and-true-p icomplete-mode))
-      (with-minibuffer-selected-window
-        (insert candidate)
-        ;; exit minibuffer when no universal or digital arg (other than default 1)
-        (when (= 1 arg)
-          (top-level))))))
-
 ;;**** minibuffer/completion/icomplete: bindings
-
-;;**** minibuffer/completion/icomplete/bindings: minibuffer-local-completion-map
-
-(define-key minibuffer-local-completion-map (kbd "M-w") #'ram-kill-ring-save-minibuffer-candidate)
-(define-key minibuffer-local-completion-map (kbd "C-w") #'ram-kill-minibuffer-candidate)
-(define-key minibuffer-local-completion-map (kbd "C-y") #'ram-insert-minibuffer-candidate)
-
-;;**** minibuffer/completion/icomplete/bindings: icomplete-minibuffer-map
 
 (define-key icomplete-minibuffer-map (kbd "<tab>") #'icomplete-force-complete)
 ;; exit with completion
@@ -4361,7 +4401,6 @@ If there is no Clojure REPL, send warning."
 ;;*** ivy Settings
 ;; (ivy-mode 1)
 (setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
 ;; credit to https://gitlab.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/emacs-init.org
 ;; gives an error: Debugger entered--Lisp error: (wrong-type-argument symbolp "%-4d ")
 ;; (set ivy-count-format "(%d/%d) ")
