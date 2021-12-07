@@ -1403,20 +1403,25 @@ succession."
 (defun ram-jump-to-def (def-str &optional swap-history-p)
   "Jump to def."
   (interactive
-   (let ((defs '())
-         (def-regex (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)"))
-         (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
-         (hist-item (car ram-jump-to-def-history))
-         (str-at-point (thing-at-point 'symbol)))
+   (let* ((defs '())
+          (buffer (if (minibufferp)
+                      my-pre-minibuffer-buffer
+                    (current-buffer)))
+          (def-regex (with-current-buffer buffer
+                       (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
+          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+          (hist-item (car ram-jump-to-def-history))
+          (str-at-point (thing-at-point 'symbol)))
      (define-key minibuffer-local-completion-map (kbd "<return>")
        (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-def-history))
-     (save-excursion
-       (goto-char (point-max))
-       (while (re-search-forward def-regex nil t -1)
-         ;; (cl-pushnew (match-string 1) defs)
-         ;; completing-read does not display duplicates,
-         ;; modify duplicate string to make it unique
-         (setq defs (cons (cons (match-string-no-properties 1) (point)) defs))))
+     (with-current-buffer buffer
+       (save-excursion
+         (goto-char (point-max))
+         (while (re-search-forward def-regex nil t -1)
+           ;; (cl-pushnew (match-string 1) defs)
+           ;; completing-read does not display duplicates,
+           ;; modify duplicate string to make it unique
+           (setq defs (cons (cons (match-string-no-properties 1) (point)) defs)))))
      ;; make duplicates unique adding "*" , otherwise, completing-read would not show them.
      (setq defs (ram-make-duplicate-keys-unique defs))
      (setq val (cdr (assoc (completing-read
@@ -1430,7 +1435,7 @@ succession."
                                 str-at-point
                               ram-jump-to-def-history)
                             nil)
-                            ;; (car ram-jump-to-def-history)
+                           ;; (car ram-jump-to-def-history)
                            defs)))
      (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
      ;; (print (format "val is: %s" val))
