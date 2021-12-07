@@ -596,6 +596,7 @@ Disable `icomplete-vertical-mode' for this command."
 (run-with-idle-timer 1 nil #'set-displaying-eval-defun-result-inline)
 
 (define-key emacs-lisp-mode-map (kbd "<S-return>") 'newline-and-indent)
+(define-key emacs-lisp-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
 
 ;;* shell
 
@@ -1092,9 +1093,38 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 (define-key minibuffer-local-completion-map (kbd "C-h v") #'ram-describe-variable-from-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "C-h o") #'ram-describe-symbol-from-minibuffer)
 
+(define-key minibuffer-local-completion-map (kbd "M-<f5>") #'ram-jump-to-outline-from-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "M-S-<f5>") #'ram-jump-to-def-from-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "M-w") #'ram-kill-ring-save-minibuffer-candidate)
 (define-key minibuffer-local-completion-map (kbd "C-w") #'ram-kill-minibuffer-candidate)
 (define-key minibuffer-local-completion-map (kbd "C-y") #'ram-insert-minibuffer-candidate)
+
+(define-key minibuffer-local-completion-map (kbd "M-n")
+  (lambda (arg) (interactive "p")
+    (next-history-element arg)
+    (move-end-of-line 1)))
+
+(define-key minibuffer-local-completion-map (kbd "M-p")
+  (lambda (arg) (interactive "p")
+    (previous-history-element arg)
+    (move-end-of-line 1)))
+
+(define-key minibuffer-local-completion-map (kbd "?")
+  (lambda () (interactive)
+    "Call `minibuffer-completion-help' and select *Completions* window. "
+    (minibuffer-completion-help)
+    (let ((completions (get-buffer-window "*Completions*")))
+      (if (and completions
+               (not (eq (selected-window)
+                        completions)))
+          (select-window completions nil)))))
+
+;; force input unconditionally
+(define-key minibuffer-local-completion-map (kbd "C-j") #'exit-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "<return>") #'minibuffer-force-complete-and-exit)
+
+;; Space should never complete
+(define-key minibuffer-local-completion-map (kbd "SPC") nil)
 
 ;;** minibuffer: functions
 
@@ -1471,37 +1501,6 @@ succession."
     ;;   (setq pulse-flag default))
 
     ))
-
-(define-key emacs-lisp-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
-
-;;** minibuffer: bindings
-
-(define-key minibuffer-local-completion-map (kbd "M-n")
-  (lambda (arg) (interactive "p")
-    (next-history-element arg)
-    (move-end-of-line 1)))
-
-(define-key minibuffer-local-completion-map (kbd "M-p")
-  (lambda (arg) (interactive "p")
-    (previous-history-element arg)
-    (move-end-of-line 1)))
-
-(define-key minibuffer-local-completion-map (kbd "?")
-  (lambda () (interactive)
-    "Call `minibuffer-completion-help' and select *Completions* window. "
-    (minibuffer-completion-help)
-    (let ((completions (get-buffer-window "*Completions*")))
-      (if (and completions
-               (not (eq (selected-window)
-                        completions)))
-          (select-window completions nil)))))
-
-;; force input unconditionally
-(define-key minibuffer-local-completion-map (kbd "C-j") #'exit-minibuffer)
-(define-key minibuffer-local-completion-map (kbd "<return>") #'minibuffer-force-complete-and-exit)
-
-;; Space should never complete
-(define-key minibuffer-local-completion-map (kbd "SPC") nil)
 
 ;;** minibuffer: completion
 
