@@ -1479,15 +1479,26 @@ succession."
 (defun ram-jump-to-def (def-str &optional swap-history-p)
   "Jump to def."
   (interactive
-   (let* ((defs '())
-          (buffer (if (minibufferp)
-                      my-pre-minibuffer-buffer
-                    (current-buffer)))
-          (def-regex (with-current-buffer buffer
-                       (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
-          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
-          (hist-item (car ram-jump-to-def-history))
-          (str-at-point (thing-at-point 'symbol)))
+   (cl-letf* ((defs '())
+              (buffer (if (minibufferp)
+                          my-pre-minibuffer-buffer
+                        (current-buffer)))
+              (def-regex (with-current-buffer buffer
+                           (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
+              (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+              (hist-item (car ram-jump-to-def-history))
+              (str-at-point (thing-at-point 'symbol))
+              ((symbol-function (lookup-key minibuffer-local-completion-map "\C-y"))
+               (lambda (arg) (interactive "p")
+                 (let ((candidate (replace-regexp-in-string "\\*+$" ""
+                                                            (car (last (split-string (substring-no-properties
+                                                                                      (car completion-all-sorted-completions))))))))
+                   (when (minibufferp)
+                     (with-minibuffer-selected-window
+                       (insert candidate)
+                       ;; exit minibuffer when no universal or digital arg (other than default 1)
+                       (when (= 1 arg)
+                         (top-level))))))))
      (define-key minibuffer-local-completion-map (kbd "<return>")
        (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-def-history))
      (with-current-buffer buffer
