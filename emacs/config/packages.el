@@ -1291,6 +1291,9 @@ succession."
   "Jump to outline."
   (interactive
    (let ((headlines '())
+         (buffer (if (minibufferp)
+                     my-pre-minibuffer-buffer
+                   (current-buffer)))
          (headline-regex
           ;; TODO: use 'outline-regexp and copy the line
           (cond
@@ -1319,10 +1322,11 @@ succession."
          (hist-item (car ram-jump-to-outline-history)))
      (define-key minibuffer-local-completion-map (kbd "<return>")
        (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-outline-history))
-     (save-excursion
-       (goto-char (point-max))
-       (while (re-search-forward headline-regex nil t -1)
-         (setq headlines (cons (cons (match-string-no-properties 3) (point)) headlines))))
+     (with-current-buffer buffer
+       (save-excursion
+         (goto-char (point-max))
+         (while (re-search-forward headline-regex nil t -1)
+           (setq headlines (cons (cons (match-string-no-properties 3) (point)) headlines)))))
      (setq headlines (ram-make-duplicate-keys-unique headlines))
      (setq val (cdr (assoc (completing-read
                             (format-prompt
