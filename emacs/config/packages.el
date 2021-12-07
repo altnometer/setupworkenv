@@ -1107,6 +1107,28 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
         (quit (abort-recursive-edit))
         (:success (abort-recursive-edit))))))
 
+(defun ram-jump-to-outline-from-minibuffer ()
+  "Call `ram-jump-to-outline' and use previous minibuffer input."
+  (interactive)
+  (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol))))
+    (minibuffer-with-setup-hook
+        (lambda () (insert user-input))
+      (condition-case err
+          (call-interactively #'ram-jump-to-outline)
+        (quit (abort-recursive-edit))
+        (:success (abort-recursive-edit))))))
+
+(defun ram-jump-to-def-from-minibuffer ()
+  "Call `ram-jump-to-def' and use previous minibuffer input."
+  (interactive)
+  (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol))))
+    (minibuffer-with-setup-hook
+        (lambda () (insert user-input))
+      (condition-case err
+          (call-interactively #'ram-jump-to-def)
+        (quit (abort-recursive-edit))
+        (:success (abort-recursive-edit))))))
+
 ;;** minibuffer: bindings: minibuffer-local-completion-map
 
 (define-key minibuffer-local-completion-map (kbd "C-h f") #'ram-describe-function-from-minibuffer)
