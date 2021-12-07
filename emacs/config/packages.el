@@ -3736,16 +3736,16 @@ heading to appear."
 
 (setq avy-dispatch-alist
       '((?K . avy-action-kill-move)
-        (?! . avy-action-kill-stay)
-        (?\' . avy-action-teleport)
+        (?_ . avy-action-kill-stay)     ; same place as 'K'
+        (?T . avy-action-teleport)
         (?M . avy-action-mark)
         (?C . avy-action-copy)
-        (?, . avy-action-yank)
+        (?Y . avy-action-yank)
         ;; (?. . avy-action-ispell)
         ;; (?. . ace-link--org-action)
         (?. . avy-action-goto)
         (?# . avy-action-zap-to-char)
-        (?> . ace-link--org-action)
+        (?L . ace-link--org-action)
         (?H . ram-avy-action-help)))
 
 ;;** avy: settings
