@@ -1423,6 +1423,7 @@ succession."
                 (cons (car ram-jump-to-outline-history)
                       (cddr ram-jump-to-outline-history)))))
   (when val
+    (when (minibufferp) (switch-to-buffer my-pre-minibuffer-buffer))
     (push-mark)
     (goto-char val)
     (beginning-of-line)
@@ -1540,6 +1541,7 @@ succession."
                 (cons (car ram-jump-to-def-history)
                       (cddr ram-jump-to-def-history)))))
   (when val
+    (when (minibufferp) (switch-to-buffer my-pre-minibuffer-buffer))
     (push-mark)
     (goto-char val)
     (beginning-of-line)
