@@ -1023,24 +1023,11 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 
 ;;** minibuffer/settings: pre-minibuffer-buffer
 
-;; copied from https://emacs.stackexchange.com/a/48877/31822
+;; if you need a last active buffer before you entered the minibuffer see
+;; https://emacs.stackexchange.com/a/48877/31822
 
-(defvar my-pre-minibuffer-buffer nil
-  "Buffer that was current before the minibuffer became active.")
+;; for my needs, #'with-minibuffer-selected-window seem to work for now.
 
-(defun my-save-pre-buffer ()
-  "Set `my-pre-minibuffer-buffer'."
-  (setq my-pre-minibuffer-buffer  (my-last-non-minibuffer-buffer)))
-
-(defun my-last-non-minibuffer-buffer ()
-  "Return the most recently used non-minibuffer live buffer."
-  (catch 'my-last-non-minibuffer-buffer
-    (dolist (buf  (buffer-list))
-      (when (and (buffer-live-p buf)  (not (minibufferp buf)))
-        (throw 'my-last-non-minibuffer-buffer buf)))
-    nil))
-
-(add-hook 'minibuffer-setup-hook 'my-save-pre-buffer)
 
 ;;** minibuffer: actions
 
