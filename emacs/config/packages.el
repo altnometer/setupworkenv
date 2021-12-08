@@ -1364,7 +1364,8 @@ succession."
   (interactive
    (let ((headlines '())
          (buffer (if (minibufferp)
-                     my-pre-minibuffer-buffer
+                     (with-minibuffer-selected-window
+                       (current-buffer))
                    (current-buffer)))
          (headline-regex
           ;; TODO: use 'outline-regexp and copy the line
@@ -1390,38 +1391,42 @@ succession."
                 line-end))
            (t
             "^;;\\(?:;\\(;[^#]\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
-         (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+         (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
          (hist-item (car ram-jump-to-outline-history)))
-     (define-key minibuffer-local-completion-map (kbd "<return>")
-       (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-outline-history))
-     (with-current-buffer buffer
-       (save-excursion
-         (goto-char (point-max))
-         (while (re-search-forward headline-regex nil t -1)
-           (setq headlines (cons (cons (match-string-no-properties 3) (point)) headlines)))))
-     (setq headlines (ram-make-duplicate-keys-unique headlines))
-     (setq val (cdr (assoc (completing-read
-                            (format-prompt
-                             "Find heading" (car ram-jump-to-outline-history))
-                            headlines
-                            nil t nil
-                            'ram-jump-to-outline-history
-                            (car ram-jump-to-outline-history))
-                           headlines)))
-     (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
-     (list val
-           ;; if two items are inserted, swap them so that the search str is first
-           (let ((third-element (caddr ram-jump-to-outline-history))
-                 (second-element (cadr ram-jump-to-outline-history)))
-             (and second-element (equal hist-item third-element))))))
+     (setf (alist-get 'return minibuffer-local-completion-map)
+           (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-outline-history))
+     (condition-case err
+         (progn (with-current-buffer buffer
+                  (save-excursion
+                    (goto-char (point-max))
+                    (while (re-search-forward headline-regex nil t -1)
+                      (setq headlines (cons (cons (match-string-no-properties 3) (point)) headlines)))))
+                (setq headlines (ram-make-duplicate-keys-unique headlines))
+                (setq val (cdr (assoc (completing-read
+                                       (format-prompt
+                                        "Find heading" (car ram-jump-to-outline-history))
+                                       headlines
+                                       nil t nil
+                                       'ram-jump-to-outline-history
+                                       (car ram-jump-to-outline-history))
+                                      headlines)))
+                (define-key minibuffer-local-completion-map (kbd "<return>") old-binding-to-return)
+                (list val
+                      ;; if two items are inserted, swap them so that the search str is first
+                      (let ((third-element (caddr ram-jump-to-outline-history))
+                            (second-element (cadr ram-jump-to-outline-history)))
+                        (and second-element (equal hist-item third-element)))))
+       (quit
+        (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
+        (signal 'quit nil))))
 
-  ;; reorder history so that the search string is fist and the input is second.
-  ;; Use it for different order when pressing <M-p> for previous history item.
-  (when swap-history-p
-    (setq ram-jump-to-outline-history
-          (cons (cadr ram-jump-to-outline-history)
-                (cons (car ram-jump-to-outline-history)
-                      (cddr ram-jump-to-outline-history)))))
+   ;; reorder history so that the search string is fist and the input is second.
+   ;; Use it for different order when pressing <M-p> for previous history item.
+   (when swap-history-p
+     (setq ram-jump-to-outline-history
+           (cons (cadr ram-jump-to-outline-history)
+                 (cons (car ram-jump-to-outline-history)
+                       (cddr ram-jump-to-outline-history))))))
   (when val
     (when (minibufferp) (switch-to-buffer my-pre-minibuffer-buffer))
     (push-mark)
@@ -1480,58 +1485,69 @@ succession."
 (defun ram-jump-to-def (def-str &optional swap-history-p)
   "Jump to def."
   (interactive
-   (cl-letf* ((defs '())
+   (let* ((defs '())
               (buffer (if (minibufferp)
-                          my-pre-minibuffer-buffer
+                          (with-minibuffer-selected-window
+                            (current-buffer))
                         (current-buffer)))
               (def-regex (with-current-buffer buffer
                            (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
-              (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
+              (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
               (hist-item (car ram-jump-to-def-history))
               (str-at-point (thing-at-point 'symbol))
-              ((symbol-function (lookup-key minibuffer-local-completion-map "\C-y"))
-               (lambda (arg) (interactive "p")
-                 (let ((candidate (replace-regexp-in-string "\\*+$" ""
-                                                            (car (last (split-string (substring-no-properties
-                                                                                      (car completion-all-sorted-completions))))))))
-                   (when (minibufferp)
-                     (with-minibuffer-selected-window
-                       (insert candidate)
-                       ;; exit minibuffer when no universal or digital arg (other than default 1)
-                       (when (= 1 arg)
-                         (top-level))))))))
-     (define-key minibuffer-local-completion-map (kbd "<return>")
-       (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-def-history))
-     (with-current-buffer buffer
-       (save-excursion
-         (goto-char (point-max))
-         (while (re-search-forward def-regex nil t -1)
-           ;; (cl-pushnew (match-string 1) defs)
-           ;; completing-read does not display duplicates,
-           ;; modify duplicate string to make it unique
-           (setq defs (cons (cons (match-string-no-properties 1) (point)) defs)))))
-     ;; make duplicates unique adding "*" , otherwise, completing-read would not show them.
-     (setq defs (ram-make-duplicate-keys-unique defs))
-     (setq val (cdr (assoc (completing-read
-                            (if str-at-point
-                                (format-prompt "Jump to def" str-at-point)
-                              (format-prompt "Jump to def" nil))
-                            defs
-                            nil t nil
-                            'ram-jump-to-def-history
-                            (if str-at-point
-                                str-at-point
-                              ram-jump-to-def-history)
-                            nil)
-                           ;; (car ram-jump-to-def-history)
-                           defs)))
-     (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
-     ;; (print (format "val is: %s" val))
-     (list val
-           ;; if two items are inserted, swap them so that the search str is first
-           (let ((third-element (caddr ram-jump-to-def-history))
-                 (second-element (cadr ram-jump-to-def-history)))
-             (and second-element (equal hist-item third-element))))))
+              (old-binding-to-control-y (cdr (assoc ?\C-y minibuffer-local-completion-map))))
+     ;; (define-key minibuffer-local-completion-map (kbd "<return>")
+     ;;   (ram-add-to-history-cmd ram-add-to-jump-to-def-history 'ram-jump-to-def-history))
+     (setf (alist-get ?\C-y minibuffer-local-completion-map)
+           (lambda (arg) (interactive "p")
+             (let ((candidate
+                    (replace-regexp-in-string "\\*+$" ""
+                                              (car (last (split-string (substring-no-properties
+                                                                        (car completion-all-sorted-completions))))))))
+               (when (minibufferp)
+                 (with-minibuffer-selected-window
+                   (insert candidate)
+                   ;; exit minibuffer when no universal or digital arg (other than default 1)
+                   (when (= 1 arg)
+                     (top-level)))))))
+     (setf (alist-get 'return minibuffer-local-completion-map)
+           (ram-add-to-history-cmd ram-add-to-jump-to-def-history 'ram-jump-to-def-history))
+
+     (condition-case err
+         (progn (with-current-buffer buffer
+                  (save-excursion
+                    (goto-char (point-max))
+                    (while (re-search-forward def-regex nil t -1)
+                      ;; (cl-pushnew (match-string 1) defs)
+                      ;; completing-read does not display duplicates,
+                      ;; modify duplicate string to make it unique
+                      (setq defs (cons (cons (match-string-no-properties 1) (point)) defs)))))
+                ;; make duplicates unique adding "*" , otherwise, completing-read would not show them.
+                (setq defs (ram-make-duplicate-keys-unique defs))
+                (setq val (cdr (assoc (completing-read
+                                       (if str-at-point
+                                           (format-prompt "Jump to def" str-at-point)
+                                         (format-prompt "Jump to def" nil))
+                                       defs
+                                       nil t nil
+                                       'ram-jump-to-def-history
+                                       (if str-at-point
+                                           str-at-point
+                                         ram-jump-to-def-history)
+                                       nil)
+                                      ;; (car ram-jump-to-def-history)
+                                      defs)))
+                (setf (alist-get ?\C-y minibuffer-local-completion-map) old-binding-to-control-y)
+                (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
+                (list val
+                      ;; if two items are inserted, swap them so that the search str is first
+                      (let ((third-element (caddr ram-jump-to-def-history))
+                            (second-element (cadr ram-jump-to-def-history)))
+                        (and second-element (equal hist-item third-element)))))
+       (quit
+        (setf (alist-get ?\C-y minibuffer-local-completion-map) old-binding-to-control-y)
+        (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
+        (signal 'quit nil)))))
 
   ;; reorder history so that the search string is fist and the input is second.
   ;; Use it for different order when pressing <M-p> for previous history item.
@@ -1545,17 +1561,7 @@ succession."
     (push-mark)
     (goto-char val)
     (beginning-of-line)
-    (recenter)
-
-    ;; (let ((default (if (boundp pulse-flag)
-    ;;                    pulse-flag
-    ;;                  nil)))
-    ;;   ;; pulse-iteration pulse-delay
-    ;;   (setq pulse-flag nil)
-    ;;   (pulse-momentary-highlight-one-line (point) 'isearch)
-    ;;   (setq pulse-flag default))
-
-    ))
+    (recenter)))
 
 ;;** minibuffer: completion
 
