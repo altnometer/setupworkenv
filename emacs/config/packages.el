@@ -4068,16 +4068,19 @@ Return nil on failure, (point) otherwise."
      ;;                                      (avy-goto-word-or-subword-1)
      ;;                                      (ram-avy--done)))
      (define-key global-map (kbd "s-s") #'ram-avy-goto-subword-2-dim)
-     (define-key emacs-lisp-mode-map (kbd "s-s") #'ram-avy-goto-ace-paren)
+     ;; (define-key global-map (kbd "s-s") 'avy-goto-char-2)
+     (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
+     ;; (define-key global-map (kbd "s-R") 'ram-avy-goto-top-paren)
+     ;; (define-key global-map (kbd "s-d") 'avy-goto-char-in-line)
+     ;; (define-key global-map (kbd "s-N") 'avy-resume)
+
+     (define-key prog-mode-map (kbd "s-R") #'ram-avy-goto-top-paren)
+
+     (define-key emacs-lisp-mode-map (kbd "s-s") #'ram-avy-goto-subword-2-dim)
      ;; (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-subword-2-dim)
      (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-symbol-in-defun)
      (define-key emacs-lisp-mode-map (kbd "C-s-s") #'ram-avy-goto-word-in-defun)
-     (define-key prog-mode-map (kbd "s-r") #'ram-avy-goto-top-paren)
-     ;; (define-key global-map (kbd "s-s") 'avy-goto-char-2)
-     (define-key global-map (kbd "s-r") 'ram-avy-goto-paragraph-start)
-     (define-key global-map (kbd "s-R") 'ram-avy-goto-top-paren)
-     ;; (define-key global-map (kbd "s-d") 'avy-goto-char-in-line)
-     ;; (define-key global-map (kbd "s-N") 'avy-resume)
+     (define-key emacs-lisp-mode-map (kbd "s-r") #'ram-avy-goto-ace-paren)
      ))
 
 ;;* projectile
