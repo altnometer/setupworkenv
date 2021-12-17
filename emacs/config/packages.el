@@ -1278,8 +1278,8 @@ succession."
   (interactive
    (let ((fn (save-excursion
                (cond
-                ((looking-at "[[({]") (forward-char))
-                ((looking-back "[])}]") (forward-sexp -1) (forward-char)))
+                ((looking-at ram-open-delim-re) (forward-char))
+                ((looking-back ram-close-delim-re) (forward-sexp -1) (forward-char)))
                (function-called-at-point)))
          (enable-recursive-minibuffers t)
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
@@ -3713,7 +3713,7 @@ heading to appear."
 (defun ram-avy-action-help (pt)
   (save-excursion
     (goto-char pt)
-    (if (looking-at "[[({]")
+    (if (looking-at ram-open-delim-re)
         (forward-char))
     (let (;; (symbol (thing-at-point 'sexp))
           (symbol (symbol-at-point)))
@@ -3945,7 +3945,7 @@ Return nil on failure, (point) otherwise."
   (catch 'break
     (dotimes (_i arg)
       (if (ignore-errors (up-list) t)
-          (when (looking-at-p "[[({]")
+          (when (looking-at-p ram-open-delim-re)
             (forward-list))
         (throw 'break nil)))
     (point)))
@@ -3958,7 +3958,7 @@ Return nil on failure, (point) otherwise."
   (let ((oldpt (point))
         newpt)
     (ram-up-list-forward arg)
-    (when (looking-back "[])}]" (line-beginning-position))
+    (when (looking-back ram-close-delim-re (line-beginning-position))
       (forward-list -1))
     (if (= oldpt (setq newpt (point)))
         nil
@@ -4187,7 +4187,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((back-to-delim ()
                 "Jump backward to the open delimiter that is not in a string."
-                (re-search-forward "[[({]" nil t -1)
+                (re-search-forward ram-open-delim-re nil t -1)
                 ;; skip matches in strings and comments
                 (let ((s (syntax-ppss)))
                   (if (or (nth 3 s)
@@ -4200,7 +4200,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((forward-to-delim ()
                 "Jump forward to the open delimiter that is not in a string."
-                (re-search-forward "[[({]" nil t 1)
+                (re-search-forward ram-open-delim-re nil t 1)
                 ;; skip matches in strings and comments
                 (let ((s (syntax-ppss)))
                   (if (or (nth 3 s)
@@ -4215,7 +4215,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((forward-to-delim ()
                 "Jump forward to the close delimiter that is not in a string."
-                (re-search-forward "[])}]" nil t 1)
+                (re-search-forward ram-close-delim-re nil t 1)
                 ;; skip matches in strings and comments
                 (let ((s (syntax-ppss)))
                   (if (or (nth 3 s)
@@ -4233,12 +4233,17 @@ If cursor is not on a bracket, call `backward-up-list'."
     (cond
      ((eq (char-after) ?\") (forward-sexp))
      ((eq (char-before) ?\") (backward-sexp ))
-     ((looking-at "[[({]") (forward-sexp))
-     ((looking-back "[])}]" (max (- (point) 1) 1))
+     ((looking-at ram-open-delim-re) (forward-sexp))
+     ((looking-back ram-close-delim-re (max (- (point) 1) 1))
       (backward-sexp))
      (t (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)))))
 
 ;;** brackets, parentheses, parens, sexps: settings
+
+(defvar ram-open-delim-re "[[({]"
+  "Regexp to match common open delimiters.")
+(defvar ram-close-delim-re "[])}]"
+  "Regexp to match common close delimiters.")
 
 ;; If true, #'paredit-blink-paren-match is slow
 (setq blink-matching-paren nil)
