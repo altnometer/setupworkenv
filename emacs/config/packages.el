@@ -870,17 +870,17 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;; Line-editing shortcuts
 
-(setq exwm-input-simulation-keys
-      '(([?\C-b] . [left])
-        ([?\C-f] . [right])
-        ([?\C-p] . [up])
-        ([?\C-n] . [down])
-        ([?\C-a] . [home])
-        ([?\C-e] . [end])
-        ([?\M-v] . [prior])
-        ([?\C-v] . [next])
-        ([?\C-d] . [delete])
-        ([?\C-k] . [S-end delete])))
+;; (setq exwm-input-simulation-keys
+;;       '(([?\C-b] . [left])
+;;         ([?\C-f] . [right])
+;;         ([?\C-p] . [up])
+;;         ([?\C-n] . [down])
+;;         ([?\C-a] . [home])
+;;         ([?\C-e] . [end])
+;;         ([?\M-v] . [prior])
+;;         ([?\C-v] . [next])
+;;         ([?\C-d] . [delete])
+;;         ([?\C-k] . [S-end delete])))
 
 ;; must be the last in 'exwm settings
 (exwm-randr-enable)
