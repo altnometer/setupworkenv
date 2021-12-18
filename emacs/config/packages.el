@@ -6501,6 +6501,20 @@ buffer-local `ram-face-remapping-cookie'."
 (add-hook 'ram-load-theme-hook (lambda ()
                                  (set-face-attribute 'region nil :extend nil)))
 
+;;** system: position registers
+
+(defun ram-point-to-register-x ()
+  (interactive)
+  (point-to-register ?x))
+
+(defun ram-jump-to-register-x ()
+  (interactive)
+  (jump-to-register ?x))
+
+(define-key global-map (kbd "S-<f14>") #'ram-point-to-register-x)
+
+(define-key global-map (kbd "<f14>") #'ram-jump-to-register-x)
+
 ;;** system: syntax tables
 
 ;; treat "_", "-" as part of the word
