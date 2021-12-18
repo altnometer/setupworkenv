@@ -6622,11 +6622,62 @@ buffer-local `ram-face-remapping-cookie'."
 
 (global-set-key (kbd "C-c j") 'dired-jump)
 
-;;* hippie
+;;* hippie-expand
+
+;;** hippie-expand:  diacritic, accented
+
+(setq ram-diacritical-marked
+      '(("AA" . "Ā")
+        ("aa" . "ā")
+        ("II" . "Ī")
+        ("ii" . "ī")
+        ("UU" . "Ū")
+        ("uu" . "ū")
+        ("\"N" . "Ṅ")
+        ("\"n" . "ṅ")
+        (".M" . "Ṃ")
+        (".m" . "ṃ")
+        ("~N" . "Ñ")
+        ("~n" . "ñ")
+        (".T" . "Ṭ")
+        (".t" . "ṭ")
+        (".D" . "Ḍ")
+        (".d" . "ḍ")
+        (".N" . "Ṇ")
+        (".n" . "ṇ")
+        (".L" . "Ḷ")
+        (".l" . "ḷ")))
+
+(defun ram-diacritical-marked-beg ()
+  (save-excursion
+    ;; (re-search-forward ".a" (- (point) 2) t -1)
+    (- (point) 2)))
+
+(defun ram-try-expand-diacritical-marked (old)
+  (unless old
+    (he-init-string (ram-diacritical-marked-beg) (point))
+    (setq he-expand-list (sort
+                          (let ((completion-ignore-case nil))
+                            (all-completions he-search-string ram-diacritical-marked))
+                          'string-lessp)))
+  (while (and he-expand-list
+              (he-string-member (car he-expand-list) he-tried-table))
+    (setq he-expand-list (cdr he-expand-list)))
+  (if (null he-expand-list)
+      (progn
+        (when old (he-reset-string))
+        ())
+    (he-substitute-string (cdr (assoc (car he-expand-list) ram-diacritical-marked)))
+    (setq he-tried-table (cons (car he-expand-list) (cdr he-tried-table)))
+    (setq he-expand-list (cdr he-expand-list))
+    t))
+
+;;** hippie-expand: make-hippie-expand-function
 
 (define-key global-map (kbd "M-/") (make-hippie-expand-function
                                     '(
                                       ;; try-expand-all-abbrevs
+                                      ram-try-expand-diacritical-marked
                                       try-expand-dabbrev-visible
                                       try-expand-dabbrev-all-buffers
                                       try-expand-dabbrev
@@ -6639,6 +6690,7 @@ buffer-local `ram-face-remapping-cookie'."
 (eval-after-load "org"
   '(define-key org-mode-map (kbd "M-/") (make-hippie-expand-function
                                          '(
+                                           ram-try-expand-diacritical-marked
                                            try-expand-all-abbrevs
                                            try-expand-dabbrev-visible
                                            try-expand-dabbrev-all-buffers
