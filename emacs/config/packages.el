@@ -5295,8 +5295,8 @@ confines of word boundaries (e.g. multiple words)."
        (not (nth 3 (syntax-ppss))))
       (backward-up-list -1)))
 
-(define-key isearch-mode-map (kbd "[") #'ram-isearch-done-to-open-paren)
-(define-key isearch-mode-map (kbd "]") #'ram-isearch-done-to-close-paren)
+;; (define-key isearch-mode-map (kbd "[") #'ram-isearch-done-to-open-paren)
+;; (define-key isearch-mode-map (kbd "]") #'ram-isearch-done-to-close-paren)
 
 ;;* packages
 
