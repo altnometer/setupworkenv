@@ -6403,12 +6403,34 @@ buffer-local `ram-face-remapping-cookie'."
 (add-hook 'lisp-interaction-mode-hook
           (lambda () (setq-local evil-shift-width 2)))
 
-;;** system: ispell
+;;** system: region
 
-(setq ispell-personal-dictionary "~/backup/emacs/.ispell_default")
-(setq ispell-silently-savep t)
+(with-eval-after-load "simple"
+  ;; this differs from the default version only by
+  ;; (overlay-put 'priority ...) line
+  (setq redisplay-highlight-region-function
+        (lambda (start end window rol)
+          (if (not (overlayp rol))
+              (let ((nrol (make-overlay start end)))
+                (funcall redisplay-unhighlight-region-function rol)
+                (overlay-put nrol 'window window)
+                (overlay-put nrol 'face 'region)
+                ;; Normal priority so that a large region doesn't hide all the
+                ;; overlays within it, but high secondary priority so that if it
+                ;; ends/starts in the middle of a small overlay, that small overlay
+                ;; won't hide the region's boundaries.
+                (overlay-put nrol 'priority '(50 . 100))
+                nrol)
+            (unless (and (eq (overlay-buffer rol) (current-buffer))
+                         (eq (overlay-start rol) start)
+                         (eq (overlay-end rol) end))
+              (move-overlay rol start end (current-buffer)))
+            rol))))
 
-;;** system: syntax
+(add-hook 'ram-load-theme-hook (lambda ()
+                                 (set-face-attribute 'region nil :extend nil)))
+
+;;** system: syntax tables
 
 ;; treat "_", "-" as part of the word
 ;; https://emacs.stackexchange.com/questions/9583/how-to-treat-underscore-as-part-of-the-word/9584
