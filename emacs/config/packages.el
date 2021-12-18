@@ -85,14 +85,40 @@ abort completely with `C-g'."
 
 ;; (clear-abbrev-table global-abbrev-table)
 
-;; (define-abbrev-table 'global-abbrev-table
-;;   '(
-;;     ;; net addrev
-;;     ("1t" "first")
-;;     ("2d" "second")
-;;     ("3d" "third")
-;;     ("ty" "thank you")
-;;     ("ws" "□")))
+(when (boundp 'global-table)
+  (clear-abbrev-table global-table))
+
+(define-abbrev-table 'global-abbrev-table
+  '(
+    ;; net addrev
+    ("1t" "first")
+    ("2d" "second")
+    ("3d" "third")
+    ("ty" "thank you")
+    ("ws" "□")
+    ;; Pāli
+    ("AA" "Ā")
+    ("aa" "ā")
+    ("II" "Ī")
+    ("ii" "ī")
+    ("UU" "Ū")
+    ("uu" "ū")
+    ;; the rest do not work as the symbols used are not word parts
+    ;; ("\"N" "Ṅ")
+    ;; ("\"n" "ṅ")
+    ;; (".M" "Ṃ")
+    ;; (".m" "ṃ")
+    ;; ("~N" "Ñ")
+    ;; ("~n" "ñ")
+    ;; (".T" "Ṭ")
+    ;; (".t" "ṭ")
+    ;; (".D" "Ḍ")
+    ;; (".d" "ḍ")
+    ;; (".N" "Ṇ")
+    ;; (".n" "ṇ")
+    ;; (".L" "Ḷ")
+    ;; (".l" "ḷ")
+    ))
 
 ;;** abbrev: clojure-mode-abbrev-table
 
