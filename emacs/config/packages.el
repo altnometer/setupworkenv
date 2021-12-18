@@ -5865,6 +5865,51 @@ That is, remove a non kept dired from the recent list."
 
 ;;* spelling
 
+;;** spelling: ispell, aspell, hunspell
+
+(with-eval-after-load "ispell"
+  ;; (setq ispell-program-name "/usr/bin/ispell")
+  ;; (setq ispell-program-name "/usr/bin/aspell")
+  (setenv "DICPATH" (expand-file-name "~/backup/emacs/dictionary"))
+  ;; (setenv "LANG" "en_US.UTF-8")
+  (setq ispell-program-name "/usr/bin/hunspell")
+  ;; ispell-set-spellchecker-params must be called before
+  ;; ispell-hunspell-add-multi-dic
+  ;; (setq ispell-hunspell-dict-paths-alist
+  ;;       `(("pali" ,(expand-file-name "~/backup/emacs/dictionary/pali.aff"))
+  ;;         ("en_US" "/usr/share/hunspell/en_US.aff")
+  ;;         ))
+  ;; (ispell-set-spellchecker-params)
+  ;; (ispell-hunspell-add-multi-dic "en_US,pali")
+  ;; (setq ispell-dictionary-alist
+  ;;       '(("pali")
+  ;;         ("en_US" #1="[[:alpha:]]" #2="[^[:alpha:]]" #3="[0-9]" t #4=("-d" "en_US")
+  ;;         nil utf-8)))
+  ;; (setq ispell-dictionary-alist
+  ;;   '((nil "[A-Za-z]" "[^A-Za-z]" "[']" t
+  ;;      ("-d" "en_US" "-i" "utf-8") nil utf-8)
+  ;;     ("american"
+  ;;      "[A-Za-z]" "[^A-Za-z]" "[']" nil
+  ;;      ("-d" "en_US") nil utf-8)
+  ;;     ("english"
+  ;;      "[A-Za-z]" "[^A-Za-z]" "[']" nil
+  ;;      ("-d" "en_GB") nil utf-8)
+  ;;     ("british"
+  ;;      "[A-Za-z]" "[^A-Za-z]" "[']" nil
+  ;;      ("-d" "en_GB") nil utf-8)
+  ;;     ("norsk"
+  ;;      "[A-Za-zÉÆØÅéæøå]" "[^A-Za-zÉÆØÅéæøå]" "[\"]" nil
+  ;;      ("-d" "nb_NO") "~list" utf-8)))
+  ;; (setq ispell-personal-dictionary "~/backup/emacs/.ispell_default")
+  ;; (setq ispell-personal-dictionary "~/backup/emacs/.aspell.en.pws")
+  (setq ispell-personal-dictionary "~/backup/emacs/dictionary/personal_dict")
+  (unless (file-exists-p ispell-personal-dictionary)
+    (write-region "" nil ispell-personal-dictionary nil 0))
+  ;; (setq ispell-dictionary "english")
+  (setq ispell-silently-savep t)
+  (setq ispell-dictionary "en_US_pali")
+  ;; (setq ispell-extra-args '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
+  )
 ;;** spelling: flycheck
 
 ;;*** spelling/flycheck: settings
