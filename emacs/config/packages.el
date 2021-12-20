@@ -522,6 +522,30 @@ Disable `icomplete-vertical-mode' for this command."
 
 (setq company-idle-delay nil)
 
+(setq company-search-regexp-function
+      (lambda (input-str)
+        "search words separated by white-space in any order."
+        (let ((search-words (split-string input-str)))
+          (cl-labels ((combinations (&rest lists)
+                        (if (endp lists)
+                            (list nil)
+                          (mapcan (lambda (inner-val)
+                                    (seq-remove #'null (mapcar (lambda (outer-val)
+                                                                 (if (not (member outer-val inner-val))
+                                                                     (cons (regexp-quote outer-val) inner-val)))
+                                                               (car lists))))
+                                  (apply #'combinations (cdr lists)))))
+                      (clone-lists (l len)
+                        (if (<= len 1)
+                            (list l)
+                          (cons l (clone-lists l (1- len))))))
+            (string-join (mapcar (lambda (m)
+                                   (concat "\\(" (string-join (mapcar (lambda (i) (concat "\\(" i "\\)")) m) ".*?") "\\)"))
+                                 (apply #'combinations (clone-lists search-words (length search-words) )))
+                         "\\|")))))
+
+;; (setq company-search-regexp-function #'regexp-quote)
+
 ;; (define-key global-map (kbd "s-c") 'company-complete)
 ;; (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 ;; originally bound to #'dabbrev-completion
