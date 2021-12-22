@@ -4185,17 +4185,49 @@ Return nil on failure, (point) otherwise."
 
 ;;** brackets, parentheses, parens, sexps: functions
 
-(defun ram-forward-list ()
-  "Call `forward-list'. If at the end, call `backward-up-list' and continue."
-  (interactive)
-  (condition-case err
-      (forward-list)
-    (scan-error (condition-case err
-                    (progn
-                      (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
-                      (forward-list))
-                  (scan-error (forward-list))))
-    (:success (point))))
+(defun ram-forward-list (&optional arg)
+  "Move forward over balanced group of parentheses.
+When at the list limit, move a level up and continue."
+  (interactive "p")
+  (let* ((point (point))
+         (bounds (ram-sexp-bounds))
+         (at-beg (= point (car bounds)))
+         (at-end (= point (cdr bounds))))
+    (condition-case err
+        (progn
+          (when (and arg (not (= (mark) (point)))) (push-mark))
+          (cond
+           (at-beg
+            (forward-list 2)
+            (backward-list))
+           (at-end (forward-list))
+           (t (goto-char (car bounds)) (ram-forward-list 1))))
+      (scan-error (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
+                  (when at-end
+                    (forward-sexp))
+                  (ram-forward-list))
+      (:success (point)))))
+
+(defun ram-backward-list (&optional arg)
+  "Move backward over balanced group of parentheses.
+When at the list limit, move a level up and continue."
+  (interactive "p")
+  (let* ((point (point))
+         (bounds (ram-sexp-bounds))
+         (at-beg (= point (car bounds)))
+         (at-end (= point (cdr bounds))))
+    (condition-case err
+        (progn
+          (when (and arg (not (= (mark) (point)))) (push-mark))
+          (cond
+           (at-beg (backward-list))
+           (at-end (backward-list 2) (forward-list))
+           (t (goto-char (car bounds)) (ram-backward-list 1))))
+      (scan-error (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
+                  (when at-end
+                    (forward-sexp))
+                  (ram-backward-list))
+      (:success (point)))))
 
 ;; This behaves like ram-jump-forward-to-close-delimiter
 ;; I'll keep to see if they differ for some edge cases.
