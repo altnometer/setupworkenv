@@ -6652,6 +6652,7 @@ buffer-local `ram-face-remapping-cookie'."
 
 (define-key ram-leader-map-tap-global (kbd "-") 'my-pop-local-mark-ring)
 (define-key global-map (kbd "<f11>") 'my-pop-local-mark-ring)
+(define-key global-map (kbd "S-<f11>") #'pop-global-mark)
 (define-key ram-leader-map-tap-global (kbd ".") 'unpop-to-mark-command)
 (define-key global-map (kbd "<f21>") 'unpop-to-mark-command)
 
