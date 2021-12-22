@@ -4173,13 +4173,18 @@ Return nil on failure, (point) otherwise."
 
 ;;* brackets, parentheses, parens, sexps
 
-;;** brackets, parentheses, parens, sexps: bindings
+;;** brackets, parentheses, parens, bindings
 
 ;; "C-M-e" bound to end-of-defun by default
 (define-key prog-mode-map (kbd "M-a") #'ram-jump-backward-to-open-delimiter)
 (define-key prog-mode-map (kbd "M-e") #'ram-jump-forward-to-close-delimiter)
+
 (define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+(define-key prog-mode-map (kbd "S-<right>") #'ram-jump-forward-to-close-delimiter)
+
 (define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+(define-key prog-mode-map (kbd "S-<left>") #'ram-jump-backward-to-close-delimiter)
+
 (define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
 (define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
 
@@ -4304,6 +4309,21 @@ If cannot move forward, go `up-list' and try again from there."
                           (nth 4 s))
                       (forward-to-delim)))))
     (forward-to-delim)))
+
+(defun ram-jump-backward-to-close-delimiter ()
+  "Jump backward to the close delimiter that is not in a string."
+  (interactive)
+  (cl-labels ((back-to-delim ()
+                "Jump backward to the open delimiter that is not in a string."
+                (when (ram-at-close-delim-p) (backward-char))
+                (re-search-backward ram-close-delim-re nil t 1)
+                (when (match-string 0) (forward-char))
+                ;; skip matches in strings and comments
+                (let ((s (syntax-ppss)))
+                  (if (or (nth 3 s)
+                          (nth 4 s))
+                      (back-to-delim)))))
+    (back-to-delim)))
 
 ;; credit to http://xahlee.info/emacs/emacs/emacs_navigating_keys_for_brackets.html
 (defun xah-goto-matching-bracket ()
