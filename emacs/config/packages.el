@@ -4192,7 +4192,8 @@ Return nil on failure, (point) otherwise."
 
 (defun ram-forward-list (&optional arg)
   "Move forward over balanced group of parentheses.
-When at the list limit, move a level up and continue."
+When at the list limit, move a level up and continue.
+If ARG is `nil', do not `push-mark'."
   (interactive "p")
   (let* ((point (point))
          (bounds (ram-sexp-bounds))
@@ -4200,11 +4201,10 @@ When at the list limit, move a level up and continue."
          (at-end (= point (cdr bounds))))
     (condition-case err
         (progn
+          (deactivate-mark)
           (when (and arg (not (= (mark) (point)))) (push-mark))
           (cond
-           (at-beg
-            (forward-list 2)
-            (backward-list))
+           (at-beg (forward-list 2) (backward-list))
            (at-end (forward-list))
            (t (goto-char (car bounds)) (ram-forward-list 1))))
       (scan-error (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
@@ -4215,7 +4215,8 @@ When at the list limit, move a level up and continue."
 
 (defun ram-backward-list (&optional arg)
   "Move backward over balanced group of parentheses.
-When at the list limit, move a level up and continue."
+When at the list limit, move a level up and continue.
+If ARG is `nil', do not `push-mark'."
   (interactive "p")
   (let* ((point (point))
          (bounds (ram-sexp-bounds))
@@ -4223,7 +4224,8 @@ When at the list limit, move a level up and continue."
          (at-end (= point (cdr bounds))))
     (condition-case err
         (progn
-          (when (and arg (not (= (mark) (point)))) (push-mark))
+          (deactivate-mark)
+          (when (and arg (not (= (mark) (point)))) (push-mark)) 
           (cond
            (at-beg (backward-list))
            (at-end (backward-list 2) (forward-list))
