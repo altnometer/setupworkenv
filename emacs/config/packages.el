@@ -4202,7 +4202,9 @@ If ARG is `nil', do not `push-mark'."
     (condition-case err
         (progn
           (deactivate-mark)
-          (when (and arg (not (= (mark) (point)))) (push-mark))
+          (when (and arg
+                     (not (when (mark) (= (mark) (point)))))
+            (push-mark))
           (cond
            (at-beg (forward-list 2) (backward-list))
            (at-end (forward-list))
@@ -4225,7 +4227,9 @@ If ARG is `nil', do not `push-mark'."
     (condition-case err
         (progn
           (deactivate-mark)
-          (when (and arg (not (= (mark) (point)))) (push-mark)) 
+          (when (and arg
+                     (when (mark) (not (= (mark) (point)))))
+            (push-mark))
           (cond
            (at-beg (backward-list))
            (at-end (backward-list 2) (forward-list))
