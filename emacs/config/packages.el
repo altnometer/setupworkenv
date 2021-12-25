@@ -963,10 +963,8 @@ Disable `icomplete-vertical-mode' for this command."
 (define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
 ;; <f1> is bound to #'help-for-help by default
 (define-key global-map (kbd "<f1>") nil)
-(define-key global-map (kbd "<f1>") (lambda () (interactive (exwm-workspace-switch-create 1))))
 ;; <f2> is a prefix to some '2C-mode commands
-;; (define-key global-map (kbd "<f2>") nil)
-;; (define-key global-map (kbd "<f2>") (lambda () (interactive (exwm-workspace-switch-create 2))))
+(define-key global-map (kbd "<f2>") nil)
 ;; (define-key global-map (kbd "<f10>") (lambda () (interactive (exwm-workspace-switch-create 0))))
 ;; (define-key global-map (kbd "<f6>") (lambda () (interactive (exwm-workspace-switch-create 6))))
 ;; (define-key global-map (kbd "<f7>") (lambda () (interactive (exwm-workspace-switch-create 7))))
@@ -4126,11 +4124,10 @@ Return nil on failure, (point) otherwise."
 
      (define-key prog-mode-map (kbd "s-R") #'ram-avy-goto-top-paren)
 
-     (define-key emacs-lisp-mode-map (kbd "s-s") #'ram-avy-goto-subword-2-dim)
-     ;; (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-subword-2-dim)
-     (define-key emacs-lisp-mode-map (kbd "s-S") #'ram-avy-goto-symbol-in-defun)
-     (define-key emacs-lisp-mode-map (kbd "C-s-s") #'ram-avy-goto-word-in-defun)
-     (define-key emacs-lisp-mode-map (kbd "s-r") #'ram-avy-goto-ace-paren)
+     (define-key prog-mode-map (kbd "s-s") #'ram-avy-goto-subword-2-dim)
+     (define-key prog-mode-map (kbd "s-S") #'ram-avy-goto-symbol-in-defun)
+     (define-key prog-mode-map (kbd "C-s-s") #'ram-avy-goto-word-in-defun)
+     (define-key prog-mode-map (kbd "s-r") #'ram-avy-goto-ace-paren)
      ))
 
 ;;* projectile
@@ -4180,10 +4177,10 @@ Return nil on failure, (point) otherwise."
 (define-key prog-mode-map (kbd "M-e") #'ram-jump-forward-to-close-delimiter)
 
 (define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
-(define-key prog-mode-map (kbd "S-<right>") #'ram-jump-forward-to-close-delimiter)
+(define-key prog-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
 
 (define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
-(define-key prog-mode-map (kbd "S-<left>") #'ram-jump-backward-to-close-delimiter)
+(define-key prog-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
 
 (define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
 (define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
@@ -5812,11 +5809,19 @@ Configure `orderless-matching-styles' for this command."
 (define-key paredit-mode-map (kbd "M-s") nil)
 (define-key paredit-mode-map (kbd "<f13>") #'paredit-splice-sexp)
 ;; slurp
-(define-key paredit-mode-map (kbd "<C-<right>") nil)
-(define-key paredit-mode-map (kbd "<C-M-<right>") nil)
+(define-key paredit-mode-map (kbd "C-<right>") nil)
+(define-key paredit-mode-map (kbd "C-M-<right>") nil)
 ;; barf
-(define-key paredit-mode-map (kbd "<C-left>") nil)
-(define-key paredit-mode-map (kbd "<C-M-<left>") nil)
+(define-key paredit-mode-map (kbd "C-<left>") nil)
+(define-key paredit-mode-map (kbd "C-M-<left>") nil)
+
+;; paredit-splice-sexp-killing-forward
+(define-key paredit-mode-map (kbd "M-<down>") nil)
+(define-key paredit-mode-map (kbd "C->") #'paredit-splice-sexp-killing-forward)
+
+;; paredit-splice-sexp-killing-backward
+(define-key paredit-mode-map (kbd "M-<up>") nil)
+(define-key paredit-mode-map (kbd "C-<") #'paredit-splice-sexp-killing-backward)
 
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
