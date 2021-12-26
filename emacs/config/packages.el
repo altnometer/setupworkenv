@@ -3935,36 +3935,6 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
            res)))
       (nreverse res))))
 
-;; copied from  https://github.com/abo-abo/ace-link
-(defun ram-up-list-forward (arg)
-  "Move forward out of one level of parentheses ARG times.
-Return nil on failure, (point) otherwise."
-  ;; move out of the string
-  (let ((s (syntax-ppss)))
-    (when (nth 3 s)
-      (goto-char (nth 8 s))))
-  (catch 'break
-    (dotimes (_i arg)
-      (if (ignore-errors (up-list) t)
-          (when (looking-at-p ram-open-delim-re)
-            (forward-list))
-        (throw 'break nil)))
-    (point)))
-
-
-;; copied from  https://github.com/abo-abo/ace-link
-(defun ram-up-list-backward (arg)
-  "Move backward out of one level of parentheses ARG times.
-Return nil on failure, (point) otherwise."
-  (let ((oldpt (point))
-        newpt)
-    (ram-up-list-forward arg)
-    (when (looking-back ram-close-delim-re (line-beginning-position))
-      (forward-list -1))
-    (if (= oldpt (setq newpt (point)))
-        nil
-      newpt)))
-
 (defun ace-link--org-action (pt)
   (when (numberp pt)
     (goto-char pt)
@@ -4295,6 +4265,53 @@ If cursor is not on a bracket, call `backward-up-list'."
      ((looking-back ram-close-delim-re (max (- (point) 1) 1))
       (backward-sexp))
      (t (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)))))
+
+;; copied from  https://github.com/abo-abo/ace-link
+(defun ram-up-list-forward (arg)
+  "Move forward out of one level of parentheses ARG times.
+Return nil on failure, (point) otherwise."
+  ;; move out of the string
+  (let ((s (syntax-ppss)))
+    (when (nth 3 s)
+      (goto-char (nth 8 s))))
+  (catch 'break
+    (dotimes (_i arg)
+      (if (ignore-errors (up-list) t)
+          (when (looking-at-p ram-open-delim-re)
+            (forward-list))
+        (throw 'break nil)))
+    (point)))
+
+;; copied from  https://github.com/abo-abo/ace-link
+(defun ram-up-list-backward (arg)
+  "Move backward out of one level of parentheses ARG times.
+Return nil on failure, (point) otherwise."
+  (let ((oldpt (point))
+        newpt)
+    (ram-up-list-forward arg)
+    (when (looking-back ram-close-delim-re (line-beginning-position))
+      (forward-list -1))
+    (if (= oldpt (setq newpt (point)))
+        nil
+      newpt)))
+
+(defun ram-beg-of-top-sexp (&optional arg)
+  "Jump to the beginning of top level sexp ARG times."
+  (interactive "p")
+  (push-mark)
+  (let* ((point (point)))
+    (ram-up-list-forward 50)
+    (forward-sexp (- arg))))
+
+(defun ram-end-of-top-sexp (&optional arg)
+  "Jump to the end of top level sexp ARG times."
+  (interactive "p")
+  (push-mark)
+  (let* ((point (point)))
+    (ram-up-list-forward 50)
+    (if (= point (point))
+        (forward-sexp arg)
+      (forward-sexp (- arg 1)))))
 
 ;;** brackets, parentheses, parens, sexps: settings
 
@@ -6917,27 +6934,3 @@ buffer-local `ram-face-remapping-cookie'."
 ;;   (backward-char 1))
 
 ;; (define-key ram-leader-map-tap-global (kbd "/") 'yf/replace-or-delete-pair)
-
-;;** custom: jump to the end of top level sexp
-
-(defun ram-beg-of-top-sexp (&optional arg)
-  "Jump to the beginning of top level sexp ARG times."
-  (interactive "p")
-  (push-mark)
-  (let* ((point (point)))
-    (ram-up-list-forward 50)
-    (forward-sexp (- arg))))
-
-(defun ram-end-of-top-sexp (&optional arg)
-  "Jump to the end of top level sexp ARG times."
-  (interactive "p")
-  (push-mark)
-  (let* ((point (point)))
-    (ram-up-list-forward 50)
-    (if (= point (point))
-        (forward-sexp arg)
-      (forward-sexp (- arg 1)))))
-
-;; "C-M-e" bound to end-of-defun by default
-(define-key prog-mode-map (kbd "M-A") #'ram-beg-of-top-sexp)
-(define-key prog-mode-map (kbd "M-E") #'ram-end-of-top-sexp)
