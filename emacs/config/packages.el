@@ -489,21 +489,6 @@ Disable `icomplete-vertical-mode' for this command."
                 (insert ?\ )))))
     (error nil)))
 
-(defun ram-up-list-backward (universal-arg)
-  "Backward `up-list' that ignores strings."
-  (interactive "p")
-  (condition-case nil
-      (let ((inside-str (nth 3 (syntax-ppss))))
-        (if inside-str
-            (up-list (- (+ 1 universal-arg)) t t)
-          (up-list (- universal-arg) t t))
-        ;; insert space
-        (insert ?\ ))
-    (error nil)))
-
-;; (define-key global-map (kbd "s-t") 'ram-up-list)
-;; (define-key global-map (kbd "s-c") 'ram-up-list-backward)
-
 ;;* company
 
 (straight-use-package
