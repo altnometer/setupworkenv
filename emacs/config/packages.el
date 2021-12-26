@@ -457,38 +457,6 @@ Disable `icomplete-vertical-mode' for this command."
 (define-key global-map (kbd "C-%") #'repeat)
 (define-key global-map (kbd "C-h a") 'apropos)
 
-;;** bindings: up-list
-
-(defun ram-up-list (universal-arg)
-  "Ignore strings when calling `up-list'."
-  (interactive "p")
-  (condition-case nil
-      (let ((inside-str (nth 3 (syntax-ppss))))
-        (if inside-str
-            (up-list (+ 1 universal-arg) t t)
-          (let ((space-between-closing-parens?
-                 (save-excursion
-                   (and (looking-at-p ")")
-                        (progn
-                          (backward-char)
-                          (looking-at-p " "))
-                        (progn
-                          (backward-char)
-                          (looking-at-p ")"))))))
-            (if space-between-closing-parens?
-                (progn (delete-char -1)
-                       (message "feature working?")))
-            (up-list universal-arg t t))
-          (let ((between-closing-parens?
-                 (save-excursion
-                   (and (looking-at-p ")")
-                        (progn
-                          (backward-char)
-                          (looking-at-p ")"))))))
-            (if between-closing-parens?
-                (insert ?\ )))))
-    (error nil)))
-
 ;;* company
 
 (straight-use-package
