@@ -4345,9 +4345,14 @@ If cursor is not on a bracket, call `backward-up-list'."
 
 ;;** brackets, parentheses, parens, sexps: settings
 
-(defvar ram-open-delim-re "[[({]"
+(defvar ram-open-delimiters "[({"
+  "A string of open delimiters.")
+(defvar ram-open-delim-re (concat "[" ram-open-delimiters "]")
   "Regexp to match common open delimiters.")
-(defvar ram-close-delim-re "[])}]"
+
+(defvar ram-close-delimiters "])}"
+  "A string of close delimiters.")
+(defvar ram-close-delim-re (concat "[" ram-close-delimiters "]")
   "Regexp to match common close delimiters.")
 
 ;; If true, #'paredit-blink-paren-match is slow
