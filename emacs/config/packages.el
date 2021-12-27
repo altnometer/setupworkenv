@@ -1448,6 +1448,7 @@ succession."
         (* space)
         (seq "("
              (group (or
+                     "defalias"
                      "defconst"
                      "defcustom"
                      "define-abbrev-table"
