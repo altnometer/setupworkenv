@@ -4266,7 +4266,7 @@ If cursor is not on a bracket, call `backward-up-list'."
       (backward-sexp))
      (t (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)))))
 
-;; copied from  https://github.com/abo-abo/ace-link
+;; copied from  https://github.com/abo-abo/lispy
 (defun ram-up-list-forward (arg)
   "Move forward out of one level of parentheses ARG times.
 Return nil on failure, (point) otherwise."
@@ -4276,9 +4276,9 @@ Return nil on failure, (point) otherwise."
       (goto-char (nth 8 s))))
   (catch 'break
     (dotimes (_i arg)
-      (if (ignore-errors (up-list) t)
-          (when (looking-at-p ram-open-delim-re)
-            (forward-list))
+      (when (not (ignore-errors (up-list) t))
+        (when (looking-at-p ram-open-delim-re)
+          (forward-list))
         (throw 'break nil)))
     (point)))
 
@@ -4290,7 +4290,7 @@ Return nil on failure, (point) otherwise."
         newpt)
     (ram-up-list-forward arg)
     (when (looking-back ram-close-delim-re (line-beginning-position))
-      (forward-list -1))
+      (backward-list))
     (if (= oldpt (setq newpt (point)))
         nil
       newpt)))
