@@ -4295,15 +4295,20 @@ Return nil on failure, (point) otherwise."
         nil
       newpt)))
 
-(defun ram-beg-of-top-sexp (&optional arg)
+(defun ram-beg-of-top-sexp (arg)
   "Jump to the beginning of top level sexp ARG times."
   (interactive "p")
   (push-mark)
-  (let* ((point (point)))
-    (ram-up-list-forward 50)
-    (forward-sexp (- arg))))
+  (let* ((point (point))
+         (comment-bounds (ram-comment-bounds))
+         (in-top-level-comments (and comment-bounds
+                                     (save-excursion (= (car comment-bounds) (point-at-bol)))))) 
+    (if in-top-level-comments
+        (goto-char (car comment-bounds))
+      (ram-up-list-forward 50)
+      (forward-sexp (- arg)))))
 
-(defun ram-end-of-top-sexp (&optional arg)
+(defun ram-end-of-top-sexp (arg)
   "Jump to the end of top level sexp ARG times."
   (interactive "p")
   (push-mark)
