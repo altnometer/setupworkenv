@@ -4093,72 +4093,53 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 ;;* brackets, parentheses, parens, sexps
 
-;;** brackets, parentheses, parens, bindings
-
-;; "C-M-e" bound to end-of-defun by default
-(define-key prog-mode-map (kbd "M-a") #'ram-jump-backward-to-open-delimiter)
-(define-key prog-mode-map (kbd "M-e") #'ram-jump-forward-to-close-delimiter)
-
-(define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
-(define-key prog-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
-
-(define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
-(define-key prog-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
-
-(define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
-(define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
-
-;;** brackets, parentheses, parens, sexps: functions
+;;** brackets, parentheses, parens, sexps: navigation
 
 (defun ram-forward-list (&optional arg)
-  "Move forward over balanced group of parentheses.
+  "Move to the next thing.
 When at the list limit, move a level up and continue.
 If ARG is `nil', do not `push-mark'."
   (interactive "p")
   (let* ((point (point))
-         (bounds (ram-sexp-bounds))
-         (at-beg (= point (car bounds)))
-         (at-end (= point (cdr bounds))))
-    (condition-case err
+         (bounds (ram-thing-bounds))
+         (next-bounds (save-excursion (goto-char (cdr bounds))
+                                      (ram-next-thing-bounds)))
+         (at-end-p (ram-at-thing-end-p)))
+    (deactivate-mark)
+    (when (and arg
+               (when (mark) (not (= (mark) (point)))))
+      (push-mark))
+    (if at-end-p
         (progn
-          (deactivate-mark)
-          (when (and arg
-                     (not (when (mark) (= (mark) (point)))))
-            (push-mark))
-          (cond
-           (at-beg (forward-list 2) (backward-list))
-           (at-end (forward-list))
-           (t (goto-char (car bounds)) (ram-forward-list 1))))
-      (scan-error (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
-                  (when at-end
-                    (forward-sexp))
-                  (ram-forward-list))
-      (:success (point)))))
+         (goto-char (cdr next-bounds))
+         next-bounds)
+      (goto-char (car next-bounds))
+      (if (> (car bounds) (car next-bounds))
+          (ram-forward-list)
+        next-bounds))))
 
 (defun ram-backward-list (&optional arg)
-  "Move backward over balanced group of parentheses.
+  "Move to the previous thing.
 When at the list limit, move a level up and continue.
 If ARG is `nil', do not `push-mark'."
   (interactive "p")
   (let* ((point (point))
-         (bounds (ram-sexp-bounds))
-         (at-beg (= point (car bounds)))
-         (at-end (= point (cdr bounds))))
-    (condition-case err
+         (bounds (ram-thing-bounds))
+         (prev-bounds (save-excursion (goto-char (car bounds))
+                                      (ram-prev-thing-bounds)))
+         (at-end-p (ram-at-thing-end-p)))
+    (deactivate-mark)
+    (when (and arg
+               (when (mark) (not (= (mark) (point)))))
+      (push-mark))
+    (if at-end-p
         (progn
-          (deactivate-mark)
-          (when (and arg
-                     (when (mark) (not (= (mark) (point)))))
-            (push-mark))
-          (cond
-           (at-beg (backward-list))
-           (at-end (backward-list 2) (forward-list))
-           (t (goto-char (car bounds)) (ram-backward-list 1))))
-      (scan-error (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
-                  (when at-end
-                    (forward-sexp))
-                  (ram-backward-list))
-      (:success (point)))))
+          (goto-char (cdr prev-bounds))
+          (if (< (cdr bounds) (cdr prev-bounds))
+              (ram-backward-list)
+            prev-bounds))
+      (goto-char (car prev-bounds))
+      prev-bounds)))
 
 ;; This behaves like ram-jump-forward-to-close-delimiter
 ;; I'll keep to see if they differ for some edge cases.
@@ -4183,17 +4164,6 @@ If cannot move forward, go `up-list' and try again from there."
                       (forward-list)
                     (scan-error (up-list-then-forward))
                     (:success (backward-sexp))))))))
-
-(defun ram-backward-list ()
-  "Call `backward-list'. If at the end, call `backward-up-list' and continue."
-  (interactive)
-  (condition-case err
-      (forward-list -1)
-    (scan-error (condition-case err
-                    (progn
-                      (up-list -1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING))
-                  (scan-error (forward-list -1))))
-    (:success (point))))
 
 (defun ram-jump-backward-to-open-delimiter ()
   "Jump backward to the open delimiter that is not in a string."
@@ -4241,7 +4211,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((back-to-delim ()
                 "Jump backward to the open delimiter that is not in a string."
-                (when (ram-at-close-delim-p) (backward-char))
+                (when (ram-at-parens-group-end-p) (backward-char))
                 (re-search-backward ram-close-delim-re nil t 1)
                 (when (match-string 0) (forward-char))
                 ;; skip matches in strings and comments
@@ -4382,22 +4352,408 @@ If ARG is 4, move to the beginning of defun."
 (with-eval-after-load "ram-highlight-sexps"
   (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
 
-;;** brackets, parentheses, parens, sexps: select-current-sexp
+;;** brackets, parentheses, parens, sexps: highlight
 
-;; credit to https://www.reddit.com/r/emacs/comments/gnika5/command_for_selecting_current_sexp/
-(defun night/backward-up-sexp (arg)
-  (interactive "p")
-  (let ((ppss (syntax-ppss)))
-    (cond ((elt ppss 3)
-           (goto-char (elt ppss 8))
-           (night/backward-up-sexp (1- arg)))
-          ((backward-up-list arg)))))
+;; overlay to highlight saved to kill ring sexps
+(add-hook 'prog-mode-hook (lambda ()
+                            (defvar ram-copied-region-overlay nil
+                              "Highlight the region copied with `ram-copy-sexp'.")
+                            (make-variable-buffer-local 'ram-copied-region-overlay)
+                            (setq-local ram-copied-region-overlay (make-overlay 0 0))
+                            (overlay-put ram-copied-region-overlay 'face (list :background
+                                                                               (face-background 'modus-themes-intense-green)))
+                            (overlay-put ram-copied-region-overlay 'priority 1)
+                            (add-hook 'pre-command-hook (lambda () (when (symbol-value 'ram-copied-region-overlay)
+                                                                     (move-overlay ram-copied-region-overlay 1 1))))))
+;;** brackets, parentheses, parens, sexps: comments
 
-(defun night/select-current-sexp (arg)
-  (interactive "p")
-  (night/backward-up-sexp arg)
-  (mark-sexp)
-  (setq deactivate-mark nil))
+;; adopted from https://github.com/abo-abo/lispy
+(defun ram-in-comment-p ()
+  (save-excursion
+    (when (not (eolp))
+      (forward-char 1))
+    (nth 4 (syntax-ppss))))
+
+(defun ram-goto-beg-of-comment ()
+  (end-of-line)
+  (comment-beginning)
+  (let ((comment-start (comment-search-backward (point-at-bol) t)))
+    (when comment-start
+      (goto-char comment-start))))
+
+(defun ram-goto-comment-block-beg ()
+  (when (ram-goto-beg-of-comment)
+    (let ((pt (point)))
+      (while (and (ram-in-comment-p)
+                  (forward-comment -1)
+                  (looking-back "^[[:space:]]*" (point-at-bol))
+                  (= 1 (- (count-lines (point) pt)
+                          (if (bolp) 0 1))))
+        (setq pt (point)))
+      (goto-char pt))))
+
+(defun ram-goto-comment-block-end ()
+  (when (ram-goto-beg-of-comment)
+    (let ((pt (point))
+          (col (current-column)))
+      (while (and (ram-in-comment-p)
+                  (forward-comment 1)
+                  (ram-goto-beg-of-comment)
+                  (and (= 1 (- (count-lines pt (point))
+                               (if (bolp) 0 1)))
+                       ;; only same indent level
+                       (= col (current-column))
+                       (looking-back "^[[:space:]]*" (point-at-bol))))
+        (setq pt (point)))
+      (goto-char pt)
+      (end-of-line)
+      (point))))
+
+;;** brackets, parentheses, parens, sexps: at beg? at end?
+
+(defun ram-at-parens-group-beg-p ()
+  "Return non `nil' if the point is after `ram-open-delim-re'."
+  (when (not (ram-in-comment-p))
+    (looking-at (concat ram-open-delim-re))))
+
+(defun ram-at-parens-group-end-p ()
+  "Return non `nil' if the point is after `ram-close-delim-re'."
+  (when (not (ram-in-comment-p))
+    (save-excursion (backward-char) (looking-at (concat ram-close-delim-re)))))
+
+(defun ram-at-string-beg-p ()
+  "Return non `nil' if `looking-at' a double quote character. "
+  (and (eq (char-after) ?\")
+       (not (eq ?\\ (char-before)))))
+
+(defun ram-at-string-end-p ()
+  "Return non `nil' if `char-before' the point is a double quote."
+  (and (eq ?\" (char-before))
+       (not (eq ?\\ (char-before (- (point) 1))))
+       ))
+
+(defun ram-at-comment-block-beg-p ()
+  (if-let ((beg (save-excursion (ram-goto-comment-block-beg))))
+      (= (point) beg)))
+
+(defun ram-at-comment-block-end-p ()
+  (if-let ((end (save-excursion (ram-goto-comment-block-end))))
+      (= (point) end)))
+
+(defun ram-at-thing-beg-p ()
+  (or (ram-at-parens-group-beg-p)
+      (ram-at-string-beg-p)
+      (ram-at-comment-block-beg-p)))
+
+(defun ram-at-thing-end-p ()
+  (or (ram-at-parens-group-end-p)
+      (ram-at-string-end-p)
+      (ram-at-comment-block-end-p)))
+
+;;** brackets, parentheses, parens, sexps: bounds
+
+(defun ram-comment-bounds ()
+  "Return the beginning and end pair of a comment block."
+  (if-let ((beg (save-excursion
+                  (let ((beg (ram-goto-comment-block-beg)))
+                    (when (and beg
+                               (looking-back "^[[:space:]]*" (point-at-bol)))
+                      beg))))
+           (end (save-excursion (ram-goto-comment-block-end))))
+      (cons beg end)))
+
+(defun ram-string-bounds ()
+  "Return the beginning and end of a string as a pair."
+  (if-let ((ppss (syntax-ppss))
+           (beg (or (when (nth 3 ppss)
+                      (nth 8 ppss))
+                    (or
+                     (when (ram-at-string-beg-p)
+                       (point))
+                     (when (ram-at-string-end-p)
+                       (save-excursion (backward-sexp) (point))))))
+           (end (save-excursion (goto-char beg) (forward-sexp) (point))))
+      (cons beg end)))
+
+
+(defun ram-delimited-sexp-bounds (&optional select-parent-list)
+  "Return bounds delimited by `ram-open-delim-re' and `ram-close-delim-re'."
+  (if-let ((ppss (syntax-ppss))
+           (beg (cond
+                 (select-parent-list
+                  ;; when between defuns, there is no parent, select previous defun
+                  (if (= (nth 0 ppss) 0)
+                      (save-excursion (beginning-of-defun) (when (not (bobp)) (point)))
+                    (nth 1 ppss)))
+                 ;; at open paren
+                 ((looking-at-p ram-open-delim-re)
+                  (point))
+                 ;; in front of indented list, return the beg of indented list
+                 ((and (looking-back "^[[:space:]]*" (point-at-bol))
+                       (looking-at-p (concat "[[:space:]]*" ram-open-delim-re)))
+                  (save-excursion
+                    (re-search-forward ram-open-delim-re (point-at-eol) t 1)
+                    (backward-char)
+                    (point)))
+                 ;; at close paren
+                 ((ram-at-parens-group-end-p)
+                  (save-excursion (backward-sexp)
+                                  (point)))
+                 ;; inside parens
+                 (t (if (= (nth 0 ppss) 0) ; not in a list
+                        (save-excursion (beginning-of-defun) (when (not (bobp)) (point)))
+                      (nth 1 ppss)))))
+           (end (save-excursion (goto-char beg) (forward-sexp) (point))))
+      (cons beg end)))
+
+(defun ram-thing-bounds ()
+  "Return the beginning and the end of a thing at point.
+Only a line comment, string and list are valid choices."
+  (cond
+   ((ram-comment-bounds))
+   ((ram-string-bounds))
+   ((ram-delimited-sexp-bounds))
+   (t (error "`ram-thing-bounds': All `cond' clauses failed"))))
+
+(defun ram-prev-thing-bounds ()
+  "Return the bounds of the previous thing.
+The search must start outside the current thing bounds."
+  (when (re-search-backward (concat "[^" ram-open-delimiters "[:space:]" "\n]") nil t 1)
+    (forward-char)
+    (ram-thing-bounds)))
+
+(defun ram-next-thing-bounds ()
+  "Return the bounds of the next thing.
+The search must start outside the current thing bounds."
+  (when (re-search-forward (concat "[^" ram-close-delimiters "[:space:]" "\n]") nil t 1)
+    (backward-char)
+    (ram-thing-bounds)))
+
+(defun ram-sexp-bounds ()
+  "Return the bounds of comment block, string, sexp or list.
+Whichever happens to be first."
+  (cond
+   ((ram-comment-bounds))
+   ((ram-string-bounds))
+   ((bounds-of-thing-at-point 'sexp))
+   ((ram-delimited-sexp-bounds))
+   (t (error "`ram-sexp-bounds': All `cond' clauses failed"))))
+
+;;** brackets, parentheses, parens, sexps: select, copy, clone, kill
+
+(defun ram-select-sexp ()
+  "Mark sexp.
+The beginning and end of sexp is defined by return value of
+`ram-thing-bounds'."
+  (interactive)
+  (if-let ((bounds (if (eq last-command this-command)
+                       (ram-delimited-sexp-bounds t)
+                     (ram-thing-bounds))))
+      (progn
+        (if (ram-at-thing-end-p)
+            (progn
+              (set-mark (car bounds))
+              (goto-char (cdr bounds)))
+          (set-mark (cdr bounds))
+          (goto-char (car bounds))))))
+
+(defun ram-copy-sexp ()
+  "Save sexp to `kill-ring'.
+The beginning and end of sexp is defined by return value of
+`ram-thing-bounds'."
+  (interactive)
+  (let* ((repeated-p (eq last-command this-command))
+         (bounds (if repeated-p
+                     (ram-delimited-sexp-bounds t)
+                   (ram-thing-bounds)))
+         (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds)))))
+    (when str
+      (if repeated-p (kill-new str t) (kill-new str))
+      (move-overlay ram-copied-region-overlay (car bounds) (cdr bounds))
+      (if (ram-at-thing-end-p)
+          (goto-char (cdr bounds))
+        (goto-char (car bounds))))))
+
+(defun ram-clone-sexp-forward ()
+  "Clone sexp. Place the copy below the original."
+  (interactive)
+  (let* ((bounds (ram-thing-bounds))
+         (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds))))
+         (at-end-p (ram-at-thing-end-p)))
+    (when str
+      (goto-char (cdr bounds))
+      (newline-and-indent)
+      (insert str)
+      (indent-according-to-mode)
+      ;; insert newline for top level clones
+      (when (= (nth 0 (syntax-ppss)) 0)
+        (goto-char (cdr bounds))
+        (newline-and-indent)
+        (forward-char))
+      (let ((new-bounds (ram-thing-bounds)))
+        (move-overlay ram-copied-region-overlay
+                      (car new-bounds) (cdr new-bounds))
+        ;; (when (not (or (= (char-before) 10)   ; beginning of line
+        ;;                (= (char-before) 32))) ; white space
+        ;;   (insert " ")
+        ;;   (backward-char))
+        (if at-end-p
+            (goto-char (cdr new-bounds))
+          (goto-char (car new-bounds)))))))
+
+(defun ram-clone-sexp-backward ()
+  "Clone sexp. Place the copy above the original."
+  (interactive)
+  (let* ((bounds (ram-thing-bounds))
+         (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds))))
+         (at-end-p (ram-at-thing-end-p)))
+    (when str
+      (goto-char (car bounds))
+      (newline-and-indent)
+      (forward-line -1)
+      (end-of-line)
+      (when (not (or (= (char-before) 10)     ; beginning of line
+                     (= (char-before) 32)))   ; white space
+        (insert " "))
+      (insert str)
+      (indent-according-to-mode)
+      ;; insert newline for defun clones
+      (when (= (nth 0 (syntax-ppss)) 0)
+        (newline-and-indent)
+        (backward-char))
+      (let ((new-bounds (ram-thing-bounds)))
+        (move-overlay ram-copied-region-overlay
+                      (car new-bounds)
+                      (cdr new-bounds))
+        (if at-end-p
+            (goto-char (cdr new-bounds))
+          (goto-char (car new-bounds)))))))
+
+(defun ram-kill-at-point ()
+  "Kill region bound by return value of `ram-thing-bounds'."
+  (interactive)
+  (let* ((bounds (if (eq last-command this-command)
+                     (ram-delimited-sexp-bounds t)
+                   (ram-sexp-bounds)))
+         (str (when bounds (buffer-substring (car bounds) (cdr bounds)))))
+    (when str
+      (kill-new str)
+      (when (not buffer-read-only)
+        (delete-region (car bounds) (cdr bounds))))))
+
+;; adopted from https://github.com/abo-abo/lispy
+(defun ram--swap-regions (bounds1 bounds2)
+  "Swap buffer regions BOUNDS1 and BOUNDS2.
+Return a cons of the new text cordinates."
+  ;; cover cases for moving sexp up or down
+  (when (> (car bounds1) (car bounds2))
+    (cl-rotatef bounds1 bounds2))
+  (let ((str1 (buffer-substring-no-properties (car bounds1) (cdr bounds1)))
+        (str2 (buffer-substring-no-properties (car bounds2) (cdr bounds2))))
+    (message ">>>> str1: %s" str1)
+    (message ">>>> str2: %s" str2)
+    (goto-char (car bounds2))
+    (delete-region (car bounds2) (cdr bounds2))
+    (insert str1)
+    (when (ram-in-comment-p)
+      (unless (eolp)
+        (newline-and-indent)))
+    (goto-char (car bounds1))
+    (delete-region (car bounds1) (cdr bounds1))
+    (insert str2)
+    (goto-char (car bounds1)))
+  (let* ((l1 (- (cdr bounds1) (car bounds1)))
+         (l2 (- (cdr bounds2) (car bounds2)))
+         (new-beg (+ (car bounds2) (- l2 l1)))
+         (new-end (+ new-beg l1)))
+    (cons
+     (cons (car bounds1) (+ (car bounds1) l2))
+     (cons new-beg new-end))))
+
+(defun ram-move-sexp-down ()
+  (interactive)
+  (let* ((bounds1 (ram-thing-bounds))
+        (limits (save-excursion
+                (deactivate-mark)
+                (goto-char (car bounds1))
+                (if (ignore-errors (up-list) t)
+                    (ram-thing-bounds)
+                  (cons (point-min) (point-max)))))
+        (at-end-p (ram-at-thing-end-p))
+        bounds2
+        new-bounds)
+    (goto-char (cdr bounds1))
+    (when (re-search-forward "[^ \t\n]" (max (1- (cdr limits))
+                                           (point)) t)
+        (progn
+          (deactivate-mark)
+          (setq bounds2 (ram-sexp-bounds))
+          (setq new-bounds (ram--swap-regions bounds1 bounds2))
+          (setq deactivate-mark nil)
+          (goto-char (cdr bounds2))
+          ;; (set-mark (point))
+          (if at-end-p
+              (goto-char (cddr new-bounds))
+            (goto-char (cadr new-bounds)))
+          ;; (backward-char (- (cdr bounds1) (car bounds1)))
+          ))))
+
+(defun ram-move-sexp-up ()
+  (interactive)
+  (let* ((bounds1 (ram-thing-bounds))
+         (limits (save-excursion
+                   (deactivate-mark)
+                   (goto-char (car bounds1))
+                   (if (ignore-errors (up-list) t)
+                       (ram-thing-bounds)
+                     (cons (point-min) (point-max)))))
+         (at-end-p (ram-at-thing-end-p))
+         bounds2
+         new-bounds)
+    (goto-char (car bounds1))
+    (when (re-search-backward "[^ \t\n]" (car limits) t)
+      (progn
+        (deactivate-mark)
+        (forward-char)
+        (setq bounds2 (ram-sexp-bounds))
+        (setq new-bounds (ram--swap-regions bounds1 bounds2))
+        (setq deactivate-mark nil)
+        (goto-char (cdr bounds2))
+        ;; (set-mark (point))
+        ;; (backward-char (- (cdr bounds1) (car bounds1)))
+        (if at-end-p
+            (goto-char (cdar new-bounds))
+          (goto-char (caar new-bounds)))))))
+
+;;** brackets, parentheses, parens, sexps: move up, down
+
+;;** brackets, parentheses, parens, sexps: bindings
+
+(define-key prog-mode-map (kbd "<end>" ) #'ram-select-sexp)
+(define-key prog-mode-map (kbd "<home>" ) #'ram-copy-sexp)
+
+(define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
+(define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
+
+(define-key prog-mode-map (kbd "M-<down>" ) #'ram-move-sexp-down)
+(define-key prog-mode-map (kbd "M-<up>" ) #'ram-move-sexp-up)
+
+(define-key prog-mode-map (kbd "S-<down>") #'ram-next-defun)
+(define-key prog-mode-map (kbd "S-<up>") #'ram-prev-defun)
+
+(define-key prog-mode-map (kbd "C-<down>" ) #'ram-clone-sexp-forward)
+(define-key prog-mode-map (kbd "C-<up>" ) #'ram-clone-sexp-backward)
+
+(define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+(define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+
+(define-key prog-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
+(define-key prog-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
+
+(define-key prog-mode-map (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
+(define-key prog-mode-map (kbd "S-<right>" ) #'ram-end-of-top-sexp)
+
+(define-key prog-mode-map (kbd "C-," ) #'ram-kill-at-point)
 
 ;;* linters
 
