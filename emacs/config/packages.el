@@ -521,7 +521,7 @@ Disable `icomplete-vertical-mode' for this command."
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
             (set (make-local-variable 'company-backends)
-                 '((company-elisp company-dabbrev-code company-files)))))
+                 '((company-capf company-elisp company-dabbrev-code company-files)))))
 
 (add-hook 'lisp-interaction-mode-hook 'company-mode)
 (add-hook 'lisp-interaction-mode-hook
@@ -6390,7 +6390,10 @@ That is, remove a non kept dired from the recent list."
     (write-region "" nil ispell-personal-dictionary nil 0))
   ;; (setq ispell-dictionary "english")
   (setq ispell-silently-savep t)
-  (setq ispell-dictionary "en_US_pali")
+  ;; pali part has a million entries, seem like it slows
+  ;; the some commands: like delete char, backward-char etc
+  ;; (setq ispell-dictionary "en_US_pali")
+  (setq ispell-dictionary "en_US")
   ;; (setq ispell-extra-args '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
   )
 ;;** spelling: flycheck
