@@ -7236,49 +7236,58 @@ buffer-local `ram-face-remapping-cookie'."
 
 (define-key global-map (kbd "<M-f16>") #'copy-line)
 
-;;** custom: ram-insert-space
+;;** custom: ram-up-list-insert-space
 
-;; when inside sexp, ram-insert-space jumps out of the sexp and insert
-;; space.
+(defun ram-forward-over-whitespace-to-regexp (regexp)
+  "Return  `match-beginning' of regexp if preceded by whitespace."
+  (if-let* ((bound (save-excursion (re-search-forward "[^[:space:]\n]" nil t 1)))
+            (new-point (save-excursion
+                         (re-search-forward (concat "\\([[:space:]]*\\|\n*\\)" "\\(" regexp "\\)")
+                                            bound
+                                            t 1))))
+    (goto-char (match-beginning 2))))
 
-(defun ram-insert-space ()
-  "When inside a sexp, jump out of it and insert space."
+(defun ram-backward-over-whitespace-to-regexp (regexp)
+  "Return  `match-end' of regexp if followed by whitespace."
+  (if-let* ((bound (save-excursion (re-search-backward "[^[:space:]\n]" nil t 1)))
+            (new-point (save-excursion
+                         (re-search-backward (concat  "\\(" regexp "\\)" "\\([[:space:]]*\\|\n*\\)")
+                                            bound
+                                            t 1))))
+      (goto-char (match-end 1))))
+
+(defun ram-remove-whitespace-between-regexps (regexp1 regexp2)
+  "Remove all whitespace between REGEXP1 and REGEXP2."
+  (let ((beg (ram-backward-over-whitespace-to-regexp regexp1) )
+        (end (ram-forward-over-whitespace-to-regexp regexp2)))
+    (when (and beg end)
+      (goto-char beg)
+     (delete-char (- end beg)))))
+
+(defun ram-up-list-insert-space ()
+  "When inside a list or string, jump out of it and insert space."
   (interactive)
-  (let ((inside-str (nth 3 (syntax-ppss)))
-        (inside-parens (nth 1 (syntax-ppss))))
+  (let* ((ppss (syntax-ppss))
+         (inside-str (nth 3 ppss))
+         (inside-parens (nth 1 ppss)))
     (cond
      (inside-str
-      (backward-up-list -1 t t)
-      (insert " "))
+      (backward-up-list -1 t t))
      ;; same as 'inside-str only removes white space between parens
      (inside-parens
-       (let ((move-in-this-direction
-              (cond
-               ((and (= (char-after) ?\))
-                     (= (char-before) ? )) #'backward-char)
-               ((and (= (char-before) ?\))
-                     (= (char-after) ? )) #'forward-char)
-               ('else nil)))
-             last-white-spc-point)
-         (cl-labels ((white-spc-between-closing-parens? ()
-                                                        (when move-in-this-direction
-                                                          (funcall move-in-this-direction)
-                                                          (cond
-                                                           ((= (char-after) ?\)) (point))
-                                                           ((= (char-before) ?\)) (point))
-                                                           ((and (= (char-after) ?\ )
-                                                                 (= (char-before) ?\ ))
-                                                            (white-spc-between-closing-parens?))
-                                                           ('else nil)))))
-           (setq last-white-spc-point
-                 (save-excursion (white-spc-between-closing-parens?)))
-           (when last-white-spc-point
-             (delete-char (- last-white-spc-point (point))))))
-       (backward-up-list -1 t t)
-       (insert " ")))))
+      (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delim-re) ram-close-delim-re)
+      (backward-up-list -1 t t)))
+    (cond
+     ((and (char-after)
+           (= (char-after) 10))
+      (newline-and-indent)
+      (indent-according-to-mode))
+     ((and (char-after)
+           (= (char-after) 32))
+      (forward-char))
+     (t (insert " ")))))
 
-(define-key global-map (kbd "S-SPC") #'ram-insert-space)
-
+(define-key global-map (kbd "S-SPC") #'ram-up-list-insert-space)
 
 ;;** custom: narrow
 
