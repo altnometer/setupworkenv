@@ -4242,6 +4242,7 @@ If cursor is not on a bracket, call `backward-up-list'."
   "Move forward out of one level of parentheses ARG times.
 Return nil on failure, (point) otherwise."
   ;; move out of the string
+  (interactive "p")
   (let ((s (syntax-ppss)))
     (when (nth 3 s)
       (goto-char (nth 8 s))))
@@ -4257,6 +4258,7 @@ Return nil on failure, (point) otherwise."
 (defun ram-up-list-backward (arg)
   "Move backward out of one level of parentheses ARG times.
 Return nil on failure, (point) otherwise."
+  (interactive "p")
   (let ((oldpt (point))
         newpt)
     (ram-up-list-forward arg)
@@ -4760,6 +4762,9 @@ Return a cons of the new text cordinates."
 
 (define-key prog-mode-map (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
 (define-key prog-mode-map (kbd "S-<right>" ) #'ram-end-of-top-sexp)
+
+(define-key prog-mode-map (kbd "C-<left>" ) #'ram-up-list-backward)
+(define-key prog-mode-map (kbd "C-<right>" ) #'ram-up-list-forward)
 
 (define-key prog-mode-map (kbd "C-," ) #'ram-kill-at-point)
 
