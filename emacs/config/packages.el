@@ -4640,7 +4640,14 @@ The beginning and end of sexp is defined by return value of
     (when str
       (kill-new str)
       (when (not buffer-read-only)
-        (delete-region (car bounds) (cdr bounds))))))
+        (delete-region (car bounds) (cdr bounds))
+        (let ((point (point))
+              (blank-line-p (save-excursion
+                              (beginning-of-line)
+                              (re-search-forward "^[[:space:]]*$" (point-at-eol) t 1))))
+          (when blank-line-p
+            (delete-region blank-line-p (1+ (point-at-eol)))
+            (indent-according-to-mode)))))))
 
 ;; adopted from https://github.com/abo-abo/lispy
 (defun ram--swap-regions (bounds1 bounds2)
