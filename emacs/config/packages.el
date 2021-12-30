@@ -4679,34 +4679,6 @@ Return a cons of the new text cordinates."
      (cons (car bounds1) (+ (car bounds1) l2))
      (cons new-beg new-end))))
 
-(defun ram-move-sexp-down ()
-  (interactive)
-  (let* ((bounds1 (ram-thing-bounds))
-        (limits (save-excursion
-                (deactivate-mark)
-                (goto-char (car bounds1))
-                (if (ignore-errors (up-list) t)
-                    (ram-thing-bounds)
-                  (cons (point-min) (point-max)))))
-        (at-end-p (ram-at-thing-end-p))
-        bounds2
-        new-bounds)
-    (goto-char (cdr bounds1))
-    (when (re-search-forward "[^ \t\n]" (max (1- (cdr limits))
-                                           (point)) t)
-        (progn
-          (deactivate-mark)
-          (setq bounds2 (ram-sexp-bounds))
-          (setq new-bounds (ram--swap-regions bounds1 bounds2))
-          (setq deactivate-mark nil)
-          (goto-char (cdr bounds2))
-          ;; (set-mark (point))
-          (if at-end-p
-              (goto-char (cddr new-bounds))
-            (goto-char (cadr new-bounds)))
-          ;; (backward-char (- (cdr bounds1) (car bounds1)))
-          ))))
-
 (defun ram-move-sexp-up ()
   (interactive)
   (let* ((bounds1 (ram-thing-bounds))
@@ -4733,6 +4705,35 @@ Return a cons of the new text cordinates."
         (if at-end-p
             (goto-char (cdar new-bounds))
           (goto-char (caar new-bounds)))))))
+
+(defun ram-move-sexp-down ()
+  (interactive)
+  (let* ((bounds1 (ram-thing-bounds))
+         (limits (save-excursion
+                   (deactivate-mark)
+                   (goto-char (car bounds1))
+                   (if (ignore-errors (up-list) t)
+                       (ram-thing-bounds)
+                     (cons (point-min) (point-max)))))
+         (at-end-p (ram-at-thing-end-p))
+         bounds2
+         new-bounds)
+    (goto-char (cdr bounds1))
+    (when (re-search-forward "[^ \t\n]" (max (1- (cdr limits))
+                                             (point)) t)
+      (progn
+        (deactivate-mark)
+        (backward-char 1)
+        (setq bounds2 (ram-sexp-bounds))
+        (setq new-bounds (ram--swap-regions bounds1 bounds2))
+        (setq deactivate-mark nil)
+        (goto-char (cdr bounds2))
+        ;; (set-mark (point))
+        (if at-end-p
+            (goto-char (cddr new-bounds))
+          (goto-char (cadr new-bounds)))
+        ;; (backward-char (- (cdr bounds1) (car bounds1)))
+        ))))
 
 ;;** brackets, parentheses, parens, sexps: move up, down
 
