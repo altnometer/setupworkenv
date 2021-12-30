@@ -4681,14 +4681,15 @@ Return a cons of the new text cordinates."
 
 (defun ram-move-sexp-up ()
   (interactive)
-  (let* ((bounds1 (ram-thing-bounds))
+  (let* ((bounds1 (ram-delimited-sexp-bounds))
          (limits (save-excursion
                    (deactivate-mark)
                    (goto-char (car bounds1))
                    (if (ignore-errors (up-list) t)
                        (ram-thing-bounds)
                      (cons (point-min) (point-max)))))
-         (at-end-p (ram-at-thing-end-p))
+         ;; (at-end-p (ram-at-thing-end-p))
+         (location (- (point) (car bounds1)))
          bounds2
          new-bounds)
     (goto-char (car bounds1))
@@ -4702,20 +4703,23 @@ Return a cons of the new text cordinates."
         (goto-char (cdr bounds2))
         ;; (set-mark (point))
         ;; (backward-char (- (cdr bounds1) (car bounds1)))
-        (if at-end-p
-            (goto-char (cdar new-bounds))
-          (goto-char (caar new-bounds)))))))
+        (goto-char (+ (caar new-bounds) location))
+        ;; (if at-end-p
+        ;;     (goto-char (cdar new-bounds))
+        ;;   (goto-char (caar new-bounds)))
+        ))))
 
 (defun ram-move-sexp-down ()
   (interactive)
-  (let* ((bounds1 (ram-thing-bounds))
+  (let* ((bounds1 (ram-delimited-sexp-bounds))
          (limits (save-excursion
                    (deactivate-mark)
                    (goto-char (car bounds1))
                    (if (ignore-errors (up-list) t)
                        (ram-thing-bounds)
                      (cons (point-min) (point-max)))))
-         (at-end-p (ram-at-thing-end-p))
+         ;; (at-end-p (ram-at-thing-end-p))
+         (location (- (point) (car bounds1)))
          bounds2
          new-bounds)
     (goto-char (cdr bounds1))
@@ -4729,9 +4733,10 @@ Return a cons of the new text cordinates."
         (setq deactivate-mark nil)
         (goto-char (cdr bounds2))
         ;; (set-mark (point))
-        (if at-end-p
-            (goto-char (cddr new-bounds))
-          (goto-char (cadr new-bounds)))
+        (goto-char (+ (cadr new-bounds) location))
+        ;; (if at-end-p
+        ;;     (goto-char (cddr new-bounds))
+        ;;   (goto-char (cadr new-bounds)))
         ;; (backward-char (- (cdr bounds1) (car bounds1)))
         ))))
 
