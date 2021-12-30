@@ -4427,13 +4427,14 @@ If ARG is 4, move to the beginning of defun."
 (defun ram-at-string-beg-p ()
   "Return non `nil' if `looking-at' a double quote character. "
   (and (eq (char-after) ?\")
-       (not (eq ?\\ (char-before)))))
+       (not (eq ?\\ (char-before)))
+       (point)))
 
 (defun ram-at-string-end-p ()
   "Return non `nil' if `char-before' the point is a double quote."
   (and (eq ?\" (char-before))
        (not (eq ?\\ (char-before (- (point) 1))))
-       ))
+       (point)))
 
 (defun ram-at-comment-block-beg-p ()
   (if-let ((beg (save-excursion (ram-goto-comment-block-beg))))
