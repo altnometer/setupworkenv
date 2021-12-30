@@ -4212,7 +4212,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((back-to-delim ()
                 "Jump backward to the open delimiter that is not in a string."
-                (when (ram-at-parens-group-end-p) (backward-char))
+                (when (ram-at-delimited-end-p) (backward-char))
                 (re-search-backward ram-close-delim-re nil t 1)
                 (when (match-string 0) (forward-char))
                 ;; skip matches in strings and comments
@@ -4414,12 +4414,12 @@ If ARG is 4, move to the beginning of defun."
 
 ;;** brackets, parentheses, parens, sexps: at beg? at end?
 
-(defun ram-at-parens-group-beg-p ()
+(defun ram-at-delimited-beg-p ()
   "Return non `nil' if the point is after `ram-open-delim-re'."
   (when (not (ram-in-comment-p))
     (looking-at (concat ram-open-delim-re))))
 
-(defun ram-at-parens-group-end-p ()
+(defun ram-at-delimited-end-p ()
   "Return non `nil' if the point is after `ram-close-delim-re'."
   (when (not (ram-in-comment-p))
     (save-excursion (backward-char) (looking-at (concat ram-close-delim-re)))))
@@ -4445,12 +4445,12 @@ If ARG is 4, move to the beginning of defun."
       (= (point) end)))
 
 (defun ram-at-thing-beg-p ()
-  (or (ram-at-parens-group-beg-p)
+  (or (ram-at-delimited-beg-p)
       (ram-at-string-beg-p)
       (ram-at-comment-block-beg-p)))
 
 (defun ram-at-thing-end-p ()
-  (or (ram-at-parens-group-end-p)
+  (or (ram-at-delimited-end-p)
       (ram-at-string-end-p)
       (ram-at-comment-block-end-p)))
 
@@ -4500,7 +4500,7 @@ If ARG is 4, move to the beginning of defun."
                     (backward-char)
                     (point)))
                  ;; at close paren
-                 ((ram-at-parens-group-end-p)
+                 ((ram-at-delimited-end-p)
                   (save-excursion (backward-sexp)
                                   (point)))
                  ;; inside parens
