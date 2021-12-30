@@ -4583,7 +4583,9 @@ The beginning and end of sexp is defined by return value of
   (interactive)
   (let* ((bounds (ram-thing-bounds))
          (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds))))
-         (at-end-p (ram-at-thing-end-p)))
+         (location (- (point) (car bounds)))
+         ;; (at-end-p (ram-at-thing-end-p))
+         )
     (when str
       (goto-char (cdr bounds))
       (newline-and-indent)
@@ -4601,23 +4603,28 @@ The beginning and end of sexp is defined by return value of
         ;;                (= (char-before) 32))) ; white space
         ;;   (insert " ")
         ;;   (backward-char))
-        (if at-end-p
-            (goto-char (cdr new-bounds))
-          (goto-char (car new-bounds)))))))
+        (goto-char (+ (car new-bounds) location))
+        (indent-according-to-mode)
+        ;; (if at-end-p
+        ;;     (goto-char (cdr new-bounds))
+        ;;   (goto-char (car new-bounds)))
+        ))))
 
 (defun ram-clone-sexp-backward ()
   "Clone sexp. Place the copy above the original."
   (interactive)
   (let* ((bounds (ram-thing-bounds))
          (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds))))
-         (at-end-p (ram-at-thing-end-p)))
+         (location (- (point) (car bounds)))
+         ;; (at-end-p (ram-at-thing-end-p))
+         )
     (when str
       (goto-char (car bounds))
       (newline-and-indent)
       (forward-line -1)
       (end-of-line)
-      (when (not (or (= (char-before) 10)     ; beginning of line
-                     (= (char-before) 32)))   ; white space
+      (when (not (or (= (char-before) 10)   ; beginning of line
+                     (= (char-before) 32))) ; white space
         (insert " "))
       (insert str)
       (indent-according-to-mode)
@@ -4629,9 +4636,12 @@ The beginning and end of sexp is defined by return value of
         (move-overlay ram-copied-region-overlay
                       (car new-bounds)
                       (cdr new-bounds))
-        (if at-end-p
-            (goto-char (cdr new-bounds))
-          (goto-char (car new-bounds)))))))
+        (goto-char (+ (car new-bounds) location))
+        (indent-according-to-mode)
+        ;; (if at-end-p
+        ;;     (goto-char (cdr new-bounds))
+        ;;   (goto-char (car new-bounds)))
+        ))))
 
 (defun ram-kill-at-point ()
   "Kill region bound by return value of `ram-thing-bounds'."
