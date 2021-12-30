@@ -4661,8 +4661,6 @@ Return a cons of the new text cordinates."
     (cl-rotatef bounds1 bounds2))
   (let ((str1 (buffer-substring-no-properties (car bounds1) (cdr bounds1)))
         (str2 (buffer-substring-no-properties (car bounds2) (cdr bounds2))))
-    (message ">>>> str1: %s" str1)
-    (message ">>>> str2: %s" str2)
     (goto-char (car bounds2))
     (delete-region (car bounds2) (cdr bounds2))
     (insert str1)
