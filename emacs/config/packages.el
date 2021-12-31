@@ -4739,7 +4739,7 @@ Return a cons of the new text cordinates."
 
 (defun ram-move-sexp-up ()
   (interactive)
-  (let* ((bounds1 (ram-delimited-sexp-bounds))
+  (let* ((bounds1 (ram-thing-bounds))
          (limits (save-excursion
                    (deactivate-mark)
                    (goto-char (car bounds1))
@@ -4769,7 +4769,7 @@ Return a cons of the new text cordinates."
 
 (defun ram-move-sexp-down ()
   (interactive)
-  (let* ((bounds1 (ram-delimited-sexp-bounds))
+  (let* ((bounds1 (ram-thing-bounds))
          (limits (save-excursion
                    (deactivate-mark)
                    (goto-char (car bounds1))
