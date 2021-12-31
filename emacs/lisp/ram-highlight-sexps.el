@@ -88,9 +88,12 @@ The list starts with the the inside sexp and moves outwards."
   ;; '("#36454F" "#51484F")
   ;; '("#21242b" "#3f444a")                ; #3f444a is doom-one-theme base4
 (defvar hl-sexp-background-colors
-  (ram-make-highlight-color (face-background 'default) 0 8000)
-  "*List of colors for highlighted sexps backgrounds.
-The list starts with the inside parentheses and moves outwards.")
+  ;; '("thistle1" "LightSteelBlue1")
+  '("LavenderBlush1" "LightSteelBlue1")
+  ;; (ram-make-highlight-color (face-background 'default) 0 8000)
+  "*List of colors for highlighting backgrounds in parentheses-like expressions.
+The first color is for current parenthesis group, the second is
+for its parent.")
 
 (defcustom hl-sexp-colors-when-at-del
   nil
@@ -142,7 +145,9 @@ The list starts with the the inside sexp and moves outwards."
 ;; (fg-alt '("#5B6268" "#2d2d2d" "white"))
 
 (defvar hl-sexp-background-colors-when-at-del
-  (ram-make-highlight-color (face-background 'default) 2000 4000)
+  ;; '("DarkSeaGreen1" "LightSteelBlue1")
+  '("honeydew1" "LightSteelBlue1")
+  ;; (ram-make-highlight-color (face-background 'default) 2000 4000)
   "*List of colors for highlighted sexps backgrounds.
 The list starts with the inside parentheses and moves outwards.")
 
@@ -414,7 +419,7 @@ repeating highlighting the same sexps in the same context.")
 ;;;###autoload
 (define-minor-mode ram-highlight-sexps-mode
   "Minor mode to highlight an expanding set of surrounding s-expressions."
-  :init-valuer: nil :lighter " hl-s" :keymap nil
+  :init-value: nil :lighter " hl-s" :keymap nil
   (mapc 'delete-overlay hl-sexp-overlays)
   (mapc 'delete-overlay hl-sexp-overlays-when-at-del)
   (mapc 'delete-overlay hl-sexp-mask-whitespace-overlays)
@@ -512,14 +517,16 @@ repeating highlighting the same sexps in the same context.")
       (overlay-put (car hl-sexp-paren-siblings-overlays) 'face attributes)
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority nil)
+      (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority 2)
       (cl-decf num))))
 
 (defun hl-sexp-color-update ()
   (setq hl-sexp-background-colors-when-at-del
-        (ram-make-highlight-color (face-background 'default) 2000 4000))
+        ;; (ram-make-highlight-color (face-background 'default) 2000 4000)
+        '("DarkSeaGreen1" "LightSteelBlue1"))
   (setq hl-sexp-background-colors
-        (ram-make-highlight-color (face-background 'default) 0 8000))
+        ;; (ram-make-highlight-color (face-background 'default) 0 8000)
+        '("thistle1" "LightSteelBlue1"))
   (setq hl-sexp-mask-leading-space-background-color
         (face-background 'default))
 
@@ -614,7 +621,7 @@ surrounding PT."
       (overlay-put (car hl-sexp-mask-whitespace-overlays) 'face attributes)
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority num)
-      (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority nil)
+      (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority 5)
       (cl-decf num))
     (setq hl-sexp-mask-whitespace-overlays (nreverse hl-sexp-mask-whitespace-overlays))))
 
@@ -690,7 +697,7 @@ trailing whitespace in the region delimited with BEGIN and END."
       (overlay-put (car hl-sexp-paren-overlays) 'face attributes)
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-overlays) 'priority 1)
+      (overlay-put (car hl-sexp-paren-overlays) 'priority 2)
       (cl-decf num))
     (setq hl-sexp-paren-overlays (nreverse hl-sexp-paren-overlays))))
 
@@ -719,7 +726,7 @@ trailing whitespace in the region delimited with BEGIN and END."
       (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'face attributes)
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority 1)
+      (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority 2)
       (cl-decf num))
     (setq hl-sexp-paren-when-at-del-overlays (nreverse hl-sexp-paren-when-at-del-overlays))))
 
