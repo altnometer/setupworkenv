@@ -4327,14 +4327,27 @@ If ARG is 4, move to the beginning of defun."
 
 ;;** brackets, parentheses, parens, sexps: settings
 
-(defvar ram-open-delimiters "[({"
-  "A string of open delimiters.")
-(defvar ram-open-delim-re (concat "[" ram-open-delimiters "]")
+(defvar ram-delimiters "{}()[]"
+  "A string of open and close delimiters pairs.")
+(defvar ram-open-delimiters
+  (let ((delims))
+    (dotimes (idx (length ram-delimiters))
+      (when (= (% idx 2) 0)
+        (message "char: %s" (aref ram-delimiters idx))
+        (setq delims (cons (char-to-string (aref ram-delimiters idx)) delims))))
+    delims)
+  "A list of open delimiter strings.")
+(defvar ram-open-delim-re (concat "[" (string-join ram-open-delimiters) "]")
   "Regexp to match common open delimiters.")
 
-(defvar ram-close-delimiters "])}"
-  "A string of close delimiters.")
-(defvar ram-close-delim-re (concat "[" ram-close-delimiters "]")
+(defvar ram-close-delimiters
+  (let ((delims))
+    (dotimes (idx (length ram-delimiters))
+      (when (= (% idx 2) 1)
+        (setq delims (cons (char-to-string (aref ram-delimiters idx)) delims))))
+    delims)
+  "A list of close delimiter strings.")
+(defvar ram-close-delim-re (concat "[" (string-join ram-close-delimiters) "]")
   "Regexp to match common close delimiters.")
 
 ;; If true, #'paredit-blink-paren-match is slow
