@@ -4454,6 +4454,54 @@ If ARG is 4, move to the beginning of defun."
       (ram-at-string-end-p)
       (ram-at-comment-block-end-p)))
 
+;;** brackets, parentheses, parens, sexps: <enter>, newline-and-indent
+
+;; adopted from https://github.com/abo-abo/lispy #'lispy-alt-line
+(defun ram-newline-and-indent (&optional arg)
+  "Automate context aware tasks before invoking `newline-and-indent'.
+Context aware actions:
+- exit the minibuffer,
+Before invoking `newline-and-indent':
+- when in a string, go to the end of enclosing list
+  (foo \"bar|\" (baz)) -> (foo \"bar\"| (baz))
+- exit a list,
+-
+"
+  (interactive "p")
+  (when (bound-and-true-p abbrev-mode)
+    (expand-abbrev))
+  (let ((bounds (ram-thing-bounds)))
+    (cond
+     ((> (minibuffer-depth) 0)
+      (exit-minibuffer))
+     ((ram-in-comment-p))
+     ((ram-string-bounds) (goto-char (cdr bounds)))
+     ((ram-at-delimited-end-p))
+     ((ram-at-delimited-beg-p) (goto-char (cdr bounds)))
+     ;; blank line with ")" at the end
+     ((and (looking-back "^ +" (point-at-bol))
+           (looking-at (concat "[[:space:]]*" ram-close-delim-re)))
+      (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delim-re) ram-close-delim-re)
+      (forward-char))
+     ;; whitespace, point, maybe code maybe with close delimiter
+     ((looking-back "^ +" (line-beginning-position))
+      (if (re-search-forward ram-close-delim-re (point-at-eol) t)
+          ;; go before closing paren
+          (backward-char 1)
+        (move-end-of-line 1))
+      )
+     (t (let ((end (min (line-end-position)
+                        (cdr (ram-delimited-sexp-bounds)))))
+          (while (< (point) (1- end))
+            (forward-sexp)))))
+    (newline-and-indent)
+    (indent-according-to-mode))
+  )
+
+(define-key emacs-lisp-mode-map (kbd "S-<return>") #'ram-newline-and-indent)
+
+(define-key lisp-interaction-mode-map (kbd "S-<return>") #'ram-newline-and-indent)
+
 ;;** brackets, parentheses, parens, sexps: bounds
 
 (defun ram-comment-bounds ()
