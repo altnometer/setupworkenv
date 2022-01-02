@@ -4671,34 +4671,49 @@ The beginning and end of sexp is defined by return value of
 (defun ram-clone-sexp-forward ()
   "Clone sexp. Place the copy below the original."
   (interactive)
-  (let* ((bounds (ram-thing-bounds))
+  (let* ((repeated-p (eq last-command this-command))
+         (get-bounds #'ram-sexp-bounds)
+         ;; repeated command selects the ancestor
+         (bounds (funcall get-bounds (max 0 (1- (or ram-num-of-repeated-command-calls 0)))))
          (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds))))
          (location (- (point) (car bounds)))
          ;; (at-end-p (ram-at-thing-end-p))
          )
     (when str
+      (when repeated-p
+        (delete-region (car bounds) (cdr bounds))
+        ;; clean whitespaces
+        (if (looking-at "[[:space:]]*$")
+            (ram-remove-whitespace-between-regexps "[[:space:]]" "[^[:space:]\n]")
+          (ram-remove-whitespace-between-regexps "[^[:space:]\n]" "[^[:space:]\n]")
+          (when (not (memq (char-after) ram-close-delimiters)) (insert " ")))
+        ;; search back for str
+        (re-search-backward (regexp-quote str) nil nil 1)
+        (goto-char (+ (point) location))
+        ;; reset variables for the ancestor
+        (setq bounds (ram-delimited-sexp-bounds ram-num-of-repeated-command-calls))
+        (setq str (buffer-substring-no-properties (car bounds) (cdr bounds)))
+        (setq location (- (point) (car bounds))))
       (goto-char (cdr bounds))
       (newline-and-indent)
       (insert str)
+      ;; format the insert
+      (when (not (or (memq (char-before) '(10 32))
+                     (memq (char-after) '(10 32))
+                     (memq (char-after) ram-close-delimiters) ))
+        (insert " ")
+        (backward-char))
       (indent-according-to-mode)
-      ;; insert newline for top level clones
+      ;; insert newline between top level clones
       (when (= (nth 0 (syntax-ppss)) 0)
         (goto-char (cdr bounds))
         (newline-and-indent)
         (forward-char))
-      (let ((new-bounds (ram-thing-bounds)))
+      ;; move overlay over cloned sexp
+      (let ((new-bounds (funcall get-bounds)))
         (move-overlay ram-copied-region-overlay
                       (car new-bounds) (cdr new-bounds))
-        ;; (when (not (or (= (char-before) 10)   ; beginning of line
-        ;;                (= (char-before) 32))) ; white space
-        ;;   (insert " ")
-        ;;   (backward-char))
-        (goto-char (+ (car new-bounds) location))
-        (indent-according-to-mode)
-        ;; (if at-end-p
-        ;;     (goto-char (cdr new-bounds))
-        ;;   (goto-char (car new-bounds)))
-        ))))
+        (goto-char (+ (car new-bounds) location))))))
 
 (defun ram-clone-sexp-backward ()
   "Clone sexp. Place the copy above the original."
