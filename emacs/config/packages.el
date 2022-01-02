@@ -4541,15 +4541,21 @@ Before invoking `newline-and-indent':
       (cons beg end)))
 
 
-(defun ram-delimited-sexp-bounds (&optional select-parent-list)
-  "Return bounds delimited by `ram-open-delim-re' and `ram-close-delim-re'."
+(defun ram-delimited-sexp-bounds (&optional select-nth-ancestor)
+  "Return bounds delimited by `ram-open-delim-re' and `ram-close-delim-re'.
+With SELECT-NTH-ANCESTOR value greater than zero, return bounds
+for than ancestor."
   (if-let ((ppss (syntax-ppss))
            (beg (cond
-                 (select-parent-list
+                 ((> (or select-nth-ancestor 0) 0)
                   ;; when between defuns, there is no parent, select previous defun
                   (if (= (nth 0 ppss) 0)
                       (save-excursion (beginning-of-defun) (when (not (bobp)) (point)))
-                    (nth 1 ppss)))
+                    (let* ((ancestor-open-parens (nth 9 ppss))
+                           (max-idx (1- (length ancestor-open-parens)))
+                           (idx (max 0 (- max-idx (1- select-nth-ancestor))))
+                           (required-ancestor-level (nth idx ancestor-open-parens)))
+                      required-ancestor-level)))
                  ;; at open paren
                  ((looking-at-p ram-open-delim-re)
                   (point))
@@ -4612,7 +4618,7 @@ The beginning and end of sexp is defined by return value of
 `ram-thing-bounds'."
   (interactive)
   (if-let ((bounds (if (eq last-command this-command)
-                       (ram-delimited-sexp-bounds t)
+                       (ram-delimited-sexp-bounds 1)
                      (ram-thing-bounds))))
       (progn
         (if (ram-at-thing-end-p)
@@ -4629,7 +4635,7 @@ The beginning and end of sexp is defined by return value of
   (interactive)
   (let* ((repeated-p (eq last-command this-command))
          (bounds (if repeated-p
-                     (ram-delimited-sexp-bounds t)
+                     (ram-delimited-sexp-bounds 1)
                    (ram-thing-bounds)))
          (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds)))))
     (when str
@@ -6571,6 +6577,22 @@ That is, remove a non kept dired from the recent list."
 ;;** system: associate major-mode with file names
 
 (add-to-list 'auto-mode-alist '("zshrc\\'" . shell-script-mode))
+
+;;** system: commands
+
+;;*** system/commands: repeated, consecutive
+
+(defvar ram-num-of-repeated-command-calls 0
+  "Hold the number of repeated command invocations.
+Reset to zero if the current command is different from the
+previous.")
+
+(defun ram-modify-num-of-repeated-calls-var ()
+  (if (eq last-command real-this-command)
+      (setq ram-num-of-repeated-command-calls (1+ ram-num-of-repeated-command-calls))
+    (setq ram-num-of-repeated-command-calls 0)))
+
+(add-hook 'pre-command-hook #'ram-modify-num-of-repeated-calls-var)
 
 ;;** system: comments
 
