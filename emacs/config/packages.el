@@ -4490,18 +4490,23 @@ Before invoking `newline-and-indent':
      ((> (minibuffer-depth) 0)
       (exit-minibuffer))
      ((ram-in-comment-p))
-     ((ram-string-bounds) (goto-char (cdr bounds)))
+     ((ram-in-string-p) (goto-char (cdr bounds)))
      ((ram-at-delimited-end-p))
      ((ram-at-delimited-beg-p) (goto-char (cdr bounds)))
+     ;; (|) -> ()|
+     ((and (memq (char-after (point)) ram-close-delimiters)
+           (memq (char-before (point)) ram-open-delimiters))
+      (goto-char (cdr bounds)))
      ;; blank line with ")" at the end
      ((and (looking-back "^ +" (point-at-bol))
            (looking-at (concat "[[:space:]]*" ram-close-delim-re)))
-      (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delim-re) ram-close-delim-re)
+      ;; (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delim-re) ram-close-delim-re)
+      (ram-remove-whitespace-between-regexps "[^[:space:]\n]" ram-close-delim-re)
       (forward-char))
      ;; whitespace, point, maybe code maybe with close delimiter
      ((looking-back "^ +" (line-beginning-position))
       (if (re-search-forward ram-close-delim-re (point-at-eol) t)
-          ;; go before closing paren
+          ;; go before closing parens
           (backward-char 1)
         (move-end-of-line 1))
       )
@@ -4513,9 +4518,11 @@ Before invoking `newline-and-indent':
     (indent-according-to-mode))
   )
 
-(define-key emacs-lisp-mode-map (kbd "S-<return>") #'ram-newline-and-indent)
+(define-key emacs-lisp-mode-map (kbd "<return>") #'ram-newline-and-indent)
+(define-key emacs-lisp-mode-map (kbd "S-<return>") #'newline-and-indent)
 
-(define-key lisp-interaction-mode-map (kbd "S-<return>") #'ram-newline-and-indent)
+(define-key lisp-interaction-mode-map (kbd "<return>") #'ram-newline-and-indent)
+(define-key lisp-interaction-mode-map (kbd "S-<return>") #'newline-and-indent)
 
 ;;** brackets, parentheses, parens, sexps: bounds
 
