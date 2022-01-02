@@ -4586,38 +4586,46 @@ for than ancestor."
            (end (save-excursion (goto-char beg) (forward-sexp) (point))))
       (cons beg end)))
 
-(defun ram-thing-bounds ()
+(defun ram-thing-bounds (&optional select-nth-ancestor)
   "Return the beginning and the end of a thing at point.
 Only a line comment, string and list are valid choices."
-  (cond
-   ((ram-comment-bounds))
-   ((ram-string-bounds))
-   ((ram-delimited-sexp-bounds))
-   (t (error "`ram-thing-bounds': All `cond' clauses failed"))))
+  (if (> (or select-nth-ancestor 0) 0)
+      (ram-delimited-sexp-bounds select-nth-ancestor)
+    (cond
+     ((ram-comment-bounds))
+     ((ram-string-bounds))
+     ((ram-delimited-sexp-bounds))
+     (t (error "`ram-thing-bounds': All `cond' clauses failed")))))
 
 (defun ram-prev-thing-bounds ()
   "Return the bounds of the previous thing.
 The search must start outside the current thing bounds."
-  (when (re-search-backward (concat "[^" ram-open-delimiters "[:space:]" "\n]") nil t 1)
+  (when (re-search-backward (concat "[^"
+                                    (string-join (mapcar #'char-to-string ram-open-delimiters))
+                                    "[:space:]" "\n]") nil t 1)
     (forward-char)
     (ram-thing-bounds)))
 
 (defun ram-next-thing-bounds ()
   "Return the bounds of the next thing.
 The search must start outside the current thing bounds."
-  (when (re-search-forward (concat "[^" ram-close-delimiters "[:space:]" "\n]") nil t 1)
+  (when (re-search-forward (concat "[^"
+                                   (string-join (mapcar #'char-to-string ram-close-delimiters))
+                                   "[:space:]" "\n]") nil t 1)
     (backward-char)
     (ram-thing-bounds)))
 
-(defun ram-sexp-bounds ()
+(defun ram-sexp-bounds (&optional select-nth-ancestor)
   "Return the bounds of comment block, string, sexp or list.
 Whichever happens to be first."
-  (cond
-   ((ram-comment-bounds))
-   ((ram-string-bounds))
-   ((bounds-of-thing-at-point 'sexp))
-   ((ram-delimited-sexp-bounds))
-   (t (error "`ram-sexp-bounds': All `cond' clauses failed"))))
+  (if (> (or select-nth-ancestor 0) 0)
+      (ram-delimited-sexp-bounds select-nth-ancestor)
+    (cond
+     ((ram-comment-bounds))
+     ((ram-string-bounds))
+     ((bounds-of-thing-at-point 'sexp))
+     ((ram-delimited-sexp-bounds))
+     (t (error "`ram-sexp-bounds': All `cond' clauses failed")))))
 
 ;;** brackets, parentheses, parens, sexps: select, copy, clone, kill
 
