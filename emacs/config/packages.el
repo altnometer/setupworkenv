@@ -1280,7 +1280,7 @@ succession."
    (let ((fn (save-excursion
                (cond
                 ((looking-at ram-open-delim-re) (forward-char))
-                ((looking-back ram-close-delim-re) (forward-sexp -1) (forward-char)))
+                ((looking-back ram-close-delimiters-re) (forward-sexp -1) (forward-char)))
                (function-called-at-point)))
          (enable-recursive-minibuffers t)
          (old-binding (cdr (assoc 'return minibuffer-local-completion-map)))
@@ -4199,7 +4199,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((forward-to-delim ()
                 "Jump forward to the close delimiter that is not in a string."
-                (re-search-forward ram-close-delim-re nil t 1)
+                (re-search-forward ram-close-delimiters-re nil t 1)
                 ;; skip matches in strings and comments
                 (let ((s (syntax-ppss)))
                   (if (or (nth 3 s)
@@ -4213,7 +4213,7 @@ If cannot move forward, go `up-list' and try again from there."
   (cl-labels ((back-to-delim ()
                 "Jump backward to the open delimiter that is not in a string."
                 (when (ram-at-delimited-end-p) (backward-char))
-                (re-search-backward ram-close-delim-re nil t 1)
+                (re-search-backward ram-close-delimiters-re nil t 1)
                 (when (match-string 0) (forward-char))
                 ;; skip matches in strings and comments
                 (let ((s (syntax-ppss)))
@@ -4233,7 +4233,7 @@ If cursor is not on a bracket, call `backward-up-list'."
      ((eq (char-after) ?\") (forward-sexp))
      ((eq (char-before) ?\") (backward-sexp ))
      ((looking-at ram-open-delim-re) (forward-sexp))
-     ((looking-back ram-close-delim-re (max (- (point) 1) 1))
+     ((looking-back ram-close-delimiters-re (max (- (point) 1) 1))
       (backward-sexp))
      (t (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)))))
 
@@ -4262,7 +4262,7 @@ Return nil on failure, (point) otherwise."
   (let ((oldpt (point))
         newpt)
     (ram-up-list-forward arg)
-    (when (looking-back ram-close-delim-re (line-beginning-position))
+    (when (looking-back ram-close-delimiters-re (line-beginning-position))
       (backward-list))
     (if (= oldpt (setq newpt (point)))
         nil
@@ -4349,7 +4349,7 @@ If ARG is 4, move to the beginning of defun."
     delims)
   "A list of close delimiter characters.")
 
-(defvar ram-close-delim-re (concat "[" (string-join (mapcar #'char-to-string ram-close-delimiters)) "]")
+(defvar ram-close-delimiters-re (concat "[" (string-join (mapcar #'char-to-string ram-close-delimiters)) "]")
   "Regexp to match common close delimiters.")
 
 ;; If true, #'paredit-blink-paren-match is slow
@@ -4435,9 +4435,9 @@ If ARG is 4, move to the beginning of defun."
     (looking-at (concat ram-open-delim-re))))
 
 (defun ram-at-delimited-end-p ()
-  "Return non `nil' if the point is after `ram-close-delim-re'."
+  "Return non `nil' if the point is after `ram-close-delimiters-re'."
   (when (not (ram-in-comment-p))
-    (save-excursion (backward-char) (looking-at (concat ram-close-delim-re)))))
+    (save-excursion (backward-char) (looking-at (concat ram-close-delimiters-re)))))
 
 (defun ram-at-string-beg-p ()
   "Return non `nil' if `looking-at' a double quote character. "
@@ -4499,13 +4499,13 @@ Before invoking `newline-and-indent':
       (goto-char (cdr bounds)))
      ;; blank line with ")" at the end
      ((and (looking-back "^ +" (point-at-bol))
-           (looking-at (concat "[[:space:]]*" ram-close-delim-re)))
-      ;; (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delim-re) ram-close-delim-re)
-      (ram-remove-whitespace-between-regexps "[^[:space:]\n]" ram-close-delim-re)
+           (looking-at (concat "[[:space:]]*" ram-close-delimiters-re)))
+      ;; (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delimiters-re) ram-close-delimiters-re)
+      (ram-remove-whitespace-between-regexps "[^[:space:]\n]" ram-close-delimiters-re)
       (forward-char))
      ;; whitespace, point, maybe code maybe with close delimiter
      ((looking-back "^ +" (line-beginning-position))
-      (if (re-search-forward ram-close-delim-re (point-at-eol) t)
+      (if (re-search-forward ram-close-delimiters-re (point-at-eol) t)
           ;; go before closing parens
           (backward-char 1)
         (move-end-of-line 1))
@@ -4557,7 +4557,7 @@ Before invoking `newline-and-indent':
 
 
 (defun ram-delimited-sexp-bounds (&optional select-nth-ancestor)
-  "Return bounds delimited by `ram-open-delim-re' and `ram-close-delim-re'.
+  "Return bounds delimited by `ram-open-delim-re' and `ram-close-delimiters-re'.
 With SELECT-NTH-ANCESTOR value greater than zero, return bounds
 for than ancestor."
   (if-let ((ppss (syntax-ppss))
@@ -4765,7 +4765,7 @@ The beginning and end of sexp is defined by return value of
             (delete-region blank-line-p (1+ (point-at-eol)))
             (indent-according-to-mode))
           (save-excursion
-            (ram-remove-whitespace-between-regexps ram-close-delim-re ram-close-delim-re)))))))
+            (ram-remove-whitespace-between-regexps ram-close-delimiters-re ram-close-delimiters-re)))))))
 
 ;; adopted from https://github.com/abo-abo/lispy
 (defun ram--swap-regions (bounds1 bounds2)
@@ -7423,7 +7423,7 @@ buffer-local `ram-face-remapping-cookie'."
       (backward-up-list -1 t t))
      ;; same as 'inside-str only removes white space between parens
      (inside-parens
-      (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delim-re) ram-close-delim-re)
+      (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delimiters-re) ram-close-delimiters-re)
       (backward-up-list -1 t t)))
     (cond
      ((and (char-after)
