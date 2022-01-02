@@ -4734,11 +4734,9 @@ The beginning and end of sexp is defined by return value of
         ))))
 
 (defun ram-kill-at-point ()
-  "Kill region bound by return value of `ram-thing-bounds'."
+  "Kill `ram-sexp-bounds' region."
   (interactive)
-  (let* ((bounds (if (eq last-command this-command)
-                     (ram-delimited-sexp-bounds t)
-                   (ram-sexp-bounds)))
+  (let* ((bounds (ram-sexp-bounds))
          (str (when bounds (buffer-substring (car bounds) (cdr bounds)))))
     (when str
       (kill-new str)
@@ -4750,7 +4748,9 @@ The beginning and end of sexp is defined by return value of
                               (re-search-forward "^[[:space:]]*$" (point-at-eol) t 1))))
           (when blank-line-p
             (delete-region blank-line-p (1+ (point-at-eol)))
-            (indent-according-to-mode)))))))
+            (indent-according-to-mode))
+          (save-excursion
+            (ram-remove-whitespace-between-regexps ram-close-delim-re ram-close-delim-re)))))))
 
 ;; adopted from https://github.com/abo-abo/lispy
 (defun ram--swap-regions (bounds1 bounds2)
