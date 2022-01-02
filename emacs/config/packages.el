@@ -4536,6 +4536,12 @@ Before invoking `newline-and-indent':
            (end (save-excursion (ram-goto-comment-block-end))))
       (cons beg end)))
 
+(defun ram-in-string-p ()
+  "Return non-`nil' if inside a string or at its borders."
+  (or (nth 3 (syntax-ppss))
+      (ram-at-string-beg-p)
+      (ram-at-string-end-p)))
+
 (defun ram-string-bounds ()
   "Return the beginning and end of a string as a pair."
   (if-let ((ppss (syntax-ppss))
