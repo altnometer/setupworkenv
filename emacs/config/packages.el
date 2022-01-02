@@ -1279,7 +1279,7 @@ succession."
   (interactive
    (let ((fn (save-excursion
                (cond
-                ((looking-at ram-open-delim-re) (forward-char))
+                ((looking-at ram-open-delimiters-re) (forward-char))
                 ((looking-back ram-close-delimiters-re) (forward-sexp -1) (forward-char)))
                (function-called-at-point)))
          (enable-recursive-minibuffers t)
@@ -3715,7 +3715,7 @@ heading to appear."
 (defun ram-avy-action-help (pt)
   (save-excursion
     (goto-char pt)
-    (if (looking-at ram-open-delim-re)
+    (if (looking-at ram-open-delimiters-re)
         (forward-char))
     (let (;; (symbol (thing-at-point 'sexp))
           (symbol (symbol-at-point)))
@@ -4171,7 +4171,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((back-to-delim ()
                 "Jump backward to the open delimiter that is not in a string."
-                (re-search-forward ram-open-delim-re nil t -1)
+                (re-search-forward ram-open-delimiters-re nil t -1)
                 ;; skip matches in strings and comments
                 (let ((s (syntax-ppss)))
                   (if (or (nth 3 s)
@@ -4184,7 +4184,7 @@ If cannot move forward, go `up-list' and try again from there."
   (interactive)
   (cl-labels ((forward-to-delim ()
                 "Jump forward to the open delimiter that is not in a string."
-                (re-search-forward ram-open-delim-re nil t 1)
+                (re-search-forward ram-open-delimiters-re nil t 1)
                 ;; skip matches in strings and comments
                 (let ((s (syntax-ppss)))
                   (if (or (nth 3 s)
@@ -4232,7 +4232,7 @@ If cursor is not on a bracket, call `backward-up-list'."
     (cond
      ((eq (char-after) ?\") (forward-sexp))
      ((eq (char-before) ?\") (backward-sexp ))
-     ((looking-at ram-open-delim-re) (forward-sexp))
+     ((looking-at ram-open-delimiters-re) (forward-sexp))
      ((looking-back ram-close-delimiters-re (max (- (point) 1) 1))
       (backward-sexp))
      (t (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)))))
@@ -4249,7 +4249,7 @@ Return nil on failure, (point) otherwise."
   (catch 'break
     (dotimes (_i arg)
       (when (not (ignore-errors (up-list) t))
-        (when (looking-at-p ram-open-delim-re)
+        (when (looking-at-p ram-open-delimiters-re)
           (forward-list))
         (throw 'break nil)))
     (point)))
@@ -4338,7 +4338,7 @@ If ARG is 4, move to the beginning of defun."
     delims)
   "A list of open delimiter characters.")
 
-(defvar ram-open-delim-re (concat "[" (string-join (mapcar #'char-to-string ram-open-delimiters)) "]")
+(defvar ram-open-delimiters-re (concat "[" (string-join (mapcar #'char-to-string ram-open-delimiters)) "]")
   "Regexp to match common open delimiters.")
 
 (defvar ram-close-delimiters
@@ -4430,9 +4430,9 @@ If ARG is 4, move to the beginning of defun."
 ;;** brackets, parentheses, parens, sexps: at beg? at end?
 
 (defun ram-at-delimited-beg-p ()
-  "Return non `nil' if the point is after `ram-open-delim-re'."
+  "Return non `nil' if the point is after `ram-open-delimiters-re'."
   (when (not (ram-in-comment-p))
-    (looking-at (concat ram-open-delim-re))))
+    (looking-at (concat ram-open-delimiters-re))))
 
 (defun ram-at-delimited-end-p ()
   "Return non `nil' if the point is after `ram-close-delimiters-re'."
@@ -4557,7 +4557,7 @@ Before invoking `newline-and-indent':
 
 
 (defun ram-delimited-sexp-bounds (&optional select-nth-ancestor)
-  "Return bounds delimited by `ram-open-delim-re' and `ram-close-delimiters-re'.
+  "Return bounds delimited by `ram-open-delimiters-re' and `ram-close-delimiters-re'.
 With SELECT-NTH-ANCESTOR value greater than zero, return bounds
 for than ancestor."
   (if-let ((ppss (syntax-ppss))
@@ -4572,13 +4572,13 @@ for than ancestor."
                            (required-ancestor-level (nth idx ancestor-open-parens)))
                       required-ancestor-level)))
                  ;; at open paren
-                 ((looking-at-p ram-open-delim-re)
+                 ((looking-at-p ram-open-delimiters-re)
                   (point))
                  ;; in front of indented list, return the beg of indented list
                  ((and (looking-back "^[[:space:]]*" (point-at-bol))
-                       (looking-at-p (concat "[[:space:]]*" ram-open-delim-re)))
+                       (looking-at-p (concat "[[:space:]]*" ram-open-delimiters-re)))
                   (save-excursion
-                    (re-search-forward ram-open-delim-re (point-at-eol) t 1)
+                    (re-search-forward ram-open-delimiters-re (point-at-eol) t 1)
                     (backward-char)
                     (point)))
                  ;; at close paren
