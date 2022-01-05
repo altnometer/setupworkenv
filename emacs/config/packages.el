@@ -4137,23 +4137,23 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 When at the list limit, move a level up and continue.
 If ARG is `nil', do not `push-mark'."
   (interactive "p")
-  (let* ((point (point))
-         (bounds (ram-thing-bounds))
+  (let* ((bounds (ram-sexp-bounds))
          (next-bounds (save-excursion (goto-char (cdr bounds))
                                       (ram-next-thing-bounds)))
-         (at-end-p (ram-at-thing-end-p)))
+         (at-end-p (= (point) (cdr bounds))))
     (deactivate-mark)
     (when (and arg
                (when (mark) (not (= (mark) (point)))))
       (push-mark))
-    (if at-end-p
-        (progn
-         (goto-char (cdr next-bounds))
-         next-bounds)
-      (goto-char (car next-bounds))
-      (if (> (car bounds) (car next-bounds))
-          (ram-forward-list)
-        next-bounds))))
+    (when next-bounds
+      (if at-end-p
+          (progn
+            (goto-char (cdr next-bounds))
+            next-bounds)
+        (goto-char (car next-bounds))
+        (if (> (car bounds) (car next-bounds))
+            (ram-forward-list)
+          next-bounds)))))
 
 (defun ram-backward-list (&optional arg)
   "Move to the previous thing.
