@@ -4094,6 +4094,42 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 ;;* brackets, parentheses, parens, sexps
 
+;;** brackets, parentheses, parens, sexps: multi-line, one-line, flatten
+
+(defun ram-toggle-multiline-delimited-sexp ()
+  "Toggle between single line and multi-line delimited sexp format."
+  (interactive)
+  (let* ((bounds (ram-delimited-sexp-bounds))
+         (location (- (point) (car bounds)))
+         newline-match-p)
+    (save-excursion
+      (goto-char (cdr bounds))
+      (while (re-search-backward "\n[[:space:]]*" (car bounds) t)
+        (setq newline-match-p t)
+        ;; if at close paren do not insert whitespace
+        (if (and
+             (goto-char (match-end 0))
+             (memq (char-after) ram-close-delimiters))
+            (progn
+              (replace-match "")
+              (goto-char (match-beginning 0)))
+          (replace-match " "))))
+    (when (not newline-match-p)
+      (save-excursion
+        (goto-char (cdr bounds))
+        (while (re-search-backward "[[:space:]]+" (car bounds) t)
+          (let ((ppss (syntax-ppss)))
+            (when (not (or
+                        (nth 3 ppss)
+                        (nth 4 ppss)
+                        ;; inside child list
+                        (not (= (car bounds) (car (last (nth 9 ppss)))))))
+              (replace-match "\n")
+              (beginning-of-line)))))
+      (save-excursion (goto-char (car bounds)) (indent-sexp))
+      ;; (indent-according-to-mode)
+      )))
+
 ;;** brackets, parentheses, parens, sexps: navigation
 
 (defun ram-forward-list (&optional arg)
