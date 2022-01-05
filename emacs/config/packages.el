@@ -4402,6 +4402,7 @@ If ARG is 4, move to the beginning of defun."
 (add-hook 'cider-repl-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'racket-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'racket-repl-mode-hook #'ram-highlight-sexps-mode)
+(add-hook 'minibuffer-mode-hook #'ram-highlight-sexps-mode)
 
 (with-eval-after-load "ram-highlight-sexps"
   (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
@@ -4898,8 +4899,14 @@ Return a cons of the new text cordinates."
 (define-key prog-mode-map (kbd "<end>" ) #'ram-select-sexp)
 (define-key prog-mode-map (kbd "<home>" ) #'ram-copy-sexp)
 
+(define-key minibuffer-mode-map (kbd "<end>" ) #'ram-select-sexp)
+(define-key minibuffer-mode-map (kbd "<home>" ) #'ram-copy-sexp)
+
 (define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
 (define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
+
+(define-key minibuffer-mode-map (kbd "<down>") #'ram-forward-list)
+(define-key minibuffer-mode-map (kbd "<up>") #'ram-backward-list)
 
 (define-key prog-mode-map (kbd "M-<down>" ) #'ram-move-sexp-down)
 (define-key prog-mode-map (kbd "M-<up>" ) #'ram-move-sexp-up)
@@ -4913,6 +4920,9 @@ Return a cons of the new text cordinates."
 (define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
 (define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
 
+(define-key minibuffer-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+(define-key minibuffer-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+
 (define-key prog-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
 (define-key prog-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
 
@@ -4923,6 +4933,8 @@ Return a cons of the new text cordinates."
 (define-key prog-mode-map (kbd "C-<right>" ) #'ram-up-list-forward)
 
 (define-key prog-mode-map (kbd "C-," ) #'ram-kill-at-point)
+
+(define-key prog-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp)
 
 ;;* linters
 
