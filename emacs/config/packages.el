@@ -4514,10 +4514,11 @@ If ARG is 4, move to the beginning of defun."
 Context aware actions:
 - exit the minibuffer,
 Before invoking `newline-and-indent':
+- when in a comment, do nothing
 - when in a string, go to the end of enclosing list
-  (foo \"bar|\" (baz)) -> (foo \"bar\"| (baz))
-- exit a list,
--
+- inside or at border of a single line list.
+  (setq foo| (bar)) -> (setq foo (bar)|)
+...
 "
   (interactive "p")
   (when (bound-and-true-p abbrev-mode)
@@ -4528,32 +4529,41 @@ Before invoking `newline-and-indent':
       (exit-minibuffer))
      ((ram-in-comment-p))
      ((ram-in-string-p) (goto-char (cdr bounds)))
-     ((ram-at-delimited-end-p))
-     ((ram-at-delimited-beg-p) (goto-char (cdr bounds)))
-     ;; (|) -> ()|
-     ((and (memq (char-after (point)) ram-close-delimiters)
-           (memq (char-before (point)) ram-open-delimiters))
-      (goto-char (cdr bounds)))
+     ;; inside a list or at its border,
+     ;; the list spans a single line: go to its end
+     ((let ((bounds (ram-delimited-sexp-bounds))
+            (line-num (line-number-at-pos)))
+        (when (and bounds
+                   (= line-num (line-number-at-pos (car bounds)))
+                   (= line-num (line-number-at-pos (cdr bounds))))
+          (goto-char (cdr bounds)))))
+     ;; captured by previous clause
+     ;; ((ram-at-delimited-beg-p) (goto-char (cdr bounds)))
+     ;; empty list: (|) -> ()|
+     ;; captured by previous clause
+     ;; ((and (memq (char-after (point)) ram-close-delimiters)
+     ;;       (memq (char-before (point)) ram-open-delimiters))
+     ;;  (goto-char (cdr bounds)))
      ;; blank line with ")" at the end
      ((and (looking-back "^ +" (point-at-bol))
            (looking-at (concat "[[:space:]]*" ram-close-delimiters-re)))
-      ;; (ram-remove-whitespace-between-regexps (concat "\"" "\\|" ram-close-delimiters-re) ram-close-delimiters-re)
       (ram-remove-whitespace-between-regexps "[^[:space:]\n]" ram-close-delimiters-re)
       (forward-char))
-     ;; whitespace, point, maybe code maybe with close delimiter
-     ((looking-back "^ +" (line-beginning-position))
-      (if (re-search-forward ram-close-delimiters-re (point-at-eol) t)
-          ;; go before closing parens
-          (backward-char 1)
-        (move-end-of-line 1))
-      )
+     ;; default case handles this as well.
+     ;; indented line: go to before closing paren or end of line
+     ;; ((looking-back "^ +" (line-beginning-position))
+     ;;  (let ((eol (point-at-eol)))
+     ;;    (while (and (condition-case nil
+     ;;                    (forward-sexp)
+     ;;                  (scan-error nil)
+     ;;                  (:success t))
+     ;;                (< (point) eol)))))
      (t (let ((end (min (line-end-position)
                         (cdr (ram-delimited-sexp-bounds)))))
           (while (< (point) (1- end))
             (forward-sexp)))))
     (newline-and-indent)
-    (indent-according-to-mode))
-  )
+    (indent-according-to-mode)))
 
 (define-key emacs-lisp-mode-map (kbd "<return>") #'ram-newline-and-indent)
 (define-key emacs-lisp-mode-map (kbd "S-<return>") #'newline-and-indent)
