@@ -4685,11 +4685,11 @@ Whichever happens to be first."
 (defun ram-mark-sexp ()
   "Mark sexp.
 The beginning and end of sexp is defined by return value of
-`ram-thing-bounds'."
+`ram-sexp-bounds'."
   (interactive)
   (if-let ((bounds (if (eq last-command this-command)
                        (ram-delimited-sexp-bounds 1)
-                     (ram-thing-bounds))))
+                     (ram-sexp-bounds))))
       (progn
         (if (ram-at-thing-end-p)
             (progn
