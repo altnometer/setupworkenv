@@ -4701,12 +4701,12 @@ The beginning and end of sexp is defined by return value of
 (defun ram-copy-sexp ()
   "Save sexp to `kill-ring'.
 The beginning and end of sexp is defined by return value of
-`ram-thing-bounds'."
+`ram-sexp-bounds'."
   (interactive)
   (let* ((repeated-p (eq last-command this-command))
          (bounds (if repeated-p
                      (ram-delimited-sexp-bounds 1)
-                   (ram-thing-bounds)))
+                   (ram-sexp-bounds)))
          (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds)))))
     (when str
       (if repeated-p (kill-new str t) (kill-new str))
