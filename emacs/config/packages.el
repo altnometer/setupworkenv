@@ -4682,7 +4682,7 @@ Whichever happens to be first."
 
 ;;** brackets, parentheses, parens, sexps: select, copy, clone, kill
 
-(defun ram-select-sexp ()
+(defun ram-mark-sexp ()
   "Mark sexp.
 The beginning and end of sexp is defined by return value of
 `ram-thing-bounds'."
@@ -4906,10 +4906,10 @@ Return a cons of the new text cordinates."
 
 ;;** brackets, parentheses, parens, sexps: bindings
 
-(define-key prog-mode-map (kbd "<end>" ) #'ram-select-sexp)
+(define-key prog-mode-map (kbd "<end>" ) #'ram-mark-sexp)
 (define-key prog-mode-map (kbd "<home>" ) #'ram-copy-sexp)
 
-(define-key minibuffer-mode-map (kbd "<end>" ) #'ram-select-sexp)
+(define-key minibuffer-mode-map (kbd "<end>" ) #'ram-mark-sexp)
 (define-key minibuffer-mode-map (kbd "<home>" ) #'ram-copy-sexp)
 
 (define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
