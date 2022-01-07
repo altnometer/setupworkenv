@@ -4437,11 +4437,12 @@ Add `pre-command-hook' to remove it."
     (nth 4 (syntax-ppss))))
 
 (defun ram-goto-beg-of-comment ()
+  (comment-normalize-vars t)
   (end-of-line)
   (comment-beginning)
-  (let ((comment-start (comment-search-backward (point-at-bol) t)))
-    (when comment-start
-      (goto-char comment-start))))
+  (if-let ((comment-start
+            (when (not (minibufferp)) (comment-search-backward (point-at-bol) t))))
+      (goto-char comment-start)))
 
 (defun ram-goto-comment-block-beg ()
   (when (ram-goto-beg-of-comment)
