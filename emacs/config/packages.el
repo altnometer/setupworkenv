@@ -4409,18 +4409,25 @@ If ARG is 4, move to the beginning of defun."
 
 ;;** brackets, parentheses, parens, sexps: highlight
 
-;; overlay to highlight saved to kill ring sexps
-(add-hook 'prog-mode-hook (lambda ()
-                            (defvar ram-copied-region-overlay nil
-                              "Highlight the region copied with `ram-copy-sexp'.")
-                            (make-variable-buffer-local 'ram-copied-region-overlay)
-                            (setq-local ram-copied-region-overlay (make-overlay 0 0))
-                            (overlay-put ram-copied-region-overlay 'face (list :background
-                                                                               (face-background 'modus-themes-intense-green)))
-                            (overlay-put ram-copied-region-overlay 'priority 1)
-                            (add-hook 'pre-command-hook (lambda () (when (symbol-value 'ram-copied-region-overlay)
-                                                                     (move-overlay ram-copied-region-overlay 1 1))))))
-;;** brackets, parentheses, parens, sexps: comments
+(defvar ram-copied-region-overlay nil
+  "Highlight the region copied with `ram-copy-sexp'.")
+(defun ram-create-copied-sexp-overlay ()
+  "Create buffer local `ram-copied-region-overlay'
+Add `pre-command-hook' to remove it."
+  (make-variable-buffer-local 'ram-copied-region-overlay)
+  (setq-local ram-copied-region-overlay (make-overlay 0 0))
+  ;; (overlay-put ram-copied-region-overlay 'face (list :background
+  ;;                                                   (face-background 'modus-themes-intense-green)))
+  (overlay-put ram-copied-region-overlay 'face (list :background "yellow"))
+  (overlay-put ram-copied-region-overlay 'priority 1)
+  (add-hook 'pre-command-hook (lambda () (when (symbol-value 'ram-copied-region-overlay)
+                                           (move-overlay ram-copied-region-overlay 1 1)))))
+
+(add-hook 'prog-mode-hook #'ram-create-copied-sexp-overlay)
+
+(add-hook 'minibuffer-mode-hook #'ram-create-copied-sexp-overlay)
+
+;; ** brackets, parentheses, parens, sexps: comments
 
 ;; adopted from https://github.com/abo-abo/lispy
 (defun ram-in-comment-p ()
