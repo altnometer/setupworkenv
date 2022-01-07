@@ -4807,9 +4807,25 @@ The beginning and end of sexp is defined by return value of
   "Kill `ram-sexp-bounds' region."
   (interactive)
   (let* ((bounds (ram-sexp-bounds))
-         (str (when bounds (buffer-substring (car bounds) (cdr bounds)))))
+         (add-newline-p (save-excursion
+                          (goto-char (car bounds))
+                          (looking-back "^[[:space:]]*" (point-at-bol))))
+         (repeated-p (eq last-command this-command))
+         (str (let ((str (buffer-substring (car bounds) (cdr bounds))))
+                (if add-newline-p
+                    (concat "\n " str)
+                  str)))
+         (location (let ((loc (- (point) (car bounds))))
+                     (if add-newline-p
+                         (+ 2 loc)
+                       loc))))
     (when str
-      (kill-new str)
+      (if repeated-p
+          (kill-new (concat
+                     (substring str 0 location)
+                     (current-kill 0 'DO-NOT-MOVE)
+                     (substring str location (length str))))
+        (kill-new str))
       (when (not buffer-read-only)
         (delete-region (car bounds) (cdr bounds))
         (let ((point (point))
