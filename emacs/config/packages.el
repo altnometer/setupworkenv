@@ -3072,13 +3072,117 @@ If the property is already set, replace its value."
 ;; relative to org-roam-directory
 (setq org-roam-dailies-directory "./daily/")
 
-;;*** org-roam/dailies: capture-templates
+;;*** org-roam/dailies: capture templates
 
-;; (defun ram-template-daily-node-heading ()
-;;   "Return the heading of the tree at point."
-;;   ;; (message ">>>>>>> org heading: >>>>> %S" (org-get-heading))
-;;   (message ">>>>>>> org heading: >>>>> %S" (buffer-name (current-buffer)))
-;;   "foo")
+(defun ram-org-get-heading ()
+  "Return the current heading and links in its section element."
+  (let* ((current-headline (save-excursion
+                             (condition-case nil
+                                 (outline-back-to-heading)
+                               (error
+                                (user-error "Before first headline at position %d in buffer %s"
+		                            (point) (current-buffer)))
+                               (:success (org-element-at-point)))))
+         ;; the heading is inserted as level one anyway
+         ;; (current-headline (org-element-put-property (org-element-copy (org-element-at-point)) :level 1))
+         (headline-element (car (org-element-map
+                                    (org-element-parse-buffer)
+                                    'headline
+                                  (lambda (headline)
+                                    (when (string= (org-element-property :raw-value headline)
+                                                   (org-element-property :raw-value current-headline))
+                                      headline)))))
+         (section-element (org-element-map
+                              headline-element
+                              'section #'identity 'first-match 'no-recursive-edit))
+         (all-links (reverse (org-element-map
+                                 section-element
+                                 'link
+                               ;; make lisp smaller by removing :parent value
+                               (lambda (link) (org-element-put-property link :parent nil)))))
+         all-links-str
+         ;; used only to split links to 'fill-column size
+         all-description-str)
+    (progn
+      (while all-links
+        (let* ((link (pop all-links))
+               (link-str (org-element-interpret-data link))
+               (link-description (or (car (org-element-contents link))
+                                     (org-element-property :raw-link link)))
+               (link-separator (let ((separator (if all-links-str " " "")))
+                                 (if (and all-description-str
+                                          (> (+ (length (car (last (split-string all-description-str "\n" 'OMIT-NULLS))))
+                                                (length link-description))
+                                             fill-column))
+                                     "\n"
+                                   separator)))
+               )
+          (setq all-links-str (concat link-str link-separator all-links-str))
+          (setq all-description-str (concat link-description link-separator all-description-str))))
+      (concat (org-element-interpret-data current-headline)
+              all-links-str))))
+
+(defun ram-capture-heading-to-dailies (&optional arg)
+  "Capture the current headline into a `org-roam' daily note.
+Insert into daily note for ARG days from now. Or use calendar if
+ARG value is 4."
+  (interactive "P")
+  (let* ((txt (ram-org-get-heading))
+         (org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (templates
+          `(("d" "continue task under heading"
+             entry ,(ram-org-get-heading)
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :empty-lines-before 1
+             :empty-lines-after 1
+             :unnarrowed t
+             :kill-buffer t
+             :immediate-finish nil
+             :no-save nil)))
+         (time (if (eq arg 4)
+                   (let ((org-read-date-prefer-future t))
+                     (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
+                 (time-add (* (or arg 0) 86400) (current-time)))))
+    (org-roam-capture- :goto nil
+                       :keys "d"
+                       :node (org-roam-node-create)
+                       :props (list :override-default-time time)
+                       :templates templates)))
+
+(defun ram-org-get-title ()
+  "Return the document title."
+  (org-element-map (org-element-parse-buffer) 'keyword
+    (lambda (kw)
+      (when (string= (org-element-property :key kw) "TITLE")
+        (org-element-property :value kw)))
+    :first-match t))
+
+(defun ram-capture-title-to-dailies (&optional arg)
+  "Capture the document title into a `org-roam' daily note.
+Insert into daily note for ARG days from now. Or use calendar if
+ARG value is 4."
+  (interactive "P")
+  (let* ((txt (ram-org-get-heading))
+         (org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (templates
+          `(("t" "capture document title"
+             entry ,(concat "* " (ram-org-get-title) "\n\n%?")
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :empty-lines-before 1
+             :empty-lines-after 1
+             :unnarrowed t
+             :kill-buffer t
+             :immediate-finish nil
+             :no-save nil)))
+         (time (if (eq arg 4)
+                   (let ((org-read-date-prefer-future t))
+                     (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
+                 (time-add (* (or arg 0) 86400) (current-time)))))
+    (org-roam-capture- :goto nil
+                       :keys "t"
+                       :node (org-roam-node-create)
+                       :props (list :override-default-time time)
+                       :templates templates)))
 
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
@@ -3089,29 +3193,17 @@ If the property is already set, replace its value."
                                             :empty-lines-after 1
                                             :unnarrowed t
                                             :kill-buffer nil
-                                            :no-save nil))
-          ;; ("n" "org-roam note" entry "* %?"
-          ;;  :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
-          ;;  :properties (:empty-lines-before 1
-          ;;                                   :empty-lines-after 1
-          ;;                                   :unnarrowed t
-          ;;                                   :kill-buffer nil
-          ;;                                   :no-save nil))
-          ;; ("c" "continue task under heading"
-          ;;  plain "* %(ram-template-daily-node-heading)"
-          ;;  :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
-          ;;  :properties (:empty-lines-before 1
-          ;;                                   :empty-lines-after 1
-          ;;                                   :unnarrowed t
-          ;;                                   :kill-buffer nil
-          ;;                                   :no-save nil))
-          )))
+                                            :no-save nil)))))
 
 ;;*** org-roam/dailies: bindings
 
 ;; these command are ###autoload and 'org-roam-dailies-map is not
 ;; (with-eval-after-load "org-roam-dailies"
 ;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
+(define-key global-map (kbd "s-c a") #'ram-capture-heading-to-dailies)
+
+(define-key global-map (kbd "s-c A") #'ram-capture-title-to-dailies)
+
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
 (define-key global-map (kbd "s-c f") #'org-roam-dailies-goto-next-note)
