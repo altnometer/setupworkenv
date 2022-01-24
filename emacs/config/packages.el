@@ -218,6 +218,8 @@ abort completely with `C-g'."
           ("charzd" "characterized")
           ("charc" "characteristic")
           ("cm" "computer")
+          ("cat" "category")
+          ("cats" "categories")
 
           ("comn" "computation")
           ("comp" "compute")
@@ -228,6 +230,9 @@ abort completely with `C-g'."
           ("comds" "commands")
 
           ("con" "continuation")
+          ("cont" "contain")
+          ("contg" "containing")
+          ("conts" "contains")
 
           ("conf" "configure")
           ("confd" "configured")
@@ -243,6 +248,7 @@ abort completely with `C-g'."
           ("el" "element")
           ("els" "elements")
           ("env" "environment")
+          ("envs" "environments")
           ("ev" "evaluate")
           ("eva" "evaluate")
           ("evd" "evaluated")
@@ -263,6 +269,8 @@ abort completely with `C-g'."
 
           ("hier" "hierarchy")
           ("hiers" "hierarchies")
+          ("hl" "headline")
+          ("hls" "headlines")
 
           ("imp" "implementation")
           ("impd" "implemented")
@@ -276,6 +284,9 @@ abort completely with `C-g'."
           ("invd" "invoked")
           ("invg" "invoking")
           ("invn" "invocation")
+
+          ("kw" "keyword")
+          ("kws" "keywords")
 
           ("lc" "logical consequence")
           ("lg" "language")
@@ -291,6 +302,7 @@ abort completely with `C-g'."
           ("nms" "numbers")
 
           ("ob" "object")
+          ("obs" "objects")
           ("occ" "occurrence")
           ("occs" "occurrences")
 
@@ -300,6 +312,8 @@ abort completely with `C-g'."
           ("pg" "program")
           ("pgn" "programming")
 
+          ("par" "paragraph")
+          ("pars" "paragraphs")
           ("pr" "procedure")
           ("prs" "procedures")
           ("prop" "property")
@@ -334,6 +348,11 @@ abort completely with `C-g'."
           ("rng" "returning")
           ("rns" "returns")
 
+          ("spc" "specific")
+          ("spd" "specified")
+          ("spl" "special")
+          ("sps" "specifies")
+          ("spy" "specify")
           ("spec" "specification")
           ("specs" "specifications")
 
@@ -343,9 +362,12 @@ abort completely with `C-g'."
           ("subs" "substitution")
           ("subss" "substitutions")
           ("subsg" "substituting")
-          ("tq" "technique")
+          ("syn" "syntax")
+          ("sync" "syntactical")
 
+          ("tq" "technique")
           ("todo" "TODO")
+
           ("und" "understand")
 
           ("val" "value")
@@ -354,6 +376,8 @@ abort completely with `C-g'."
           ("vls" "values")
           ("var" "variable")
           ("vars" "variables")
+
+          ("wo" "without")
 
           ;; Greek
 
