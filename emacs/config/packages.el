@@ -4519,7 +4519,7 @@ Add `pre-command-hook' to remove it."
 
 (add-hook 'minibuffer-mode-hook #'ram-create-copied-sexp-overlay)
 
-;; ** brackets, parentheses, parens, sexps: comments
+;;** brackets, parentheses, parens, sexps: comments
 
 ;; adopted from https://github.com/abo-abo/lispy
 (defun ram-in-comment-p ()
@@ -4755,18 +4755,24 @@ Only a line comment, string and list are valid choices."
 The search must start outside the current thing bounds."
   (when (re-search-backward (concat "[^"
                                     (string-join (mapcar #'char-to-string ram-open-delimiters))
-                                    "[:space:]" "\n]") nil t 1)
+                                    "#'[:space:]" "\n]") nil t 1)
     (forward-char)
-    (ram-thing-bounds)))
+    (if (thing-at-point 'symbol)
+        (progn (forward-symbol -1)
+               (ram-prev-thing-bounds))
+      (ram-thing-bounds))))
 
 (defun ram-next-thing-bounds ()
   "Return the bounds of the next thing.
 The search must start outside the current thing bounds."
   (when (re-search-forward (concat "[^"
                                    (string-join (mapcar #'char-to-string ram-close-delimiters))
-                                   "[:space:]" "\n]") nil t 1)
+                                   "#'[:space:]" "\n]") nil t 1)
     (backward-char)
-    (ram-thing-bounds)))
+    (if (thing-at-point 'symbol)
+        (progn (forward-symbol 1)
+               (ram-next-thing-bounds))
+      (ram-thing-bounds))))
 
 (defun ram-sexp-bounds (&optional select-nth-ancestor)
   "Return the bounds of comment block, string, sexp or list.
