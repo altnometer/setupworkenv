@@ -1728,7 +1728,7 @@ instead."
             (select-window help)
           (select-window (get-mru-window)))))))
 
-(define-key global-map (kbd "s-l") #'prot/focus-minibuffer-or-completions)
+(define-key global-map (kbd "C-~") #'prot/focus-minibuffer-or-completions)
 
 (define-key completion-list-mode-map (kbd "h") #'prot/describe-symbol-at-point)
 (define-key completion-list-mode-map (kbd "w") #'prot/completions-kill-symbol-at-point)
@@ -2584,7 +2584,7 @@ it can be passed in POS."
   (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~)
 
   (define-key org-mode-map (kbd "s-R") #'ram-avy-goto-org-heading)
-  (define-key org-mode-map (kbd "s-S") #'ram-avy-goto-org-link)
+  (define-key org-mode-map (kbd "s-l") #'ram-avy-goto-org-link)
 
   (define-key global-map (kbd "C-c C-S-L") #'org-store-link)
   (define-key org-mode-map (kbd "C-c C-l") #'org-insert-link))
@@ -2852,6 +2852,7 @@ This function is created to identify TODO items in agenda buffers.
 
 ;;** org-agenda: settings
 
+(setq org-agenda-sticky t)
 (setq org-agenda-prefix-format
       '((agenda . " %i %(ram-make-org-doc-category-identifier 16)%?-12t% s")
         (todo . " %i %(ram-make-org-doc-category-identifier 16) ")
@@ -4168,6 +4169,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
      (define-key prog-mode-map (kbd "s-S") #'ram-avy-goto-symbol-in-defun)
      (define-key prog-mode-map (kbd "C-s-s") #'ram-avy-goto-word-in-defun)
      (define-key prog-mode-map (kbd "s-r") #'ram-avy-goto-ace-paren)
+     (define-key prog-mode-map (kbd "C-s-r") #'avy-resume)
      ))
 
 ;;* projectile
@@ -4519,6 +4521,7 @@ If ARG is 4, move to the beginning of defun."
 (add-hook 'racket-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'racket-repl-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'minibuffer-mode-hook #'ram-highlight-sexps-mode)
+(add-hook 'org-mode-hook #'ram-highlight-sexps-mode)
 
 (with-eval-after-load "ram-highlight-sexps"
   (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
@@ -7283,7 +7286,7 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;;*** system/general settings: info/manual
 
-(define-key Info-mode-map (kbd "s-S") #'ace-link)
+(define-key Info-mode-map (kbd "s-l") #'ace-link)
 
 
 ;;*** system/general settings: errors, warnings
