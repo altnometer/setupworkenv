@@ -5028,43 +5028,75 @@ Return a cons of the new text cordinates."
 
 ;;** brackets, parentheses, parens, sexps: bindings
 
-(define-key prog-mode-map (kbd "<end>" ) #'ram-mark-sexp)
-(define-key prog-mode-map (kbd "<home>" ) #'ram-copy-sexp)
+;; ------
+(define-key global-map (kbd "<end>" ) #'ram-mark-sexp)
+(define-key global-map (kbd "<home>" ) #'ram-copy-sexp)
 
-(define-key minibuffer-mode-map (kbd "<end>" ) #'ram-mark-sexp)
-(define-key minibuffer-mode-map (kbd "<home>" ) #'ram-copy-sexp)
+;; (define-key prog-mode-map (kbd "<end>" ) #'ram-mark-sexp)
+;; (define-key prog-mode-map (kbd "<home>" ) #'ram-copy-sexp)
 
-(define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
-(define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
+;; (define-key minibuffer-mode-map (kbd "<end>" ) #'ram-mark-sexp)
+;; (define-key minibuffer-mode-map (kbd "<home>" ) #'ram-copy-sexp)
 
-(define-key minibuffer-mode-map (kbd "<down>") #'ram-forward-list)
-(define-key minibuffer-mode-map (kbd "<up>") #'ram-backward-list)
+;; ------
+(define-key global-map (kbd "<down>") #'ram-forward-list)
+(define-key global-map (kbd "<up>") #'ram-backward-list)
 
+;; (define-key prog-mode-map (kbd "<down>") #'ram-forward-list)
+;; (define-key prog-mode-map (kbd "<up>") #'ram-backward-list)
+
+;; (define-key minibuffer-mode-map (kbd "<down>") #'ram-forward-list)
+;; (define-key minibuffer-mode-map (kbd "<up>") #'ram-backward-list)
+
+;; ------
 (define-key prog-mode-map (kbd "M-<down>" ) #'ram-move-sexp-down)
 (define-key prog-mode-map (kbd "M-<up>" ) #'ram-move-sexp-up)
 
-(define-key prog-mode-map (kbd "S-<down>") #'ram-next-defun)
-(define-key prog-mode-map (kbd "S-<up>") #'ram-prev-defun)
+;; ------
+(define-key global-map (kbd "S-<down>") #'ram-next-defun)
+(define-key global-map (kbd "S-<up>") #'ram-prev-defun)
 
+;; (define-key prog-mode-map (kbd "S-<down>") #'ram-next-defun)
+;; (define-key prog-mode-map (kbd "S-<up>") #'ram-prev-defun)
+
+;; ------
 (define-key prog-mode-map (kbd "C-<down>" ) #'ram-clone-sexp-forward)
 (define-key prog-mode-map (kbd "C-<up>" ) #'ram-clone-sexp-backward)
 
-(define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
-(define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+;; ------
+(define-key global-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+(define-key global-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
 
-(define-key minibuffer-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
-(define-key minibuffer-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+;; (define-key prog-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+;; (define-key prog-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
 
-(define-key prog-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
-(define-key prog-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
+;; (define-key minibuffer-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+;; (define-key minibuffer-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
 
-(define-key prog-mode-map (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
-(define-key prog-mode-map (kbd "S-<right>" ) #'ram-end-of-top-sexp)
+;; ------
+(define-key global-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
+(define-key global-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
 
-(define-key prog-mode-map (kbd "C-<left>" ) #'ram-up-list-backward)
-(define-key prog-mode-map (kbd "C-<right>" ) #'ram-up-list-forward)
+;; (define-key prog-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
+;; (define-key prog-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
 
-(define-key prog-mode-map (kbd "C-," ) #'ram-kill-at-point)
+;; ------
+(define-key global-map (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
+(define-key global-map (kbd "S-<right>" ) #'ram-end-of-top-sexp)
+
+;; (define-key prog-mode-map (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
+;; (define-key prog-mode-map (kbd "S-<right>" ) #'ram-end-of-top-sexp)
+
+;; ------
+(define-key global-map (kbd "C-<left>" ) #'ram-up-list-backward)
+(define-key global-map (kbd "C-<right>" ) #'ram-up-list-forward)
+
+;; (define-key prog-mode-map (kbd "C-<left>" ) #'ram-up-list-backward)
+;; (define-key prog-mode-map (kbd "C-<right>" ) #'ram-up-list-forward)
+
+;; ------
+;; (define-key prog-mode-map (kbd "C-," ) #'ram-kill-at-point)
+(define-key global-map (kbd "C-," ) #'ram-kill-at-point)
 
 (define-key prog-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp)
 
