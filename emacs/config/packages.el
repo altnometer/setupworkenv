@@ -3187,8 +3187,7 @@ ARG value is 4."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
-  (let* ((txt (ram-org-get-heading))
-         (org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
          (templates
           `(("t" "capture document title"
              entry ,(concat "* " (ram-org-get-title) "\n\n%?")
