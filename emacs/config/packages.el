@@ -3174,13 +3174,15 @@ ARG value is 4."
                        :props (list :override-default-time time)
                        :templates templates)))
 
-(defun ram-org-get-title ()
+(defun ram-org-element-get-title (&optional parsed-buffer)
   "Return the document title."
-  (org-element-map (org-element-parse-buffer) 'keyword
-    (lambda (kw)
-      (when (string= (org-element-property :key kw) "TITLE")
-        (org-element-property :value kw)))
-    :first-match t))
+  (let ((buf (or parsed-buffer
+                 (org-element-parse-buffer))))
+    (org-element-map buf 'keyword
+      (lambda (kw)
+        (when (string= (org-element-property :key kw) "TITLE")
+          (org-element-property :value kw)))
+      :first-match t)))
 
 (defun ram-capture-title-to-dailies (&optional arg)
   "Capture the document title into a `org-roam' daily note.
@@ -3188,9 +3190,17 @@ Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
   (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (parsed-buffer (org-element-parse-buffer))
+         (doc-title (ram-org-element-get-title parsed-buffer))
+         (backlink (org-element-map
+                       parsed-buffer 'node-property
+                     (lambda (prop)
+                       (when (string= (org-element-property :key prop) "ID")
+                         (concat "[[id:" (org-element-property :value prop) "][" doc-title "]]")))
+                     'first-match t))
          (templates
           `(("t" "capture document title"
-             entry ,(concat "* " (ram-org-get-title) "\n\n%?")
+             entry ,(concat "* " doc-title  "\n" backlink "\n\n%?")
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
              :empty-lines-before 1
              :empty-lines-after 1
