@@ -3147,7 +3147,7 @@ If the property is already set, replace its value."
       (concat (org-element-interpret-data current-headline)
               all-links-str))))
 
-(defun ram-capture-heading-to-dailies (&optional arg)
+(defun ram-org-capture-heading-to-dailies (&optional arg)
   "Capture the current headline into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
@@ -3184,7 +3184,7 @@ ARG value is 4."
           (org-element-property :value kw)))
       :first-match t)))
 
-(defun ram-capture-title-to-dailies (&optional arg)
+(defun ram-org-capture-title-to-dailies (&optional arg)
   "Capture the document title into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
@@ -3234,9 +3234,9 @@ ARG value is 4."
 ;; these command are ###autoload and 'org-roam-dailies-map is not
 ;; (with-eval-after-load "org-roam-dailies"
 ;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
-(define-key global-map (kbd "s-c a") #'ram-capture-heading-to-dailies)
+(define-key global-map (kbd "s-c a") #'ram-org-capture-heading-to-dailies)
 
-(define-key global-map (kbd "s-c A") #'ram-capture-title-to-dailies)
+(define-key global-map (kbd "s-c A") #'ram-org-capture-title-to-dailies)
 
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
