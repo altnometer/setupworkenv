@@ -3200,7 +3200,7 @@ ARG value is 4."
                      'first-match t))
          (templates
           `(("t" "capture document title"
-             entry ,(concat "* " doc-title  "\n" backlink "\n\n%?")
+             entry ,(concat "* " doc-title " %(org-set-tags \":read:\")  " "\n" backlink "\n\n%?")
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
              :empty-lines-before 1
              :empty-lines-after 1
@@ -3216,7 +3216,8 @@ ARG value is 4."
                        :keys "t"
                        :node (org-roam-node-create)
                        :props (list :override-default-time time)
-                       :templates templates)))
+                       :templates templates)
+    (org-align-tags)))
 
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
