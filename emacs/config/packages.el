@@ -4271,7 +4271,8 @@ If ARG is `nil', do not `push-mark'."
          (at-end-p (= (point) (cdr bounds))))
     (deactivate-mark)
     (when (and arg
-               (when (mark) (not (= (mark) (point)))))
+               (mark)
+               (not (= (mark) (point))))
       (push-mark))
     (when next-bounds
       (if at-end-p
