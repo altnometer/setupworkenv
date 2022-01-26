@@ -317,17 +317,17 @@ Color attributes might be overriden by
 Color attributes might be overriden by `hl-sexp-mask-leading-space-background-color'."
   :group 'highlight-sexps)
 
-(defvar hl-sexps-last-point -1
+(defvar hl-sexp-last-point -1
   "The last point for which sexps were highlighted.
-This is used in tandem with `hl-sexps-last-max-point' to prevent
+This is used in tandem with `hl-sexp-last-max-point' to prevent
 repeating highlighting the same sexps in the same context.")
-(make-variable-buffer-local 'hl-sexps-last-point)
+(make-variable-buffer-local 'hl-sexp-last-point)
 
-(defvar hl-sexps-last-max-point -1
+(defvar hl-sexp-last-max-point -1
   "The last max point when sexps were highlighted.
-This is used in tandem with `hl-sexps-last-point' to prevent
+This is used in tandem with `hl-sexp-last-point' to prevent
 repeating highlighting the same sexps in the same context.")
-(make-variable-buffer-local 'hl-sexps-last-max-point)
+(make-variable-buffer-local 'hl-sexp-last-max-point)
 
 (defvar last-at-opening-paren-p nil
   "True if last delimiter visited was an opening one.")
@@ -336,10 +336,10 @@ repeating highlighting the same sexps in the same context.")
 (defun hl-sexp-highlight ()
   "Highlight the nested s-expressions around point"
   (when (not (and
-              (= (point) hl-sexps-last-point)
-              (= (point-max) hl-sexps-last-max-point)))
-    (setq hl-sexps-last-point (point))
-    (setq hl-sexps-last-max-point (point-max))
+              (= (point) hl-sexp-last-point)
+              (= (point-max) hl-sexp-last-max-point)))
+    (setq hl-sexp-last-point (point))
+    (setq hl-sexp-last-max-point (point-max))
     (let* ((p (point))
            (ppss (syntax-ppss))
            (at-delimiter-p (and (not (nth 3 ppss)) ; not in string
@@ -437,8 +437,8 @@ repeating highlighting the same sexps in the same context.")
   (kill-local-variable 'hl-sexp-paren-when-at-del-overlays)
   (kill-local-variable 'hl-sexp-paren-siblings-overlays)
 
-  (kill-local-variable 'hl-sexps-last-point)
-  (kill-local-variable 'hl-sexps-last-max-point)
+  (kill-local-variable 'hl-sexp-last-point)
+  (kill-local-variable 'hl-sexp-last-max-point)
   (kill-local-variable 'last-at-opening-paren-p)
   (remove-hook 'post-command-hook 'hl-sexp-highlight t)
   (when (and ram-highlight-sexps-mode
@@ -563,8 +563,8 @@ repeating highlighting the same sexps in the same context.")
         (hl-sexp-create-paren-overlays)
         (hl-sexp-create-paren-when-at-del-overlays)
         (hl-sexp-create-paren-sibling-overlays)
-        (let ((hl-sexps-last-point -1)
-              (hl-sexps-last-max-point -1)
+        (let ((hl-sexp-last-point -1)
+              (hl-sexp-last-max-point -1)
               (last-at-opening-paren-p nil))
           (hl-sexp-highlight))))))
 
