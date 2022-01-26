@@ -4558,6 +4558,16 @@ Add `pre-command-hook' to remove it."
 
 ;;** brackets, parentheses, parens, sexps: comments
 
+(defun ram-block-comment-bounds ()
+  "Return the beginning and end pair of a comment block."
+  (if-let ((beg (save-excursion
+                  (let ((beg (ram-goto-comment-block-beg)))
+                    (when (and beg
+                               (looking-back "^[[:space:]]*" (point-at-bol)))
+                      beg))))
+           (end (save-excursion (ram-goto-comment-block-end))))
+      (cons beg end)))
+
 ;; adopted from https://github.com/abo-abo/lispy
 (defun ram-in-comment-p ()
   (save-excursion
@@ -4710,16 +4720,6 @@ Before invoking `newline-and-indent':
 
 ;;** brackets, parentheses, parens, sexps: bounds
 
-(defun ram-comment-bounds ()
-  "Return the beginning and end pair of a comment block."
-  (if-let ((beg (save-excursion
-                  (let ((beg (ram-goto-comment-block-beg)))
-                    (when (and beg
-                               (looking-back "^[[:space:]]*" (point-at-bol)))
-                      beg))))
-           (end (save-excursion (ram-goto-comment-block-end))))
-      (cons beg end)))
-
 (defun ram-in-string-p ()
   "Return non-`nil' if inside a string or at its borders."
   (or (nth 3 (syntax-ppss))
@@ -4782,7 +4782,7 @@ Only a line comment, string and list are valid choices."
   (if (> (or select-nth-ancestor 0) 0)
       (ram-delimited-sexp-bounds select-nth-ancestor)
     (cond
-     ((ram-comment-bounds))
+     ((ram-block-comment-bounds))
      ((ram-string-bounds))
      ((ram-delimited-sexp-bounds))
      (t (error "`ram-thing-bounds': All `cond' clauses failed")))))
@@ -4821,7 +4821,7 @@ Whichever happens to be first."
   (if (> (or select-nth-ancestor 0) 0)
       (ram-delimited-sexp-bounds select-nth-ancestor)
     (cond
-     ((ram-comment-bounds))
+     ((ram-block-comment-bounds))
      ((ram-string-bounds))
      ((bounds-of-thing-at-point 'sexp))
      ((ram-delimited-sexp-bounds))
