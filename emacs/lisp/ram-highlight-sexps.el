@@ -716,7 +716,7 @@ trailing whitespace in the region delimited with BEGIN and END."
       (overlay-put (car hl-sexp-paren-overlays) 'face attributes)
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-overlays) 'priority 2)
+      (overlay-put (car hl-sexp-paren-overlays) 'priority 3)
       (cl-decf num))
     (setq hl-sexp-paren-overlays (nreverse hl-sexp-paren-overlays))))
 
@@ -745,7 +745,7 @@ trailing whitespace in the region delimited with BEGIN and END."
       (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'face attributes)
       ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
       ;; (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority 2)
+      (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority 3)
       (cl-decf num))
     (setq hl-sexp-paren-when-at-del-overlays (nreverse hl-sexp-paren-when-at-del-overlays))))
 
