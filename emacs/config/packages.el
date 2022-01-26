@@ -4584,11 +4584,14 @@ Add `pre-command-hook' to remove it."
     (nth 4 (syntax-ppss))))
 
 (defun ram-goto-beg-of-comment ()
-  (comment-normalize-vars t)
-  (end-of-line)
-  (comment-beginning)
+  "Go to comment beginning if in comment. Do Nothing otherwise."
   (if-let ((comment-start
-            (when (not (minibufferp)) (comment-search-backward (point-at-bol) t))))
+            (when (not (minibufferp))
+              (comment-normalize-vars)
+              (save-excursion
+                (end-of-line)
+                (and (comment-beginning)
+                     (comment-search-backward (point-at-bol) t))))))
       (goto-char comment-start)))
 
 (defun ram-goto-comment-block-beg ()
