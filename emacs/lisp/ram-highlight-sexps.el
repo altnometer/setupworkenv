@@ -602,16 +602,27 @@ surrounding PT."
             (push (list prev next) results)
             (setq p prev)))))))
 
-(defun hl-sexp-get-siblings-end-points (pt n)
-  "Return sibling lists endpoints or nil if none exist."
-  (let (end-points)
+(defun hl-sexp-get-siblings-end-points (point siblings-number)
+  "Return a list of sibling endpoints or nil if none exist."
+  (let* ((number-up (/ siblings-number 2))
+         (number-down (- siblings-number number-up))
+         end-points)
     (condition-case nil
         (save-excursion
-          (goto-char pt)
-          (while (> n 0)
+          (goto-char point)
+          (while (> number-up 0)
             (forward-list)
             (push (list (scan-sexps (point) -1) (point)) end-points)
-            (setq n (1- n))))
+            (setq number-up (1- number-up))))
+      (error nil))
+    (setq number-down (+ number-down number-up))
+    (condition-case nil
+        (save-excursion
+          (goto-char point)
+          (while (> number-down 0)
+            (backward-list)
+            (push (list (point) (scan-sexps (point) 1)) end-points)
+            (setq number-down (1- number-down))))
       (error nil))
     end-points))
 
