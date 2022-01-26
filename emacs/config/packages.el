@@ -4806,10 +4806,14 @@ The search must start outside the current thing bounds."
                                     (string-join (mapcar #'char-to-string ram-open-delimiters))
                                     "#'[:space:]" "\n]") nil t 1)
     (forward-char)
-    (if (thing-at-point 'symbol)
-        (progn (forward-symbol -1)
-               (ram-prev-thing-bounds))
-      (ram-thing-bounds))))
+    (cond
+     ((thing-at-point 'symbol)
+      (progn (forward-symbol -1)
+             (ram-prev-thing-bounds)))
+     ((ram-inline-comment-bounds)
+      (goto-char (car (ram-inline-comment-bounds)))
+      (ram-prev-thing-bounds))
+     (t (ram-thing-bounds)))))
 
 (defun ram-next-thing-bounds ()
   "Return the bounds of the next thing.
