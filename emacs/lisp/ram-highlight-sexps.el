@@ -341,8 +341,11 @@ repeating highlighting the same sexps in the same context.")
     (setq hl-sexps-last-point (point))
     (setq hl-sexps-last-max-point (point-max))
     (let* ((p (point))
-           (at-delimiter-p (or (memq (char-after p) '(?\( ?\{ ?\[ ?\<))
-                               (memq (char-before p) '(?\) ?\} ?\] ?\>))))
+           (ppss (syntax-ppss))
+           (at-delimiter-p (and (not (nth 3 ppss)) ; not in string
+                                (not (nth 4 ppss)) ; not in comment
+                                (or (memq (char-after p) '(?\( ?\{ ?\[ ?\<))
+                                    (memq (char-before p) '(?\) ?\} ?\] ?\>)))))
            (overlays-sexp (if at-delimiter-p
                               (list hl-sexp-overlays-when-at-del hl-sexp-overlays)
                             (list hl-sexp-overlays hl-sexp-overlays-when-at-del)))
@@ -567,7 +570,12 @@ repeating highlighting the same sexps in the same context.")
 
 (defun hl-sexp-start-of-sexp (pt)
   "Start of the s-expression surrounding PT."
-  (save-excursion (cadr (syntax-ppss pt))))
+  (let ((ppss (syntax-ppss)))
+    (save-excursion
+      (when (or (nth 3 ppss)
+                (nth 4 ppss))
+        (goto-char (nth 8 ppss)))
+      (cadr (syntax-ppss pt)))))
 
 (defun hl-sexp-end-of-sexp (pt)
   "End of s-expression that matches beginning point PT."
