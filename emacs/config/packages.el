@@ -4558,6 +4558,14 @@ Add `pre-command-hook' to remove it."
 
 ;;** brackets, parentheses, parens, sexps: comments
 
+(defun ram-inline-comment-bounds ()
+  "Return a pair of the inline comment beginning and end. "
+  (if-let (beg (and (ram-in-comment-p)
+                    (save-excursion
+                      (ram-goto-beg-of-comment)
+                      (re-search-backward "[^[:space:]]" (point-at-bol) t 1))))
+      (cons beg (point-at-eol))))
+
 (defun ram-block-comment-bounds ()
   "Return the beginning and end pair of a comment block."
   (if-let ((beg (save-excursion
