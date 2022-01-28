@@ -333,6 +333,40 @@ repeating highlighting the same sexps in the same context.")
   "True if last delimiter visited was an opening one.")
 (make-variable-buffer-local 'last-at-opening-paren-p)
 
+;;; delimiters
+
+(defvar hl-sexp-delimiters "{}()[]<>"
+  "A string of open and close delimiters pairs.")
+
+(defvar hl-sexp-open-delimiters
+  (let ((delims))
+    (dotimes (idx (length hl-sexp-delimiters))
+      (when (= (% idx 2) 0)
+        (setq delims (cons (aref hl-sexp-delimiters idx) delims))))
+    delims)
+  "A list of open delimiter characters.")
+
+(defvar hl-sexp-close-delimiters
+  (let ((delims))
+    (dotimes (idx (length hl-sexp-delimiters))
+      (when (= (% idx 2) 1)
+        (setq delims (cons (aref hl-sexp-delimiters idx) delims))))
+    delims)
+  "A list of close delimiter characters.")
+
+;;; debug
+
+;; how to get a trace from commands in 'post-command-hook
+;; credit to Johan Bockgård
+;; https://lists.gnu.org/archive/html/emacs-devel/2010-07/msg01410.html
+;; !!! make sure to (setq debug-on-error t)
+;; !!! also see if debug-ignored-errors does not have the error that you debugging
+(defadvice hl-sexp-highlight (around intercept activate)
+  (condition-case err
+      ad-do-it
+    ;; Let the debugger run
+    ((debug error) (signal (car err) (cdr err)))))
+
 (defun hl-sexp-highlight ()
   "Highlight the nested s-expressions around point"
   (when (not (and
@@ -344,8 +378,8 @@ repeating highlighting the same sexps in the same context.")
            (ppss (syntax-ppss))
            (at-delimiter-p (and (not (nth 3 ppss)) ; not in string
                                 (not (nth 4 ppss)) ; not in comment
-                                (or (memq (char-after p) '(?\( ?\{ ?\[ ?\<))
-                                    (memq (char-before p) '(?\) ?\} ?\] ?\>)))))
+                                (or (memq (char-after p) hl-sexp-open-delimiters)
+                                    (memq (char-before p) hl-sexp-close-delimiters))))
            (overlays-sexp (if at-delimiter-p
                               (list hl-sexp-overlays-when-at-del hl-sexp-overlays)
                             (list hl-sexp-overlays hl-sexp-overlays-when-at-del)))
@@ -589,9 +623,9 @@ surrounding PT."
   (let (results prev next
                 (p pt))
     (when hl-sexp-highlight-adjacent
-      (cond ((memq (char-before p) '(?\) ?\} ?\] ?\>))
+      (cond ((memq (char-before p) hl-sexp-close-delimiters)
              (setq p (1- p)))
-            ((memq (char-after p) '(?\( ?\{ ?\[ ?\<))
+            ((memq (char-after p) hl-sexp-open-delimiters)
              (setq p (1+ p)))))
     (dotimes (i n (nreverse results))
       (when (not (= p 0))
