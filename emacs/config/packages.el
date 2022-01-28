@@ -3235,7 +3235,9 @@ ARG value is 4."
 ;; these command are ###autoload and 'org-roam-dailies-map is not
 ;; (with-eval-after-load "org-roam-dailies"
 ;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
-(define-key global-map (kbd "s-c a") #'ram-org-capture-heading-to-dailies)
+(with-eval-after-load "org"
+  (define-key org-mode-map (kbd "s-c a") #'ram-org-capture-heading-to-dailies)
+  (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-dailies))
 
 (define-key global-map (kbd "s-c A") #'ram-org-capture-title-to-dailies)
 
