@@ -980,6 +980,7 @@ Disable `icomplete-vertical-mode' for this command."
 (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
 (setq magit-save-repository-buffers 'dontask)
 (setq magit-diff-refine-hunk 'all)
+(setq magit-copy-revision-abbreviated t)
 
 (define-key global-map (kbd "s-m") 'magit-status)
 (define-key global-map (kbd "s-M") 'magit-file-dispatch)
@@ -2793,6 +2794,12 @@ it can be passed in POS."
 ;;    '(git-gutter:statistic 1)))
 
 
+;;** org-mode:orgit
+
+;; Link to Magit buffers from Org documents
+;; https://github.com/magit/orgit
+(straight-use-package
+ '(orgit :type git :flavor melpa :host github :repo "magit/orgit"))
 ;;* org-agenda
 
 ;;** org-agenda: bindings
@@ -3256,6 +3263,40 @@ ARG value is 4."
                        :templates templates)
     (org-align-tags)))
 
+(defun ram-org-capture-magit-commit-to-dailies (&optional arg)
+  "Capture magit commit into a `org-roam' daily note.
+Insert into daily note for ARG days from now. Or use calendar if
+ARG value is 4."
+  (interactive "P")
+  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (repo (abbreviate-file-name default-directory))
+         (rev (if (eq major-mode 'magit-status-mode)
+                  (magit-copy-section-value nil)
+                (magit-git-string "rev-parse" "HEAD")))
+         (backlink (format "[[orgit-rev:%s::%s][%s]]" repo rev (substring rev 0 7)))
+         (summary (substring-no-properties (magit-format-rev-summary rev)))
+         (templates
+          `(("t" "capture document title"
+             entry, (format "* %s %%(org-set-tags \":git:\")\n%s\n\n%%?"
+                            summary backlink)
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :empty-lines-before 1
+             :empty-lines-after 1
+             :unnarrowed t
+             :kill-buffer t
+             :immediate-finish nil
+             :no-save nil)))
+         (time (if (eq arg 4)
+                   (let ((org-read-date-prefer-future t))
+                     (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
+                 (time-add (* (or arg 0) 86400) (current-time)))))
+    (org-roam-capture- :goto nil
+                       :keys "t"
+                       :node (org-roam-node-create)
+                       :props (list :override-default-time time)
+                       :templates templates)
+    (org-align-tags)))
+
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
   (setq org-roam-dailies-capture-templates
@@ -3277,6 +3318,8 @@ ARG value is 4."
   (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-dailies))
 
 (define-key emacs-lisp-mode-map (kbd "s-c a") #'ram-org-capture-defun-to-dailies)
+
+(define-key global-map (kbd "s-c g") #'ram-org-capture-magit-commit-to-dailies)
 
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
