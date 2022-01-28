@@ -3411,10 +3411,10 @@ Ignore \"No following same-level heading\" error, call
 ;;** outline: hooks, advice, timers
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
-                                  (setq-local outline-regexp "^;;\\(?:;[^#]\\|\\*+\\)")
+                                  (setq-local outline-regexp "^;;\\(?:;+[^#]\\|\\*+\\)")
                                   (outline-minor-mode 1)))
 (add-hook 'clojure-mode-hook (lambda ()
-                                  (setq-local outline-regexp "^;;\\(?:;[^#]\\|\\*+\\)")
+                                  (setq-local outline-regexp "^;;\\(?:;+[^#]\\|\\*+\\)")
                                   (outline-minor-mode 1)))
 
 ;;* hideshow
