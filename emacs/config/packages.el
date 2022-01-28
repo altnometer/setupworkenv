@@ -7195,7 +7195,12 @@ With a prefix argument N, (un)comment that many sexps."
 (setq confirm-kill-emacs 'y-or-n-p)
 
 (setq large-file-warning-threshold nil)
+
+;;*** system/general settings: debug
+
 (setq debug-on-error t)
+(setq debug-ignored-errors nil)
+
 (run-with-idle-timer 2 nil (lambda () (fringe-mode '(20 . 20))))
 ;; use "y", "n" for confirmations requiring "yes", "no"
 (defalias 'yes-or-no-p 'y-or-n-p)
