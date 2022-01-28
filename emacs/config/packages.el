@@ -4477,7 +4477,7 @@ Return nil on failure, (point) otherwise."
   (interactive "p")
   (push-mark)
   (let* ((point (point))
-         (comment-bounds (ram-comment-bounds))
+         (comment-bounds (ram-block-comment-bounds))
          (in-top-level-comments (and comment-bounds
                                      (save-excursion (= (car comment-bounds) (point-at-bol))))))
     (if in-top-level-comments
