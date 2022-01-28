@@ -603,28 +603,57 @@ surrounding PT."
             (setq p prev)))))))
 
 (defun hl-sexp-get-siblings-end-points (point siblings-number)
-  "Return a list of sibling endpoints or nil if none exist."
-  (let* ((number-up (/ siblings-number 2))
-         (number-down (- siblings-number number-up))
+  "Return a list of sibling list endpoints."
+  (let* ((limit-forward (/ siblings-number 2))
+         (limit-backward (- siblings-number limit-forward))
+         (last-point-forward point)     ; where find-forward stopped
          end-points)
-    (condition-case nil
+    (cl-labels ((find-forward (limit acc)
+                  "Return LIMIT sibling lists looking forward."
+                  ;; exclude current list
+                  (when (memq (char-after) hl-sexp-open-delimiters)
+                    (forward-list))
+                  (condition-case nil
+                      (forward-list)
+                    (error (cons limit (list acc)))
+                    (:success (let ((acc (cons (cons (scan-sexps (point) -1) (point)) acc)))
+                                (if (> limit 1)
+                                    (find-forward (1- limit) acc)
+                                  (cons (1- limit) (list acc)))))))
+                (find-backward (limit acc)
+                  "Return LIMIT sibling lists looking backward."
+                  ;; exclude current list
+                  (when (memq (char-before) hl-sexp-close-delimiters)
+                    (backward-list))
+                  (condition-case nil
+                      (backward-list)
+                    (error (cons limit (list acc)))
+                    (:success (let ((acc (cons (cons (point) (scan-sexps (point) 1)) acc)))
+                                (if (> limit 1)
+                                    (find-backward (1- limit) acc)
+                                  (cons (1- limit) (list acc))))))))
+      (save-excursion
+        (goto-char point)
+        (cl-destructuring-bind (limit acc) (find-forward limit-forward '())
+          (setq limit-forward limit)
+          (setq end-points (append acc end-points))
+          (setq last-point-forward (or (cdar acc)
+                                       last-point-forward))))
+      (setq limit-backward (+ limit-backward limit-forward))
+      (save-excursion
+        (goto-char point)
+        (cl-destructuring-bind (limit acc) (find-backward limit-backward '())
+          (setq limit-backward limit)
+          (setq end-points (append acc end-points))))
+      (when (> limit-backward 0)
+        ;; found less siblings than wanted,
+        ;; continue looking the opposite direction.
+        (setq limit-forward limit-backward)
         (save-excursion
-          (goto-char point)
-          (while (> number-up 0)
-            (forward-list)
-            (push (list (scan-sexps (point) -1) (point)) end-points)
-            (setq number-up (1- number-up))))
-      (error nil))
-    (setq number-down (+ number-down number-up))
-    (condition-case nil
-        (save-excursion
-          (goto-char point)
-          (while (> number-down 0)
-            (backward-list)
-            (push (list (point) (scan-sexps (point) 1)) end-points)
-            (setq number-down (1- number-down))))
-      (error nil))
-    end-points))
+          (goto-char last-point-forward)
+          (cl-destructuring-bind (limit acc) (find-forward limit-forward '())
+            (setq end-points (append acc end-points)))))
+      end-points)))
 
 ;;; handle masking excessive whitespace created by highlighting overlays
 
