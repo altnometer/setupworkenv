@@ -3219,6 +3219,43 @@ ARG value is 4."
                        :templates templates)
     (org-align-tags)))
 
+(defun ram-org-capture-defun-to-dailies (&optional arg)
+  "Capture the defun into a `org-roam' daily note.
+Insert into daily note for ARG days from now. Or use calendar if
+ARG value is 4."
+  (interactive "P")
+  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (defun-name (save-excursion
+                       (when (not (= (char-before) ?\n))
+                         (beginning-of-defun))
+                       (down-list)
+                       (forward-symbol 2)
+                       (let ((bounds (bounds-of-thing-at-point 'sexp)))
+                         (buffer-substring-no-properties (car bounds) (cdr bounds)))))
+         (backlink (format "[[file:%s::%s][%s]]" (buffer-file-name) defun-name defun-name))
+         (templates
+          `(("t" "capture document title"
+            entry ,(concat "* " defun-name  " %(org-set-tags \":"
+                           (car (split-string (symbol-name major-mode) "-"))
+                           ":\")\n" backlink "\n\n%?")
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :empty-lines-before 1
+             :empty-lines-after 1
+             :unnarrowed t
+             :kill-buffer t
+             :immediate-finish nil
+             :no-save nil)))
+         (time (if (eq arg 4)
+                   (let ((org-read-date-prefer-future t))
+                     (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
+                 (time-add (* (or arg 0) 86400) (current-time)))))
+    (org-roam-capture- :goto nil
+                       :keys "t"
+                       :node (org-roam-node-create)
+                       :props (list :override-default-time time)
+                       :templates templates)
+    (org-align-tags)))
+
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
   (setq org-roam-dailies-capture-templates
@@ -3239,7 +3276,7 @@ ARG value is 4."
   (define-key org-mode-map (kbd "s-c a") #'ram-org-capture-heading-to-dailies)
   (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-dailies))
 
-(define-key global-map (kbd "s-c A") #'ram-org-capture-title-to-dailies)
+(define-key emacs-lisp-mode-map (kbd "s-c a") #'ram-org-capture-defun-to-dailies)
 
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
