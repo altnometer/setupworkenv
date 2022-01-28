@@ -392,8 +392,8 @@ repeating highlighting the same sexps in the same context.")
            (sexps-for-mask sexp-list)
            (sexps-for-parens (hl-sexp-end-points p
                                                  (length (car overlays-parens))))
-           (sexps-siblings (if (caadr sexps-for-parens)
-                               (hl-sexp-get-siblings-end-points (1+ (caadr sexps-for-parens)) hl-sexp-siblings-number)))
+           (sexps-siblings (when (> (length sexps-for-parens) 1) ; length one means the outer most level of parens
+                             (hl-sexp-get-siblings-end-points (caar sexps-for-parens) hl-sexp-siblings-number)))
            pos1
            pos2
            at-opening-paren-p)
