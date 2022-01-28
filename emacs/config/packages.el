@@ -1402,7 +1402,7 @@ succession."
                 (* space)
                 line-end))
            (t
-            "^;;\\(?:;\\(;[^#]\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
+            "^;;\\(?:\\(;+\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
          (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
          (hist-item (car ram-jump-to-outline-history)))
      (setf (alist-get 'return minibuffer-local-completion-map)
