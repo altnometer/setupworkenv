@@ -4667,12 +4667,12 @@ Add `pre-command-hook' to remove it."
 (defun ram-at-delimited-beg-p ()
   "Return non `nil' if the point is after `ram-open-delimiters-re'."
   (when (not (ram-in-comment-p))
-    (looking-at (concat ram-open-delimiters-re))))
+    (memq (char-after) ram-open-delimiters)))
 
 (defun ram-at-delimited-end-p ()
   "Return non `nil' if the point is after `ram-close-delimiters-re'."
   (when (not (ram-in-comment-p))
-    (save-excursion (backward-char) (looking-at (concat ram-close-delimiters-re)))))
+    (memq (char-before) ram-close-delimiters)))
 
 (defun ram-at-string-beg-p ()
   "Return non `nil' if `looking-at' a double quote character. "
