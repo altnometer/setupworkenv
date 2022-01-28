@@ -436,7 +436,7 @@ repeating highlighting the same sexps in the same context.")
                  (overlay-2 (pop overlays-siblings))
                  (sexp (pop sexps-siblings))
                  (pos1 (car sexp))
-                 (pos2 (cadr sexp)))
+                 (pos2 (cdr sexp)))
             (if at-opening-paren-p
                 (progn (move-overlay overlay-1 pos1 (1+ pos1))
                        (move-overlay overlay-2 (1- pos2) pos2))
@@ -485,6 +485,8 @@ repeating highlighting the same sexps in the same context.")
     (hl-sexp-create-paren-when-at-del-overlays)
     (hl-sexp-create-paren-sibling-overlays)
     (add-hook 'post-command-hook 'hl-sexp-highlight nil t)))
+
+;;; create overlays
 
 (defun hl-sexp-create-overlays ()
   "Create some sexp overlays."
@@ -536,7 +538,8 @@ repeating highlighting the same sexps in the same context.")
   "Create overlays for highlighting sibling parentheses."
   (let* ((fg hl-sexp-colors-siblings)
          (bg hl-sexp-background-siblings)
-         (num hl-sexp-siblings-number)
+         ;; we need two overlays for one sibling (for opening and closing delimiter)
+         (num (* 2 hl-sexp-siblings-number))
          attributes)
     (while (> num 0)
       (setq attributes (face-attr-construct 'hl-sexp-face))
