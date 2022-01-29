@@ -3083,6 +3083,154 @@ If the property is already set, replace its value."
 (straight-use-package
  '(org-roam :type git :flavor melpa :host github :repo "org-roam/org-roam"))
 ;(require 'org-roam)
+
+;;** org-roam: deft, search notes with regexp
+
+;; https://github.com/jrblevin/deft
+;; deft is for quickly browsing, filtering, and editing directories of notes.
+
+(straight-use-package
+ '(deft :type git :flavor melpa :host github :repo "jrblevin/deft"))
+
+;;*** packages/deft: settings
+
+(setq deft-extensions '("org"))
+(with-eval-after-load "deft"
+  (setq deft-directory org-roam-directory))
+;; (setq deft-ignore-file-regexp "your regex here")
+;; (setq deft-recursive t)
+(setq deft-recursive nil)
+;; (setq deft-recursive-ignore-dir-regexp "daily")
+;; (setq deft-strip-title-regexp "your regex here")
+;; 0 disables auto save feature
+;; when saving, ram-update-org-roam-tag-if-contains-todos is called by hook,
+;; it calls org-roam-tag-remove which raises (wrong-type-argument integer-or-marker-p nil)
+(setq deft-auto-save-interval 0)
+;; (setq deft-parse-title-function 'your-title-parsing-function)
+(setq deft-use-filename-as-title t)
+;; (setq deft-strip-summary-regexp "your regex here")
+(setq deft-current-sort-method 'title)
+;; nil would make regexp search
+;; (setq deft-incremental-search t)
+
+;;*** packages/deft: functions
+
+(when (not (boundp 'org-list-full-item-re))
+  (require 'org))
+
+(defun ram-get-deft-strip-summary-regexp-for-notes ()
+  "Return a regexp to exclude from note content."
+  (concat "\\(?:"
+          "[[:space:]]+"                ; blank
+          "\\|"
+          "^:PROPERTIES:.*$"
+          "\\|"
+          "^:ID:.*$"
+          "\\|"
+          "^:END:.*$"
+          "\\|"
+          "^#\\+[^[:blank:]]+:.*$"      ; org-mode metadata
+          "\\|"
+          "^- tags $"                   ; tags
+          "\\|"
+          "^-source .*$"                ; source
+          "\\|"
+          "\\[\\[\\(?:\\(id\\)\\|\\(info\\)\\|\\(file\\)\\)[^]]+\\]" ; links
+          "\\|"
+          "\\][^]]"                     ; ']' from link
+          "\\|"
+          "\\(?:^\\*\\*+[[:blank:]]+.*$\\)" ; any headline that is not top level
+          "\\|"
+          "\\(?:^[^*]\\{1,\\}.*$\\)"   ; anything that is not headline
+          "\\|"
+          (regexp-quote org-list-full-item-re) ; org list items
+          "\\)"))
+
+(setq deft-file-limit 65)
+
+(defun ram-deft-search-org-roam-notes ()
+  "Invoke `deft' with settings for `org-roam' notes."
+  (interactive)
+  ;; avoid (error "Defining as dynamic an already lexical var") with #'require
+  (require 'deft)
+  ;; Lisp error: (error "No buffer named *Deft*")
+  (condition-case err
+      (kill-buffer "*Deft*")
+    (error (if (string= (error-message-string err)
+                        "No buffer named *Deft*")
+               (message "No *Deft* buffer to kill")
+             (signal (car err) (cdr err))))
+    (:success
+     (message "Killed org-roam dailies *Deft* buffer")))
+  (let ((deft-directory (expand-file-name org-roam-directory))
+        ;; (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
+        (deft-current-sort-method 'title)
+        ;; (deft-recursive t)
+        ;; (deft-recursive-ignore-dir-regexp "\\(?:\\.\\|\\.\\.\\)$\\|\\(?:/daily\\)")
+        (title-match "second_brain"))
+    (cl-letf* (;; (list title-match)
+               ((symbol-function 'deft-parse-title)
+                (lambda (file contents)
+                  (let (
+                        ;; first headline
+                        ;; (begin (string-match "^\\*[[:blank:]]+\\(.*\\)$" contents))
+                        ;; title
+                        (begin (string-match "^#\\+TITLE: \\(.*\\)$" contents)))
+                    (if begin
+                        (setq title-match (substring contents (match-beginning 1) (match-end 1)))
+                      (setq title-match (replace-in-string (deft-base-filename file) "^[0-9]\\{14\\}-" ""))))))
+
+               ((symbol-function 'deft-parse-summary)
+                (lambda (contets title)
+                  "Remove any line that contains `org-roam' note \"title\"."
+                  (let ((summary (let* ((case-fold-search nil)
+                                        ;; (begin (string-match "^#\\+TITLE: \\(.*\\)$" contents))
+                                        (title-regex (when (string-match "^#\\+TITLE: \\(.*\\)$" contents)
+                                                       (format "^.*%s.*$"
+                                                               (regexp-quote
+                                                                (string-replace "_" " "
+                                                                                (substring contents
+                                                                                           (match-beginning 1)
+                                                                                           (match-end 1)))))))
+                                        (strip-summary-regex (if title-regex
+                                                                 (concat (ram-get-deft-strip-summary-regexp-for-notes)
+                                                                         "\\|\\(?:" title-regex "\\)")
+                                                               (ram-get-deft-strip-summary-regexp-for-notes))))
+                                   (replace-regexp-in-string strip-summary-regex " " contents))))
+                    (deft-chomp summary)))))
+      (deft))))
+
+(defun ram-deft-search-daily-notes ()
+  "Invoke `deft' after setting `deft-directory' to `org-roam-dailies-directory'"
+  (interactive)
+  ;; avoid (error "Defining as dynamic an already lexical var") with #'require
+  (require 'deft)
+  ;; Lisp error: (error "No buffer named *Deft*")
+  (condition-case err
+      (kill-buffer "*Deft*")
+    (error (if (string= (error-message-string err)
+                        "No buffer named *Deft*")
+               (message "No *Deft* buffer to kill")
+             (signal (car err) (cdr err))))
+    (:success
+     (message "Killed org-roam dailies *Deft* buffer")))
+  (cl-letf ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+            (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
+            ((symbol-function 'deft-sort-files)
+             (lambda (files)
+               (sort files (lambda (f1 f2)
+                             (let ((t1 (deft-file-title f1))
+                                   (t2 (deft-file-title f2)))
+                               (string-greaterp
+                                (and t1 (downcase t1))
+                                (and t2 (downcase t2)))))))))
+    (deft)))
+
+;;*** packages/deft: bindings
+
+(define-key global-map (kbd "s-c S") #'ram-deft-search-org-roam-notes)
+(define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
+
 ;;** org-roam: settings
 
 (with-eval-after-load "org-roam"
@@ -6237,153 +6385,6 @@ confines of word boundaries (e.g. multiple words)."
 
 (straight-use-package
  '(ace-link :type git :flavor melpa :host github :repo "abo-abo/ace-link"))
-
-;;** packages: deft
-
-;; https://github.com/jrblevin/deft
-;; deft is for quickly browsing, filtering, and editing directories of notes.
-
-(straight-use-package
- '(deft :type git :flavor melpa :host github :repo "jrblevin/deft"))
-
-;;*** packages/deft: settings
-
-(setq deft-extensions '("org"))
-(with-eval-after-load "deft"
-  (setq deft-directory org-roam-directory))
-;; (setq deft-ignore-file-regexp "your regex here")
-;; (setq deft-recursive t)
-(setq deft-recursive nil)
-;; (setq deft-recursive-ignore-dir-regexp "daily")
-;; (setq deft-strip-title-regexp "your regex here")
-;; 0 disables auto save feature
-;; when saving, ram-update-org-roam-tag-if-contains-todos is called by hook,
-;; it calls org-roam-tag-remove which raises (wrong-type-argument integer-or-marker-p nil)
-(setq deft-auto-save-interval 0)
-;; (setq deft-parse-title-function 'your-title-parsing-function)
-(setq deft-use-filename-as-title t)
-;; (setq deft-strip-summary-regexp "your regex here")
-(setq deft-current-sort-method 'title)
-;; nil would make regexp search
-;; (setq deft-incremental-search t)
-
-;;*** packages/deft: functions
-
-(when (not (boundp 'org-list-full-item-re))
-  (require 'org))
-
-(defun ram-get-deft-strip-summary-regexp-for-notes ()
-  "Return a regexp to exclude from note content."
-  (concat "\\(?:"
-          "[[:space:]]+"                ; blank
-          "\\|"
-          "^:PROPERTIES:.*$"
-          "\\|"
-          "^:ID:.*$"
-          "\\|"
-          "^:END:.*$"
-          "\\|"
-          "^#\\+[^[:blank:]]+:.*$"      ; org-mode metadata
-          "\\|"
-          "^- tags $"                   ; tags
-          "\\|"
-          "^-source .*$"                ; source
-          "\\|"
-          "\\[\\[\\(?:\\(id\\)\\|\\(info\\)\\|\\(file\\)\\)[^]]+\\]" ; links
-          "\\|"
-          "\\][^]]"                     ; ']' from link
-          "\\|"
-          "\\(?:^\\*\\*+[[:blank:]]+.*$\\)" ; any headline that is not top level
-          "\\|"
-          "\\(?:^[^*]\\{1,\\}.*$\\)"   ; anything that is not headline
-          "\\|"
-          (regexp-quote org-list-full-item-re) ; org list items
-          "\\)"))
-
-(setq deft-file-limit 65)
-
-(defun ram-deft-search-org-roam-notes ()
-  "Invoke `deft' with settings for `org-roam' notes."
-  (interactive)
-  ;; avoid (error "Defining as dynamic an already lexical var") with #'require
-  (require 'deft)
-  ;; Lisp error: (error "No buffer named *Deft*")
-  (condition-case err
-      (kill-buffer "*Deft*")
-    (error (if (string= (error-message-string err)
-                        "No buffer named *Deft*")
-               (message "No *Deft* buffer to kill")
-             (signal (car err) (cdr err))))
-    (:success
-     (message "Killed org-roam dailies *Deft* buffer")))
-  (let ((deft-directory (expand-file-name org-roam-directory))
-        ;; (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
-        (deft-current-sort-method 'title)
-        ;; (deft-recursive t)
-        ;; (deft-recursive-ignore-dir-regexp "\\(?:\\.\\|\\.\\.\\)$\\|\\(?:/daily\\)")
-        (title-match "second_brain"))
-    (cl-letf* (;; (list title-match)
-               ((symbol-function 'deft-parse-title)
-                (lambda (file contents)
-                  (let (
-                        ;; first headline
-                        ;; (begin (string-match "^\\*[[:blank:]]+\\(.*\\)$" contents))
-                        ;; title
-                        (begin (string-match "^#\\+TITLE: \\(.*\\)$" contents)))
-                    (if begin
-                        (setq title-match (substring contents (match-beginning 1) (match-end 1)))
-                      (setq title-match (replace-in-string (deft-base-filename file) "^[0-9]\\{14\\}-" ""))))))
-
-               ((symbol-function 'deft-parse-summary)
-                (lambda (contets title)
-                  "Remove any line that contains `org-roam' note \"title\"."
-                  (let ((summary (let* ((case-fold-search nil)
-                                        ;; (begin (string-match "^#\\+TITLE: \\(.*\\)$" contents))
-                                        (title-regex (when (string-match "^#\\+TITLE: \\(.*\\)$" contents)
-                                                       (format "^.*%s.*$"
-                                                               (regexp-quote
-                                                                (string-replace "_" " "
-                                                                                (substring contents
-                                                                                           (match-beginning 1)
-                                                                                           (match-end 1)))))))
-                                        (strip-summary-regex (if title-regex
-                                                                 (concat (ram-get-deft-strip-summary-regexp-for-notes)
-                                                                         "\\|\\(?:" title-regex "\\)")
-                                                               (ram-get-deft-strip-summary-regexp-for-notes))))
-                                   (replace-regexp-in-string strip-summary-regex " " contents))))
-                    (deft-chomp summary)))))
-      (deft))))
-
-(defun ram-deft-search-daily-notes ()
-  "Invoke `deft' after setting `deft-directory' to `org-roam-dailies-directory'"
-  (interactive)
-  ;; avoid (error "Defining as dynamic an already lexical var") with #'require
-  (require 'deft)
-  ;; Lisp error: (error "No buffer named *Deft*")
-  (condition-case err
-      (kill-buffer "*Deft*")
-    (error (if (string= (error-message-string err)
-                        "No buffer named *Deft*")
-               (message "No *Deft* buffer to kill")
-             (signal (car err) (cdr err))))
-    (:success
-     (message "Killed org-roam dailies *Deft* buffer")))
-  (cl-letf ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-            (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
-            ((symbol-function 'deft-sort-files)
-             (lambda (files)
-               (sort files (lambda (f1 f2)
-                             (let ((t1 (deft-file-title f1))
-                                   (t2 (deft-file-title f2)))
-                               (string-greaterp
-                                (and t1 (downcase t1))
-                                (and t2 (downcase t2)))))))))
-    (deft)))
-
-;;*** packages/deft: bindings
-
-(define-key global-map (kbd "s-c S") #'ram-deft-search-org-roam-notes)
-(define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
 
 ;;** packages: diff
 
