@@ -5847,6 +5847,21 @@ repository, then the corresponding root is used instead."
 
 (add-function :before pre-redisplay-function #'ram-get-selected-window)
 
+;;** mode-line: bitcoin price ticker
+
+;; based on https://github.com/niedbalski/emacs-btc-ticker
+
+;; (require 'json)
+;; (require 'request)
+
+;; (request
+;;  "https://www.bitstamp.net/api/ticker/"
+;;  :parser 'json-read
+;;  :success (function*
+;;            (lambda(&key data &allow-other-keys)
+;; 	     (setq btc-ticker-mode-line
+;; 		   (concat " $" (assoc-default 'last data))))))
+
 ;;** mode-line: battery
 
 (customize-set-variable 'battery-mode-line-format "%b%p%%%")
