@@ -4784,7 +4784,7 @@ Add `pre-command-hook' to remove it."
                                            (move-overlay ram-copied-region-overlay 1 1)))))
 
 (add-hook 'prog-mode-hook #'ram-create-copied-sexp-overlay)
-
+(add-hook 'org-mode-hook #'ram-create-copied-sexp-overlay)
 (add-hook 'minibuffer-mode-hook #'ram-create-copied-sexp-overlay)
 
 ;;** brackets, parentheses, parens, sexps: comments
