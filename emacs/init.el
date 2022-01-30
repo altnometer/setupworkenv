@@ -1,13 +1,14 @@
 ;; fix "bad request issue"
 ;; https://github.com/syl20bnr/spacemacs/issues/12535
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
-(setq gc-cons-threshold 50000000)
+;;* prevent garbage collection for while loading configuration
+;; (setq gc-cons-threshold 50000000)
 
-(add-hook 'emacs-startup-hook 'my/set-gc-threshold)
-(defun my/set-gc-threshold ()
-  "Reset `gc-cons-threshold' to its default value."
-  (setq gc-cons-threshold 800000))
+;; (add-hook 'emacs-startup-hook 'my/set-gc-threshold)
+;; (defun my/set-gc-threshold ()
+;;   "Reset `gc-cons-threshold' to its default value."
+;;   (setq gc-cons-threshold 800000))
 
 ;;* debug
 
