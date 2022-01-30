@@ -9,6 +9,11 @@
   "Reset `gc-cons-threshold' to its default value."
   (setq gc-cons-threshold 800000))
 
+;;* debug
+
+(setq debug-on-error t)
+(setq debug-ignored-errors nil)
+
 ;; credit to https://github.com/Fuco1/.emacs.d
 (defmacro my-with-elapsed-timer (text &rest body)
   (declare (indent 1))
