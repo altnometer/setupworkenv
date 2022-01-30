@@ -2740,6 +2740,9 @@ it can be passed in POS."
 
 ;;** org-mode: org-babel
 
+(straight-use-package
+ '(org-babel-eval-in-repl :type git :flavor melpa :host github :repo "diadochos/org-babel-eval-in-repl"))
+
 (with-eval-after-load "org"
   (autoload 'ob-racket "ob-racket")
   (org-babel-do-load-languages
@@ -2756,11 +2759,8 @@ it can be passed in POS."
 
 ;;*** org-mode/org-babel: org-babel-eval-in-repl
 
-(straight-use-package
- '(org-babel-eval-in-repl :type git :flavor melpa :host github :repo "diadochos/org-babel-eval-in-repl"))
-
 (with-eval-after-load "ob"
-  (require 'eval-in-repl-racket)
+  ;; (require 'eval-in-repl-racket)
   (require 'org-babel-eval-in-repl)
   (add-to-list 'ober-org-babel-type-list '("prolog" . (ediprolog ediprolog-dwim)))
   (add-to-list 'ober-org-babel-type-list '("racket" . (eval-in-repl-racket eir-eval-in-racket)))
