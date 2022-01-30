@@ -3093,7 +3093,7 @@ If the property is already set, replace its value."
 (straight-use-package
  '(deft :type git :flavor melpa :host github :repo "jrblevin/deft"))
 
-;;*** packages/deft: settings
+;;*** org-roam/deft: settings
 
 (setq deft-extensions '("org"))
 (with-eval-after-load "deft"
@@ -3114,10 +3114,12 @@ If the property is already set, replace its value."
 ;; nil would make regexp search
 ;; (setq deft-incremental-search t)
 
-;;*** packages/deft: functions
+;;*** org-roam/deft: functions
 
-(when (not (boundp 'org-list-full-item-re))
-  (require 'org))
+;; (when (not (boundp 'org-list-full-item-re))
+;; (require 'org))
+
+(defvar org-list-full-item-re)
 
 (defun ram-get-deft-strip-summary-regexp-for-notes ()
   "Return a regexp to exclude from note content."
@@ -3227,7 +3229,7 @@ If the property is already set, replace its value."
                                 (and t2 (downcase t2)))))))))
     (deft)))
 
-;;*** packages/deft: bindings
+;;*** org-roam/deft: bindings
 
 (define-key global-map (kbd "s-c S") #'ram-deft-search-org-roam-notes)
 (define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
