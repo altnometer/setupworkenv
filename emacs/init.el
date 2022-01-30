@@ -201,7 +201,7 @@
  '(font-lock-comment-face ((t (:family "Operator Mono Light-19"))))
  '(font-lock-doc-face ((t (:family "Operator Mono Light-19" :slant italic))))
  '(font-lock-string-face ((t (:family "Operator Mono Light-19" :slant italic))))
- '(region ((t (:inherit nil :background "green4" :foreground "#100a14")))))
+ `(region ((t (:inherit nil :background ,(face-background 'modus-themes-intense-green) :foreground "#100a14")))))
 (put 'magit-diff-edit-hunk-commit 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
