@@ -614,12 +614,13 @@ Disable `icomplete-vertical-mode' for this command."
 (defun set-displaying-eval-defun-result-inline ()
   "Display `eval-defun' results inline."
   (advice-add 'eval-defun :filter-return
-                                       (lambda (r)
-                                         (endless/eval-overlay
-                                          r
-                                          (save-excursion
-                                            (end-of-defun)
-                                            (point))))))
+              (lambda (r)
+                (endless/eval-overlay
+                 r
+                 (save-excursion
+                   (end-of-defun)
+                   (point))))))
+
 (run-with-idle-timer 1 nil #'set-displaying-eval-defun-result-inline)
 
 (define-key emacs-lisp-mode-map (kbd "<S-return>") 'newline-and-indent)
