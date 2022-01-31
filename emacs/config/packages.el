@@ -1143,7 +1143,17 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
         (quit (abort-recursive-edit))
         (:success (abort-recursive-edit))))))
 
-;;** minibuffer: bindings: minibuffer-local-completion-map
+;;** minibuffer: bindings
+
+;;*** minibuffer/bindings: global-map
+
+(define-key global-map (kbd "C-_") #'prot/focus-minibuffer)
+(define-key global-map (kbd "C-~") #'prot/focus-minibuffer-or-completions)
+
+;; quit minibuffer from anywhere
+(define-key global-map (kbd "C-^") #'top-level)
+
+;;*** minibuffer/bindings: minibuffer-local-completion-map
 
 (define-key minibuffer-local-completion-map (kbd "C-h f") #'ram-describe-function-from-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "C-h v") #'ram-describe-variable-from-minibuffer)
@@ -1730,8 +1740,6 @@ instead."
             (select-window help)
           (select-window (get-mru-window)))))))
 
-(define-key global-map (kbd "C-~") #'prot/focus-minibuffer-or-completions)
-
 (define-key completion-list-mode-map (kbd "h") #'prot/describe-symbol-at-point)
 (define-key completion-list-mode-map (kbd "w") #'prot/completions-kill-symbol-at-point)
 (define-key completion-list-mode-map (kbd "i") #'prot/completions-insert-symbol-at-point)
@@ -1740,7 +1748,6 @@ instead."
 (define-key completion-list-mode-map (kbd "p") #'previous-line)
 (define-key completion-list-mode-map (kbd "b") #'previous-completion)
 (define-key completion-list-mode-map (kbd "M-v") #'prot/focus-minibuffer)
-(define-key global-map (kbd "C-_") #'prot/focus-minibuffer)
 
 ;;*** minibuffer/completion: styles
 
