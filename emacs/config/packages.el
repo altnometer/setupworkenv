@@ -3317,8 +3317,7 @@ If the property is already set, replace its value."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
-  (let* ((txt (ram-org-get-heading))
-         (org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
          (templates
           `(("d" "continue task under heading"
              entry ,(ram-org-get-heading)
