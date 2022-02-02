@@ -1452,7 +1452,10 @@ succession."
                  (cons (car ram-jump-to-outline-history)
                        (cddr ram-jump-to-outline-history))))))
   (when val
-    (when (minibufferp) (switch-to-buffer my-pre-minibuffer-buffer))
+    (when (minibufferp)
+      (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
+                                     (current-buffer))))
+        (switch-to-buffer pre-minibuffer-buffer)))
     (push-mark)
     (goto-char val)
     (beginning-of-line)
@@ -1511,16 +1514,16 @@ succession."
   "Jump to def."
   (interactive
    (let* ((defs '())
-              (buffer (if (minibufferp)
-                          (with-minibuffer-selected-window
-                            (current-buffer))
-                        (current-buffer)))
-              (def-regex (with-current-buffer buffer
-                           (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
-              (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
-              (hist-item (car ram-jump-to-def-history))
-              (str-at-point (thing-at-point 'symbol))
-              (old-binding-to-control-y (cdr (assoc ?\C-y minibuffer-local-completion-map))))
+          (buffer (if (minibufferp)
+                      (with-minibuffer-selected-window
+                        (current-buffer))
+                    (current-buffer)))
+          (def-regex (with-current-buffer buffer
+                       (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
+          (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
+          (hist-item (car ram-jump-to-def-history))
+          (str-at-point (thing-at-point 'symbol))
+          (old-binding-to-control-y (cdr (assoc ?\C-y minibuffer-local-completion-map))))
      ;; (define-key minibuffer-local-completion-map (kbd "<return>")
      ;;   (ram-add-to-history-cmd ram-add-to-jump-to-def-history 'ram-jump-to-def-history))
      (setf (alist-get ?\C-y minibuffer-local-completion-map)
@@ -1582,7 +1585,10 @@ succession."
                 (cons (car ram-jump-to-def-history)
                       (cddr ram-jump-to-def-history)))))
   (when val
-    (when (minibufferp) (switch-to-buffer my-pre-minibuffer-buffer))
+    (when (minibufferp)
+      (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
+                                     (current-buffer))))
+        (switch-to-buffer pre-minibuffer-buffer)))
     (push-mark)
     (goto-char val)
     (beginning-of-line)
