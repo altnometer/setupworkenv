@@ -2635,6 +2635,7 @@ it can be passed in POS."
 (setq org-startup-indented t)
 (setq org-indent-mode-turns-on-hiding-stars nil)
 (setq org-indent-mode-turns-off-org-adapt-indentation t)
+(setq org-link-file-path-type 'absolute)
 
 ;;** org-mode: hooks, advice, timers
 
