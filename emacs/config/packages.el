@@ -4702,13 +4702,15 @@ Return nil on failure, (point) otherwise."
 If ARG is negative, reverse the final point location.
 If ARG is 4, move to the end of defun."
   (interactive "p")
+  (when (buffer-narrowed-p)
+    (widen))
   (let ((at-end-p (ram-at-thing-end-p))
         next-bounds)
     (if (= arg 4)
         (ram-end-of-top-sexp 1)
       (ram-beg-of-top-sexp 1)
       (setq next-bounds (ram-forward-list))
-      (when (< arg 0)                     ; reverse at-end-p value
+      (when (< arg 0)                   ; reverse at-end-p value
         (setq at-end-p (not at-end-p)))
       (if at-end-p
           (goto-char (cdr next-bounds))
@@ -4719,13 +4721,15 @@ If ARG is 4, move to the end of defun."
 If ARG is negative, reverse the final point location.
 If ARG is 4, move to the beginning of defun."
   (interactive "p")
+  (when (buffer-narrowed-p)
+    (widen))
   (let ((at-end-p (ram-at-thing-end-p))
         prev-bounds)
     (if (= arg 4)
         (ram-beg-of-top-sexp 1)
       (ram-beg-of-top-sexp 1)
       (setq prev-bounds (ram-backward-list))
-      (when (< arg 0)                     ; reverse at-end-p value
+      (when (< arg 0)                   ; reverse at-end-p value
         (setq at-end-p (not at-end-p)))
       (if at-end-p
           (goto-char (cdr prev-bounds))
