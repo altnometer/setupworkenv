@@ -4557,7 +4557,8 @@ If ARG is `nil', do not `push-mark'."
           (if (< (cdr bounds) (cdr prev-bounds))
               (ram-backward-list)
             prev-bounds))
-      (goto-char (car prev-bounds))
+      (and prev-bounds
+           (goto-char (car prev-bounds)))
       prev-bounds)))
 
 ;; This behaves like ram-jump-forward-to-close-delimiter
@@ -4744,8 +4745,10 @@ If ARG is 4, move to the beginning of defun."
       (when (< arg 0)                   ; reverse at-end-p value
         (setq at-end-p (not at-end-p)))
       (if at-end-p
-          (goto-char (cdr prev-bounds))
-        (goto-char (car prev-bounds))))))
+          (and prev-bounds
+               (goto-char (cdr prev-bounds)))
+        (and prev-bounds
+             (goto-char (car prev-bounds)))) )))
 
 ;;** brackets, parentheses, parens, sexps: settings
 
