@@ -3323,8 +3323,7 @@ If the property is already set, replace its value."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
-  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-         (templates
+  (let* ((templates
           `(("d" "continue task under heading"
              entry ,(ram-org-get-heading)
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
@@ -3334,15 +3333,15 @@ ARG value is 4."
              :kill-buffer t
              :immediate-finish nil
              :no-save nil)))
-         (time (if (eq arg 4)
+         (time (if (equal arg '(4))
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
-    (org-roam-capture- :goto nil
-                       :keys "d"
-                       :node (org-roam-node-create)
-                       :props (list :override-default-time time)
-                       :templates templates)))
+    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
+      (org-roam-capture- :goto nil
+                         :node (org-roam-node-create)
+                         :props (list :override-default-time time)
+                         :templates templates))))
 
 (defun ram-org-element-get-title (&optional parsed-buffer)
   "Return the document title."
@@ -3359,8 +3358,7 @@ ARG value is 4."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
-  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-         (parsed-buffer (org-element-parse-buffer))
+  (let* ((parsed-buffer (org-element-parse-buffer))
          (doc-title (ram-org-element-get-title parsed-buffer))
          (backlink (org-element-map
                        parsed-buffer 'node-property
@@ -3378,15 +3376,15 @@ ARG value is 4."
              :kill-buffer t
              :immediate-finish nil
              :no-save nil)))
-         (time (if (eq arg 4)
+         (time (if (equal arg '(4))
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
-    (org-roam-capture- :goto nil
-                       :keys "t"
-                       :node (org-roam-node-create)
-                       :props (list :override-default-time time)
-                       :templates templates)
+    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
+      (org-roam-capture- :goto nil
+                         :node (org-roam-node-create)
+                         :props (list :override-default-time time)
+                         :templates templates))
     (org-align-tags)))
 
 (defun ram-org-capture-defun-to-dailies (&optional arg)
@@ -3394,8 +3392,7 @@ ARG value is 4."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
-  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-         (defun-name (save-excursion
+  (let* ((defun-name (save-excursion
                        (when (not (= (char-before) ?\n))
                          (beginning-of-defun))
                        (down-list)
@@ -3405,9 +3402,9 @@ ARG value is 4."
          (backlink (format "[[file:%s::%s][%s]]" (buffer-file-name) defun-name defun-name))
          (templates
           `(("t" "capture document title"
-            entry ,(concat "* " defun-name  " %(org-set-tags \":"
-                           (car (split-string (symbol-name major-mode) "-"))
-                           ":\")\n" backlink "\n\n%?")
+             entry ,(concat "* " defun-name  " %(org-set-tags \":"
+                            (car (split-string (symbol-name major-mode) "-"))
+                            ":\")\n" backlink "\n\n%?")
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
              :empty-lines-before 1
              :empty-lines-after 1
@@ -3415,15 +3412,15 @@ ARG value is 4."
              :kill-buffer t
              :immediate-finish nil
              :no-save nil)))
-         (time (if (eq arg 4)
+         (time (if (equal arg '(4))
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
-    (org-roam-capture- :goto nil
-                       :keys "t"
-                       :node (org-roam-node-create)
-                       :props (list :override-default-time time)
-                       :templates templates)
+    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
+      (org-roam-capture- :goto nil
+                         :node (org-roam-node-create)
+                         :props (list :override-default-time time)
+                         :templates templates))
     (org-align-tags)))
 
 (defun ram-org-capture-magit-commit-to-dailies (&optional arg)
@@ -3431,8 +3428,7 @@ ARG value is 4."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
-  (let* ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-         (repo (abbreviate-file-name default-directory))
+  (let* ((repo (abbreviate-file-name default-directory))
          (rev (if (eq major-mode 'magit-status-mode)
                   (magit-copy-section-value nil)
                 (magit-git-string "rev-parse" "HEAD")))
@@ -3449,15 +3445,15 @@ ARG value is 4."
              :kill-buffer t
              :immediate-finish nil
              :no-save nil)))
-         (time (if (eq arg 4)
+         (time (if (equal arg '(4))
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
-    (org-roam-capture- :goto nil
-                       :keys "t"
-                       :node (org-roam-node-create)
-                       :props (list :override-default-time time)
-                       :templates templates)
+    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
+      (org-roam-capture- :goto nil
+                         :node (org-roam-node-create)
+                         :props (list :override-default-time time)
+                         :templates templates))
     (org-align-tags)))
 
 (with-eval-after-load "org-roam-dailies"
