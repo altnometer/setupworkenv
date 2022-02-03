@@ -3300,24 +3300,24 @@ If the property is already set, replace its value."
          all-links-str
          ;; used only to split links to 'fill-column size
          all-description-str)
-    (progn
-      (while all-links
-        (let* ((link (pop all-links))
-               (link-str (org-element-interpret-data link))
-               (link-description (or (car (org-element-contents link))
-                                     (org-element-property :raw-link link)))
-               (link-separator (let ((separator (if all-links-str " " "")))
-                                 (if (and all-description-str
-                                          (> (+ (length (car (last (split-string all-description-str "\n" 'OMIT-NULLS))))
-                                                (length link-description))
-                                             fill-column))
-                                     "\n"
-                                   separator)))
-               )
-          (setq all-links-str (concat link-str link-separator all-links-str))
-          (setq all-description-str (concat link-description link-separator all-description-str))))
-      (concat (org-element-interpret-data current-headline)
-              all-links-str))))
+    (while all-links
+      (let* ((link (pop all-links))
+             (link-str (org-element-interpret-data link))
+             (link-description (or (car (org-element-contents link))
+                                   (org-element-property :raw-link link)))
+             (link-separator (let ((separator (if all-links-str " " "")))
+                               (if (and all-description-str
+                                        (> (+ (length (car (last (split-string all-description-str "\n" 'OMIT-NULLS))))
+                                              (length link-description))
+                                           fill-column))
+                                   "\n"
+                                 separator)))
+             )
+        (setq all-links-str (concat link-str link-separator all-links-str))
+        (setq all-description-str (concat link-description link-separator all-description-str))))
+    (concat (org-element-interpret-data current-headline)
+            all-links-str)))
+
 
 (defun ram-org-capture-heading-to-dailies (&optional arg)
   "Capture the current headline into a `org-roam' daily note.
