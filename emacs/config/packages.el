@@ -2381,6 +2381,17 @@ displaying TEST-BUFFER-P buffer."
                   (eq 'org-mode mode)))
               8 2))
 
+
+;;****** buffers/display/alist: org weekly
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (or (string-match-p "^CAPTURE\\(-[0-9]\\)\\{,1\\}-[0-9]\\{4\\}-[0-9]\\{2\\}-w[0-9]\\{1,2\\}\\.org$" buf-name)
+                      (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-w[0-9]\\{1,2\\}\\.org$" buf-name))))
+              7))
+
 ;;****** buffers/display/alist: org-roam dailies
 
 (add-to-list 'display-buffer-alist
