@@ -3471,13 +3471,13 @@ ARG value is 4."
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
   (setq org-roam-dailies-capture-templates
-        '(("d" "default" entry "* %?"
+        '(("d" "default" plain ""
            :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n")
-           :properties (:empty-lines-before 1
-                                            :empty-lines-after 1
-                                            :unnarrowed t
-                                            :kill-buffer nil
-                                            :no-save nil)))))
+           :empty-lines-before 1
+           :empty-lines-after 1
+           :unnarrowed t
+           :kill-buffer nil
+           :no-save nil))))
 
 ;;*** org-roam/dailies: bindings
 
