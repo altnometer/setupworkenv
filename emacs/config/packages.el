@@ -244,6 +244,8 @@ abort completely with `C-g'."
           ("df" "different")
           ("dfc" "difference")
           ("dfl" "default")
+          ("dr" "derivative")
+          ("drs" "derivatives")
 
           ("el" "element")
           ("els" "elements")
