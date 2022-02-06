@@ -3306,7 +3306,7 @@ If the property is already set, replace its value."
          (all-links (reverse (org-element-map
                                  section-element
                                  'link
-                               ;; make lisp smaller by removing :parent value
+                               ;; do not need :parent large value
                                (lambda (link) (org-element-put-property link :parent nil)))))
          all-links-str
          ;; used only to split links to 'fill-column size
