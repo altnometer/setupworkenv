@@ -3374,14 +3374,20 @@ ARG value is 4."
   (interactive "P")
   (let* ((parsed-buffer (org-element-parse-buffer))
          (doc-title (ram-org-element-get-title parsed-buffer))
-         (backlink (org-element-map
-                       parsed-buffer 'node-property
-                     (lambda (prop)
-                       (when (string= (org-element-property :key prop) "ID")
-                         (concat "[[id:" (org-element-property :value prop) "][" doc-title "]]")))
-                     'first-match t))
+         (backlink (if (org-at-heading-p)
+                       ;; then: backlink to the heading
+                       (let ((heading (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment) ))
+                         (format "[[file:%s::*%s][%s]]"
+                                 (file-truename (buffer-file-name)) heading heading))
+                     ;; else: backlink to document ID
+                     (org-element-map
+                         parsed-buffer 'node-property
+                       (lambda (prop)
+                         (when (string= (org-element-property :key prop) "ID")
+                           (concat "[[id:" (org-element-property :value prop) "][" doc-title "]]")))
+                       'first-match t)))
          (templates
-          `(("t" "capture document title"
+          `(("d" "capture document title"
              entry ,(concat "* " doc-title " %(org-set-tags \":read:\")  " "\n" backlink "\n\n%?")
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
              :empty-lines-before 1
