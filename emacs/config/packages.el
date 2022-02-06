@@ -3411,7 +3411,7 @@ ARG value is 4."
                        (forward-symbol 2)
                        (let ((bounds (bounds-of-thing-at-point 'sexp)))
                          (buffer-substring-no-properties (car bounds) (cdr bounds)))))
-         (backlink (format "[[file:%s::%s][%s]]" (buffer-file-name) defun-name defun-name))
+         (backlink (format "[[file:%s::%s][%source]]" (buffer-file-name) defun-name))
          (templates
           `(("t" "capture document title"
              entry ,(concat "* " defun-name  " %(org-set-tags \":"
