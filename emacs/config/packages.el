@@ -3516,20 +3516,135 @@ ARG value is 4."
 ;;** org-roam/ram-weeklies: settings
 
 (setq ram-org-roam-weeklies-directory "./weekly/")
-(defun ram-org-roam-weeklies--capture (time &optional goto)
-  "Capture an entry in a weekly-note for TIME, creating it if necessary.
-When GOTO is non-nil, go to the note without creating an entry."
-  (let ((org-roam-directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
-    (org-roam-capture- :goto (when goto '(4))
-                       :node (org-roam-node-create)
-                       :templates ram-org-roam-weeklies-capture-templates
-                       :props (list :override-default-time time))
-    ;; (when goto (run-hooks 'ram-org-roam-dailies-find-file-hook))
-    ))
 
-(setq ram-org-roam-weeklies-capture-templates
-      '(("d" "default" entry "* %?"
-         :target (file+head "%<%Y-%U>.org" "#+TITLE: %<%Y-%U>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n"))))
+(defun ram-org-get-heading-string (headline-element filename)
+  "Return a string of the heading with links and a backlink."
+  (let* ((file filename)
+         (section-element (org-element-map
+                              headline-element
+                              'section #'identity 'first-match 'no-recursive-edit))
+         (all-links (reverse (org-element-map
+                                 section-element
+                                 'link
+                               ;; set :parent to nil, no need for its chunky value
+                               (lambda (link) (org-element-interpret-data link)))))
+         (text-p (some #'identity
+                       (org-element-map
+                           section-element 'paragraph
+                         (lambda (p) (let ((contents (org-element-contents p)))
+                                       ;; true if there is more content in the paragraph
+                                       ;; except links
+                                       (cl-labels ((exclude-links (contents)
+                                                     (if (null contents)
+                                                         '()
+                                                       (let* ((c (car contents))
+                                                              (c-type (org-element-type c)))
+                                                         (cons (not (or
+                                                                     ;; empty string is a fail
+                                                                     (and (eq c-type 'plain-text)
+                                                                          (string-empty-p (string-trim c)))
+                                                                     ;; exclude links. they are inserted by default
+                                                                     (eq c-type 'link)))
+                                                               (exclude-links (cdr contents)))))))
+                                         (some #'identity (exclude-links contents)))))))))
+    (concat
+     ;; heading
+     (substring-no-properties
+      (string-trim (org-element-interpret-data
+                    ;; get just headline, no section etc
+                    (list 'headline (plist-get
+                                     ;; demote the level
+                                     (org-element-put-property
+                                      headline-element :level
+                                      (1+ (org-element-property :level headline-element)))
+                                     'headline)))))
+     ;; links in the original heading content
+     (if all-links
+         (concat "\n"
+                 (s-join "\n" all-links)))
+     ;; backlink
+     (if text-p
+         (concat "\n\n"
+                 (format "[[file:%s::*%s][%s]]"
+                         file
+                         (org-element-property :raw-value headline-element)
+                         "source"))))))
+
+(defun ram-org-get-daily-note-headings (time)
+  "Return headings and links from an `org-roam' daily note."
+  (let* ((dailies-dir (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (weekday (let ((wd (nth 6 (decode-time time)))) ; start week from Mon rather than Sun
+                    (if (= wd 0) 6 (1- wd))))
+         (mon (time-subtract time (* weekday 86400)))
+         (day-times (cl-labels ((get-week-days (counter time)
+                                  (if (>= counter 6)
+                                      (list time)
+                                    (cons time (get-week-days (1+ counter) (time-add 86400 time))))))
+                      (get-week-days 0 mon)))
+         (daily-notes (cl-labels ((get-headings (days)
+                                    (if (null days)
+                                        '()
+                                      (cons
+                                       (let* ((file (file-name-concat dailies-dir
+                                                                      (format-time-string "%Y-%m-%d.org" (car days)))))
+                                         ;; when no daily note, create it
+                                         (when (not (file-exists-p file))
+                                           (let* ((default-template (assoc "d" org-roam-dailies-capture-templates))
+                                                  (new-templ (plist-put
+                                                              default-template
+                                                              :immediate-finish t))
+                                                  (org-roam-dailies-capture-templates (list new-templ)))
+                                             (org-roam-dailies--capture (car days))))
+                                         (with-temp-buffer
+                                           (insert-file-contents file)
+                                           (org-mode)
+                                           (let* ((parsed-buffer (org-element-parse-buffer))
+                                                  (id (org-element-map
+                                                          parsed-buffer 'node-property
+                                                        (lambda (prop)
+                                                          (when (string= (org-element-property :key prop) "ID")
+                                                            (org-element-property :value prop)))
+                                                        'first-match t)))
+                                             (concat
+                                              (format "* [[id:%s][%s]]\n\n"
+                                                      id
+                                                      (upcase (format-time-string "%a %-d" (car days))))
+                                              (s-join "\n\n"
+                                                      (org-element-map parsed-buffer 'headline
+                                                        (lambda (h)
+                                                          (ram-org-get-heading-string h file))))))))
+                                       (get-headings (cdr days))))))
+                        (get-headings day-times))))
+    (s-join "\n\n" daily-notes)))
+
+(defun ram-org-capture-dailies-to-weeklies (&optional arg)
+  "Capture notes `org-roam-dailies-directory' for all days in a week.
+Insert into daily note for ARG days from now. Or use calendar if
+ARG value is 4.
+When GOTO is non-nil, go to the note without
+creating an entry."
+  (interactive "P")
+  (let* ((time (if (eq arg 4)
+                   (let ((org-read-date-prefer-future t))
+                     (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
+                 (time-add (* (or arg 0) 86400) (current-time))))
+         (templates
+          `(("t" "capture document title"
+             entry ,(ram-org-get-daily-note-headings time)
+             :target (file+head "%<%Y-%m-w%-W>.org" "#+TITLE: %<%Y-%m-w%-W>\n#+CREATED: %U")
+             :empty-lines-before 1
+             :empty-lines-after 1
+             :unnarrowed t
+             :kill-buffer t
+             :immediate-finish nil
+             :no-save nil))))
+    (let ((org-roam-directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
+      (org-roam-capture- :goto nil
+                         :keys "t"
+                         :node (org-roam-node-create)
+                         :props (list :override-default-time time)
+                         :templates templates))
+    (org-align-tags)))
 
 
 ;;* outline, headings, headlines
