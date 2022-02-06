@@ -3504,6 +3504,8 @@ ARG value is 4."
 
 (define-key global-map (kbd "s-c g") #'ram-org-capture-magit-commit-to-dailies)
 
+(define-key global-map (kbd "s-c w") #'ram-org-capture-dailies-to-weeklies)
+
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
 (define-key global-map (kbd "s-c f") #'org-roam-dailies-goto-next-note)
