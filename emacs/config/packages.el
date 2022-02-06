@@ -3337,6 +3337,7 @@ If the property is already set, replace its value."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
+  (require 'org-roam-dailies)
   (let* ((templates
           `(("d" "continue task under heading"
              entry ,(ram-org-get-heading)
@@ -3372,6 +3373,7 @@ ARG value is 4."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
+  (require 'org-roam-dailies)
   (let* ((parsed-buffer (org-element-parse-buffer))
          (doc-title (ram-org-element-get-title parsed-buffer))
          (backlink (if (org-at-heading-p)
@@ -3413,15 +3415,16 @@ Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
   (let* ((defun-name (save-excursion
-                       (when (not (= (char-before) ?\n))
+                       (when (not (or (bobp)
+                                      (= (char-before) ?\n)))
                          (beginning-of-defun))
                        (down-list)
                        (forward-symbol 2)
                        (let ((bounds (bounds-of-thing-at-point 'sexp)))
                          (buffer-substring-no-properties (car bounds) (cdr bounds)))))
-         (backlink (format "[[file:%s::%s][%source]]" (buffer-file-name) defun-name))
+         (backlink (format "[[file:%s::%s][source]]" (buffer-file-name) defun-name))
          (templates
-          `(("t" "capture document title"
+          `(("d" "capture document title"
              entry ,(concat "* " defun-name  " %(org-set-tags \":"
                             (car (split-string (symbol-name major-mode) "-"))
                             ":\")\n" backlink "\n\n%?")
@@ -3448,6 +3451,7 @@ ARG value is 4."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
+  (require 'org-roam-dailies)
   (let* ((repo (abbreviate-file-name default-directory))
          (rev (if (eq major-mode 'magit-status-mode)
                   (magit-copy-section-value nil)
@@ -3455,8 +3459,8 @@ ARG value is 4."
          (backlink (format "[[orgit-rev:%s::%s][%s]]" repo rev (substring rev 0 7)))
          (summary (substring-no-properties (magit-format-rev-summary rev)))
          (templates
-          `(("t" "capture document title"
-             entry, (format "* %s %%(org-set-tags \":git:\")\n%s\n\n%%?"
+          `(("d" "capture document title"
+             entry ,(format "* %s %%(org-set-tags \":git:\")\n%s\n\n%%?"
                             summary backlink)
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
              :empty-lines-before 1
@@ -3637,7 +3641,7 @@ creating an entry."
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time))))
          (templates
-          `(("t" "capture document title"
+          `(("d" "capture document title"
              entry ,(ram-org-get-daily-note-headings time)
              :target (file+head "%<%Y-%m-w%-W>.org" "#+TITLE: %<%Y-%m-w%-W>\n#+CREATED: %U")
              :empty-lines-before 1
@@ -3648,7 +3652,6 @@ creating an entry."
              :no-save nil))))
     (let ((org-roam-directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
       (org-roam-capture- :goto nil
-                         :keys "t"
                          :node (org-roam-node-create)
                          :props (list :override-default-time time)
                          :templates templates))
