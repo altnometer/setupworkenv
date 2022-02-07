@@ -3504,7 +3504,7 @@ ARG value is 4."
 
 (define-key global-map (kbd "s-c g") #'ram-org-capture-magit-commit-to-dailies)
 
-(define-key global-map (kbd "s-c w") #'ram-org-capture-dailies-to-weeklies)
+(define-key global-map (kbd "s-c w") #'ram-org-create-weekly-note)
 
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
@@ -3603,6 +3603,7 @@ ARG value is 4."
                                                                       (format-time-string "%Y-%m-%d.org" (car days)))))
                                          ;; when no daily note, create it
                                          (when (not (file-exists-p file))
+                                           (require 'org-roam-dailies)
                                            (let* ((default-template (assoc "d" org-roam-dailies-capture-templates))
                                                   (new-templ (plist-put
                                                               default-template
@@ -3631,33 +3632,50 @@ ARG value is 4."
                         (get-headings day-times))))
     (s-join "\n\n" daily-notes)))
 
-(defun ram-org-capture-dailies-to-weeklies (&optional arg)
+(defun ram-org-create-weekly-note (&optional arg)
   "Capture notes `org-roam-dailies-directory' for all days in a week.
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4.
 When GOTO is non-nil, go to the note without
 creating an entry."
   (interactive "P")
+  (require 'org)
   (let* ((time (if (eq arg 4)
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time))))
-         (templates
-          `(("d" "capture document title"
-             entry ,(ram-org-get-daily-note-headings time)
-             :target (file+head "%<%Y-%m-w%-W>.org" "#+TITLE: %<%Y-%m-w%-W>\n#+CREATED: %U")
-             :empty-lines-before 1
-             :empty-lines-after 1
-             :unnarrowed t
-             :kill-buffer t
-             :immediate-finish nil
-             :no-save nil))))
-    (let ((org-roam-directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
-      (org-roam-capture- :goto nil
-                         :node (org-roam-node-create)
-                         :props (list :override-default-time time)
-                         :templates templates))
-    (org-align-tags)))
+         ;; (templates
+         ;;  `(("d" "capture document title"
+         ;;     entry ,(ram-org-get-daily-note-headings time)
+         ;;     :target (file+head "%<%Y-%m-w%-W>.org" "#+TITLE: %<%Y-%m-w%-W>\n#+CREATED: %U")
+         ;;     :empty-lines-before 1
+         ;;     :empty-lines-after 1
+         ;;     :unnarrowed t
+         ;;     :kill-buffer t
+         ;;     :immediate-finish nil
+         ;;     :no-save nil)))
+         (doc-title (format-time-string "%Y-%m-w%W" time))
+         (doc-header (concat ":PROPERTIES:\n"
+                             (format ":ID:       %s\n" (org-id-new))
+                             ":END:\n"
+                             (format "#+TITLE: %s\n" doc-title)
+                             (format "#+CREATED: [%s]\n\n"
+                                     (format-time-string (org-time-stamp-format t t) time))))
+         (doc-body (ram-org-get-daily-note-headings time)))
+    (let ((file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
+                                                         org-roam-directory)
+                                       (file-name-with-extension doc-title "org"))))
+      (find-file file-name)
+      (erase-buffer)
+      (insert (concat doc-header doc-body))
+      (re-search-backward (format "^\\*[[:blank:]]+.+%s [[:digit:]]\\{1,2\\}.+$" (format-time-string "%a" time))))
+    ;; (let ((org-roam-directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
+    ;;   (org-roam-capture- :goto nil
+    ;;                      :node (org-roam-node-create)
+    ;;                      :props (list :override-default-time time)
+    ;;                      :templates templates))
+    ;; (org-align-tags)
+    ))
 
 
 ;;* outline, headings, headlines
