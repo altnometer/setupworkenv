@@ -3688,14 +3688,11 @@ Use the current buffer file-path if FILE is nil."
     (s-join "\n\n" daily-notes)))
 
 (defun ram-org-create-weekly-note (&optional arg)
-  "Capture notes `org-roam-dailies-directory' for all days in a week.
-Insert into daily note for ARG days from now. Or use calendar if
-ARG value is 4.
-When GOTO is non-nil, go to the note without
-creating an entry."
+  "Create a weekly note from daily notes in an ARG week from now.
+Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
-  (let* ((time (if (eq arg 4)
+  (let* ((time (if (eq arg '(4))
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 7 86400) (current-time))))
