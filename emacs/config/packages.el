@@ -794,8 +794,8 @@ Disable `icomplete-vertical-mode' for this command."
 
         (,(kbd "s-c n") . org-roam-dailies-capture-today)
         (,(kbd "s-c d") . org-roam-dailies-goto-today)
-        (,(kbd "s-c f") . org-roam-dailies-goto-next-note)
-        (,(kbd "s-c b") . org-roam-dailies-goto-previous-note)
+        (,(kbd "s-c f") . ram-org-roam-next-note-dwim)
+        (,(kbd "s-c b") . ram-org-roam-prev-note-dwim)
         (,(kbd "s-c c") . org-roam-dailies-goto-date)
         (,(kbd "s-c v") . org-roam-dailies-capture-date)
         (,(kbd "s-c t") . org-roam-dailies-goto-tomorrow)
@@ -3491,6 +3491,36 @@ ARG value is 4."
            :kill-buffer nil
            :no-save nil))))
 
+;;*** org-roam/dailies: navigate notes
+
+(defun ram-org-roam-prev-note-dwim (&optional n)
+  "Goto the previous note of the same type is the current one."
+  (interactive "p")
+  (require 'org-roam-dailies)
+  (cond
+   ((ram-org-roam-weekly-note-p)
+    (ram-org-roam-weeklies-next -1))
+   ((and (buffer-file-name)
+         (org-roam-dailies--daily-note-p))
+    (org-roam-dailies-goto-previous-note))
+   (t (org-roam-dailies-goto-today)
+      (org-roam-dailies-goto-previous-note)
+      (delete-other-windows))))
+
+(defun ram-org-roam-next-note-dwim (&optional n)
+  "Goto the next note of the same type as the current one."
+  (interactive "p")
+  (require 'org-roam-dailies)
+  (cond
+   ((ram-org-roam-weekly-note-p)
+    (ram-org-roam-weeklies-next 1))
+   ((and (buffer-file-name)
+         (org-roam-dailies--daily-note-p))
+    (org-roam-dailies-goto-next-note))
+   (t (org-roam-dailies-goto-today)
+      (org-roam-dailies-goto-next-note)
+      (delete-other-windows))))
+
 ;;*** org-roam/dailies: bindings
 
 ;; these command are ###autoload and 'org-roam-dailies-map is not
@@ -3508,8 +3538,8 @@ ARG value is 4."
 
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
-(define-key global-map (kbd "s-c f") #'org-roam-dailies-goto-next-note)
-(define-key global-map (kbd "s-c b") #'org-roam-dailies-goto-previous-note)
+(define-key global-map (kbd "s-c f") #'ram-org-roam-next-note-dwim)
+(define-key global-map (kbd "s-c b") #'ram-org-roam-prev-note-dwim)
 (define-key global-map (kbd "s-c c") #'org-roam-dailies-goto-date)
 (define-key global-map (kbd "s-c C") #'org-roam-dailies-capture-date)
 (define-key global-map (kbd "s-c t") #'org-roam-dailies-goto-tomorrow)
@@ -3527,7 +3557,32 @@ ARG value is 4."
 
 ;;** org-roam: weeklies
 
-;;** org-roam/ram-weeklies: settings
+;;*** org-roam/weeklies: functions
+
+(defun ram-org-roam-weekly-note-p (&optional file)
+  "Return t if FILE is a weekly note.
+Use the current buffer file-path if FILE is nil."
+  (when-let ((buffer-name
+              (or file
+                  (buffer-file-name (buffer-base-buffer))))
+             (path (expand-file-name
+                    buffer-name))
+             (directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
+    (setq path (expand-file-name path))
+    (save-match-data
+      (and (org-roam-file-p path)
+           (f-descendant-of-p path directory)))))
+
+(defun ram-org-roam-weeklies-next (&optional n)
+  "Goto or create next Nth weekly note."
+  (let* ((file-name (file-name-base (buffer-file-name (buffer-base-buffer))))
+         (week-from-buffer-name (string-to-number (car (last (split-string file-name "-w")))))
+         (time (current-time))
+         (current-week (string-to-number (format-time-string "%W" time))))
+    (ram-org-create-weekly-note (+ (- week-from-buffer-name current-week) n))))
+
+
+;;*** org-roam/weeklies: settings
 
 (setq ram-org-roam-weeklies-directory "./weekly/")
 
@@ -3643,7 +3698,7 @@ creating an entry."
   (let* ((time (if (eq arg 4)
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
-                 (time-add (* (or arg 0) 86400) (current-time))))
+                 (time-add (* (or arg 0) 7 86400) (current-time))))
          ;; (templates
          ;;  `(("d" "capture document title"
          ;;     entry ,(ram-org-get-daily-note-headings time)
@@ -5729,8 +5784,8 @@ If there is no Clojure REPL, send warning."
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-tomorrow)
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-yesterday)
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-date)
-  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-next-note)
-  (add-to-list 'super-save-triggers #'org-roam-dailies-goto-previous-note)
+  (add-to-list 'super-save-triggers #'ram-org-roam-next-note-dwim)
+  (add-to-list 'super-save-triggers #'ram-org-roam-prev-note-dwim)
 
   (add-to-list 'super-save-triggers #'org-roam-dailies-capture-today)
   (add-to-list 'super-save-triggers #'org-roam-dailies-capture-tomorrow)
