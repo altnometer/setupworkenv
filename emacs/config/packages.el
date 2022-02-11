@@ -3589,17 +3589,24 @@ Use the current buffer file-path if FILE is nil."
 
 (setq ram-org-roam-weeklies-directory "./weekly/")
 
-(defun ram-org-get-heading-string (headline-element filename)
-  "Return a string of the heading with links and a backlink."
+(defun ram-org-parse-heading-element (headline-element filename)
+  "Return a heading element with only links and a backlink."
   (let* ((file filename)
+         ;; set lengthy properties to nil
+         (new-props (plist-put
+                     (plist-put
+                      (plist-put (nth 1 headline-element) :parent nil) :pre-blank 0)
+                     :post-blank 0))
+         (new-headline (plist-put headline-element 'headline new-props))
          (section-element (org-element-map
-                              headline-element
+                              new-headline
                               'section #'identity 'first-match 'no-recursive-edit))
-         (all-links (reverse (org-element-map
-                                 section-element
-                                 'link
-                               ;; set :parent to nil, no need for its chunky value
-                               (lambda (link) (org-element-interpret-data link)))))
+         (all-links (org-element-map
+                        section-element
+                        'link
+                      ;; set :parent to nil, no need for its chunky value
+                      (lambda (link) (org-element-put-property link :parent nil))))
+         ;; if heading has text, backlink to it
          (text-p (some #'identity
                        (org-element-map
                            section-element 'paragraph
@@ -3612,35 +3619,36 @@ Use the current buffer file-path if FILE is nil."
                                                        (let* ((c (car contents))
                                                               (c-type (org-element-type c)))
                                                          (cons (not (or
-                                                                     ;; empty string is a fail
+                                                                     ;; exclude empty string
                                                                      (and (eq c-type 'plain-text)
                                                                           (string-empty-p (string-trim c)))
-                                                                     ;; exclude links. they are inserted by default
+                                                                     ;; exclude links
                                                                      (eq c-type 'link)))
                                                                (exclude-links (cdr contents)))))))
-                                         (some #'identity (exclude-links contents)))))))))
-    (concat
-     ;; heading
-     (substring-no-properties
-      (string-trim (org-element-interpret-data
-                    ;; get just headline, no section etc
-                    (list 'headline (plist-get
-                                     ;; demote the level
-                                     (org-element-put-property
-                                      headline-element :level
-                                      (1+ (org-element-property :level headline-element)))
-                                     'headline)))))
-     ;; links in the original heading content
-     (if all-links
-         (concat "\n"
-                 (s-join "\n" all-links)))
-     ;; backlink
-     (if text-p
-         (concat "\n\n"
-                 (format "[[file:%s::*%s][%s]]"
-                         file
-                         (org-element-property :raw-value headline-element)
-                         "source"))))))
+                                         (some #'identity (exclude-links contents))))))))
+         (backlink (when text-p
+                     (cons 'link
+                           (cons `(:type "file"
+                                         :path ,file
+                                         :format bracket
+                                         :raw-link ,(format "file:%s::*%s" file
+                                                            (org-element-property :raw-value new-headline))
+                                         :search-option ,(concat "*" (org-element-property :raw-value new-headline)))
+                                 '("backlink"))))))
+    (when backlink (setq all-links (cons backlink all-links)))
+    ;; heading
+    ;; get just headline, no section etc
+    (list 'headline (plist-get new-headline 'headline)
+          (cl-labels ((build-links (links)
+                        (if (null links)
+                            '()
+                          (cons (car links)
+                                (if (cdr links)
+                                    (cons "\n" (build-links (cdr links)))
+                                  (build-links (cdr links)))))))
+            (list 'section '(:post-blank 0 :pre-plank 0)
+                  (cons 'paragraph (cons '(:post-blank 0 :pre-blank 0)
+                                         (build-links all-links))))))))
 
 (defun ram-org-get-daily-note-headings (time)
   "Return headings and links from an `org-roam' daily note."
@@ -3653,42 +3661,66 @@ Use the current buffer file-path if FILE is nil."
                                       (list time)
                                     (cons time (get-week-days (1+ counter) (time-add 86400 time))))))
                       (get-week-days 0 mon)))
-         (daily-notes (cl-labels ((get-headings (days)
-                                    (if (null days)
-                                        '()
-                                      (cons
-                                       (let* ((file (file-name-concat dailies-dir
-                                                                      (format-time-string "%Y-%m-%d.org" (car days)))))
-                                         ;; when no daily note, create it
-                                         (when (not (file-exists-p file))
-                                           (require 'org-roam-dailies)
-                                           (let* ((default-template (assoc "d" org-roam-dailies-capture-templates))
-                                                  (new-templ (plist-put
-                                                              default-template
-                                                              :immediate-finish t))
-                                                  (org-roam-dailies-capture-templates (list new-templ)))
-                                             (org-roam-dailies--capture (car days))))
-                                         (with-temp-buffer
-                                           (insert-file-contents file)
-                                           (org-mode)
-                                           (let* ((parsed-buffer (org-element-parse-buffer))
-                                                  (id (org-element-map
-                                                          parsed-buffer 'node-property
-                                                        (lambda (prop)
-                                                          (when (string= (org-element-property :key prop) "ID")
-                                                            (org-element-property :value prop)))
-                                                        'first-match t)))
-                                             (concat
-                                              (format "* [[id:%s][%s]]\n\n"
-                                                      id
-                                                      (upcase (format-time-string "%a %-d" (car days))))
-                                              (s-join "\n\n"
-                                                      (org-element-map parsed-buffer 'headline
-                                                        (lambda (h)
-                                                          (ram-org-get-heading-string h file))))))))
-                                       (get-headings (cdr days))))))
-                        (get-headings day-times))))
-    (s-join "\n\n" daily-notes)))
+         (daily-notes
+          (cl-labels
+              ((get-headings (days acc)
+                 (if (null days)
+                     acc
+                   (get-headings
+                    (cdr days)
+                    (concat
+                     acc "\n"
+                     (let* ((file-name (file-name-with-extension
+                                        (format-time-string "%Y-%m-%d" (car days))
+                                        "org"))
+                            (file-path (file-name-concat dailies-dir file-name)))
+                       (if (not (file-exists-p file-path))
+                           ;; create daily note, return backlink
+                           (let* ((id (org-id-new))
+                                  (doc-title (file-name-base file-name))
+                                  (doc-header (concat
+                                               ":PROPERTIES:\n"
+                                               (format ":ID:       %s\n" id)
+                                               ":END:\n"
+                                               (format "#+TITLE: %s\n" doc-title)
+                                               (format "#+CREATED: %s\n"
+                                                       (format-time-string
+                                                        (org-time-stamp-format t t) (current-time)))))
+                                  buffer)
+                             (let ((inhibit-message t)
+                                   (message-log-max nil))
+                               (setq buffer (find-file-noselect file-path))
+                               (set-buffer buffer)
+                               (insert doc-header)
+                               (save-buffer)
+                               (kill-buffer))
+                             (format "* [[id:%s][%s]]\n"
+                                     id
+                                     (upcase (format-time-string "%a %-d" (car days)))))
+                         ;; return backlink and headings in daily note
+                         (with-temp-buffer
+                           (insert-file-contents file-path)
+                           (org-mode)
+                           (let* ((parsed-buffer (org-element-parse-buffer))
+                                  (id (org-element-map
+                                          parsed-buffer 'node-property
+                                        (lambda (prop)
+                                          (when (string= (org-element-property :key prop) "ID")
+                                            (org-element-property :value prop)))
+                                        'first-match t)))
+                             (concat
+                              (format "* [[id:%s][%s]]\n"
+                                      id
+                                      (upcase (format-time-string "%a %-d" (car days))))
+                              (s-join "\n"
+                                      (org-element-map parsed-buffer 'headline
+                                        (lambda (h)
+                                          (let ((h (ram-org-parse-heading-element h file-path)))
+                                            (org-element-interpret-data
+                                             (org-element-put-property
+                                              h :level (1+ (org-element-property :level h))))))))))))))))))
+            (get-headings day-times ""))))
+    daily-notes))
 
 (defun ram-org-create-weekly-note (&optional arg)
   "Create a weekly note from daily notes in an ARG week from now.
