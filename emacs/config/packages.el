@@ -3416,6 +3416,7 @@ ARG value is 4."
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
+  (require 'org-roam-dailies)
   (let* ((defun-name (save-excursion
                        (when (not (or (bobp)
                                       (= (char-before) ?\n)))
