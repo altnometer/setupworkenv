@@ -3714,7 +3714,7 @@ Use calendar if ARG value is '(4)."
                              (format ":ID:       %s\n" (org-id-new))
                              ":END:\n"
                              (format "#+TITLE: %s\n" doc-title)
-                             (format "#+CREATED: [%s]\n\n"
+                             (format "#+CREATED: %s\n\n"
                                      (format-time-string (org-time-stamp-format t t) time))))
          (doc-body (ram-org-get-daily-note-headings time)))
     (let ((file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
