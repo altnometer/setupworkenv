@@ -6931,6 +6931,15 @@ Configure `orderless-matching-styles' for this command."
 
 ;; (define-key lisp-interaction-mode-map (kbd "RET" ) #'electrify-return-if-match)
 
+(defun ram-expand-abbrev-before-paredit-open-round ()
+  "Call `expand-abbrev' before invoking `paredit-open-round'."
+  (interactive)
+  (expand-abbrev)
+  (paredit-open-round))
+
+(with-eval-after-load 'paredit
+  (define-key paredit-mode-map (kbd "(") #'ram-expand-abbrev-before-paredit-open-round))
+
 ;;** packages: recentf
 
 (setq recentf-auto-cleanup 'never) ;; disable before we start recentf!
