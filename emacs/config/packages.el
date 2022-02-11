@@ -483,6 +483,8 @@ Disable `icomplete-vertical-mode' for this command."
 (define-key global-map (kbd "C-%") #'repeat)
 (define-key global-map (kbd "C-h a") 'apropos)
 
+;;** bindings: prog-mode-map
+
 ;;* company
 
 (straight-use-package
@@ -7635,7 +7637,7 @@ buffer-local `ram-face-remapping-cookie'."
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-;;*** system/general settings: *scratch*
+;;*** system/general settings: *scratch*, lisp-interaction-mode
 
 (defun ram-switch-to-scratch ()
   (interactive)
