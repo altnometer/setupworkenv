@@ -4753,7 +4753,7 @@ If ARG is `nil', do not `push-mark'."
   (interactive "p")
   (let* ((bounds (ram-sexp-bounds))
          (next-bounds (save-excursion (goto-char (cdr bounds))
-                                      (ram-next-thing-bounds)))
+                                      (ram-next-delimited-sexp-bounds)))
          (at-end-p (= (point) (cdr bounds))))
     (deactivate-mark)
     (when (and arg
@@ -4778,7 +4778,7 @@ If ARG is `nil', do not `push-mark'."
   (let* ((point (point))
          (bounds (ram-thing-bounds))
          (prev-bounds (save-excursion (goto-char (car bounds))
-                                      (ram-prev-thing-bounds)))
+                                      (ram-prev-delimited-sexp-bounds)))
          (at-end-p (ram-at-thing-end-p)))
     (deactivate-mark)
     (when (and arg
@@ -5308,6 +5308,27 @@ The search must start outside the current thing bounds."
       (ram-prev-thing-bounds))
      (t (ram-thing-bounds)))))
 
+(defun ram-prev-delimited-sexp-bounds ()
+  "Return the bounds of the previous delimited sexp.
+The search must start outside the current thing bounds."
+  (when (re-search-backward (concat "[^"
+                                    (string-join (mapcar #'char-to-string ram-open-delimiters))
+                                    "#'[:space:]" "\n]") nil t 1)
+    (forward-char)
+    (cond
+     ((thing-at-point 'symbol)
+      (progn (forward-symbol -1)
+             (ram-prev-delimited-sexp-bounds)))
+     ((ram-in-string-p)
+      (goto-char (car (ram-string-bounds)))
+      (ram-prev-delimited-sexp-bounds))
+     ((ram-inline-comment-bounds)
+      (goto-char (car (ram-inline-comment-bounds)))
+      (ram-prev-delimited-sexp-bounds))
+     ((ram-goto-comment-block-beg)
+      (ram-prev-delimited-sexp-bounds))
+     (t (ram-thing-bounds)))))
+
 (defun ram-next-thing-bounds ()
   "Return the bounds of the next thing.
 The search must start outside the current thing bounds."
@@ -5322,6 +5343,27 @@ The search must start outside the current thing bounds."
      ((ram-inline-comment-bounds)
       (end-of-line)
       (ram-next-thing-bounds))
+     (t (ram-thing-bounds)))))
+
+(defun ram-next-delimited-sexp-bounds ()
+  "Return the bounds of the delimited sexp.
+The search must start outside the current thing bounds."
+  (when (re-search-forward (concat "[^"
+                                   (string-join (mapcar #'char-to-string ram-close-delimiters))
+                                   "#'[:space:]" "\n]") nil t 1)
+    (backward-char)
+    (cond
+     ((thing-at-point 'symbol)
+      (forward-symbol 1)
+      (ram-next-delimited-sexp-bounds))
+     ((ram-in-string-p)
+      (goto-char (cdr (ram-string-bounds)))
+      (ram-next-delimited-sexp-bounds))
+     ((ram-inline-comment-bounds)
+      (end-of-line)
+      (ram-next-delimited-sexp-bounds))
+     ((ram-goto-comment-block-end)
+      (ram-next-delimited-sexp-bounds))
      (t (ram-thing-bounds)))))
 
 (defun ram-sexp-bounds (&optional select-nth-ancestor)
