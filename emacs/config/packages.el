@@ -3650,8 +3650,8 @@ Use the current buffer file-path if FILE is nil."
                   (cons 'paragraph (cons '(:post-blank 0 :pre-blank 0)
                                          (build-links all-links))))))))
 
-(defun ram-org-get-daily-note-headings (time)
-  "Return headings and links from an `org-roam' daily note."
+(defun ram-org-get-headings-from-daily-note (time)
+  "Return an org-element made from headings in `org-roam' daily note."
   (let* ((dailies-dir (expand-file-name org-roam-dailies-directory org-roam-directory))
          (weekday (let ((wd (nth 6 (decode-time time)))) ; start week from Mon rather than Sun
                     (if (= wd 0) 6 (1- wd))))
@@ -3663,63 +3663,73 @@ Use the current buffer file-path if FILE is nil."
                       (get-week-days 0 mon)))
          (daily-notes
           (cl-labels
-              ((get-headings (days acc)
+              ((get-headings (days)
                  (if (null days)
-                     acc
-                   (get-headings
-                    (cdr days)
-                    (concat
-                     acc "\n"
-                     (let* ((file-name (file-name-with-extension
-                                        (format-time-string "%Y-%m-%d" (car days))
-                                        "org"))
-                            (file-path (file-name-concat dailies-dir file-name)))
-                       (if (not (file-exists-p file-path))
-                           ;; create daily note, return backlink
-                           (let* ((id (org-id-new))
-                                  (doc-title (file-name-base file-name))
-                                  (doc-header (concat
-                                               ":PROPERTIES:\n"
-                                               (format ":ID:       %s\n" id)
-                                               ":END:\n"
-                                               (format "#+TITLE: %s\n" doc-title)
-                                               (format "#+CREATED: %s\n"
-                                                       (format-time-string
-                                                        (org-time-stamp-format t t) (current-time)))))
-                                  buffer)
-                             (let ((inhibit-message t)
-                                   (message-log-max nil))
-                               (setq buffer (find-file-noselect file-path))
-                               (set-buffer buffer)
-                               (insert doc-header)
-                               (save-buffer)
-                               (kill-buffer))
-                             (format "* [[id:%s][%s]]\n"
-                                     id
-                                     (upcase (format-time-string "%a %-d" (car days)))))
-                         ;; return backlink and headings in daily note
-                         (with-temp-buffer
-                           (insert-file-contents file-path)
-                           (org-mode)
-                           (let* ((parsed-buffer (org-element-parse-buffer))
-                                  (id (org-element-map
-                                          parsed-buffer 'node-property
-                                        (lambda (prop)
-                                          (when (string= (org-element-property :key prop) "ID")
-                                            (org-element-property :value prop)))
-                                        'first-match t)))
-                             (concat
-                              (format "* [[id:%s][%s]]\n"
-                                      id
-                                      (upcase (format-time-string "%a %-d" (car days))))
-                              (s-join "\n"
-                                      (org-element-map parsed-buffer 'headline
-                                        (lambda (h)
-                                          (let ((h (ram-org-parse-heading-element h file-path)))
-                                            (org-element-interpret-data
-                                             (org-element-put-property
-                                              h :level (1+ (org-element-property :level h))))))))))))))))))
-            (get-headings day-times ""))))
+                     '()
+                   (cons
+                    (let* ((file-name (file-name-with-extension
+                                       (format-time-string "%Y-%m-%d" (car days))
+                                       "org"))
+                           (file-path (file-name-concat dailies-dir file-name)))
+                      (if (not (file-exists-p file-path))
+                          ;; create daily note, return backlink
+                          (let* ((id (org-id-new))
+                                 (doc-title (file-name-base file-name))
+                                 (doc-header (concat
+                                              ":PROPERTIES:\n"
+                                              (format ":ID:       %s\n" id)
+                                              ":END:\n"
+                                              (format "#+TITLE: %s\n" doc-title)
+                                              (format "#+CREATED: %s\n"
+                                                      (format-time-string
+                                                       (org-time-stamp-format t t) (current-time)))))
+                                 (week-day-heading
+                                  (format "[[id:%s][%s]]"
+                                          id
+                                          (upcase (format-time-string "%a %-d" (car days)))))
+                                 buffer)
+                            (let ((inhibit-message t)
+                                  (message-log-max nil))
+                              (setq buffer (find-file-noselect file-path))
+                              (set-buffer buffer)
+                              (insert doc-header)
+                              (save-buffer)
+                              (kill-buffer))
+                            ;; (format "* [[id:%s][%s]]\n"
+                            ;;         id
+                            ;;         (upcase (format-time-string "%a %-d" (car days))))
+                            (list 'headline
+                                  `(:raw-value ,week-day-heading
+                                               :post-blank 1
+                                               :level 1
+                                               :title ,(list week-day-heading))))
+                        ;; return backlink and headings in daily note
+                        (with-temp-buffer
+                          (insert-file-contents file-path)
+                          (org-mode)
+                          (let* ((parsed-buffer (org-element-parse-buffer))
+                                 (id (org-element-map
+                                         parsed-buffer 'node-property
+                                       (lambda (prop)
+                                         (when (string= (org-element-property :key prop) "ID")
+                                           (org-element-property :value prop)))
+                                       'first-match t))
+                                 (week-day-heading
+                                  (format "[[id:%s][%s]]"
+                                          id
+                                          (upcase (format-time-string "%a %-d" (car days))))))
+                            (cons 'headline
+                                  (cons `(:raw-value ,week-day-heading
+                                                     :post-blank 1
+                                                     :level 1
+                                                     :title ,(list week-day-heading))
+                                        (org-element-map parsed-buffer 'headline
+                                          (lambda (h)
+                                            (let ((h (ram-org-parse-heading-element h file-path)))
+                                              (org-element-put-property
+                                               h :level (1+ (org-element-property :level h))))))))))))
+                    (get-headings (cdr days))))))
+            (get-headings day-times))))
     daily-notes))
 
 (defun ram-org-create-weekly-note (&optional arg)
@@ -3748,7 +3758,7 @@ Use calendar if ARG value is '(4)."
                              (format "#+TITLE: %s\n" doc-title)
                              (format "#+CREATED: %s\n\n"
                                      (format-time-string (org-time-stamp-format t t) time))))
-         (doc-body (ram-org-get-daily-note-headings time)))
+         (doc-body (org-element-interpret-data (ram-org-get-headings-from-daily-note time))))
     (let ((file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
                                                          org-roam-directory)
                                        (file-name-with-extension doc-title "org"))))
