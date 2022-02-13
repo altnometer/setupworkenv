@@ -3686,13 +3686,8 @@ Use the current buffer file-path if FILE is nil."
   (let* ((file-name (file-name-base (buffer-file-name (buffer-base-buffer))))
          (week-from-buffer-name (string-to-number (car (last (split-string file-name "-w")))))
          (time (current-time))
-         (current-week (string-to-number (format-time-string "%W" time))))
+         (current-week (/ (time-to-day-in-year (current-time)) 7)))
     (ram-org-create-weekly-note (+ (- week-from-buffer-name current-week) n))))
-
-
-;;*** org-roam/weeklies: settings
-
-(setq ram-org-roam-weeklies-directory "./weekly/")
 
 (defun ram-org-parse-heading-element (headline-element filename)
   "Return a heading element with only links and a backlink."
@@ -3879,6 +3874,10 @@ Use calendar if ARG value is '(4)."
     ;; (org-align-tags)
     ))
 
+
+;;*** org-roam/weeklies: settings
+
+(setq ram-org-roam-weeklies-directory "./weekly/")
 
 ;;* outline, headings, headlines
 
