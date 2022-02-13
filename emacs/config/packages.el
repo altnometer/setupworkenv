@@ -3841,38 +3841,28 @@ Use calendar if ARG value is '(4)."
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 7 86400) (current-time))))
-         ;; (templates
-         ;;  `(("d" "capture document title"
-         ;;     entry ,(ram-org-get-daily-note-headings time)
-         ;;     :target (file+head "%<%Y-%m-w%-W>.org" "#+TITLE: %<%Y-%m-w%-W>\n#+CREATED: %U")
-         ;;     :empty-lines-before 1
-         ;;     :empty-lines-after 1
-         ;;     :unnarrowed t
-         ;;     :kill-buffer t
-         ;;     :immediate-finish nil
-         ;;     :no-save nil)))
          (doc-title (format-time-string "%Y-%m-w%W" time))
-         (doc-header (concat ":PROPERTIES:\n"
-                             (format ":ID:       %s\n" (org-id-new))
-                             ":END:\n"
-                             (format "#+TITLE: %s\n" doc-title)
-                             (format "#+CREATED: %s\n\n"
-                                     (format-time-string (org-time-stamp-format t t) time))))
-         (doc-body (org-element-interpret-data (ram-org-get-headings-from-daily-note time))))
-    (let ((file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
-                                                         org-roam-directory)
-                                       (file-name-with-extension doc-title "org"))))
-      (find-file file-name)
-      (erase-buffer)
-      (insert (concat doc-header doc-body))
-      (re-search-backward (format "^\\*[[:blank:]]+.+%s [[:digit:]]\\{1,2\\}.+$" (format-time-string "%a" time))))
-    ;; (let ((org-roam-directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
-    ;;   (org-roam-capture- :goto nil
-    ;;                      :node (org-roam-node-create)
-    ;;                      :props (list :override-default-time time)
-    ;;                      :templates templates))
-    ;; (org-align-tags)
-    ))
+         (file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
+                                                        org-roam-directory)
+                                      (file-name-with-extension doc-title "org")))
+         (note-exists-p (or (get-buffer (file-name-nondirectory file-name))
+                            (file-readable-p file-name)))
+         (doc-text (concat (when (not note-exists-p)
+                             (concat ":PROPERTIES:\n"
+                                     (format ":ID:       %s\n" (org-id-new))
+                                     ":END:\n"
+                                     (format "#+TITLE: %s\n" doc-title)
+                                     (format "#+CREATED: %s\n\n"
+                                             (format-time-string (org-time-stamp-format t t) time))))
+                           (org-element-interpret-data (ram-org-get-headings-from-daily-note time)))))
+    (find-file file-name)
+    (if (not note-exists-p)
+        (erase-buffer)
+      (goto-char (point-min))
+      (org-next-visible-heading 1)
+      (delete-region (point) (point-max)))
+    (insert doc-text)
+    (re-search-backward (format "^\\*[[:blank:]]+.+%s [[:digit:]]\\{1,2\\}.+$" (format-time-string "%a" time)))))
 
 
 ;;*** org-roam/weeklies: settings
