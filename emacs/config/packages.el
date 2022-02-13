@@ -2386,6 +2386,15 @@ displaying TEST-BUFFER-P buffer."
               8 2))
 
 
+;;****** buffers/display/alist: org monthly
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}.org$" buf-name)))
+              7))
+
 ;;****** buffers/display/alist: org weekly
 
 (add-to-list 'display-buffer-alist
@@ -3557,6 +3566,102 @@ ARG value is 4."
 
 ;; (add-hook 'org-roam-dailies-find-file-hook #'ram-set-face-remapping-alist)
 ;; (remove-hook 'org-roam-dailies-find-file-hook #'ram-set-face-remapping-alist)
+
+;;** org-roam: monthly
+
+;;*** org-roam/monthly: functions
+
+;;*** org-roam/monthly: settings
+
+(setq ram-org-roam-monthly-directory "./monthly/")
+
+(defun ram-org-roam-monthly-note-p (&optional file)
+  "Return t if FILE is a monthly note.
+Use the current buffer file-path if FILE is nil."
+  (when-let ((buffer-name
+              (or file
+                  (buffer-file-name (buffer-base-buffer))))
+             (path (expand-file-name
+                    buffer-name))
+             (directory (expand-file-name ram-org-roam-monthly-directory org-roam-directory)))
+    (setq path (expand-file-name path))
+    (save-match-data
+      (and (org-roam-file-p path)
+           (f-descendant-of-p path directory)))))
+
+
+(defun ram-org-create-monthly-element (week-time)
+  "Return an org-element for a month built from weekly headings."
+  (cl-labels
+      ((get-week (week)
+         (if (> (nth 4 (decode-time week)) (nth 4 (decode-time week-time)))
+             '()
+           (cons
+            (cons 'headline
+                  (cons (let ((week-day-heading (format (format-time-string "%^b w %%s" week)
+                                                        ;; week number in the month
+                                                        (1+ (- (/ (time-to-day-in-year week) 7)
+                                                               (/ (time-to-day-in-year week-time) 7))) )))
+                          `(:raw-value ,week-day-heading
+                                       :pre-blank 0
+                                       :post-blank 2
+                                       :level 1
+                                       :title ,(list week-day-heading)))
+                        (cl-labels ((demote-headings (hs)
+                                      (cond
+                                       ((null hs) '())
+                                       ((eq (org-element-type (car hs)) 'headline)
+                                        (cons
+                                         (cons
+                                          (caar hs) (cons (plist-put (cadar hs)
+                                                                     :level
+                                                                     (1+ (plist-get (cadar hs) :level)))
+                                                          (demote-headings (cddar hs))))
+                                         (demote-headings (cdr hs))))
+                                       (t (cons (car hs) (demote-headings (cdr hs)))))))
+                          (demote-headings (ram-org-get-headings-from-daily-note week)))))
+            (get-week (time-add (* 7 86400) week))))))
+    (get-week week-time)))
+
+(defun ram-org-create-monthly-note (&optional arg)
+  "Create a note of all weeks in an ARG month from now.
+Use calendar if ARG value is '(4)."
+  (interactive "P")
+  (require 'org)
+  (let* ((time (if (eq arg '(4))
+                   (let ((org-read-date-prefer-future t))
+                     (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
+                 (let* ((time  (current-time))
+                        (time-decoded (decode-time time))
+                        (month (nth 4 time-decoded))
+                        (year  (nth 5 time-decoded))
+                        (month-1st-week (encode-time 1 1 0 1 month year)))
+                   month-1st-week
+                   ;; (time-add (* (or arg 0) 7 86400) (current-time))
+                   )))
+         (doc-title (format-time-string "%Y-%m" time))
+         (file-name (file-name-concat (expand-file-name ram-org-roam-monthly-directory
+                                                        org-roam-directory)
+                                      (file-name-with-extension doc-title "org")))
+         (note-exists-p (or (get-buffer (file-name-nondirectory file-name))
+                            (file-readable-p file-name)))
+         (doc-text (concat (when (not note-exists-p)
+                             (concat ":PROPERTIES:\n"
+                                     (format ":ID:       %s\n" (org-id-new))
+                                     ":END:\n"
+                                     (format "#+TITLE: %s\n" doc-title)
+                                     (format "#+CREATED: [%s]\n\n"
+                                             (format-time-string (org-time-stamp-format t t) time))))
+                           (org-element-interpret-data (ram-org-create-monthly-element time)))))
+    (find-file file-name)
+    (if (not note-exists-p)
+        (erase-buffer)
+      (goto-char (point-min))
+      (org-next-visible-heading 1)
+      (delete-region (point) (point-max)))
+    (insert doc-text)
+    (goto-char (point-min))
+    (org-next-visible-heading 1)))
 
 ;;** org-roam: weeklies
 
