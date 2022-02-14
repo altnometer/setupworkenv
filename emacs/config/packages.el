@@ -3655,22 +3655,23 @@ Use the current buffer file-path if FILE is nil."
             (get-week (time-add (* 7 86400) week))))))
     (get-week first-week-time)))
 
-(defun ram-org-create-monthly-note (&optional arg)
+(defun ram-org-create-monthly-note (&optional arg time)
   "Create a note of all weeks in an ARG month from now.
 Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
-  (let* ((time (if (eq arg '(4))
-                   (let ((org-read-date-prefer-future t))
-                     (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
-                 (let* ((time  (current-time))
-                        (time-decoded (decode-time time))
-                        (month (nth 4 time-decoded))
-                        (year  (nth 5 time-decoded))
-                        (month-1st-week (encode-time 1 1 0 1 month year)))
-                   month-1st-week
-                   ;; (time-add (* (or arg 0) 7 86400) (current-time))
-                   )))
+  (let* ((time (or time
+                   (if (eq arg '(4))
+                       (let ((org-read-date-prefer-future t))
+                         (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
+                     (let* ((time  (current-time))
+                            (time-decoded (decode-time time))
+                            (month (nth 4 time-decoded))
+                            (year  (nth 5 time-decoded))
+                            (month-1st-week (encode-time 1 1 0 1 month year)))
+                       month-1st-week
+                       ;; (time-add (* (or arg 0) 7 86400) (current-time))
+                       ))))
          (doc-title (format-time-string "%Y-%m" time))
          (file-name (file-name-concat (expand-file-name ram-org-roam-monthly-directory
                                                         org-roam-directory)
