@@ -3622,18 +3622,18 @@ Use the current buffer file-path if FILE is nil."
            (f-descendant-of-p path directory)))))
 
 
-(defun ram-org-create-monthly-element (week-time)
+(defun ram-org-create-monthly-element (first-week-time)
   "Return an org-element for a month built from weekly headings."
   (cl-labels
       ((get-week (week)
-         (if (> (nth 4 (decode-time week)) (nth 4 (decode-time week-time)))
+         (if (not (= (nth 4 (decode-time week)) (nth 4 (decode-time first-week-time)))) ; different month
              '()
            (cons
             (cons 'headline
                   (cons (let ((week-day-heading (format (format-time-string "%^b w %%s" week)
                                                         ;; week number in the month
                                                         (1+ (- (/ (time-to-day-in-year week) 7)
-                                                               (/ (time-to-day-in-year week-time) 7))) )))
+                                                               (/ (time-to-day-in-year first-week-time) 7))) )))
                           `(:raw-value ,week-day-heading
                                        :pre-blank 0
                                        :post-blank 2
@@ -3653,7 +3653,7 @@ Use the current buffer file-path if FILE is nil."
                                        (t (cons (car hs) (demote-headings (cdr hs)))))))
                           (demote-headings (ram-org-get-headings-from-daily-note week)))))
             (get-week (time-add (* 7 86400) week))))))
-    (get-week week-time)))
+    (get-week first-week-time)))
 
 (defun ram-org-create-monthly-note (&optional arg)
   "Create a note of all weeks in an ARG month from now.
