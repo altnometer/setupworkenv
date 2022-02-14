@@ -3510,11 +3510,13 @@ ARG value is 4."
   (interactive "p")
   (require 'org-roam-dailies)
   (cond
-   ((ram-org-roam-weekly-note-p)
-    (ram-org-roam-weeklies-next -1))
    ((and (buffer-file-name)
          (org-roam-dailies--daily-note-p))
     (org-roam-dailies-goto-previous-note))
+   ((ram-org-roam-weekly-note-p)
+    (ram-org-roam-weeklies-next -1))
+   ((ram-org-roam-monthly-note-p)
+    (ram-org-roam-monthly-note-next -1))
    (t (org-roam-dailies-goto-today)
       (org-roam-dailies-goto-previous-note)
       (delete-other-windows))))
@@ -3524,11 +3526,13 @@ ARG value is 4."
   (interactive "p")
   (require 'org-roam-dailies)
   (cond
-   ((ram-org-roam-weekly-note-p)
-    (ram-org-roam-weeklies-next 1))
    ((and (buffer-file-name)
          (org-roam-dailies--daily-note-p))
     (org-roam-dailies-goto-next-note))
+   ((ram-org-roam-weekly-note-p)
+    (ram-org-roam-weeklies-next 1))
+   ((ram-org-roam-monthly-note-p)
+    (ram-org-roam-monthly-note-next 1))
    (t (org-roam-dailies-goto-today)
       (org-roam-dailies-goto-next-note)
       (delete-other-windows))))
@@ -3547,6 +3551,8 @@ ARG value is 4."
 (define-key global-map (kbd "s-c g") #'ram-org-capture-magit-commit-to-dailies)
 
 (define-key global-map (kbd "s-c w") #'ram-org-create-weekly-note)
+
+(define-key global-map (kbd "s-c m") #'ram-org-create-monthly-note)
 
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
@@ -3570,6 +3576,32 @@ ARG value is 4."
 ;;** org-roam: monthly
 
 ;;*** org-roam/monthly: functions
+
+(defun ram-org-roam-monthly-note-p (&optional file)
+  "Return t if FILE is a monthly note.
+Use the current buffer file-path if FILE is nil."
+  (when-let ((buffer-name
+              (or file
+                  (buffer-file-name (buffer-base-buffer))))
+             (path (expand-file-name
+                    buffer-name))
+             (directory (expand-file-name ram-org-roam-monthly-directory org-roam-directory)))
+    (setq path (expand-file-name path))
+    (save-match-data
+      (and (org-roam-file-p path)
+           (f-descendant-of-p path directory)))))
+
+(defun ram-org-roam-monthly-note-next (&optional n)
+  "Goto or create next Nth monthly note."
+  (pcase-let* ((file-name (file-name-base (buffer-file-name (buffer-base-buffer))))
+               (month-from-buffer-name (string-to-number (cadr (split-string file-name "-"))))
+               (year-from-buffer-name (string-to-number (car (split-string file-name "-"))))
+               (`(,target-month ,target-year) (let ((val (+ month-from-buffer-name n)))
+                                                (cond
+                                                 ((< val 1) (list (+ 12 val) (1- year-from-buffer-name)))
+                                                 ((> val 12) (list (- val 12) (1+ year-from-buffer-name)))
+                                                 (t (list val year-from-buffer-name))))))
+    (ram-org-create-monthly-note nil (encode-time 1 1 0 1 target-month target-year))))
 
 ;;*** org-roam/monthly: settings
 
