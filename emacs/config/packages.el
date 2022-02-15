@@ -3657,7 +3657,7 @@ Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
   (let* ((time (or time
-                   (if (eq arg '(4))
+                   (if (equal arg '(4))
                        (let ((org-read-date-prefer-future t))
                          (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
                      (let* ((time  (current-time))
@@ -3719,9 +3719,15 @@ Use the current buffer file-path if FILE is nil."
   "Goto or create next Nth weekly note."
   (let* ((file-name (file-name-base (buffer-file-name (buffer-base-buffer))))
          (week-from-buffer-name (string-to-number (car (last (split-string file-name "-w")))))
-         (time (current-time))
-         (current-week (/ (time-to-day-in-year (current-time)) 7)))
-    (ram-org-create-weekly-note (+ (- week-from-buffer-name current-week) n))))
+         (year-from-buffer-name (string-to-number (car (split-string file-name "-"))))
+         (1st-of-jan (encode-time 1 1 0 1 1 year-from-buffer-name))
+         (dow-1st-of-jan (let ((wd (nth 6 (decode-time 1st-of-jan)))) ; start week from Mon rather than Sun
+                           (if (= wd 0) 6 (1- wd))))
+         (time-from-buffer-name (time-add 1st-of-jan
+                                          (- (* 7 week-from-buffer-name 86400) ;subtract weekdays before 1st of Jan
+                                             (* dow-1st-of-jan 86400))))
+         (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
+    (ram-org-create-weekly-note nil target-time)))
 
 (defun ram-org-parse-heading-element (headline-element filename)
   "Return a heading element with only links and a backlink."
@@ -3866,15 +3872,16 @@ Use the current buffer file-path if FILE is nil."
             (get-headings day-times))))
     daily-notes))
 
-(defun ram-org-create-weekly-note (&optional arg)
+(defun ram-org-create-weekly-note (&optional arg time)
   "Create a weekly note from daily notes in an ARG week from now.
 Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
-  (let* ((time (if (eq arg '(4))
-                   (let ((org-read-date-prefer-future t))
-                     (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
-                 (time-add (* (or arg 0) 7 86400) (current-time))))
+  (let* ((time (or time
+                   (if (equal arg '(4))
+                       (let ((org-read-date-prefer-future t))
+                         (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
+                     (time-add (* (or arg 0) 7 86400) (current-time)))))
          (doc-title (format-time-string "%Y-%m-w%W" time))
          (file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
                                                         org-roam-directory)
