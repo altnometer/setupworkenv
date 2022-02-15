@@ -3603,10 +3603,6 @@ Use the current buffer file-path if FILE is nil."
                                                  (t (list val year-from-buffer-name))))))
     (ram-org-create-monthly-note nil (encode-time 1 1 0 1 target-month target-year))))
 
-;;*** org-roam/monthly: settings
-
-(setq ram-org-roam-monthly-directory "./monthly/")
-
 (defun ram-org-roam-monthly-note-p (&optional file)
   "Return t if FILE is a monthly note.
 Use the current buffer file-path if FILE is nil."
@@ -3695,6 +3691,11 @@ Use calendar if ARG value is '(4)."
     (insert doc-text)
     (goto-char (point-min))
     (org-next-visible-heading 1)))
+
+
+;;*** org-roam/monthly: settings
+
+(setq ram-org-roam-monthly-directory "./monthly/")
 
 ;;** org-roam: weeklies
 
