@@ -4910,53 +4910,77 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 ;;** brackets, parentheses, parens, sexps: navigation
 
+(defun ram-push-mark ()
+  "Push mark only if there is no mark for the point."
+  (if (mark)
+      (when (not (= (mark) (point)))
+             (push-mark))
+    (push-mark)))
+
 (defun ram-forward-list (&optional arg)
   "Move to the next thing.
 When at the list limit, move a level up and continue.
 If ARG is `nil', do not `push-mark'."
   (interactive "p")
-  (let* ((bounds (ram-sexp-bounds))
-         (next-bounds (save-excursion (goto-char (cdr bounds))
-                                      (ram-next-delimited-sexp-bounds)))
-         (at-end-p (= (point) (cdr bounds))))
-    (deactivate-mark)
-    (when (and arg
-               (mark)
-               (not (= (mark) (point))))
-      (push-mark))
-    (when next-bounds
-      (if at-end-p
-          (progn
-            (goto-char (cdr next-bounds))
-            next-bounds)
-        (goto-char (car next-bounds))
-        (if (> (car bounds) (car next-bounds))
-            (ram-forward-list)
-          next-bounds)))))
+  (deactivate-mark)
+  (when arg (ram-push-mark))
+  (cond
+   ;; move out of empty space
+   ((save-excursion (and (or (bobp)
+                             (looking-back "[[:space:]\n]+"
+                                           (save-excursion (previous-logical-line)
+                                                           (point-at-eol))))
+                         (looking-at-p "[[:space:]\n]+")))
+    (re-search-forward "[^[:space:]\n]\\{1\\}")
+    (if (ram-at-delimited-beg-p)
+        (ram-sexp-bounds)
+      (ram-forward-list)))
+   (t (let* ((bounds (ram-sexp-bounds))
+             (next-bounds (save-excursion (goto-char (cdr bounds))
+                                          (ram-next-delimited-sexp-bounds)))
+             (at-end-p (= (point) (cdr bounds))))
+        (when next-bounds
+          (if at-end-p
+              (progn
+                (goto-char (cdr next-bounds))
+                next-bounds)
+            (goto-char (car next-bounds))
+            (if (> (car bounds) (car next-bounds))
+                (ram-forward-list)
+              next-bounds)))))))
 
 (defun ram-backward-list (&optional arg)
   "Move to the previous thing.
 When at the list limit, move a level up and continue.
 If ARG is `nil', do not `push-mark'."
   (interactive "p")
-  (let* ((point (point))
-         (bounds (ram-thing-bounds))
-         (prev-bounds (save-excursion (goto-char (car bounds))
-                                      (ram-prev-delimited-sexp-bounds)))
-         (at-end-p (ram-at-thing-end-p)))
-    (deactivate-mark)
-    (when (and arg
-               (when (mark) (not (= (mark) (point)))))
-      (push-mark))
-    (if at-end-p
-        (progn
-          (goto-char (cdr prev-bounds))
-          (if (< (cdr bounds) (cdr prev-bounds))
-              (ram-backward-list)
-            prev-bounds))
-      (and prev-bounds
-           (goto-char (car prev-bounds)))
-      prev-bounds)))
+  (deactivate-mark)
+  (when arg (ram-push-mark))
+  (cond
+   ;; move out of empty space
+   ((and (looking-back "[[:space:]\n]+"
+                       (save-excursion (previous-logical-line)
+                                       (point-at-eol)))
+         (looking-at-p "[[:space:]\n]+"))
+    (when (re-search-backward "[^[:space:]\n]\\{1\\}")
+      (if-let ((bounds (save-excursion (forward-char) (ram-thing-bounds))))
+          (progn (goto-char  (car bounds))
+                 (when (not (ram-at-delimited-beg-p))
+                   (ram-backward-list))))))
+   (t (let* ((point (point))
+             (bounds (ram-sexp-bounds))
+             (prev-bounds (save-excursion (goto-char (car bounds))
+                                          (ram-prev-delimited-sexp-bounds)))
+             (at-end-p (ram-at-thing-end-p)))
+        (if at-end-p
+            (progn
+              (goto-char (cdr prev-bounds))
+              (if (< (cdr bounds) (cdr prev-bounds))
+                  (ram-backward-list)
+                prev-bounds))
+          (and prev-bounds
+               (goto-char (car prev-bounds)))
+          prev-bounds)))))
 
 ;; This behaves like ram-jump-forward-to-close-delimiter
 ;; I'll keep to see if they differ for some edge cases.
@@ -5523,6 +5547,8 @@ The search must start outside the current thing bounds."
                                    "#'[:space:]" "\n]") nil t 1)
     (backward-char)
     (cond
+     ((memq (char-after) ram-open-delimiters)  ; edge case when comments follow a delimiter
+      (ram-thing-bounds))
      ((thing-at-point 'symbol)
       (forward-symbol 1)
       (ram-next-delimited-sexp-bounds))
