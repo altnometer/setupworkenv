@@ -4688,14 +4688,45 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (goto-char pt)
     (org-open-at-point)))
 
+(defun ram-get-open-parens ()
+  "Get all open parens in defun, drop adjacent."
+  (let* ((ppss (syntax-ppss))
+         (beg (if (= 0 (car ppss))
+                  (point)
+                (car (nth 9 ppss))))
+         (end (save-excursion
+                (goto-char beg)
+                (forward-list)))
+         (window (get-buffer-window)))
+    (cl-labels ((get-open-parens ()
+                  (let ((delimiter (ram-forward-to-delim)))
+                    (if (and delimiter
+                             (not (> delimiter end)))
+                        (cons delimiter (get-open-parens))
+                      '())))
+                (remove-adjacent (delims)
+                  (let ((1st (car delims))
+                        (2nd (cadr delims))
+                        (rest (cddr delims)))
+                    (cond
+                     ((not 1st) '())
+                     ((not 2nd) (list 1st))
+                     (t (if (= 1st (1- 2nd))
+                            (cons 1st (remove-adjacent rest))
+                          (cons 1st (cons 2nd (remove-adjacent rest)))))))))
+      (mapcar (lambda (p) (cons (cons (1- p) p) window))
+              (remove-adjacent (save-excursion (goto-char beg) (get-open-parens)))))))
+
 (defun ram-avy-goto-ace-paren ()
   "Call `lispy-ace-paren'."
   (interactive)
   (require 'lispy)
   (let* ((avy-command 'ram-avy-goto-ace-paren)
          (avy-style 'at-full)
-         (avy-orders-alist (list (cons avy-command 'ram-avy-order-from-beg-of-defun))))
-    (call-interactively 'lispy-ace-paren)))
+         (avy-orders-alist (list (cons avy-command 'ram-avy-order-from-beg-of-defun)))
+         (cands (ram-get-open-parens)))
+    (setq avy-action nil)
+    (avy-process cands)))
 
 (defun ram-avy-goto-paragraph-start ()
   (interactive)
