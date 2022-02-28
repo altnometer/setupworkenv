@@ -3441,13 +3441,13 @@ ARG value is 4."
                        ;; then: backlink to the heading
                        (let ((heading (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment) ))
                          (format "[[file:%s::*%s][%s]]"
-                                 (file-truename (buffer-file-name)) heading heading))
+                                 (file-truename (buffer-file-name)) (org-link-escape heading) "source"))
                      ;; else: backlink to document ID
                      (org-element-map
                          parsed-buffer 'node-property
                        (lambda (prop)
                          (when (string= (org-element-property :key prop) "ID")
-                           (concat "[[id:" (org-element-property :value prop) "][" doc-title "]]")))
+                           (concat "[[id:" (org-element-property :value prop) "][source]]")))
                        'first-match t)))
          (templates
           `(("d" "capture document title"
