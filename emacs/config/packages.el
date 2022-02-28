@@ -5906,9 +5906,9 @@ If there is no Clojure REPL, send warning."
  '(elpy :type git :flavor melpa
         :files ("*.el" "NEWS.rst" "snippets" "elpy" "elpy-pkg.el")
         :host github :repo "jorgenschaefer/elpy"))
-(elpy-enable)
 
 ;;** python: outlines
+
 (defun python-mode-outline-hook ()
   (setq outline-level 'python-outline-level)
 
@@ -5950,6 +5950,15 @@ If there is no Clojure REPL, send warning."
 
 ;; (with-eval-after-load "outline"
 ;;   (define-key outline-minor-mode-map (kbd "<tab>") #'bicycle-cycle))
+
+(setq elpy-rpc-virtualenv-path "~/.virtualenvs/elpy-env/")
+(setenv "PYTHONIOENCODING" "utf-8")
+(with-eval-after-load 'elpy
+  (add-to-list 'process-coding-system-alist '("python" . (utf-8 . utf-8)))
+  (add-to-list 'process-coding-system-alist '("elpy" . (utf-8 . utf-8)))
+  (add-to-list 'process-coding-system-alist '("flake8" . (utf-8 . utf-8))))
+
+(add-hook 'python-mode-hook #'elpy-enable)
 
 (add-hook 'python-mode-hook #'outline-minor-mode)
 
