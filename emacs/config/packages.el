@@ -5023,17 +5023,9 @@ If cannot move forward, go `up-list' and try again from there."
 (defun ram-jump-forward-to-open-delimiter ()
   "Jump forward to the open delimiter that is not in a string."
   (interactive)
-  (cl-labels ((forward-to-delim ()
-                "Jump forward to the open delimiter that is not in a string."
-                (re-search-forward ram-open-delimiters-re nil t 1)
-                ;; skip matches in strings and comments
-                (let ((s (syntax-ppss)))
-                  (if (or (nth 3 s)
-                          (nth 4 s))
-                      (forward-to-delim)))))
-    (forward-char 1)
-    (forward-to-delim)
-    (forward-char -1)))
+  (forward-char 1)
+  (ram-forward-to-delim)
+  (forward-char -1))
 
 (defun ram-jump-forward-to-close-delimiter ()
   "Jump forward to the close delimiter that is not in a string."
