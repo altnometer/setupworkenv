@@ -217,6 +217,8 @@ abort completely with `C-g'."
           ("charz" "characterize")
           ("charzd" "characterized")
           ("charc" "characteristic")
+          ("cj" "clojure")
+          ("Cj" "Clojure")
           ("cm" "computer")
           ("cat" "category")
           ("cats" "categories")
@@ -237,10 +239,14 @@ abort completely with `C-g'."
           ("conf" "configure")
           ("confd" "configured")
           ("confn" "configuration")
-
+          ;;*** D
           ("dec" "declare")
           ("decn" "declaration")
           ("def" "definition")
+
+          ("dep" "dependency")
+          ("deps" "dependencies")
+
           ("df" "different")
           ("dfc" "difference")
           ("dfl" "default")
@@ -340,6 +346,8 @@ abort completely with `C-g'."
           ("repd" "represented")
           ("repn" "representation")
           ("repg" "representing")
+
+          ("repl" "REPL")
           ("resp" "responsibility")
           ("resps" "responsibilities")
 
@@ -372,12 +380,16 @@ abort completely with `C-g'."
 
           ("und" "understand")
 
+          ;;*** V
           ("val" "value")
           ("vals" "values")
           ("vl" "value")
           ("vls" "values")
           ("var" "variable")
           ("vars" "variables")
+
+          ("visn" "visualization")
+          ("visg" "visualizing")
 
           ("wo" "without")
 
@@ -4975,6 +4987,30 @@ If cannot move forward, go `up-list' and try again from there."
                           (nth 4 s))
                       (back-to-delim)))))
     (back-to-delim)))
+
+(defun ram-forward-to-delim ()
+  "Jump forward to the open delimiter that is not in a string or comment."
+  (let ((match-point (re-search-forward ram-open-delimiters-re nil t 1)))
+    ;; skip matches in strings and comments
+    (let ((s (syntax-ppss)))
+      (if (or (nth 3 s)
+              (nth 4 s))
+          (ram-forward-to-delim)
+        match-point))))
+
+(defun cand ()
+  (let ((start (beginning-of-defun))
+        (limit (save-excursion (end-of-defun) (point))))
+    (cl-labels ((get-open-parens ()
+                  (let ((delimiter (ram-forward-to-delim)))
+                    (message "delimiter: " delimiter)
+                    (if (and delimiter
+                             (not (> delimiter limit)))
+                        (cons delimiter (get-open-parens))
+                      '()))))
+      (beginning-of-defun)
+      (get-open-parens)
+      )))
 
 (defun ram-jump-forward-to-open-delimiter ()
   "Jump forward to the open delimiter that is not in a string."
