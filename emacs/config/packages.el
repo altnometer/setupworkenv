@@ -5387,6 +5387,10 @@ Before invoking `newline-and-indent':
 (define-key emacs-lisp-mode-map (kbd "<return>") #'ram-newline-and-indent)
 (define-key emacs-lisp-mode-map (kbd "S-<return>") #'newline-and-indent)
 
+(with-eval-after-load 'clojure
+  (define-key clojure-mode-map (kbd "<return>") #'ram-newline-and-indent)
+  (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent))
+
 (define-key lisp-interaction-mode-map (kbd "<return>") #'ram-newline-and-indent)
 (define-key lisp-interaction-mode-map (kbd "S-<return>") #'newline-and-indent)
 
