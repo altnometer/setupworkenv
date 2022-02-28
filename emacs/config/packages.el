@@ -5006,20 +5006,6 @@ If cannot move forward, go `up-list' and try again from there."
           (ram-forward-to-delim)
         match-point))))
 
-(defun cand ()
-  (let ((start (beginning-of-defun))
-        (limit (save-excursion (end-of-defun) (point))))
-    (cl-labels ((get-open-parens ()
-                  (let ((delimiter (ram-forward-to-delim)))
-                    (message "delimiter: " delimiter)
-                    (if (and delimiter
-                             (not (> delimiter limit)))
-                        (cons delimiter (get-open-parens))
-                      '()))))
-      (beginning-of-defun)
-      (get-open-parens)
-      )))
-
 (defun ram-jump-forward-to-open-delimiter ()
   "Jump forward to the open delimiter that is not in a string."
   (interactive)
