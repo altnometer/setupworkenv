@@ -3941,12 +3941,18 @@ Use calendar if ARG value is '(4)."
         (bicycle-cycle)
       (indent-for-tab-command)))
 
-(defun prot/outline-down-heading ()
-    "Move to the next `outline-mode' subtree."
-    (interactive)
-    ;; Hacky, but it kinda works.
-    (outline-up-heading 1 t)
-    (outline-forward-same-level 1))
+(defun ram-move-to-heading-visible-char ()
+  "Move to first visible char assuming starting at `point-at-bol'."
+  (re-search-forward "[^[:space:]]")
+  (backward-char))
+
+;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
+(defun ram-outline-down-heading ()
+  "Move to the next `outline-mode' subtree."
+  (interactive)
+  (outline-up-heading 1 t)
+  (outline-forward-same-level 1)
+  (ram-move-to-heading-visible-char))
 
 (defun ram-outline-up-heading (arg &optional invisible-ok)
   "Call `outline-up-heading' and ignore the error.
@@ -3959,43 +3965,68 @@ Ignore \"Already at top level of the outline\" error, call
   (error (if (string= (error-message-string err)
                       "Already at top level of the outline")
              (outline-backward-same-level arg)
-           (signal (car err) (cdr err))))))
+           (signal (car err) (cdr err)))))
+(ram-move-to-heading-visible-char))
 
 (defun ram-outline-forward-same-level (arg &optional invisible-ok)
   "Call `outline-forward-same-level' and ignore the error.
 
 Ignore \"No following same-level heading\" error, call
-`prot/outline-down-heading' instead."
+`ram-outline-down-heading' instead."
   (interactive "p")
   (condition-case err
       (outline-forward-same-level arg)
     (error (if (string= (error-message-string err)
                         "No following same-level heading")
-               (prot/outline-down-heading)
-             (signal (car err) (cdr err))))))
+               (ram-outline-down-heading)
+             (signal (car err) (cdr err)))))
+  (ram-move-to-heading-visible-char))
+
+(defun ram-outline-next-visible-heading (arg)
+  "Move point after jumping to a heading."
+  (interactive "p")
+  (call-interactively #'outline-next-visible-heading 'RECORD-FLAG)
+  (ram-move-to-heading-visible-char))
+
+(defun ram-outline-previous-visible-heading (arg)
+  "Move point after jumping to a heading."
+  (interactive "p")
+  (call-interactively #'outline-previous-visible-heading 'RECORD-FLAG)
+  (ram-move-to-heading-visible-char))
+
+(defun ram-outline-backward-same-level (arg)
+  "Move point after jumping to a heading."
+  (interactive "p")
+  (call-interactively #'outline-backward-same-level 'RECORD-FLAG)
+  (ram-move-to-heading-visible-char))
+
+
 
 ;;** outline: bindings
 
 (with-eval-after-load "outline"
   (define-key outline-minor-mode-map (kbd "<tab>") #'bicycle-cycle))
 
-(define-key ram-leader-map-tap-global (kbd "n") #'outline-next-visible-heading)
-(define-key ram-leader-map-tap-global (kbd "p") #'outline-previous-visible-heading)
+(define-key ram-leader-map-tap-global (kbd "n") #'ram-outline-next-visible-heading)
+(define-key ram-leader-map-tap-global (kbd "p") #'ram-outline-previous-visible-heading)
 (define-key ram-leader-map-tap-global (kbd "f") #'ram-outline-forward-same-level)
-(define-key ram-leader-map-tap-global (kbd "b") #'outline-backward-same-level)
+(define-key ram-leader-map-tap-global (kbd "b") #'ram-outline-backward-same-level)
 (define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
 (define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
 (define-key ram-leader-map-tap-global (kbd "u") #'ram-outline-up-heading)
-(define-key ram-leader-map-tap-global (kbd "d") #'prot/outline-down-heading)
+(define-key ram-leader-map-tap-global (kbd "d") #'ram-outline-down-heading)
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-outline-heading)
 
-;;** outline: hooks, advice, timers
+;;** outline: outline-regexp
+
+(defvar ram-outline-regxp-for-lisp "[[:space:]]*;;\\(?:;+[^#]\\|\\*+\\)"
+  "`outline-regexp' for languages with comments defined by \";\".")
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
-                                  (setq-local outline-regexp "^;;\\(?:;+[^#]\\|\\*+\\)")
+                                  (setq-local outline-regexp ram-outline-regxp-for-lisp)
                                   (outline-minor-mode 1)))
 (add-hook 'clojure-mode-hook (lambda ()
-                                  (setq-local outline-regexp "^;;\\(?:;+[^#]\\|\\*+\\)")
+                                  (setq-local outline-regexp ram-outline-regxp-for-lisp)
                                   (outline-minor-mode 1)))
 
 ;;* hideshow
