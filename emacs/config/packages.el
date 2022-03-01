@@ -5052,13 +5052,13 @@ If cannot move forward, go `up-list' and try again from there."
 
 (defun ram-forward-to-delim ()
   "Jump forward to the open delimiter that is not in a string or comment."
-  (let ((match-point (re-search-forward ram-open-delimiters-re nil t 1)))
-    ;; skip matches in strings and comments
-    (let ((s (syntax-ppss)))
-      (if (or (nth 3 s)
-              (nth 4 s))
-          (ram-forward-to-delim)
-        match-point))))
+  (if-let ((match-point (re-search-forward ram-open-delimiters-re (point-max) t 1)))
+      ;; skip matches in strings and comments
+      (let ((s (syntax-ppss)))
+        (if (or (nth 3 s)
+                (nth 4 s))
+            (ram-forward-to-delim)
+          match-point))))
 
 (defun ram-jump-forward-to-open-delimiter ()
   "Jump forward to the open delimiter that is not in a string."
