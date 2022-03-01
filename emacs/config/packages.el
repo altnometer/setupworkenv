@@ -5541,9 +5541,6 @@ The search must start outside the current thing bounds."
                                     "#'[:space:]" "\n]") nil t 1)
     (forward-char)
     (cond
-     ((thing-at-point 'symbol)
-      (progn (forward-symbol -1)
-             (ram-prev-delimited-sexp-bounds)))
      ((ram-in-string-p)
       (goto-char (car (ram-string-bounds)))
       (ram-prev-delimited-sexp-bounds))
@@ -5552,6 +5549,9 @@ The search must start outside the current thing bounds."
       (ram-prev-delimited-sexp-bounds))
      ((ram-goto-comment-block-beg)
       (ram-prev-delimited-sexp-bounds))
+     ((thing-at-point 'symbol)
+      (progn (forward-symbol -1)
+             (ram-prev-delimited-sexp-bounds)))
      (t (ram-thing-bounds)))))
 
 (defun ram-next-thing-bounds ()
