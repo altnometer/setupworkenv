@@ -4196,7 +4196,9 @@ Ignore \"No following same-level heading\" error, call
 ;; (setq package-check-signature nil)
 
 (straight-use-package
- '(cider :type git :flavor melpa :files ("*.el" (:exclude ".dir-locals.el") "cider-pkg.el") :host github :repo "clojure-emacs/cider"))
+ '(cider :type git :flavor melpa
+         :files ("*.el" (:exclude ".dir-locals.el") "cider-pkg.el")
+         :host github :repo "clojure-emacs/cider"))
 (with-eval-after-load 'cider
   (add-hook 'clojure-mode-hook #'cider-mode)
   (cider-auto-test-mode 1) ;; run test on buffer load
@@ -4218,6 +4220,13 @@ Ignore \"No following same-level heading\" error, call
 
 (with-eval-after-load "cider"
   (define-key cider-repl-mode-map (kbd "<f2>") #'cider-repl-return))
+
+;;*** cider/repl: reveal
+
+;; start repl from Emacs with #'cider-jack-in
+(setq cider-inject-dependencies-at-jack-in nil)
+;; (setq cider-clojure-cli-parameters "-A:test:dev:local-dev")
+(setq cider-clojure-cli-parameters "-M:inspect/reveal-cider")
 
 ;;* racket
 
