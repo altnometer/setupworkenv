@@ -1522,6 +1522,17 @@ succession."
                      "set-default")
                     (+ space)           ; 1 or more whitespaces
                     (regexp name-regex)))))
+   ((eq major-mode 'clojure-mode)
+    (rx line-start
+        (* space)
+        (seq "("
+             (group (or
+                     "def"
+                     "defmacro"
+                     "defn"
+                     "defn-")
+                    (+ space)           ; 1 or more whitespaces
+                    (regexp name-regex)))))
    ((eq major-mode 'racket-mode)
     (format "^(\\(def\\(?:ine\\) +%s\\)" name-regex))
    (t (error (format "%s is not supported, add regex to `ram-jump-to-def'" major-mode)))))
