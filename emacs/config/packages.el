@@ -4821,7 +4821,9 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   "Get all open parens in defun, drop adjacent."
   (let* ((ppss (syntax-ppss))
          (beg (if (= 0 (car ppss))
-                  (point)
+                  (if (memq (char-before) ram-close-delimiters)
+                      (save-excursion (backward-list))
+                    (point))
                 (car (nth 9 ppss))))
          (end (min (window-end)
                    (save-excursion
@@ -4845,10 +4847,9 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
                      (t (if (= 1st (1- 2nd))
                             (cons 1st (remove-adjacent rest))
                           (cons 1st (cons 2nd (remove-adjacent rest)))))))))
-      (when (save-excursion (ram-forward-to-delim))
-        (mapcar (lambda (p) (cons (cons (1- p) p) window))
-                (remove-adjacent (seq-filter (lambda (p) (> p window-start))
-                                             (save-excursion (goto-char beg) (get-open-parens)))))))))
+      (mapcar (lambda (p) (cons (cons (1- p) p) window))
+              (remove-adjacent (seq-filter (lambda (p) (> p window-start))
+                                           (save-excursion (goto-char beg) (get-open-parens))))))))
 
 (defun ram-avy-goto-ace-paren ()
   "Call `lispy-ace-paren'."
