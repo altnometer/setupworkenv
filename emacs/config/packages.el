@@ -5061,7 +5061,7 @@ If ARG is `nil', do not `push-mark'."
   (when arg (ram-push-mark))
   (cond
    ;; move out of empty space
-   ((save-excursion (and (or (bobp)
+   ((save-excursion (and (or (= 1 (line-number-at-pos))
                              (looking-back "[[:space:]\n]+"
                                            (save-excursion (previous-logical-line)
                                                            (point-at-eol))))
@@ -5093,9 +5093,11 @@ If ARG is `nil', do not `push-mark'."
   (when arg (ram-push-mark))
   (cond
    ;; move out of empty space
-   ((and (looking-back "[[:space:]\n]+"
-                       (save-excursion (previous-logical-line)
-                                       (point-at-eol)))
+   ((and (and (or (= 1 (line-number-at-pos))
+                             (looking-back "[[:space:]\n]+"
+                                           (save-excursion (previous-logical-line)
+                                                           (point-at-eol))))
+                         (looking-at-p "[[:space:]\n]+"))
          (looking-at-p "[[:space:]\n]+"))
     (when (re-search-backward "[^[:space:]\n]\\{1\\}")
       (if-let ((bounds (save-excursion (forward-char) (ram-thing-bounds))))
