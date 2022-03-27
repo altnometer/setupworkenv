@@ -193,6 +193,11 @@ abort completely with `C-g'."
 
   (setq org-abbrevs
         '(
+
+          ;;*** latin
+          ("eg" "e.g.,")
+          ("ie" "i.e.,")
+
           ("~c" "~cons~")
           ("aor" "area of responsibility")
           ("ab" "abstraction")
@@ -208,6 +213,7 @@ abort completely with `C-g'."
           ("bc" "because")
           ("bf" "before")
           ("bh" "behavior")
+          ("bhs" "behaviors")
           ("bn" "between")
 
           ("chr" "character")
@@ -217,6 +223,7 @@ abort completely with `C-g'."
           ("charz" "characterize")
           ("charzd" "characterized")
           ("charc" "characteristic")
+          ("Cider" "CIDER")
           ("cj" "clojure")
           ("Cj" "Clojure")
           ("cm" "computer")
@@ -225,7 +232,7 @@ abort completely with `C-g'."
 
           ("comn" "computation")
           ("comp" "compute")
-          ("comd" "command")
+          ("cmd" "command")
           ("compl" "completion")
           ("complg" "completing")
 
@@ -248,8 +255,9 @@ abort completely with `C-g'."
           ("deps" "dependencies")
 
           ("df" "different")
+          ("dfy" "differently")
           ("dfc" "difference")
-          ("dfl" "default")
+          ("dft" "default")
           ("dr" "derivative")
           ("drs" "derivatives")
 
@@ -274,15 +282,17 @@ abort completely with `C-g'."
           ("fn" "function")
           ("fns" "functions")
           ("fnl" "functional")
+          ("fny" "functionality")
 
           ("hier" "hierarchy")
           ("hiers" "hierarchies")
           ("hl" "headline")
           ("hls" "headlines")
 
-          ("imp" "implementation")
+          ("imp" "implement")
+          ("imps" "implements")
           ("impd" "implemented")
-          ("impt" "implement")
+          ("impn" "implementation")
 
           ("inf" "information")
           ("inz" "initialize")
@@ -298,12 +308,15 @@ abort completely with `C-g'."
 
           ("lc" "logical consequence")
           ("lg" "language")
+          ("lgs" "languages")
 
 
           ("mt" "manipulate")
           ("mtg" "manipulating")
           ("mec" "mechanism")
 
+          ("nams" "namespace")
+          ("namss" "namespaces")
           ("nb" "number")
           ("nbs" "numbers")
           ("nm" "number")
@@ -318,7 +331,7 @@ abort completely with `C-g'."
 
           ("par" "parentheses")
           ("pg" "program")
-          ("pgn" "programming")
+          ("pgg" "programming")
 
           ("par" "paragraph")
           ("pars" "paragraphs")
@@ -328,8 +341,14 @@ abort completely with `C-g'."
           ("props" "properties")
           ("prd" "predicate")
           ("pri" "principle")
-          ("prm" "parameter")
-          ("prms" "parameters")
+
+          ("parm" "parameter")
+          ("parmd" "parameterized")
+          ("parmg" "parameterizing")
+          ("parmn" "parameterization")
+          ("parms" "parameters")
+          ("parmz" "parameterize")
+
           ("prec" "preceding")
           ("prev" "previous")
 
@@ -347,7 +366,8 @@ abort completely with `C-g'."
           ("repn" "representation")
           ("repg" "representing")
 
-          ("repl" "REPL")
+          ("Repl" "REPL")
+          ("nRepl" "nREPL")
           ("resp" "responsibility")
           ("resps" "responsibilities")
 
@@ -358,11 +378,15 @@ abort completely with `C-g'."
           ("rng" "returning")
           ("rns" "returns")
 
+          ("seq" "sequence")
+          
+          ("sd" "should")
           ("spc" "specific")
           ("spd" "specified")
           ("spl" "special")
           ("sps" "specifies")
           ("spy" "specify")
+          ("spg" "specifying")
           ("spec" "specification")
           ("specs" "specifications")
 
@@ -392,6 +416,7 @@ abort completely with `C-g'."
           ("visg" "visualizing")
 
           ("wo" "without")
+          ("wd" "would")
 
           ;; Greek
 
