@@ -4239,8 +4239,8 @@ Ignore \"No following same-level heading\" error, call
  '(cider :type git :flavor melpa
          :files ("*.el" (:exclude ".dir-locals.el") "cider-pkg.el")
          :host github :repo "clojure-emacs/cider"))
+
 (with-eval-after-load 'cider
-  (add-hook 'clojure-mode-hook #'cider-mode)
   (cider-auto-test-mode 1) ;; run test on buffer load
   ;; (cider-fringe-good-face ((t (:foreground ,green-l))))
   (setq cider-save-file-on-load t)
@@ -4249,6 +4249,8 @@ Ignore \"No following same-level heading\" error, call
   (setq cider-test-show-report-on-success nil)
   (setq cider-repl-history-file "~/.cider-repl-history")
   (setq cider-repl-display-help-banner nil)
+  (setq cider-show-eval-spinner nil)
+  (setq cider-eval-result-duration 'change)
   (face-spec-set
    'cider-fringe-good-face
    '((t :foreground "SkyBlue2"
@@ -4267,6 +4269,54 @@ Ignore \"No following same-level heading\" error, call
 (setq cider-inject-dependencies-at-jack-in nil)
 ;; (setq cider-clojure-cli-parameters "-A:test:dev:local-dev")
 (setq cider-clojure-cli-parameters "-M:inspect/reveal-cider")
+
+(defun ram-cider-eval (form)
+  "Evaluate FORM calling `cider-interactive-eval'."
+  (let ((cider-show-eval-spinner 'nil)
+        (cider-use-overlays 'nil))
+    (cider-interactive-eval form (lambda (response) 'nil) nil nil)))
+
+(defun ram-cider-eval-defun-at-point-in-reveal (arg)
+  "Call `cider-eval-defun-at-point', do not display results."
+  (interactive "P")
+  (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
+        (cider-show-eval-spinner 'nil)
+        (cider-use-overlays nil))
+    (cider-interactive-eval (cider-defun-at-point) (lambda (response) 'nil) nil nil)
+    ;; switch to workspace that displays Reveal window
+    ;; it is determined by the exwm settings
+    (exwm-workspace-switch 4)
+    (display-buffer "java")
+    (exwm-workspace-switch orginal-workspace)))
+
+(defun ram-reveal-clear ()
+  (interactive)
+  (let ((form "{:vlaaad.reveal/command '(clear-output)}"))
+    (ram-cider-eval form)))
+
+(defun ram-reveal-eval ()
+  (interactive)
+  (ram-reveal-send-to-output "{:a 2 :b 4}"))
+
+(defun ram-reveal-as-table (form-str)
+  (ram-cider-eval
+   (format "{:vlaaad.reveal/command
+ '(open-view
+   {:fx/type action-view
+    :action :vlaaad.reveal.action/view:table
+    :value v})
+ ;; environment passed from current ns
+ :env {'v %s}}}" form-str)))
+
+
+(defun ram-reveal-defun-as-table ()
+  (interactive)
+  (ram-reveal-as-table (cider-defun-at-point)))
+
+(defun ram-reveal-send-to-output (form)
+  (ram-cider-eval (format "{:vlaaad.reveal/command '(submit %s)}" form)))
+
+(define-key global-map (kbd "<f2> c") #'ram-reveal-clear)
 
 ;;* racket
 
