@@ -5395,7 +5395,6 @@ If ARG is 4, move to the end of defun."
 (add-hook 'racket-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'racket-repl-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'minibuffer-mode-hook #'ram-highlight-sexps-mode)
-(add-hook 'org-mode-hook #'ram-highlight-sexps-mode)
 
 (with-eval-after-load "ram-highlight-sexps"
   (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
