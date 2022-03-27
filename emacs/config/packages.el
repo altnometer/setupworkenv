@@ -5588,10 +5588,6 @@ Before invoking `newline-and-indent':
 (define-key emacs-lisp-mode-map (kbd "<return>") #'ram-newline-and-indent)
 (define-key emacs-lisp-mode-map (kbd "S-<return>") #'newline-and-indent)
 
-(with-eval-after-load 'clojure
-  (define-key clojure-mode-map (kbd "<return>") #'ram-newline-and-indent)
-  (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent))
-
 (define-key lisp-interaction-mode-map (kbd "<return>") #'ram-newline-and-indent)
 (define-key lisp-interaction-mode-map (kbd "S-<return>") #'newline-and-indent)
 
@@ -8289,8 +8285,6 @@ buffer-local `ram-face-remapping-cookie'."
 
 (define-key global-map (kbd "<s-return>") 'smart-open-line)
 (define-key global-map (kbd "<S-s-return>") 'smart-open-line-above)
-(with-eval-after-load 'clojure-mode
-  (define-key clojure-mode-map (kbd "<S-return>") 'newline-and-indent))
 
 ;;* xah-fly-keys
 
