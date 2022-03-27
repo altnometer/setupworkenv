@@ -7339,6 +7339,9 @@ Configure `orderless-matching-styles' for this command."
       (newline arg)
       (indent-according-to-mode)))
 
+(define-key paredit-mode-map (kbd "M-[") #'paredit-wrap-square)
+(define-key paredit-mode-map (kbd "M-{") #'paredit-wrap-curly)
+
 (define-key paredit-mode-map (kbd "M-s") nil)
 (define-key paredit-mode-map (kbd "<f13>") #'paredit-splice-sexp)
 ;; slurp
