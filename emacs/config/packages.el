@@ -5258,7 +5258,8 @@ Return nil on failure, (point) otherwise."
     (if in-top-level-comments
         (goto-char (car comment-bounds))
       (ram-up-list-forward 50)
-      (forward-sexp (- arg)))))
+      (forward-sexp (- arg))
+      (point))))
 
 (defun ram-end-of-top-sexp (arg)
   "Jump to the end of top level sexp ARG times."
