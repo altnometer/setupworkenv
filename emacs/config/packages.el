@@ -5448,7 +5448,8 @@ Add `pre-command-hook' to remove it."
 (defun ram-goto-beg-of-comment ()
   "Go to comment beginning if in comment. Do Nothing otherwise."
   (if-let ((comment-start
-            (when (not (minibufferp))
+            (when (and (ram-in-comment-p)
+                       (not (minibufferp)))
               (comment-normalize-vars)
               (save-excursion
                 (end-of-line)
