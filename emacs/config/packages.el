@@ -5684,7 +5684,7 @@ The search must start outside the current thing bounds."
 The search must start outside the current thing bounds."
   (when (re-search-forward (concat "[^"
                                    (string-join (mapcar #'char-to-string ram-close-delimiters))
-                                   "#'[:space:]" "\n]") nil t 1)
+                                   "@#',[:space:]" "\n]") nil t 1)
     (backward-char)
     (cond
      ((memq (char-after) ram-open-delimiters)  ; edge case when comments follow a delimiter
