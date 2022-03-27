@@ -5291,25 +5291,27 @@ If ARG is 4, move to the end of defun."
         (goto-char (car next-bounds))))))
 
 (defun ram-prev-defun (&optional arg)
-  "Jump to the previous top level thing.
-If ARG is negative, reverse the final point location.
-If ARG is 4, move to the beginning of defun."
+  "Jump to the previous top level thing."
   (interactive "p")
   (when (buffer-narrowed-p)
     (widen))
-  (let ((at-end-p (ram-at-thing-end-p))
-        prev-bounds)
-    (if (= arg 4)
-        (ram-beg-of-top-sexp 1)
-      (ram-beg-of-top-sexp 1)
-      (setq prev-bounds (ram-backward-list))
-      (when (< arg 0)                   ; reverse at-end-p value
-        (setq at-end-p (not at-end-p)))
-      (if at-end-p
-          (and prev-bounds
-               (goto-char (cdr prev-bounds)))
-        (and prev-bounds
-             (goto-char (car prev-bounds)))) )))
+  (let ((point (point)))
+    (when (= point (ram-beg-of-top-sexp 1))
+      (ram-backward-list)))
+  ;; (let ((at-end-p (ram-at-thing-end-p))
+  ;;       prev-bounds)
+  ;;   (if (= arg 4)
+  ;;       (ram-beg-of-top-sexp 1)
+  ;;     (ram-beg-of-top-sexp 1)
+  ;;     (setq prev-bounds (ram-backward-list))
+  ;;     (when (< arg 0)                   ; reverse at-end-p value
+  ;;       (setq at-end-p (not at-end-p)))
+  ;;     (if at-end-p
+  ;;         (and prev-bounds
+  ;;              (goto-char (cdr prev-bounds)))
+  ;;       (and prev-bounds
+  ;;            (goto-char (car prev-bounds)))) ))
+  )
 
 ;;** brackets, parentheses, parens, sexps: settings
 
