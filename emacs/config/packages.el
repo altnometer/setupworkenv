@@ -2215,8 +2215,8 @@ TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION). The
 ACTION part returns a `exwm-mode' WORKSPACE-IDX window to display
 the buffer.
 
-It splits the window horizontally if TEST-BUFFER-P is not
-visible."
+It splits the window horizontally if it is not displaying the
+same buffer or if TEST-BUFFER-P for the buffer is false."
   (list test-buffer-p
         `(lambda (buffer alist)
            ,(format "Display BUFFER in workspace %d in a horizontal split." workspace-idx)
@@ -2227,6 +2227,9 @@ visible."
               ;; reuse target-window displaying same buffer
               ((string= (buffer-name (window-buffer target-window))
                         (if (stringp buffer) buffer (buffer-name buffer)))
+               (window--display-buffer buffer target-window 'reuse alist))
+              ;; reuse target-window if TEST-BUFFER-P is false
+              ((not (,test-buffer-p (window-buffer target-window) nil))
                (window--display-buffer buffer target-window 'reuse alist))
               ;; reuse next-to-target-window
               ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
