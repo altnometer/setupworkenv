@@ -1559,7 +1559,8 @@ succession."
                      "set-default")
                     (+ space)           ; 1 or more whitespaces
                     (regexp name-regex)))))
-   ((eq major-mode 'clojure-mode)
+   ((or (eq major-mode 'clojure-mode)
+        (eq major-mode 'clojurec-mode))
     (rx line-start
         (* space)
         (seq "("
