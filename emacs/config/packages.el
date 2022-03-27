@@ -6055,12 +6055,25 @@ If there is no Clojure REPL, send warning."
         (switch-to-buffer repl)
       (error "No Clojure REPL buffer found with name: %s" repl-regexp))))
 
-(with-eval-after-load 'clojure-mode
+(defun ram-clojure-add-bindings ()
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+  (define-key clojure-mode-map (kbd "<f2> <f2>") #'ram-cider-eval-defun-at-point-in-reveal)
+
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
-  (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl))
-  ;; (require 'flycheck-clj-kondo)
+  (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
+
+  (define-key clojure-mode-map (kbd "<f2> e") #'ram-reveal-eval)
+  (define-key clojure-mode-map (kbd "<f2> t") #'ram-reveal-defun-as-table)
+
+  (define-key clojure-mode-map (kbd "<return>") #'ram-newline-and-indent)
+  (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent))
+
+(add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
+(add-hook 'clojure-mode-hook #'cider-mode)
+
+
+;; (require 'flycheck-clj-kondo)
 
 
 ;;* python
