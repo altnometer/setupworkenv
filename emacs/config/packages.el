@@ -2468,6 +2468,16 @@ displaying TEST-BUFFER-P buffer."
                       (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
               7 3))
 
+;;****** buffers/display/alist: java, reveal
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let (;; (mode (buffer-local-value 'major-mode (get-buffer buffer)))
+                      (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "^java\\(<[0-9]+>\\)\\{0,1\\}$" buf-name)))
+              4))
+
 ;;****** buffers/display/alist: *scratch*
 
 (add-to-list 'display-buffer-alist
