@@ -594,11 +594,13 @@ Disable `icomplete-vertical-mode' for this command."
             (set (make-local-variable 'company-backends)
                  '((company-elisp company-dabbrev-code company-files)))))
 
+(add-hook 'cider-repl-mode-hook #'company-mode)
+(add-hook 'cider-mode-hook #'company-mode)
 (add-hook 'clojure-mode-hook
           (lambda ()
             (set (make-local-variable 'company-backends)
                  (list '(company-capf)))))
-(add-hook 'clojure-mode-hook
+(add-hook 'cider-repl-mode-hook
           (lambda ()
             (set (make-local-variable 'company-backends)
                  (list '(company-capf)))))
