@@ -824,12 +824,22 @@ Disable `icomplete-vertical-mode' for this command."
 ;; floating X windows frames differ from emacs frames
 (setq exwm-manage-force-tiling t)
 
+(setq exwm-workspace-show-all-buffers t)
+
 ;;** exwm: bindings
 
 ;; Global keybindings.
 (setq exwm-input-global-keys
       `(
+
+        (,(kbd "C-^") . top-level)      ; close all minibuffers
+        ;; <XF86Copy> key is in layer where F1-F12 defined, in place of "w" key
+        (,(kbd "<M-XF86Copy>") . delete-other-windows)
+        (,(kbd "<M-S-XF86Copy>") . delete-window)
+
         (,(kbd "s-a") . org-agenda)
+
+        (,(kbd "<f2> c") . ram-reveal-clear)
 
         (,(kbd "s-c n") . org-roam-dailies-capture-today)
         (,(kbd "s-c d") . org-roam-dailies-goto-today)
@@ -885,11 +895,11 @@ Disable `icomplete-vertical-mode' for this command."
         ;; (,(kbd "<f7>") . (lambda () (interactive) (exwm-workspace-switch-create 7)))
         ;; 's-N': Switch to certain workspace.
         (\,@ (mapcar (lambda (i)
-                        `(,(kbd (format "s-%d" i)) .
-                          (lambda ()
-                            (interactive)
-                            (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 9)))))
+                       `(,(kbd (format "s-%d" i)) .
+                         (lambda ()
+                           (interactive)
+                           (exwm-workspace-switch-create ,i))))
+                     (number-sequence 0 9)))))
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
@@ -909,7 +919,9 @@ Disable `icomplete-vertical-mode' for this command."
 
 (setq exwm-manage-configurations
       '(((member exwm-instance-name '("qutebrowser"))
-         workspace 1)))
+         workspace 1)
+        ((member exwm-instance-name '("java"))
+         workspace 4)))
 
 ;; Line-editing shortcuts
 
