@@ -3355,37 +3355,43 @@ If the property is already set, replace its value."
                       ;; set :parent to nil, no need for its chunky value
                       (lambda (link) (org-element-put-property link :parent nil))))
          ;; if heading has text, backlink to it
-         (text-p (some #'identity
-                       (org-element-map
-                           section-element 'paragraph
-                         (lambda (p) (let ((contents (org-element-contents p)))
-                                       ;; true if there is more content in the paragraph
-                                       ;; except links
-                                       (cl-labels ((exclude-links (contents)
-                                                     (if (null contents)
-                                                         '()
-                                                       (let* ((c (car contents))
-                                                              (c-type (org-element-type c)))
-                                                         (cons (not (or
-                                                                     ;; exclude empty string
-                                                                     (and (eq c-type 'plain-text)
-                                                                          (string-empty-p (string-trim c)))
-                                                                     ;; exclude links
-                                                                     (eq c-type 'link)))
-                                                               (exclude-links (cdr contents)))))))
-                                         (some #'identity (exclude-links contents))))))))
+         ;; (text-p (some #'identity
+         ;;               (org-element-map
+         ;;                   section-element 'paragraph
+         ;;                 (lambda (p) (let ((contents (org-element-contents p)))
+         ;;                               ;; true if there is more content in the paragraph
+         ;;                               ;; except links
+         ;;                               (cl-labels ((exclude-links (contents)
+         ;;                                             (if (null contents)
+         ;;                                                 '()
+         ;;                                               (let* ((c (car contents))
+         ;;                                                      (c-type (org-element-type c)))
+         ;;                                                 (cons (not (or
+         ;;                                                             ;; exclude empty string
+         ;;                                                             (and (eq c-type 'plain-text)
+         ;;                                                                  (string-empty-p (string-trim c)))
+         ;;                                                             ;; exclude links
+         ;;                                                             (eq c-type 'link)))
+         ;;                                                       (exclude-links (cdr contents)))))))
+         ;;                                 (some #'identity (exclude-links contents))))))))
          ;; if heading has subheadings, backlink to it
-         (subheadings-p (cdr (org-element-map headline-element 'headline #'identity)))
-         (backlink (when (or text-p
-                             subheadings-p)
-                     (cons 'link
-                           (cons `(:type "file"
-                                         :path ,file
-                                         :format bracket
-                                         :raw-link ,(format "file:%s::*%s" file
-                                                            (org-element-property :raw-value new-headline))
-                                         :search-option ,(concat "*" (org-element-property :raw-value new-headline)))
-                                 '("source"))))))
+         ;; (subheadings-p (cdr (org-element-map headline-element 'headline #'identity)))
+         (backlink
+          ;; disable checking for text-p and subheadings-p in order to insert
+          ;; a backling. If there is only source code block, the backlink is not inserted, but it
+          ;; should. Rather than adding another checking for the code block, abandon the conditional
+          ;; insert of a backlink (make it more general for now).
+          ;; 
+          ;; (when (or text-p
+          ;;           subheadings-p))
+          (cons 'link
+                (cons `(:type "file"
+                              :path ,file
+                              :format bracket
+                              :raw-link ,(format "file:%s::*%s" file
+                                                 (org-element-property :raw-value new-headline))
+                              :search-option ,(concat "*" (org-element-property :raw-value new-headline)))
+                      '("source")))))
     (when backlink (setq all-links (cons backlink all-links)))
     ;; heading
     ;; get just headline, no section etc
