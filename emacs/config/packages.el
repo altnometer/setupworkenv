@@ -5425,8 +5425,7 @@ Add `pre-command-hook' to remove it."
   "Return a pair of the inline comment beginning and end. "
   (if-let (beg (and (ram-in-comment-p)
                     (save-excursion
-                      (ram-goto-beg-of-comment)
-                      (re-search-backward "[^[:space:]]" (point-at-bol) t 1))))
+                      (ram-goto-beg-of-comment))))
       (cons beg (point-at-eol))))
 
 (defun ram-block-comment-bounds ()
