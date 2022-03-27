@@ -8308,11 +8308,11 @@ buffer-local `ram-face-remapping-cookie'."
 ;;     (load-file (expand-file-name "~/.emacs.d/lisp/emacs-keybinding-command-tooltip-mode.el"))))
 
 ;;* sayid
-(straight-use-package
- '(sayid :type git :flavor melpa :files ("src/el/*.el" "sayid-pkg.el") :host github :repo "clojure-emacs/sayid"))
+;; (straight-use-package
+;;  '(sayid :type git :flavor melpa :files ("src/el/*.el" "sayid-pkg.el") :host github :repo "clojure-emacs/sayid"))
 
-(eval-after-load 'clojure-mode
-  '(sayid-setup-package))
+;; (eval-after-load 'clojure
+;;   '(sayid-setup-package))
 
 ;;* dired
 
