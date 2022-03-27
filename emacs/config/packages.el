@@ -3435,8 +3435,12 @@ Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
   (require 'org-roam-dailies)
-  (let* ((templates
+  (let* ((backlink (let ((heading (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment) ))
+                     (format "[[file:%s::*%s][%s]]"
+                             (file-truename (buffer-file-name)) (org-link-escape heading) "source")))
+         (templates
           `(("d" "continue task under heading"
+             ;; entry ,(concat (ram-org-get-heading) " %(org-set-tags \":write:\")  " "\n" backlink "\n\n%?")
              entry ,(ram-org-get-heading)
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
              :empty-lines-before 1
