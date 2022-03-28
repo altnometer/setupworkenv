@@ -5550,6 +5550,8 @@ Before invoking `newline-and-indent':
       (exit-minibuffer))
      ((ram-in-comment-p))
      ((ram-in-string-p) (goto-char (cdr bounds)))
+     ;; at delimited sexp begining
+     ((ram-at-delimited-beg-p) (goto-char (cdr bounds)))
      ;; inside a list or at its border,
      ;; the list spans a single line: go to its end
      ((let ((bounds (ram-delimited-sexp-bounds))
@@ -5557,17 +5559,20 @@ Before invoking `newline-and-indent':
         (when (and bounds
                    (= line-num (line-number-at-pos (car bounds)))
                    (= line-num (line-number-at-pos (cdr bounds))))
-          (goto-char (cdr bounds)))))
-     ;; captured by previous clause
-     ;; ((ram-at-delimited-beg-p) (goto-char (cdr bounds)))
+          (goto-char (cdr bounds))
+          (backward-char))))
      ;; empty list: (|) -> ()|
-     ;; captured by previous clause
-     ;; ((and (memq (char-after (point)) ram-close-delimiters)
-     ;;       (memq (char-before (point)) ram-open-delimiters))
-     ;;  (goto-char (cdr bounds)))
+     ((and (memq (char-after (point)) ram-close-delimiters)
+           (memq (char-before (point)) ram-open-delimiters))
+      (goto-char (cdr bounds)))
      ;; blank line with ")" at the end
      ((and (looking-back "^ +" (point-at-bol))
            (looking-at (concat "[[:space:]]*" ram-close-delimiters-re)))
+      (ram-remove-whitespace-between-regexps "[^[:space:]\n]" ram-close-delimiters-re)
+      (forward-char))
+     ;; blank line
+     ((and (looking-back "^ +" (point-at-bol))
+           (looking-at "[[:space:]]*$"))
       (ram-remove-whitespace-between-regexps "[^[:space:]\n]" ram-close-delimiters-re)
       (forward-char))
      ;; default case handles this as well.
