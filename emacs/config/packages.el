@@ -379,7 +379,7 @@ abort completely with `C-g'."
           ("rns" "returns")
 
           ("seq" "sequence")
-          
+
           ("sd" "should")
           ("spc" "specific")
           ("spd" "specified")
@@ -3377,8 +3377,9 @@ If the property is already set, replace its value."
 
 ;;*** org-roam/dailies: capture templates
 
-(defun ram-org-parse-heading-element (headline-element filename)
-  "Return a heading element with only links and a backlink."
+(defun ram-org-parse-heading-element (headline-element filename &optional include-backlink-p)
+  "Return a heading element with links.
+Include a backlink if INCLUDE-BACKLINK-P is true."
   (let* ((file filename)
          ;; set lengthy properties to nil
          (new-props (plist-put
@@ -3421,7 +3422,7 @@ If the property is already set, replace its value."
           ;; a backling. If there is only source code block, the backlink is not inserted, but it
           ;; should. Rather than adding another checking for the code block, abandon the conditional
           ;; insert of a backlink (make it more general for now).
-          ;; 
+          ;;
           ;; (when (or text-p
           ;;           subheadings-p))
           (cons 'link
@@ -3432,7 +3433,8 @@ If the property is already set, replace its value."
                                                  (org-element-property :raw-value new-headline))
                               :search-option ,(concat "*" (org-element-property :raw-value new-headline)))
                       '("source")))))
-    (when backlink (setq all-links (cons backlink all-links)))
+    (when include-backlink-p
+      (cons backlink all-links))
     ;; heading
     ;; get just headline, no section etc
     (list 'headline (plist-get new-headline 'headline)
@@ -3466,7 +3468,7 @@ If the property is already set, replace its value."
                                     (when (string= (org-element-property :raw-value headline)
                                                    (org-element-property :raw-value current-headline))
                                       headline))))))
-    (org-element-interpret-data (ram-org-parse-heading-element headline-element file-name))))
+    (org-element-interpret-data (ram-org-parse-heading-element headline-element file-name 'INCLUDE-BACKLINK-P))))
 
 
 (defun ram-org-capture-heading-to-dailies (&optional arg)
@@ -3859,7 +3861,7 @@ Use the current buffer file-path if FILE is nil."
          (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
     (ram-org-create-weekly-note nil target-time)))
 
-(defun ram-org-get-headings-from-daily-note (time)
+(defun ram-org-get-headings-from-daily-note (time &optional include-backlink-p)
   "Return an org-element made from headings in `org-roam' daily note."
   (let* ((dailies-dir (expand-file-name org-roam-dailies-directory org-roam-directory))
          (weekday (let ((wd (nth 6 (decode-time time)))) ; start week from Mon rather than Sun
