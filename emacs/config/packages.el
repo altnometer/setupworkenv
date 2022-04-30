@@ -4812,9 +4812,13 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
         (avy-command 'ram-avy-goto-org-heading)
         (avy--overlay-offset 0))
     (setq avy-action nil)
-    (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg nil :end nil))
-  (re-search-forward "[^*[:space:]]" (window-end) t 1)
-  (forward-char -1))
+    ;; when in org-mode, if 1st thing in a heading is a link and
+    ;; org-toggle-link-display is on, the following regex does not work
+    ;; (avy-jump "^[[:blank:]]*\\*+ [^[:space:]]" :window-flip nil :beg nil :end nil)
+    (avy-jump "^[[:blank:]]*\\*+[[:space:]]+" :window-flip nil :beg nil :end nil))
+  ;; (re-search-forward "[^*[:space:]]" (window-end) t 1)
+  ;; (forward-char -1)
+  )
 
 (defun ram-avy-goto-org-link ()
   (interactive)
