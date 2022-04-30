@@ -1955,6 +1955,27 @@ one, an error is signaled."
 (define-key global-map (kbd "C-s-c") #'buf-move-left)
 (define-key global-map (kbd "C-s-t") #'buf-move-right)
 
+(defun ram-windmove-swap-up-or-down ()
+  "Swap windows up or down."
+  (interactive)
+  (condition-case err
+      (windmove-swap-states-up)
+    (user-error (if (string= (error-message-string err)
+                             "No window up from selected window")
+                    (condition-case err
+                        (windmove-swap-states-down)
+                      (user-error (if (not (string= (error-message-string err)
+                                                    "No window down from selected window"))
+                                      (error (signal (car err) (cdr err)))))
+                      (error (signal (car err) (cdr err))))
+                  (signal (car err) (cdr err))))
+    (error (signal (car err) (cdr err)))
+    ;; (:success
+    ;;  (ram-agenda-files-remove file-path))
+    ))
+
+(define-key global-map (kbd "s-w") #'ram-windmove-swap-up-or-down)
+
 ;;*** windows: winner-mode
 
 ;; undo and redo changes in window configuration
