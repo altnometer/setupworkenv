@@ -2263,14 +2263,41 @@ same buffer or if TEST-BUFFER-P for the buffer is false."
            ,(format "Display BUFFER in workspace %d in a horizontal split." workspace-idx)
            (let* ((target-frame (exwm-workspace--workspace-from-frame-or-index ,workspace-idx))
                   (target-window (frame-selected-window target-frame))
-                  (next-to-target-window (next-window target-window 'nomini target-frame)))
+                  (buffer-name (if (stringp buffer) buffer (buffer-name buffer)))
+                  (next-to-target-window (next-window target-window 'nomini target-frame))
+                  (windows-in-frame (window-list-1 nil 'nomini target-frame))
+                  (win-displaying-same-buf (car
+                                            (seq-filter (lambda (w)
+                                                          (string= buffer-name
+                                                                   (buffer-name (window-buffer w))))
+                                                        windows-in-frame)))
+                  (delete-windows-except (lambda (exclude-this-window)
+                                           (let ((buffer-major-mode (buffer-local-value 'major-mode (get-buffer buffer))))
+                                             (when (> (length windows-in-frame) 1)
+                                               (dolist (w windows-in-frame)
+                                                 (when (and (not (equal w exclude-this-window))
+                                                            (or
+                                                             ;; different major-mode
+                                                             (not (string= buffer-major-mode
+                                                                           (buffer-local-value 'major-mode (window-buffer w))))
+                                                             ;; same buffer
+                                                             (string= buffer-name (buffer-name (window-buffer w)))))
+                                                   (delete-window w))))))))
              (cond
+              ;; reuse window displaying same buffer
+              (win-displaying-same-buf
+               (funcall delete-windows-except win-displaying-same-buf)
+               (window--display-buffer buffer win-displaying-same-buf 'reuse alist))
               ;; reuse target-window displaying same buffer
-              ((string= (buffer-name (window-buffer target-window))
-                        (if (stringp buffer) buffer (buffer-name buffer)))
-               (window--display-buffer buffer target-window 'reuse alist))
+              ;; ((string= (buffer-name (window-buffer target-window))
+              ;;           (if (stringp buffer) buffer (buffer-name buffer)))
+              ;;  (funcall delete-windows-except target-window)
+              ;;  ;; (when (> (length windows-in-frame) 1)
+              ;;  ;;   (delete-window next-to-target-window))
+              ;;  (window--display-buffer buffer target-window 'reuse alist))
               ;; reuse target-window if TEST-BUFFER-P is false
               ((not (,test-buffer-p (window-buffer target-window) nil))
+               (funcall delete-windows-except target-window)
                (window--display-buffer buffer target-window 'reuse alist))
               ;; reuse next-to-target-window
               ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
