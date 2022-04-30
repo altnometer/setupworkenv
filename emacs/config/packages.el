@@ -4300,17 +4300,7 @@ Ignore \"No following same-level heading\" error, call
         :weight bold))
    'face-defface-spec))
 
-;;** cider: repl
-
-(with-eval-after-load "cider"
-  (define-key cider-repl-mode-map (kbd "<f2>") #'cider-repl-return))
-
-;;*** cider/repl: reveal
-
-;; start repl from Emacs with #'cider-jack-in
-(setq cider-inject-dependencies-at-jack-in nil)
-;; (setq cider-clojure-cli-parameters "-A:test:dev:local-dev")
-(setq cider-clojure-cli-parameters "-M:inspect/reveal-cider")
+;;** cider: functions
 
 (defun ram-cider-eval (form)
   "Evaluate FORM calling `cider-interactive-eval'."
@@ -4318,47 +4308,15 @@ Ignore \"No following same-level heading\" error, call
         (cider-use-overlays 'nil))
     (cider-interactive-eval form (lambda (response) 'nil) nil nil)))
 
-(defun ram-cider-eval-defun-at-point-in-reveal (arg)
-  "Call `cider-eval-defun-at-point', do not display results."
-  (interactive "P")
-  (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
-        (cider-show-eval-spinner 'nil)
-        (cider-use-overlays nil))
-    (cider-interactive-eval (cider-defun-at-point) (lambda (response) 'nil) nil nil)
-    ;; switch to workspace that displays Reveal window
-    ;; it is determined by the exwm settings
-    (exwm-workspace-switch 4)
-    (display-buffer "java")
-    (exwm-workspace-switch orginal-workspace)))
+;;** cider: repl
 
-(defun ram-reveal-clear ()
-  (interactive)
-  (let ((form "{:vlaaad.reveal/command '(clear-output)}"))
-    (ram-cider-eval form)))
+(with-eval-after-load "cider"
+  (define-key cider-repl-mode-map (kbd "<f2>") #'cider-repl-return))
 
-(defun ram-reveal-eval ()
-  (interactive)
-  (ram-reveal-send-to-output "{:a 2 :b 4}"))
-
-(defun ram-reveal-as-table (form-str)
-  (ram-cider-eval
-   (format "{:vlaaad.reveal/command
- '(open-view
-   {:fx/type action-view
-    :action :vlaaad.reveal.action/view:table
-    :value v})
- ;; environment passed from current ns
- :env {'v %s}}}" form-str)))
-
-
-(defun ram-reveal-defun-as-table ()
-  (interactive)
-  (ram-reveal-as-table (cider-defun-at-point)))
-
-(defun ram-reveal-send-to-output (form)
-  (ram-cider-eval (format "{:vlaaad.reveal/command '(submit %s)}" form)))
-
-(define-key global-map (kbd "<f2> c") #'ram-reveal-clear)
+;; start repl from Emacs with #'cider-jack-in
+(setq cider-inject-dependencies-at-jack-in nil)
+;; (setq cider-clojure-cli-parameters "-A:test:dev:local-dev")
+;; (setq cider-clojure-cli-parameters "-M:inspect/reveal-cider")
 
 ;;* racket
 
@@ -6084,6 +6042,8 @@ Return a cons of the new text cordinates."
                 :files ("clojure-mode.el" "clojure-mode-pkg.el")
                 :host github :repo "clojure-emacs/clojure-mode"))
 
+;; (require 'flycheck-clj-kondo)
+
 (defun ram-switch-to-clojure-repl ()
   "Switch to Clojure REPL if it is running.
 
@@ -6097,25 +6057,152 @@ If there is no Clojure REPL, send warning."
         (switch-to-buffer repl)
       (error "No Clojure REPL buffer found with name: %s" repl-regexp))))
 
+;;** clojure: bindings
+
 (defun ram-clojure-add-bindings ()
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
-  (define-key clojure-mode-map (kbd "<f2> <f2>") #'ram-cider-eval-defun-at-point-in-reveal)
+  (define-key clojure-mode-map (kbd "<f2> <f2>") #'ram-clojure-eval-defun-at-point-in-reveal)
+
+  (define-key clojure-mode-map (kbd "<f2> <f14>") #'ram-clojure-eval-last-sexp)
+  (define-key clojure-mode-map (kbd "<f2> e") #'ram-clojure-eval-last-sexp)
 
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
-  (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
 
-  (define-key clojure-mode-map (kbd "<f2> e") #'ram-reveal-eval)
+  (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
   (define-key clojure-mode-map (kbd "<f2> t") #'ram-reveal-defun-as-table)
 
   (define-key clojure-mode-map (kbd "<return>") #'ram-newline-and-indent)
   (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent))
 
+;;** clojure: functions
+
+;;** clojure/functions: 
+
+(defun ram-clojure-get-last-sexp ()
+  "Return the sexp preceding the point."
+  (save-excursion
+    (clojure-backward-logical-sexp 1)
+    (let ((beg (point)))
+      (clojure-forward-logical-sexp 1)
+      (buffer-substring-no-properties beg (point)))))
+
+(defun ram-clojure-get-defun-at-point ()
+  "Return the toplevel sexp at point."
+  (save-excursion
+    (save-match-data
+      (end-of-defun)
+      (let ((end (point)))
+        (clojure-backward-logical-sexp 1)
+        (buffer-substring-no-properties (point) end)))))
+
+(defun ram-clojure-eval-defun-at-point-in-reveal (arg)
+  "Evaluate top level sexp at point."
+  (interactive "P")
+  (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
+        (cider-show-eval-spinner 'nil)
+        (cider-use-overlays nil))
+    (cider-interactive-eval (ram-clojure-get-defun-at-point) (lambda (response) 'nil) nil nil)
+    ;; switch to workspace that displays Reveal window
+    ;; it is determined by the exwm settings
+    (ram-reveal-display-buffers orginal-workspace 4)
+    ))
+
+(defun ram-clojure-eval-last-sexp (arg)
+  "Evaluate the sexp preceding the point."
+  (interactive "P")
+  (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
+        (cider-show-eval-spinner 'nil)
+        (cider-use-overlays nil))
+    (cider-interactive-eval (ram-clojure-get-last-sexp) (lambda (response) 'nil) nil nil)
+    ;; switch to workspace that displays Reveal window
+    ;; it is determined by the exwm settings
+    (ram-reveal-display-buffers orginal-workspace 4)
+    ))
+
+;;** clojure: hooks, advice, timers
+
 (add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
 (add-hook 'clojure-mode-hook #'cider-mode)
 
+;;** clojure: reveal
 
-;; (require 'flycheck-clj-kondo)
+(defun ram-reveal-display-buffers (original-exwm-workspace reveal-exwm-workspace)
+  "Display \"java\" buffers in REVEAL-EXWM-WORKSPACE."
+  ;; switch to reveal-exwm-workspace
+  (exwm-workspace-switch reveal-exwm-workspace)
+  (let ((acc '()))
+    (dolist (b (buffer-list))
+      (when (string-match "java" (buffer-name b))
+        (setq acc (cons (buffer-name b) acc))))
+    (dolist (b (sort acc #'string<))
+      ;; (display-buffer b nil (exwm-workspace--workspace-from-frame-or-index reveal-exwm-workspace))
+      (display-buffer b)
+      ))
+  (dolist (w (window-list-1 nil 'NOMINI (exwm-workspace--workspace-from-frame-or-index reveal-exwm-workspace)))
+    (when (window-live-p w)
+      (select-window w)
+      ;; give time to render reveal windows
+      (sleep-for 0.1)))
+  (exwm-workspace-switch original-exwm-workspace))
+
+(defun ram-reveal-clear ()
+  (interactive)
+  (let ((form "{:vlaaad.reveal/command '(clear-output)}"))
+    (ram-cider-eval form)))
+
+(defun ram-clojure-reveal-tap (form)
+  "Evaluate \"(tap> FORM)\""
+  ())
+
+(defun ram-reveal-as-table (form-str)
+  (;; ram-cider-eval
+   (format "{:vlaaad.reveal/command
+ '(open-view
+   {:fx/type action-view
+    :action :vlaaad.reveal.action/view:table
+    :value v})
+ ;; environment passed from current ns
+ :env {'v %s}}}" form-str)))
+
+
+(defun ram-reveal-defun-as-table ()
+  (interactive)
+  (ram-reveal-as-table (cider-defun-at-point)))
+
+(defun ram-reveal-send-to-output (form)
+  (ram-cider-eval (format "{:vlaaad.reveal/command '(submit %s)}" form)))
+
+(define-key global-map (kbd "<f2> c") #'ram-reveal-clear)
+
+;;** clojure: lsp
+
+;; (setq package-selected-packages '(clojure-mode lsp-mode cider lsp-treemacs flycheck company))
+
+(straight-use-package
+ '(lsp-mode :type git :flavor melpa :files (:defaults "clients/*.el" "lsp-mode-pkg.el")
+            :host github :repo "emacs-lsp/lsp-mode"))
+
+(straight-use-package
+ '(lsp-treemacs :type git :flavor melpa :files (:defaults "icons" "lsp-treemacs-pkg.el")
+                :host github :repo "emacs-lsp/lsp-treemacs"))
+
+(add-hook 'clojure-mode-hook 'lsp)
+(add-hook 'clojurescript-mode-hook 'lsp)
+(add-hook 'clojurec-mode-hook 'lsp)
+
+;;*** clojure/lsp: settings
+
+(setq lsp-clojure-custom-server-command '("bash" "-c" "$HOME/.local/bin/clojure-lsp"))
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-minimum-prefix-length 1
+      lsp-lens-enable t
+      lsp-signature-auto-activate nil
+      ; lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
+      ; lsp-enable-completion-at-point nil ; uncomment to use cider completion instead of lsp
+      )
 
 
 ;;* python
