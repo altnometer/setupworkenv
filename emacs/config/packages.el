@@ -781,6 +781,8 @@ Disable `icomplete-vertical-mode' for this command."
 (define-key global-map (kbd "s-v") #'ram-open-vterm)
 
 (define-key vterm-mode-map (kbd "M-<f9>") #'vterm-copy-mode)
+(define-key vterm-mode-map (kbd "C-.") #'vterm-send-C-x)
+
 (define-key vterm-copy-mode-map (kbd "M-<f9>") #'vterm-copy-mode-done)
 
 ;;* exwm
