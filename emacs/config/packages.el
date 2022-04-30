@@ -5539,7 +5539,7 @@ Before invoking `newline-and-indent':
   (interactive "p")
   (when (bound-and-true-p abbrev-mode)
     (expand-abbrev))
-  (let ((bounds (ram-thing-bounds)))
+  (let ((bounds (ignore-errors (ram-thing-bounds))))
     (cond
      ((> (minibuffer-depth) 0)
       (exit-minibuffer))
@@ -5580,7 +5580,7 @@ Before invoking `newline-and-indent':
      ;;                  (:success t))
      ;;                (< (point) eol)))))
      (t (let ((end (min (line-end-position)
-                        (cdr (ram-delimited-sexp-bounds)))))
+                        ( or (cdr (ram-delimited-sexp-bounds)) (point-max)))))
           (while (< (point) (1- end))
             (forward-sexp)))))
     (newline-and-indent)
