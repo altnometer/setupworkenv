@@ -1513,6 +1513,7 @@ succession."
         (switch-to-buffer pre-minibuffer-buffer)))
     (push-mark)
     (goto-char val)
+    (outline-show-entry)
     (beginning-of-line)
     (recenter)
     ;; (let ((default (if (boundp pulse-flag)
