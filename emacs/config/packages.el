@@ -283,6 +283,7 @@ abort completely with `C-g'."
           ("fns" "functions")
           ("fnl" "functional")
           ("fny" "functionality")
+          ("fnty" "functionality")
 
           ("hier" "hierarchy")
           ("hiers" "hierarchies")
@@ -295,9 +296,11 @@ abort completely with `C-g'."
           ("impn" "implementation")
 
           ("inf" "information")
+
           ("inz" "initialize")
           ("inzd" "initialized")
           ("inzg" "initializing")
+
           ("inv" "invoke")
           ("invd" "invoked")
           ("invg" "invoking")
@@ -393,6 +396,7 @@ abort completely with `C-g'."
           ("sm" "symbol")
           ("sms" "symbols")
           ("st" "structure")
+          ("sts" "structures")
           ("subs" "substitution")
           ("subss" "substitutions")
           ("subsg" "substituting")
