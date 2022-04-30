@@ -3191,7 +3191,7 @@ If the property is already set, replace its value."
   (setq org-roam-capture-templates
         '(("d" "default"
            entry "* ${title}\n\n%?"
-           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n")
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
            :unnarrowed t))))
 
 
@@ -3433,9 +3433,9 @@ Include a backlink if INCLUDE-BACKLINK-P is true."
                               :raw-link ,(format "file:%s::*%s" file
                                                  (org-element-property :raw-value new-headline))
                               :search-option ,(concat "*" (org-element-property :raw-value new-headline)))
-                      '("source")))))
+                      '("backlink")))))
     (when include-backlink-p
-      (cons backlink all-links))
+      (setq all-links (cons backlink all-links)))
     ;; heading
     ;; get just headline, no section etc
     (list 'headline (plist-get new-headline 'headline)
@@ -3485,7 +3485,7 @@ ARG value is 4."
           `(("d" "continue task under heading"
              ;; entry ,(concat (ram-org-get-heading) " %(org-set-tags \":write:\")  " "\n" backlink "\n\n%?")
              entry ,(ram-org-get-heading)
-             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d %a>")
              :empty-lines-before 1
              :empty-lines-after 1
              :unnarrowed t
@@ -3520,22 +3520,17 @@ ARG value is 4."
   (require 'org-roam-dailies)
   (let* ((parsed-buffer (org-element-parse-buffer))
          (doc-title (ram-org-element-get-title parsed-buffer))
-         (backlink (if (org-at-heading-p)
-                       ;; then: backlink to the heading
-                       (let ((heading (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment) ))
-                         (format "[[file:%s::*%s][%s]]"
-                                 (file-truename (buffer-file-name)) (org-link-escape heading) "source"))
-                     ;; else: backlink to document ID
-                     (org-element-map
-                         parsed-buffer 'node-property
-                       (lambda (prop)
-                         (when (string= (org-element-property :key prop) "ID")
-                           (concat "[[id:" (org-element-property :value prop) "][source]]")))
-                       'first-match t)))
+         ;; backlink to document ID
+         (backlink (org-element-map
+                       parsed-buffer 'node-property
+                     (lambda (prop)
+                       (when (string= (org-element-property :key prop) "ID")
+                         (concat "[[id:" (org-element-property :value prop) "][source]]")))
+                     'first-match t))
          (templates
           `(("d" "capture document title"
              entry ,(concat "* " doc-title " %(org-set-tags \":read:\")  " "\n" backlink "\n\n%?")
-             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d %a>")
              :empty-lines-before 1
              :empty-lines-after 1
              :unnarrowed t
@@ -3573,7 +3568,7 @@ ARG value is 4."
              entry ,(concat "* " defun-name  " %(org-set-tags \":"
                             (car (split-string (symbol-name major-mode) "-"))
                             ":\")\n" backlink "\n\n%?")
-             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d %a>")
              :empty-lines-before 1
              :empty-lines-after 1
              :unnarrowed t
@@ -3607,7 +3602,7 @@ ARG value is 4."
           `(("d" "capture document title"
              entry ,(format "* %s %%(org-set-tags \":git:\")\n%s\n\n%%?"
                             summary backlink)
-             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U")
+             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d %a>")
              :empty-lines-before 1
              :empty-lines-after 1
              :unnarrowed t
@@ -3629,7 +3624,7 @@ ARG value is 4."
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
   (setq org-roam-dailies-capture-templates
         '(("d" "default" plain ""
-           :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n")
+           :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
            :empty-lines-before 1
            :empty-lines-after 1
            :unnarrowed t
@@ -3812,7 +3807,7 @@ Use calendar if ARG value is '(4)."
                                      (format ":ID:       %s\n" (org-id-new))
                                      ":END:\n"
                                      (format "#+TITLE: %s\n" doc-title)
-                                     (format "#+CREATED: [%s]\n\n"
+                                     (format "#+CREATED: [%s]\n#+DATE: %<%Y-%m-%d %a>"
                                              (format-time-string (org-time-stamp-format t t) time))))
                            (org-element-interpret-data (ram-org-create-monthly-element time)))))
     (find-file file-name)
@@ -3892,9 +3887,9 @@ Use the current buffer file-path if FILE is nil."
                                               (format ":ID:       %s\n" id)
                                               ":END:\n"
                                               (format "#+TITLE: %s\n" doc-title)
-                                              (format "#+CREATED: %s\n"
+                                              (format "#+DATE: %s\n"
                                                       (format-time-string
-                                                       (org-time-stamp-format t t) (current-time)))))
+                                                       "%Y-%m-%d %a" (car days)))))
                                  (week-day-heading
                                   (format "[[id:%s][%s]]"
                                           id
@@ -3970,7 +3965,15 @@ Use calendar if ARG value is '(4)."
                            (org-element-interpret-data (ram-org-get-headings-from-daily-note time)))))
     (find-file file-name)
     (if (not note-exists-p)
-        (erase-buffer)
+        (progn
+         (erase-buffer)
+         ;; when new daily notes are created (they were automatically
+         ;; created because none existed)
+         ;; the id link does not work because id locations were not updates.
+         ;; call (org-roam-update-org-id-locations)
+         ;; TODO: may too much overhead involved?
+         ;; update only the relevant directory dailies
+         (org-roam-update-org-id-locations))
       (goto-char (point-min))
       (org-next-visible-heading 1)
       (delete-region (point) (point-max)))
