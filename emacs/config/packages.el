@@ -1878,7 +1878,7 @@ instead."
   "Quit `ram-info-buffer-p' buffers first.
 Then, quit other window."
   (interactive)
-  (let* ((win-list (window-list-1 nil 'nomini 'A))
+  (let* ((win-list (window-list-1 nil 'nomini))
          (win-info-buf-list (seq-filter (lambda (w) (ram-info-buffer-p (window-buffer w) nil)) win-list))
          (win-interactive-buf-list (seq-filter (lambda (w) (ram-interactive-buffer-p (window-buffer w) nil)) win-list)))
     (cond
@@ -2071,7 +2071,7 @@ one, an error is signaled."
 (defun ram-display-buffer-in-info-window (buf alist)
   "Display buffer in window with `ram-info-buffer-p' buffer."
   (let (info-windows)
-    (dolist (window (window-list-1 nil 'nomini 'A))
+    (dolist (window (window-list-1 nil 'nomini))
       (when (ram-info-buffer-p (window-buffer window) nil)
         (push window info-windows)))
     ;; (set-window-buffer (car info-windows) buf)
@@ -2081,7 +2081,7 @@ one, an error is signaled."
 (defun ram-display-buffer-in-interactive-window (buf alist)
   "Display buffer in window with `ram-interactive-buffer-p' buffer."
   (let (interactive-windows)
-    (dolist (window (window-list-1 nil 'nomini 'A))
+    (dolist (window (window-list-1 nil 'nomini))
       (when (ram-interactive-buffer-p (window-buffer window) nil)
         (push window interactive-windows)))
     ;; (set-window-buffer (car interactive-windows) buf)
@@ -2097,7 +2097,7 @@ one, an error is signaled."
           (buf-mode (with-current-buffer buf major-mode))
           same-name
           same-mode)
-      (dolist (window (window-list-1 nil 'nomini 'A))
+      (dolist (window (window-list-1 nil 'nomini))
         (let ((name? (with-current-buffer (window-buffer window)
                        (cond ((equal buf-name (buffer-name)) 'same))))
               (mode? (with-current-buffer (window-buffer window)
@@ -2115,7 +2115,7 @@ one, an error is signaled."
 (defun ram-display-buffer-in-other-window (buf alist)
   "Display buffer in any other window if it exists."
   (let (windows)
-    (dolist (window (window-list-1 nil 'nomini 'A))
+    (dolist (window (window-list-1 nil 'nomini))
       (when (not (eq window (selected-window)))
         (push window windows)))
     (when windows
@@ -4225,7 +4225,7 @@ Ignore \"No following same-level heading\" error, call
            (save-buffer)
            (let ((diff-win (car (seq-filter
                                  (lambda (w) (equal "*git-gutter:diff*" (buffer-name (window-buffer w))))
-                                 (window-list-1 nil 'nomini 'A)))))
+                                 (window-list-1 nil 'nomini)))))
              (when diff-win
                (quit-window nil diff-win)))
            (magit-status)))
