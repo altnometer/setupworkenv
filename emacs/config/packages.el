@@ -8501,7 +8501,7 @@ buffer-local `ram-face-remapping-cookie'."
 
 (autoload 'dired-mode "dired")
 
-;;** dired settings
+;;** dired: settings
 
 ;; use the other dired window at the paste/move target
 (setq dired-dwim-target t)
@@ -8516,7 +8516,17 @@ buffer-local `ram-face-remapping-cookie'."
 
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
-;;** dired bindings
+;;** dired: functions
+
+(defun ram-dired-find-dir ()
+  "Find directory recursively."
+  (interactive)
+  (let ((start-dir (read-directory-name "Directory:"))
+        (find-cmd-opts (format "-type d -name '%s'" (read-string "Search string: "))))
+    (message "Ran (find-dired  %s %s)" start-dir find-cmd-opts)
+    (find-dired start-dir find-cmd-opts)))
+
+;;** dired: bindings
 
 ;; default behavior would create a new buffer for each visited dir, change it with the following:
 ;; was dired-advertised-find-file
