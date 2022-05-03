@@ -6164,33 +6164,52 @@ If there is no Clojure REPL, send warning."
         (clojure-backward-logical-sexp 1)
         (buffer-substring-no-properties (point) end)))))
 
-(defun ram-clojure-eval-defun-at-point-in-reveal (arg)
+(defun ram-clojure-eval-defun-at-point (arg)
   "Evaluate top level sexp at point."
   (interactive "P")
   (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
-        (cider-show-eval-spinner 'nil)
-        (cider-use-overlays nil))
-    (cider-interactive-eval (ram-clojure-get-defun-at-point) (lambda (response) 'nil) nil nil)
+        ;; the workspace that shows reveal buffers as defined in
+        ;; display-buffer-alist
+        (reveal-exwm-workspace 4))
+    (ram-cider-eval (ram-clojure-get-defun-at-point))
     ;; switch to workspace that displays Reveal window
-    ;; it is determined by the exwm settings
-    (ram-reveal-display-buffers orginal-workspace 4)
-    ))
+    (ram-reveal-display-buffers orginal-workspace reveal-exwm-workspace)))
 
 (defun ram-clojure-eval-last-sexp (arg)
   "Evaluate the sexp preceding the point."
   (interactive "P")
   (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
-        (cider-show-eval-spinner 'nil)
-        (cider-use-overlays nil))
-    (cider-interactive-eval (ram-clojure-get-last-sexp) (lambda (response) 'nil) nil nil)
+        ;; the workspace that shows reveal buffers as defined in
+        ;; display-buffer-alist
+        (reveal-exwm-workspace 4))
+    (ram-cider-eval (ram-clojure-get-last-sexp))
     ;; switch to workspace that displays Reveal window
-    ;; it is determined by the exwm settings
-    (ram-reveal-display-buffers orginal-workspace 4)
-    ))
+    (ram-reveal-display-buffers orginal-workspace reveal-exwm-workspace)))
+
+(defun ram-clojure-tap-defun-at-point (arg)
+  "Evaluate top level sexp at point wrapped in \"tap>\"."
+  (interactive "P")
+  (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
+        ;; the workspace that shows reveal buffers as defined in
+        ;; display-buffer-alist
+        (reveal-exwm-workspace 4))
+    (ram-cider-eval (format "(tap> %s)" (ram-clojure-get-defun-at-point)))
+    ;; switch to workspace that displays Reveal window
+    (ram-reveal-display-buffers orginal-workspace reveal-exwm-workspace)))
+
+(defun ram-clojure-tap-last-sexp (arg)
+  "Evaluate the sexp preceding the point wrapped in \"tap>\"."
+  (interactive "P")
+  (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
+        ;; the workspace that shows reveal buffers as defined in
+        ;; display-buffer-alist
+        (reveal-exwm-workspace 4))
+    (ram-cider-eval (format "(tap> %s)" (ram-clojure-get-last-sexp)))
+    ;; switch to workspace that displays Reveal window
+    (ram-reveal-display-buffers orginal-workspace reveal-exwm-workspace)))
 
 ;;** clojure: hooks, advice, timers
 
-(add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
 (add-hook 'clojure-mode-hook #'cider-mode)
 
 ;;** clojure: reveal
@@ -6218,10 +6237,6 @@ If there is no Clojure REPL, send warning."
   (interactive)
   (let ((form "{:vlaaad.reveal/command '(clear-output)}"))
     (ram-cider-eval form)))
-
-(defun ram-clojure-reveal-tap (form)
-  "Evaluate \"(tap> FORM)\""
-  ())
 
 (defun ram-reveal-as-table (form-str)
   (;; ram-cider-eval
