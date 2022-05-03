@@ -6129,19 +6129,22 @@ If there is no Clojure REPL, send warning."
 
 (defun ram-clojure-add-bindings ()
   (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
-  (define-key clojure-mode-map (kbd "<f2> <f2>") #'ram-clojure-eval-defun-at-point-in-reveal)
+  (define-key clojure-mode-map (kbd "<f2> <f2>") #'ram-clojure-eval-defun-at-point)
+  (define-key clojure-mode-map (kbd "<f2> <f7>") #'ram-clojure-tap-defun-at-point)
 
   (define-key clojure-mode-map (kbd "<f2> <f14>") #'ram-clojure-eval-last-sexp)
   (define-key clojure-mode-map (kbd "<f2> e") #'ram-clojure-eval-last-sexp)
+  (define-key clojure-mode-map (kbd "<f2> t") #'ram-clojure-tap-last-sexp)
 
   (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
   (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
 
   (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
-  (define-key clojure-mode-map (kbd "<f2> t") #'ram-reveal-defun-as-table)
 
   (define-key clojure-mode-map (kbd "<return>") #'ram-newline-and-indent)
   (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent))
+
+(add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
 
 ;;** clojure: functions
 
