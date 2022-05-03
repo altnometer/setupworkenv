@@ -6242,7 +6242,7 @@ If there is no Clojure REPL, send warning."
     (ram-cider-eval form)))
 
 (defun ram-reveal-as-table (form-str)
-  (;; ram-cider-eval
+  (ram-cider-eval
    (format "{:vlaaad.reveal/command
  '(open-view
    {:fx/type action-view
