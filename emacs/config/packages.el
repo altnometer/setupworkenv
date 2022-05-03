@@ -230,6 +230,8 @@ abort completely with `C-g'."
           ("cat" "category")
           ("cats" "categories")
 
+          ("clsp" "=clojure-lsp=")
+
           ("comn" "computation")
           ("comp" "compute")
           ("cmd" "command")
@@ -309,6 +311,8 @@ abort completely with `C-g'."
           ("kw" "keyword")
           ("kws" "keywords")
 
+          ("Lsp" "LSP")
+
           ("lc" "logical consequence")
           ("lg" "language")
           ("lgs" "languages")
@@ -332,18 +336,20 @@ abort completely with `C-g'."
 
           ("oa" "org-agenda")
 
-          ("par" "parentheses")
+          ("par" "paragraph")
+          ("pars" "paragraphs")
+          ("parn" "parentheses")
           ("pg" "program")
           ("pgg" "programming")
 
-          ("par" "paragraph")
-          ("pars" "paragraphs")
           ("pr" "procedure")
           ("prs" "procedures")
           ("prop" "property")
           ("props" "properties")
           ("prd" "predicate")
           ("pri" "principle")
+          ("prj" "project")
+          ("prjs" "project")
 
           ("parm" "parameter")
           ("parmd" "parameterized")
