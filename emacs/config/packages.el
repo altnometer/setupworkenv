@@ -2752,6 +2752,8 @@ it can be passed in POS."
   "Insert \"~\" in front of a sexp and after it."
   (interactive)
   (backward-sexp 1)
+  (cond
+   ((= (char-before) ?\:) (backward-char)))
   (insert "~")
   (backward-sexp -1)
   (insert "~"))
