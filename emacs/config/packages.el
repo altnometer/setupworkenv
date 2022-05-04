@@ -2173,9 +2173,11 @@ part returns a window for displaying the buffer in WORKSPACE-IDX
   (list test-buffer-p
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm desktop %d" workspace-idx)
-            (let* ((frame (exwm-workspace--workspace-from-frame-or-index ,workspace-idx))
-                   (window (car (window-list-1 nil 'nomini frame)))
-                   (selected-frm (selected-frame)))
+            (when-let* ((frame (and (frame-parameter (selected-frame) 'exwm-active)
+                                    (<= ,workspace-idx (exwm-workspace--count))
+                                    (exwm-workspace--workspace-from-frame-or-index ,workspace-idx)))
+                        (window (car (window-list-1 nil 'nomini frame)))
+                        (selected-frm (selected-frame)))
               (when window
                 (exwm-workspace-switch ,workspace-idx)
                 (exwm-workspace-switch selected-frm)
@@ -2194,49 +2196,50 @@ expression."
   (list test-buffer-p
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm workspace %d or %d" primary secondary)
-            (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
-                   (primary ,primary)
-                   (secondary ,secondary)
-                   (buffer-sameness-p (lambda (frm)
-                                        (,test-buffer-p (window-buffer (frame-selected-window frm)))))
-                   (selected-frm (selected-frame))
-                   ;; decide between primary and secondary workspaces
-                   (workspc (cond
-                             ;; primary-frame is not active, select it
-                             ((not (frame-parameter primary-frame 'exwm-active))
-                              ;; (message "???????? case 1")
-                              primary)
-                             ;; primary is active but buffer-sameness-p is false, select it
-                             ((and (frame-parameter primary-frame 'exwm-active)
-                                   (not (funcall buffer-sameness-p primary-frame)))
-                              ;; (message "???????? case 2")
-                              primary)
-                             ;; selected primary is displaying sameness buffer, select secondary
-                             ((and (eq selected-frm primary-frame)
-                                   (funcall buffer-sameness-p primary-frame))
-                              ;; (message "???????? case 3")
-                              secondary)
-                             ;; not selected primary is displaying sameness buffer
-                             ((and (frame-parameter primary-frame 'exwm-active)
-                                   (not (eq selected-frm primary-frame))
-                                   (funcall buffer-sameness-p primary-frame))
-                              ;; selected displaying sameness buffer too, select primary
-                              ;; (message "???????? case 4")
-                              (if (funcall buffer-sameness-p selected-frm)
-                                  primary
-                                secondary))
-                             (t
-                              ;; (message "???????? case default")
-                              primary)))
-                   ;; ALIST indicates it wants other window or frame
-                   (other-frame-p (or (cdr (assq 'inhibit-same-window alist))
-                                      (cdr (assq 'reusable-frames alist))))
-                   ;; swap workspc when other-frame-p is true
-                   (workspc (if other-frame-p
-                                (if (= workspc primary) secondary primary)
-                              workspc))
-                   (workspc-frm (exwm-workspace--workspace-from-frame-or-index workspc))
-                   (window-to-display-in (car (window-list-1 nil 'nomini workspc-frm))))
+            (when-let* ((primary-frame (and (frame-parameter (selected-frame) 'exwm-active)
+                                            (<= ,primary (exwm-workspace--count))
+                                            (<= ,secondary (exwm-workspace--count))
+                                            (exwm-workspace--workspace-from-frame-or-index ,primary)))
+                        (primary ,primary)
+                        (secondary ,secondary)
+                        (buffer-sameness-p (lambda (frm)
+                                             (,test-buffer-p (window-buffer (frame-selected-window frm)))))
+                        (selected-frm (selected-frame))
+                        ;; decide between primary and secondary workspaces
+                        (workspc (cond
+                                  ;; primary-frame is not active, select it
+                                  ((not (frame-parameter primary-frame 'exwm-active))
+                                   ;; (message "???????? case 1")
+                                   primary)
+                                  ;; primary is active but buffer-sameness-p is false, select it
+                                  ((and (frame-parameter primary-frame 'exwm-active)
+                                        (not (funcall buffer-sameness-p primary-frame)))
+                                   ;; (message "???????? case 2")
+                                   primary)
+                                  ;; selected primary is displaying sameness buffer, select secondary
+                                  ((and (eq selected-frm primary-frame)
+                                        (funcall buffer-sameness-p primary-frame))
+                                   ;; (message "???????? case 3")
+                                   secondary)
+                                  ;; not selected primary is displaying sameness buffer
+                                  ((and (frame-parameter primary-frame 'exwm-active)
+                                        (not (eq selected-frm primary-frame))
+                                        (funcall buffer-sameness-p primary-frame))
+                                   ;; selected displaying sameness buffer too, select primary
+                                   ;; (message "???????? case 4")
+                                   (if (funcall buffer-sameness-p selected-frm)
+                                       primary
+                                     secondary))
+                                  (t
+                                   ;; (message "???????? case default")
+                                   primary)))
+                        ;; swap workspc when ALIST indicates it wants other window or frame
+                        (workspc (if (or (cdr (assq 'inhibit-same-window alist))
+                                         (cdr (assq 'reusable-frames alist)))
+                                     (if (= workspc primary) secondary primary)
+                                   workspc))
+                        (workspc-frm (exwm-workspace--workspace-from-frame-or-index workspc))
+                        (window-to-display-in (car (window-list-1 nil 'nomini workspc-frm))))
               (when window-to-display-in
                 (exwm-workspace-switch workspc-frm)
                 ;; when new and selected frame share same monitor, keep new one active
@@ -2255,28 +2258,31 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
   (list test-buffer-p
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm workspace %d or %d" primary secondary)
-            (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
-                   (primary ,primary)
-                   (secondary ,secondary)
-                   (buffer-sameness-p (lambda (frm)
-                                        (,test-buffer-p (window-buffer (frame-selected-window frm)))))
-                   (selected-frm (selected-frame))
-                   ;; decide between primary and secondary workspaces
-                   (workspc (cond
-                             ;; selected is displaying sameness buffer, choose it
-                             ((funcall buffer-sameness-p (selected-frame))
-                              (if (eq (selected-frame) primary-frame)
-                                  primary
-                                secondary))
-                             (t
-                              ;; choose workspace in the other monitor
-                              (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
-                                           (frame-parameter primary-frame 'exwm-randr-monitor))
-                                  secondary
-                                primary))))
-                   (window-to-display-in
-                    (car (window-list-1 nil 'nomini
-                                        (exwm-workspace--workspace-from-frame-or-index workspc)))))
+            (when-let* ((primary-frame (and (frame-parameter (selected-frame) 'exwm-active)
+                                            (<= ,primary (exwm-workspace--count))
+                                            (<= ,secondary (exwm-workspace--count))
+                                            (exwm-workspace--workspace-from-frame-or-index ,primary)))
+                        (primary ,primary)
+                        (secondary ,secondary)
+                        (buffer-sameness-p (lambda (frm)
+                                             (,test-buffer-p (window-buffer (frame-selected-window frm)))))
+                        (selected-frm (selected-frame))
+                        ;; decide between primary and secondary workspaces
+                        (workspc (cond
+                                  ;; selected is displaying sameness buffer, choose it
+                                  ((funcall buffer-sameness-p (selected-frame))
+                                   (if (eq (selected-frame) primary-frame)
+                                       primary
+                                     secondary))
+                                  (t
+                                   ;; choose workspace in the other monitor
+                                   (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
+                                                (frame-parameter primary-frame 'exwm-randr-monitor))
+                                       secondary
+                                     primary))))
+                        (window-to-display-in
+                         (car (window-list-1 nil 'nomini
+                                             (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window-to-display-in
                 (exwm-workspace-switch workspc)
                 (exwm-workspace-switch selected-frm)
@@ -2294,33 +2300,37 @@ same buffer or if TEST-BUFFER-P for the buffer is false."
   (list test-buffer-p
         `(lambda (buffer alist)
            ,(format "Display BUFFER in workspace %d in a horizontal split." workspace-idx)
-           (let* ((target-frame (exwm-workspace--workspace-from-frame-or-index ,workspace-idx))
-                  (target-window (frame-selected-window target-frame))
-                  (buffer-name (if (stringp buffer) buffer (buffer-name buffer)))
-                  (next-to-target-window (next-window target-window 'nomini target-frame))
-                  (windows-in-frame (window-list-1 nil 'nomini target-frame))
-                  (win-displaying-same-buf (car
-                                            (seq-filter (lambda (w)
-                                                          (string= buffer-name
-                                                                   (buffer-name (window-buffer w))))
-                                                        windows-in-frame)))
-                  (delete-windows-except (lambda (exclude-this-window)
-                                           (let ((buffer-major-mode (buffer-local-value 'major-mode (get-buffer buffer))))
-                                             (when (> (length windows-in-frame) 1)
-                                               (dolist (w windows-in-frame)
-                                                 (when (and (not (equal w exclude-this-window))
-                                                            (or
-                                                             ;; different major-mode
-                                                             (not (string= buffer-major-mode
-                                                                           (buffer-local-value 'major-mode (window-buffer w))))
-                                                             ;; same buffer
-                                                             (string= buffer-name (buffer-name (window-buffer w)))))
-                                                   (delete-window w))))))))
+           (when-let* ((target-frame (and (frame-parameter (selected-frame) 'exwm-active)
+                                          (<= ,workspace-idx (exwm-workspace--count))
+                                          (exwm-workspace--workspace-from-frame-or-index ,workspace-idx)))
+                       (target-window (frame-selected-window target-frame))
+                       (buffer-name (if (stringp buffer) buffer (buffer-name buffer)))
+                       (next-to-target-window (next-window target-window 'nomini target-frame))
+                       (windows-in-frame (window-list-1 nil 'nomini target-frame))
+                       ;; defined as a fn only because of #'when-let*
+                       (get-win-displaying-same-buf (lambda (frame-windows)
+                                                      (car
+                                                       (seq-filter (lambda (w)
+                                                                     (string= buffer-name
+                                                                              (buffer-name (window-buffer w))))
+                                                                   frame-windows))))
+                       (delete-windows-except (lambda (exclude-this-window)
+                                                (let ((buffer-major-mode (buffer-local-value 'major-mode (get-buffer buffer))))
+                                                  (when (> (length windows-in-frame) 1)
+                                                    (dolist (w windows-in-frame)
+                                                      (when (and (not (equal w exclude-this-window))
+                                                                 (or
+                                                                  ;; different major-mode
+                                                                  (not (string= buffer-major-mode
+                                                                                (buffer-local-value 'major-mode (window-buffer w))))
+                                                                  ;; same buffer
+                                                                  (string= buffer-name (buffer-name (window-buffer w)))))
+                                                        (delete-window w))))))))
              (cond
               ;; reuse window displaying same buffer
-              (win-displaying-same-buf
-               (funcall delete-windows-except win-displaying-same-buf)
-               (window--display-buffer buffer win-displaying-same-buf 'reuse alist))
+              ((funcall get-win-displaying-same-buf windows-in-frame)
+               (funcall delete-windows-except (funcall get-win-displaying-same-buf windows-in-frame))
+               (window--display-buffer buffer (funcall get-win-displaying-same-buf windows-in-frame) 'reuse alist))
               ;; reuse target-window displaying same buffer
               ;; ((string= (buffer-name (window-buffer target-window))
               ;;           (if (stringp buffer) buffer (buffer-name buffer)))
@@ -2384,27 +2394,30 @@ displaying TEST-BUFFER-P buffer."
   (list test-buffer-p
         `(lambda (buffer alist)
            ,(format "Display BUFFER in exwm desktop %d or %d with horizontal split." primary secondary)
-           (let* ((primary-frame (exwm-workspace--workspace-from-frame-or-index ,primary))
-                  (primary ,primary)
-                  (secondary ,secondary)
-                  (buffer-sameness-p (lambda (frm)
-                                        (,test-buffer-p (window-buffer (frame-selected-window frm)))))
-                  (workspc (cond
-                            ;; selected is displaying sameness buffer, choose it
-                            ((funcall buffer-sameness-p (selected-frame))
-                             (if (eq (selected-frame) primary-frame)
-                                 primary
-                               secondary))
-                            (t
-                             ;; if selected workspace is in the same monitor as the primary,
-                             ;; choose secondary.
-                             (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
-                                          (frame-parameter primary-frame 'exwm-randr-monitor))
-                                 secondary
-                               primary))))
-                  (target-frame (exwm-workspace--workspace-from-frame-or-index workspc))
-                  (target-window (frame-selected-window target-frame))
-                  (next-to-target-window (next-window target-window 'nomini target-frame)))
+           (when-let* ((primary-frame (and (frame-parameter (selected-frame) 'exwm-active)
+                                           (<= ,primary (exwm-workspace--count))
+                                           (<= ,secondary (exwm-workspace--count))
+                                           (exwm-workspace--workspace-from-frame-or-index ,primary)))
+                       (primary ,primary)
+                       (secondary ,secondary)
+                       (buffer-sameness-p (lambda (frm)
+                                            (,test-buffer-p (window-buffer (frame-selected-window frm)))))
+                       (workspc (cond
+                                 ;; selected is displaying sameness buffer, choose it
+                                 ((funcall buffer-sameness-p (selected-frame))
+                                  (if (eq (selected-frame) primary-frame)
+                                      primary
+                                    secondary))
+                                 (t
+                                  ;; if selected workspace is in the same monitor as the primary,
+                                  ;; choose secondary.
+                                  (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
+                                               (frame-parameter primary-frame 'exwm-randr-monitor))
+                                      secondary
+                                    primary))))
+                       (target-frame (exwm-workspace--workspace-from-frame-or-index workspc))
+                       (target-window (frame-selected-window target-frame))
+                       (next-to-target-window (next-window target-window 'nomini target-frame)))
              (exwm-workspace-switch target-frame)
              (cond
               ;; reuse target-window displaying same buffer
