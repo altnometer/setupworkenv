@@ -4102,7 +4102,7 @@ Use calendar if ARG value is '(4)."
 
 (defun ram-move-to-heading-visible-char ()
   "Move to first visible char assuming starting at `point-at-bol'."
-  (re-search-forward "[^[:space:]]")
+  (re-search-forward "[^[:space:]]" (point-at-eol) 'NOERROR 1)
   (backward-char))
 
 ;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
