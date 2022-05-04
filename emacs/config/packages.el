@@ -6155,13 +6155,12 @@ If there is no Clojure REPL, send warning."
   (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
 
   (define-key clojure-mode-map (kbd "<return>") #'ram-newline-and-indent)
-  (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent))
+  (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent)
+  (define-key clojure-mode-map (kbd ":") #'ram-insert-column))
 
 (add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
 
 ;;** clojure: functions
-
-;;** clojure/functions: 
 
 (defun ram-clojure-get-last-sexp ()
   "Return the sexp preceding the point."
@@ -8662,7 +8661,9 @@ buffer-local `ram-face-remapping-cookie'."
 
 (define-key global-map (kbd "<M-f16>") #'copy-line)
 
-;;** custom: ram-up-list-insert-space
+;;** custom: insert
+
+;;*** custom/insert: ram-up-list-insert-space
 
 (defun ram-forward-over-whitespace-to-regexp (regexp)
   "Return  `match-beginning' of regexp if preceded by whitespace."
@@ -8714,6 +8715,19 @@ buffer-local `ram-face-remapping-cookie'."
      (t (insert " ")))))
 
 (define-key global-map (kbd "S-SPC") #'ram-up-list-insert-space)
+
+;;*** custom/insert: ram-insert-column
+
+(defun ram-insert-column ()
+  "Insert space followed by ':'."
+  (interactive)
+  (cond
+   ((memq (char-before) ram-open-delimiters) (insert ":"))
+   ((memq (char-before) ram-open-delimiters) (insert ":"))
+   ((or (= (char-before) 10)            ; beginning of line
+        (= (char-before) 32))           ; white space
+    (insert ":"))
+   (t (insert " :"))))
 
 ;;** custom: narrow
 
