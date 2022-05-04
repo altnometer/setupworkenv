@@ -7000,7 +7000,9 @@ been modified since its last check-in."
                   :weight light
                   :background "grey55" :foreground "black"
                   :height
-                  ,(if (>= (x-display-pixel-width) large-sreen-width)
+                  ,(if (and (eq (window-system) 'x)
+                            (fboundp 'x-display-pixel-width)
+                            (>= (x-display-pixel-width) large-sreen-width))
                        155
                      100))))
 
@@ -7013,7 +7015,9 @@ been modified since its last check-in."
                   :weight light
                   :foreground "grey20" :background "grey90"
                   :height
-                  ,(if (>= (x-display-pixel-width) large-sreen-width)
+                  ,(if (and (eq (window-system) 'x)
+                            (fboundp 'x-display-pixel-width)
+                            (>= (x-display-pixel-width) large-sreen-width))
                        155
                      100))))
 
@@ -8069,7 +8073,9 @@ With a prefix argument N, (un)comment that many sexps."
   (interactive)
   (if window-system
       (progn
-        (if (>= (x-display-pixel-width) large-sreen-width)
+        (if (and (eq (window-system) 'x)
+                 (fboundp 'x-display-pixel-width)
+                 (>= (x-display-pixel-width) large-sreen-width))
             (progn
               (set-frame-parameter frame 'font "Operator Mono Medium-19")
               (custom-set-faces
