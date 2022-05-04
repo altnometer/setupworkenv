@@ -2834,10 +2834,12 @@ it can be passed in POS."
 
 (defun ram-org-mode-syntax-table-update ()
   "Update `org-mode-syntax-table'."
-  ;; the default is word constituent, breaks expansion
-  (modify-syntax-entry ?' "'" org-mode-syntax-table)
-  ;; the default is symbol constituent, breaks expansion
-  (modify-syntax-entry ?~ "'" org-mode-syntax-table))
+  ;; the default for ?' is word constituent, breaks expansion
+  (modify-syntax-entry ?\' "'" org-mode-syntax-table)
+  ;; the default for ?~ is symbol constituent, breaks expansion
+  (modify-syntax-entry ?\~ "'" org-mode-syntax-table)
+  ;; make ?: a word constituent
+  (modify-syntax-entry ?\: "w" org-mode-syntax-table))
 
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
 
