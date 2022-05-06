@@ -228,6 +228,8 @@ abort completely with `C-g'."
           ("Cj" "Clojure")
           ("cm" "computer")
           ("cat" "category")
+          ("catzd" "categorized")
+          ("catzn" "categorization")
           ("cats" "categories")
 
           ("clsp" "=clojure-lsp=")
@@ -235,6 +237,7 @@ abort completely with `C-g'."
           ("comn" "computation")
           ("comp" "compute")
           ("cmd" "command")
+          ("cmds" "commands")
           ("compl" "completion")
           ("complg" "completing")
 
@@ -253,8 +256,8 @@ abort completely with `C-g'."
           ("decn" "declaration")
           ("def" "definition")
 
-          ("dep" "dependency")
-          ("deps" "dependencies")
+          ("dp" "dependency")
+          ("dps" "dependencies")
 
           ("df" "different")
           ("dfy" "differently")
@@ -273,6 +276,10 @@ abort completely with `C-g'."
           ("evg" "evaluating")
           ("evn" "evaluation")
           ("evt" "evaluation")
+
+          ("excn" "exception")
+          ("excns" "exceptions")
+
           ("exp" "expression")
           ("expd" "expressed")
           ("exps" "expressions")
@@ -311,6 +318,8 @@ abort completely with `C-g'."
           ("kw" "keyword")
           ("kws" "keywords")
 
+          ("lib" "library")
+          ("libs" "libraries")
           ("Lsp" "LSP")
 
           ("lc" "logical consequence")
@@ -338,18 +347,6 @@ abort completely with `C-g'."
 
           ("par" "paragraph")
           ("pars" "paragraphs")
-          ("parn" "parentheses")
-          ("pg" "program")
-          ("pgg" "programming")
-
-          ("pr" "procedure")
-          ("prs" "procedures")
-          ("prop" "property")
-          ("props" "properties")
-          ("prd" "predicate")
-          ("pri" "principle")
-          ("prj" "project")
-          ("prjs" "project")
 
           ("parm" "parameter")
           ("parmd" "parameterized")
@@ -357,6 +354,22 @@ abort completely with `C-g'."
           ("parmn" "parameterization")
           ("parms" "parameters")
           ("parmz" "parameterize")
+          ("parn" "parentheses")
+
+          ("pg" "program")
+          ("pgs" "programs")
+          ("pgg" "programming")
+
+          ("pr" "procedure")
+          ("prs" "procedures")
+
+          ("proc" "process")
+          ("prop" "property")
+          ("props" "properties")
+          ("prd" "predicate")
+          ("pri" "principle")
+          ("prj" "project")
+          ("prjs" "project")
 
           ("prec" "preceding")
           ("prev" "previous")
