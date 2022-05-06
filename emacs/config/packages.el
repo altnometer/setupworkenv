@@ -3602,7 +3602,7 @@ ARG value is 4."
                        parsed-buffer 'node-property
                      (lambda (prop)
                        (when (string= (org-element-property :key prop) "ID")
-                         (concat "[[id:" (org-element-property :value prop) "][source]]")))
+                         (concat "[[id:" (org-element-property :value prop) "][backlink]]")))
                      'first-match t))
          (templates
           `(("d" "capture document title"
