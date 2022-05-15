@@ -2780,12 +2780,17 @@ it can be passed in POS."
 (defun ram-wrap-in-~ ()
   "Insert \"~\" in front of a sexp and after it."
   (interactive)
-  (backward-sexp 1)
-  (cond
-   ((= (char-before) ?\:) (backward-char)))
-  (insert "~")
-  (backward-sexp -1)
-  (insert "~"))
+  (let ((new-syntax-table (copy-syntax-table org-mode-syntax-table)))
+    (with-syntax-table
+        new-syntax-table
+      (modify-syntax-entry ?\: "w" new-syntax-table)
+      (backward-sexp 1)
+      (cond
+       ((= (char-before) ?\:) (backward-char)))
+      (insert "~")
+      (backward-sexp -1)
+      (insert "~"))))
+
 
 (with-eval-after-load "org"
   ;; originally, C-' runs the command org-cycle-agenda-files
@@ -2868,7 +2873,8 @@ it can be passed in POS."
   ;; the default for ?~ is symbol constituent, breaks expansion
   (modify-syntax-entry ?\~ "'" org-mode-syntax-table)
   ;; make ?: a word constituent
-  (modify-syntax-entry ?\: "w" org-mode-syntax-table))
+  ;; (modify-syntax-entry ?\: "w" org-mode-syntax-table)
+  )
 
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
 
