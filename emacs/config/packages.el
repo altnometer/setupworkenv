@@ -7450,11 +7450,6 @@ With \\[universal-argument] do it for the current file instead."
  '(expand-region :type git :flavor melpa :host github :repo "magnars/expand-region.el"))
 (define-key global-map (kbd "C-'") #'er/expand-region)
 
-;;** packages: flycheck
-(straight-use-package
- '(flycheck :type git :flavor melpa :host github :repo "flycheck/flycheck"))
-(add-hook 'clojure-mode-hook #'flycheck-mode)
-
 ;;** packages: iedit
 (straight-use-package
  '(iedit :type git :flavor melpa :host github :repo "victorhge/iedit"))
@@ -7862,7 +7857,12 @@ That is, remove a non kept dired from the recent list."
   (setq ispell-dictionary "en_US")
   ;; (setq ispell-extra-args '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
   )
+
 ;;** spelling: flycheck
+
+(straight-use-package
+ '(flycheck :type git :flavor melpa :host github :repo "flycheck/flycheck"))
+(add-hook 'clojure-mode-hook #'flycheck-mode)
 
 ;;*** spelling/flycheck: settings
 
