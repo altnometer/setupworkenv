@@ -7118,7 +7118,14 @@ been modified since its last check-in."
                 " %*%*%* "
                 ;; mode-line-buffer-identification
 
-                (:eval (propertize "%b " 'face font-lock-keyword-face
+                ;; (:eval (propertize "%b " 'face font-lock-keyword-face
+                ;;                    'help-echo (buffer-file-name)))
+                (:eval (propertize (format "%s " (if (> (length (buffer-name)) 25)
+                                                     (format "%s...%s" (substring (buffer-name) 0 13)
+                                                             (substring (buffer-name) (- (length (buffer-name))
+                                                                                         12)))
+                                                   (buffer-name)))
+                                   'face font-lock-keyword-face
                                    'help-echo (buffer-file-name)))
                 (:eval (if (boundp 'git-gutter-mode)
                            (propertize (format "+%s " (car (git-gutter:statistic)))
