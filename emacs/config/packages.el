@@ -6254,9 +6254,31 @@ If there is no Clojure REPL, send warning."
     ;; switch to workspace that displays Reveal window
     (ram-reveal-display-buffers orginal-workspace reveal-exwm-workspace)))
 
+(defun ram-assoc-clojure-buffer-with-file ()
+  "Associate a Clojure buffer with a file.
+
+The file is a part of a Clojure project. This is done so that
+Clojure editing tools, e.g., lsp-mode, are enabled."
+  (when (string= major-mode 'clojure-mode)
+    (write-region (point-min) (point-max)
+                  "~/backup/projects/clojure/hello-clojure/src/org_code/example.clj"
+                  nil ; overwrite, do not append
+                  t   ; mark buffer as visiting the file
+                  nil ; no name for locking, unlocking
+                  nil ; do not ask for confirmation to overwrite
+                  )
+    ;; the buffer is already in 'clojure-mode
+    ;; is it ok to run the 'clojure-mode-hook the second time?
+    ;; or should I just call #'lsp fn, (as the hook does).
+    ;; For now, opted for running the hook because some other
+    ;; functionality triggered in hooks might require
+    ;; a visiting file rather than just a buffer
+    (run-mode-hooks 'clojure-mode-hook)))
+
 ;;** clojure: hooks, advice, timers
 
 (add-hook 'clojure-mode-hook #'cider-mode)
+(add-hook 'org-src-mode-hook #'ram-assoc-clojure-buffer-with-file)
 
 ;;** clojure: reveal
 
