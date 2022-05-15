@@ -1612,6 +1612,8 @@ succession."
                      "defn"
                      "defn-")
                     (+ space)           ; 1 or more whitespaces
+                    (* (or "^:private"))
+                    (* space)
                     (regexp name-regex)))))
    ((eq major-mode 'racket-mode)
     (format "^(\\(def\\(?:ine\\) +%s\\)" name-regex))
