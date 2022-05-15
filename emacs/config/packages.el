@@ -216,6 +216,12 @@ abort completely with `C-g'."
           ("bhs" "behaviors")
           ("bn" "between")
 
+
+          ("cat" "category")
+          ("catzd" "categorized")
+          ("catzn" "categorization")
+          ("cats" "categories")
+
           ("chr" "character")
           ("char" "character")
           ("chrs" "characters")
@@ -227,14 +233,12 @@ abort completely with `C-g'."
           ("cj" "clojure")
           ("Cj" "Clojure")
           ("cm" "computer")
-          ("cat" "category")
-          ("catzd" "categorized")
-          ("catzn" "categorization")
-          ("cats" "categories")
 
-          ("clsp" "=clojure-lsp=")
+          ("clp" "classpath")
+          ("clsp" "clojure-lsp")
 
           ("comn" "computation")
+          ("comg" "computing")
           ("comp" "compute")
           ("cmd" "command")
           ("cmds" "commands")
@@ -250,11 +254,15 @@ abort completely with `C-g'."
 
           ("conf" "configure")
           ("confd" "configured")
+          ("confg" "configuring")
           ("confn" "configuration")
+          ("confns" "configurations")
           ;;*** D
           ("dec" "declare")
           ("decn" "declaration")
           ("def" "definition")
+
+          ("desc" "describe")
 
           ("dp" "dependency")
           ("dps" "dependencies")
@@ -265,6 +273,7 @@ abort completely with `C-g'."
           ("dft" "default")
           ("dr" "derivative")
           ("drs" "derivatives")
+
 
           ("el" "element")
           ("els" "elements")
@@ -320,6 +329,8 @@ abort completely with `C-g'."
 
           ("lib" "library")
           ("libs" "libraries")
+          ("lb" "lib")
+          ("lbs" "libs")
           ("Lsp" "LSP")
 
           ("lc" "logical consequence")
@@ -369,7 +380,7 @@ abort completely with `C-g'."
           ("prd" "predicate")
           ("pri" "principle")
           ("prj" "project")
-          ("prjs" "project")
+          ("prjs" "projects")
 
           ("prec" "preceding")
           ("prev" "previous")
@@ -403,7 +414,8 @@ abort completely with `C-g'."
           ("seq" "sequence")
 
           ("sd" "should")
-          ("spc" "specific")
+          ("spcc" "specific")
+          ("spcd" "specified")
           ("spd" "specified")
           ("spl" "special")
           ("sps" "specifies")
@@ -421,6 +433,8 @@ abort completely with `C-g'."
           ("subsg" "substituting")
           ("syn" "syntax")
           ("sync" "syntactical")
+
+          ("sys" "system")
 
           ("tq" "technique")
           ("todo" "TODO")
