@@ -2791,19 +2791,44 @@ it can be passed in POS."
       (backward-sexp -1)
       (insert "~"))))
 
+(defun ram-org-next-block (arg)
+  "Jump to next code block without raising the error.
+
+Leave a mark to return to."
+  (interactive "p")
+  (condition-case err
+      (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)
+    (user-error (when (not (string= (error-message-string err)
+                                    "No next code blocks"))
+                  (signal (car err) (cdr err))))
+    (error (signal (car err) (cdr err)))
+    ;; (:success
+    ;;  nil)
+    ))
+
+(defun ram-org-previous-block (arg)
+  "Jump to previous code block without raising the error.
+
+Leave a mark to return to."
+  (interactive "p")
+  (condition-case err
+      (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)
+    (user-error (when (not (string= (error-message-string err)
+                                    "No previous code blocks"))
+                  (signal (car err) (cdr err))))
+    (error (signal (car err) (cdr err)))
+    ;; (:success
+    ;;  nil)
+    ))
 
 (with-eval-after-load "org"
   ;; originally, C-' runs the command org-cycle-agenda-files
   (define-key org-mode-map (kbd "C-'") nil)
 
-  (define-key org-mode-map (kbd "<M-f19>") (lambda (arg) (interactive "p")
-                                            (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)))
-  (define-key org-mode-map (kbd "C-c M-f") (lambda (arg) (interactive "p")
-                                             (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)))
-  (define-key org-mode-map (kbd "<M-f20>") (lambda (arg) (interactive "p")
-                                            (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)))
-  (define-key org-mode-map (kbd "C-c M-b") (lambda (arg) (interactive "p")
-                                             (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)))
+  (define-key org-mode-map (kbd "M-<f19>") #'ram-org-next-block)
+  (define-key org-mode-map (kbd "C-c M-f") #'ram-org-next-block)
+  (define-key org-mode-map (kbd "M-<f20>") #'ram-org-previous-block)
+  (define-key org-mode-map (kbd "C-c M-b") #'ram-org-previous-block)
 
   (define-key org-mode-map (kbd "C-c C-n") #'org-next-link)
   (define-key org-mode-map (kbd "C-c C-p") #'org-previous-link)
@@ -4206,7 +4231,11 @@ Ignore \"No following same-level heading\" error, call
   (define-key outline-minor-mode-map (kbd "<tab>") #'bicycle-cycle))
 
 (define-key ram-leader-map-tap-global (kbd "n") #'ram-outline-next-visible-heading)
+(define-key global-map (kbd "<f19>") #'ram-outline-next-visible-heading)
+
 (define-key ram-leader-map-tap-global (kbd "p") #'ram-outline-previous-visible-heading)
+(define-key global-map (kbd "<f20>") #'ram-outline-previous-visible-heading)
+
 (define-key ram-leader-map-tap-global (kbd "f") #'ram-outline-forward-same-level)
 (define-key ram-leader-map-tap-global (kbd "b") #'ram-outline-backward-same-level)
 (define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
