@@ -13,7 +13,8 @@
 (setq abbrev-file-name "~/.emacs.d/lisp/abbrev-defs")
 
 (setq-default abbrev-mode t)
-(setq save-abbrevs 'silently)
+;; (setq save-abbrevs 'silently)
+(setq save-abbrevs nil)
 
 ;; (setq save-abbrevs nil)
 
