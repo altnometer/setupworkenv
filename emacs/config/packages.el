@@ -1359,10 +1359,12 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
                 (cons (car ram-describe-variable-history)
                       (cddr ram-describe-variable-history)))))
 
-  (let ((default history-add-new-input))
-    (setq history-add-new-input nil)
+  (let ((default history-add-new-input)
+        (history-add-new-input nil))
+    ;; (setq history-add-new-input nil)
     (describe-variable variable)
-    (setq history-add-new-input default)))
+    ;; (setq history-add-new-input default)
+    ))
 
 (define-key global-map (kbd "C-h v") #'ram-describe-variable)
 
