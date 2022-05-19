@@ -6382,9 +6382,11 @@ Clojure editing tools, e.g., lsp-mode, are enabled."
  '(lsp-treemacs :type git :flavor melpa :files (:defaults "icons" "lsp-treemacs-pkg.el")
                 :host github :repo "emacs-lsp/lsp-treemacs"))
 
-(add-hook 'clojure-mode-hook 'lsp)
-(add-hook 'clojurescript-mode-hook 'lsp)
-(add-hook 'clojurec-mode-hook 'lsp)
+(straight-use-package
+ '(lsp-ui :type git :flavor melpa :files (:defaults "lsp-ui-doc.html" "resources" "lsp-ui-pkg.el")
+          :host github :repo "emacs-lsp/lsp-ui"))
+
+;;*** clojure/lsp: functions
 
 ;;*** clojure/lsp: settings
 
@@ -6394,11 +6396,40 @@ Clojure editing tools, e.g., lsp-mode, are enabled."
       treemacs-space-between-root-nodes nil
       company-minimum-prefix-length 1
       lsp-lens-enable nil
-      lsp-signature-auto-activate nil
-      ; lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
+      ; lsp-enable-indentation nil ; uncomment to use r indentation instead of lsp
       ; lsp-enable-completion-at-point nil ; uncomment to use cider completion instead of lsp
       )
 (setq lsp-lens-place-position 'above-line)
+(setq lsp-enable-symbol-highlighting nil)
+(setq lsp-ui-doc-enable t)
+(setq lsp-ui-doc-show-with-cursor t)
+(setq lsp-ui-doc-show-with-mouse t)
+(setq lsp-headerline-breadcrumb-enable t)
+
+(setq lsp-ui-sideline-enable t)
+(setq lsp-ui-sideline-show-code-actions t)
+(setq lsp-ui-sideline-show-hover t)
+(setq lsp-ui-sideline-show-diagnostics t)
+(setq lsp-ui-sideline-show-code-actions nil)
+
+(setq lsp-modeline-code-actions-enable t) ; do not see anything in modeline
+(setq lsp-modeline-diagnostics-enable t)  ; same, does not work
+
+(setq lsp-diagnostics-provider :auto)
+(setq lsp-eldoc-enable-hover t) ; supposed to show docs in minibuffer
+
+(setq lsp-signature-auto-activate t)
+(setq lsp-signature-render-documentation t)
+
+(setq lsp-completion-provider :capf)
+(setq lsp-completion-show-detail t)
+(setq lsp-completion-show-kind t)
+
+;;*** clojure/lsp: hooks, advice, timers
+
+(add-hook 'clojure-mode-hook 'lsp)
+(add-hook 'clojurescript-mode-hook 'lsp)
+(add-hook 'clojurec-mode-hook 'lsp)
 
 ;;* python
 
