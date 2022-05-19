@@ -5655,27 +5655,33 @@ Before invoking `newline-and-indent':
   (when (bound-and-true-p abbrev-mode)
     (expand-abbrev))
   (let ((bounds (ignore-errors (ram-thing-bounds))))
+    ;; !!! newline-and-indent is called after 'cond actions
     (cond
+     ;; if in minibuffer, exit
      ((> (minibuffer-depth) 0)
       (exit-minibuffer))
+     ;; if in comment, do nothing
      ((ram-in-comment-p))
+     ;; when in string, go to its end
      ((ram-in-string-p) (goto-char (cdr bounds)))
-     ;; at delimited sexp begining
+     ;; at delimited sexp beginning, go to its end
      ((ram-at-delimited-beg-p) (goto-char (cdr bounds)))
-     ;; inside a list or at its border,
-     ;; the list spans a single line: go to its end
+     ;; inside a list that spans a single line: go to before the closing delimiter
      ((let ((bounds (ram-delimited-sexp-bounds))
             (line-num (line-number-at-pos)))
         (when (and bounds
                    (= line-num (line-number-at-pos (car bounds)))
-                   (= line-num (line-number-at-pos (cdr bounds))))
+                   (= line-num (line-number-at-pos (cdr bounds)))
+                   ;; not before open delim or after close delim
+                   (not (or (ram-at-delimited-beg-p)
+                            (ram-at-delimited-end-p))))
           (goto-char (cdr bounds))
           (backward-char))))
      ;; empty list: (|) -> ()|
      ((and (memq (char-after (point)) ram-close-delimiters)
            (memq (char-before (point)) ram-open-delimiters))
       (goto-char (cdr bounds)))
-     ;; blank line with ")" at the end
+     ;; blank line with `ram-close-delimiters' at the end
      ((and (looking-back "^ +" (point-at-bol))
            (looking-at (concat "[[:space:]]*" ram-close-delimiters-re)))
       (ram-remove-whitespace-between-regexps "[^[:space:]\n]" ram-close-delimiters-re)
