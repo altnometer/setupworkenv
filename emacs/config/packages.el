@@ -1639,7 +1639,9 @@ succession."
      ;; (define-key minibuffer-local-completion-map (kbd "<return>")
      ;;   (ram-add-to-history-cmd ram-add-to-jump-to-def-history 'ram-jump-to-def-history))
      (setf (alist-get ?\C-y minibuffer-local-completion-map)
-           (lambda (arg) (interactive "p")
+           (lambda (arg)
+             "Insert selection and exit."
+             (interactive "p")
              (let ((candidate
                     (replace-regexp-in-string "\\*+$" ""
                                               (car (last (split-string (substring-no-properties
