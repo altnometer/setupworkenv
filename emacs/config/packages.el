@@ -7210,10 +7210,10 @@ been modified since its last check-in."
 
                 ;; (:eval (propertize "%b " 'face font-lock-keyword-face
                 ;;                    'help-echo (buffer-file-name)))
-                (:eval (propertize (format "%s " (if (> (length (buffer-name)) 25)
+                (:eval (propertize (format "%s " (if (> (length (buffer-name)) 33)
                                                      (format "%s...%s" (substring (buffer-name) 0 13)
                                                              (substring (buffer-name) (- (length (buffer-name))
-                                                                                         12)))
+                                                                                         20)))
                                                    (buffer-name)))
                                    'face font-lock-keyword-face
                                    'help-echo (buffer-file-name)))
