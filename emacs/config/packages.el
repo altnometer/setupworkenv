@@ -2504,6 +2504,12 @@ displaying TEST-BUFFER-P buffer."
                   (eq 'emacs-lisp-mode mode)))
               2 8))
 
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "^\\*Org Src .+?\\[ emacs-lisp \\]\\*$" buf-name)))))
+
 
 ;;****** buffers/display/alist: deft
 
