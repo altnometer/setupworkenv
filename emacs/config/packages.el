@@ -1532,6 +1532,8 @@ succession."
                                        (car ram-jump-to-outline-history))
                                       headlines)))
                 (define-key minibuffer-local-completion-map (kbd "<return>") old-binding-to-return)
+                ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
+                ;; FIXME: confusing logic, rewrite without using these args
                 (list val
                       ;; if two items are inserted, swap them so that the search str is first
                       (let ((third-element (caddr ram-jump-to-outline-history))
@@ -1626,6 +1628,9 @@ succession."
   "Jump to def."
   (interactive
    (let* ((defs '())
+          ;; get the buffer to search through, even if minibuffer is active
+          ;; in case `ram-jump-to-def' is invoked from a minibuffer,
+          ;; e.g. decided to do the "def" search when doing "headers" search
           (buffer (if (minibufferp)
                       (with-minibuffer-selected-window
                         (current-buffer))
