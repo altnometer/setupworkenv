@@ -6246,7 +6246,9 @@ If there is no Clojure REPL, send warning."
 
   (define-key clojure-mode-map (kbd "<return>") #'ram-newline-and-indent)
   (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent)
-  (define-key clojure-mode-map (kbd ":") #'ram-insert-column))
+  (define-key clojure-mode-map (kbd ":") #'ram-insert-column)
+
+  (define-key clojure-mode-map (kbd "<f10>") #'ram-lsp-jump-workspace-symbol))
 
 (add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
 
@@ -6402,6 +6404,183 @@ Clojure editing tools, e.g., lsp-mode, are enabled."
           :host github :repo "emacs-lsp/lsp-ui"))
 
 ;;*** clojure/lsp: functions
+
+;;**** clojure/lsp/functions: symbols completion
+
+(defun ram-lsp-icomplete--transform-candidate (project-root candidate)
+  "Transform `lsp-mode' &SymbolInformation to build completion table from."
+  (require 'lsp-ido)
+  (if-let* ((kind (gethash "kind" candidate))
+            (sanitized-kind (if (< kind (length lsp-ido-symbol-kind-to-string)) kind 0))
+            (type (elt lsp-ido-symbol-kind-to-string sanitized-kind))
+            (typestr (if lsp-ido-show-symbol-kind (format "[%s] " type) ""))
+            (location (gethash "location" candidate))
+            (uri (gethash "uri" location))
+            (pathstr (if lsp-ido-show-symbol-filename
+                         (propertize (format " %s" (file-relative-name (lsp--uri-to-path uri) project-root))
+                                     'face 'font-lock-comment-face)
+                       ""))
+            (textual-representation
+             (lsp-render-symbol-information candidate "."))
+            (entry (concat typestr textual-representation
+                           (make-string
+                            (- (window-width) (length typestr) (length textual-representation) (length pathstr))
+                            32)
+                           pathstr)))
+      (cons entry candidate)))
+
+(defun ram-lsp-request-workspaces-symbols (query)
+  "Get all WORKSPACES symbols that match QUERY"
+  (let* ((workspace-root (lsp-workspace-root))
+         (raw-choices (with-lsp-workspaces (lsp-workspaces)
+                        (lsp-request "workspace/symbol"
+                                     (lsp-make-workspace-symbol-params :query query)))))
+    (mapcar (apply-partially #'ram-lsp-icomplete--transform-candidate
+                             workspace-root)
+            raw-choices)))
+
+(defvar ram-lsp-workspace-symbol-history nil "History for `lsp-mode' symbols completions.")
+(put 'ram-lsp-workspace-symbol-history 'history-length 20)
+
+(defun ram-lsp-add-to-workspace-symbol-history ()
+  "Add search string entered in minibuffer to `ram-lsp-workspace-symbol-history'."
+  (interactive)
+  (let ((search-str (buffer-substring
+                     (line-beginning-position) (line-end-position 1))))
+    ;; (message ">>> this-command: %S" this-command)
+    (when (>=  (length (buffer-substring
+                        (line-beginning-position) (line-end-position 1)))
+               2)
+      (add-to-history 'ram-lsp-workspace-symbol-history search-str)))
+  (minibuffer-force-complete-and-exit))
+(intern "ram-lsp-add-to-workspace-symbol-history")
+
+(defun ram-lsp-jump-to-workspace-symbol-from-minibuffer ()
+  "Call `ram-lsp-jump-workspace-symbol' and use previous minibuffer input.
+Toggle `lsp-ido-show-symbol-filename'."
+  (interactive)
+  (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol)))
+        (lsp-ido-show-symbol-filename (not lsp-ido-show-symbol-filename)))
+    (minibuffer-with-setup-hook
+        (lambda () (insert user-input))
+      (condition-case err
+          (with-current-buffer (window-buffer (minibuffer-selected-window))
+            (call-interactively #'ram-lsp-jump-workspace-symbol))
+        (quit (abort-recursive-edit))
+        (:success (abort-recursive-edit))))))
+(intern "ram-lsp-jump-to-workspace-symbol-from-minibuffer")
+
+(defun ram-lsp-jump-selected-candidate (candidate)
+  "Jump to selected candidate."
+  (require 'dash)
+  (-let (((&SymbolInformation
+           :location (&Location :uri
+                                :range (&Range :start (&Position :line :character))))
+          candidate))
+    (find-file (lsp--uri-to-path uri))
+    (goto-char (point-min))
+    (forward-line line)
+    (forward-char character)))
+
+(defun ram-lsp-jump-workspace-symbol (arg)
+  "Search among `lsp-mode' workspace symbols and jump to its definition."
+  (interactive "P")
+  (let* ((symbl-at-point (symbol-at-point))
+         ;; (query (if (and (equal arg '(4)) symbl-at-point) (symbol-name symbl-at-point) ""))
+         ;; if query is provided, you can search only in the narrowed
+         ;; providing the query limits the search candidates,
+         ;; if you decide to search for a part of the symbol, it would not work.
+         ;; for now, allow searching from the full set of symbols
+         (query "")
+         (candidates (ram-lsp-request-workspaces-symbols query))
+         ;; do not use default writing to history
+         (history-add-new-input nil)
+         (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
+         (this-cmd-key (aref (this-command-keys) 0))
+         (minibuffer-cmd-bound-to-this-cmd-key (cdr (assoc this-cmd-key
+                                                           minibuffer-local-completion-map)))
+         (selected-symbol nil)
+         (hist-item (car ram-lsp-workspace-symbol-history))
+         (rebind-key (lambda (key command old-command)
+                       (if old-command
+                           (setf (alist-get key minibuffer-local-completion-map) command)
+                         (define-key minibuffer-local-completion-map (vector key) command))))
+         (restore-bindings (lambda ()
+                             "Rebind modified keys to their previous states."
+                             (setf (alist-get 'return minibuffer-local-completion-map
+                                              nil 'remove)
+                                   old-binding-to-return)
+                             (setf (alist-get this-cmd-key minibuffer-local-completion-map
+                                              nil 'remove)
+                                   minibuffer-cmd-bound-to-this-cmd-key))))
+
+    ;; bind to 'return key the fn that writes to history
+    (funcall rebind-key 'return #'ram-lsp-add-to-workspace-symbol-history old-binding-to-return)
+
+    ;; bind to this-command-keys fn that toggles showing files
+    (funcall rebind-key this-cmd-key #'ram-lsp-jump-to-workspace-symbol-from-minibuffer
+             minibuffer-cmd-bound-to-this-cmd-key)
+
+    (condition-case err
+        (minibuffer-with-setup-hook
+            (if (and (equal arg '(4))
+                     symbl-at-point)
+                (lambda () (insert (symbol-name symbl-at-point)))
+              (lambda ()))
+          (setq selected-symbol
+                (assoc (completing-read
+                        (if symbl-at-point
+                            (format-prompt "Workspace Symbol" (symbol-name symbl-at-point))
+                          (format-prompt "Workspace Symbol" (car ram-lsp-workspace-symbol-history)))
+                        candidates
+                        nil t nil
+                        'ram-lsp-workspace-symbol-history
+                        (if symbl-at-point
+                            (symbol-name symbl-at-point)
+                          ram-lsp-workspace-symbol-history))
+                       candidates)))
+      (error (funcall restore-bindings) (signal (car err) (cdr err)))
+      (quit (funcall restore-bindings) (signal 'quit nil))
+      (:success (funcall restore-bindings)))
+
+    ;; append selected symbol to history
+    (when selected-symbol
+      (setq ram-lsp-workspace-symbol-history
+            ;; get the symbol name only (disregard the type and filepath)
+            (cons (let ((split (split-string (car selected-symbol) nil 'omit-nulls)))
+                    (if lsp-ido-show-symbol-kind
+                        (cadr split)
+                      (car-split)))
+                  ram-lsp-workspace-symbol-history)))
+
+    ;; reorder history so that the search string is fist and the
+    ;; selected item is second.
+
+    ;; if user input was inserted, we added two items in total
+    (if (string= hist-item (caddr ram-lsp-workspace-symbol-history))
+        (delete-dups
+         (setq ram-lsp-workspace-symbol-history
+               (cons (cadr ram-lsp-workspace-symbol-history)
+                     (cons (car ram-lsp-workspace-symbol-history)
+                           (cddr ram-lsp-workspace-symbol-history))))))
+
+    (when selected-symbol
+      (setq my-selected-symbol (cdr selected-symbol))
+      (when (minibufferp)
+        (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
+                                       (current-buffer))))
+          (switch-to-buffer pre-minibuffer-buffer)
+          (push-mark)))
+
+      (ram-lsp-jump-selected-candidate (cdr selected-symbol))
+
+      (let ((default (if (boundp pulse-flag)
+                         pulse-flag
+                       nil)))
+        ;; pulse-iteration pulse-delay
+        (setq pulse-flag nil)
+        (pulse-momentary-highlight-one-line (point) 'isearch)
+        (setq pulse-flag default)))))
 
 ;;*** clojure/lsp: settings
 
