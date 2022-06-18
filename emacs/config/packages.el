@@ -4231,7 +4231,7 @@ Ignore \"Already at top level of the outline\" error, call
            (signal (car err) (cdr err)))))
 (ram-move-to-heading-visible-char))
 
-(defun ram-outline-forward-same-level (arg &optional invisible-ok)
+(defun ram-outline-next-same-level (arg &optional invisible-ok)
   "Call `outline-forward-same-level' and ignore the error.
 
 Ignore \"No following same-level heading\" error, call
@@ -4257,7 +4257,7 @@ Ignore \"No following same-level heading\" error, call
   (call-interactively #'outline-previous-visible-heading 'RECORD-FLAG)
   (ram-move-to-heading-visible-char))
 
-(defun ram-outline-backward-same-level (arg)
+(defun ram-outline-previous-same-level (arg)
   "Move point after jumping to a heading."
   (interactive "p")
   (call-interactively #'outline-backward-same-level 'RECORD-FLAG)
@@ -4271,17 +4271,28 @@ Ignore \"No following same-level heading\" error, call
   (define-key outline-minor-mode-map (kbd "<tab>") #'bicycle-cycle))
 
 (define-key ram-leader-map-tap-global (kbd "n") #'ram-outline-next-visible-heading)
-(define-key global-map (kbd "<f19>") #'ram-outline-next-visible-heading)
+(define-key global-map (kbd "<f10>") #'ram-outline-next-visible-heading)
 
 (define-key ram-leader-map-tap-global (kbd "p") #'ram-outline-previous-visible-heading)
-(define-key global-map (kbd "<f20>") #'ram-outline-previous-visible-heading)
+(define-key global-map (kbd "<f6>") #'ram-outline-previous-visible-heading)
 
-(define-key ram-leader-map-tap-global (kbd "f") #'ram-outline-forward-same-level)
-(define-key ram-leader-map-tap-global (kbd "b") #'ram-outline-backward-same-level)
+(define-key ram-leader-map-tap-global (kbd "f") #'ram-outline-next-same-level)
+(define-key global-map (kbd "<f20>") #'ram-outline-next-same-level)
+(define-key global-map (kbd "<f17>") #'ram-outline-next-same-level)
+
+(define-key ram-leader-map-tap-global (kbd "b") #'ram-outline-previous-same-level)
+(define-key global-map (kbd "<f24>") #'ram-outline-previous-same-level)
+(define-key global-map (kbd "<f16>") #'ram-outline-previous-same-level)
+
 (define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
 (define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
+
 (define-key ram-leader-map-tap-global (kbd "u") #'ram-outline-up-heading)
+(define-key global-map (kbd "<f23>") #'ram-outline-up-heading)
+
 (define-key ram-leader-map-tap-global (kbd "d") #'ram-outline-down-heading)
+(define-key global-map (kbd "<f7>") #'ram-outline-down-heading)
+
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-outline-heading)
 
 ;;** outline: outline-regexp
