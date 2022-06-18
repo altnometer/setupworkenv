@@ -3927,7 +3927,7 @@ Use the current buffer file-path if FILE is nil."
              '()
            (cons
             (cons 'headline
-                  (cons (let ((week-day-heading (format (format-time-string "%^b w %%s" week)
+                  (cons (let ((week-day-heading (format (format-time-string "%b w %%s" week)
                                                         ;; week number in the month
                                                         (1+ (- (/ (time-to-day-in-year week) 7)
                                                                (/ (time-to-day-in-year first-week-time) 7))) )))
@@ -3975,20 +3975,20 @@ Use calendar if ARG value is '(4)."
                                       (file-name-with-extension doc-title "org")))
          (note-exists-p (or (get-buffer (file-name-nondirectory file-name))
                             (file-readable-p file-name)))
-         (doc-text (concat (when (not note-exists-p)
-                             (concat ":PROPERTIES:\n"
-                                     (format ":ID:       %s\n" (org-id-new))
-                                     ":END:\n"
-                                     (format "#+TITLE: %s\n" doc-title)
-                                     (format "#+CREATED: [%s]\n#+DATE: %<%Y-%m-%d %a>"
-                                             (format-time-string (org-time-stamp-format t t) time))))
+         (doc-id (if note-exists-p
+                     (ram-org-get-fist-id-property file-name)
+                   (org-id-new)))
+         (doc-text (concat (concat ":PROPERTIES:\n"
+                                   (format ":ID:       %s\n" doc-id)
+                                   ":END:\n"
+                                   (format "#+TITLE: %s\n" doc-title)
+                                   (format "#+CREATED: [%s]\n"
+                                           (format-time-string (org-time-stamp-format t t) time))
+                                   (format "#+DATE: %s\n\n"
+                                           (format-time-string "%Y %b" time)))
                            (org-element-interpret-data (ram-org-create-monthly-element time)))))
     (find-file file-name)
-    (if (not note-exists-p)
-        (erase-buffer)
-      (goto-char (point-min))
-      (org-next-visible-heading 1)
-      (delete-region (point) (point-max)))
+    (erase-buffer)
     (insert doc-text)
     (goto-char (point-min))
     (org-next-visible-heading 1)))
