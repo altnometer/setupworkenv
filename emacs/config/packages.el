@@ -2776,6 +2776,26 @@ it can be passed in POS."
     (org-hide-block-toggle))
    (t (org-hide-block-toggle))))
 
+(defun ram-org-get-fist-id-property (file)
+  "Return the first ID property found.
+Based on `org-id-update-id-locations'."
+  (let ((id-regexp
+	 (rx (seq bol (0+ (any "\t ")) ":ID:" (1+ " ") (not (any " ")))))
+        (id-found nil))
+    (with-temp-buffer
+      (delay-mode-hooks
+        (org-mode)
+        (when (file-exists-p file)
+          (insert-file-contents file nil nil nil 'replace)
+          (let ((case-fold-search t))
+            (org-with-point-at 1
+	      (while (and (re-search-forward id-regexp nil t)
+                          (not id-found))
+	        (when (org-at-property-p)
+                  (setq id-found (org-entry-get (point) "ID"))))
+	      )))))
+    id-found))
+
 (with-eval-after-load "org"
   (define-key org-mode-map (kbd "<C-tab>") #'ram-hide-block-toggle))
 
