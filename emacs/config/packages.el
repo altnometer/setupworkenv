@@ -4102,33 +4102,57 @@ Use calendar if ARG value is '(4)."
                        (let ((org-read-date-prefer-future t))
                          (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                      (time-add (* (or arg 0) 7 86400) (current-time)))))
+         ;; day of the week, where 0 is monday and 6 is sunday
+         (dow (let ((dow (nth 6 (decode-time time))))
+                (if (= dow 0) 6 (1- dow))))
+         (date-str (let* ((monday (time-subtract time (* dow 86400)))
+                          (month-1st-day-mon (encode-time 1 1 0 1 (nth 4 (decode-time monday))
+                                                          (nth 5 (decode-time monday))))
+                          (date-str-mon (format "%s w%s"
+                                                (format-time-string "%b" monday)
+                                                (1+ (- (string-to-number (format-time-string "%W" monday))
+                                                       (string-to-number (format-time-string "%W" month-1st-day-mon))))))
+                          (sunday (time-add time (* (- 6 dow) 86400)))
+                          (month-1st-day-sun (encode-time 1 1 0 1 (nth 4 (decode-time sunday))
+                                                          (nth 5 (decode-time sunday))))
+                          (date-str-sun (format "%s w%s"
+                                                (format-time-string "%b" sunday)
+                                                (1+ (- (string-to-number (format-time-string "%W" sunday))
+                                                       (string-to-number (format-time-string "%W" month-1st-day-sun)))))))
+                     (if (string= date-str-mon date-str-sun)
+                         date-str-mon
+                       (format "%s, %s" date-str-mon date-str-sun))))
          (doc-title (format-time-string "%Y-%m-w%W" time))
          (file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
                                                         org-roam-directory)
                                       (file-name-with-extension doc-title "org")))
          (note-exists-p (or (get-buffer (file-name-nondirectory file-name))
                             (file-readable-p file-name)))
-         (doc-text (concat (when (not note-exists-p)
-                             (concat ":PROPERTIES:\n"
-                                     (format ":ID:       %s\n" (org-id-new))
-                                     ":END:\n"
-                                     (format "#+TITLE: %s\n" doc-title)
-                                     (format "#+CREATED: %s\n\n"
-                                             (format-time-string (org-time-stamp-format t t) time))))
+         (doc-id (if note-exists-p
+                     (ram-org-get-fist-id-property file-name)
+                   (org-id-new)))
+         (doc-text (concat (concat ":PROPERTIES:\n"
+                                   (format ":ID:       %s\n" doc-id)
+                                   ":END:\n"
+                                   (format "#+TITLE: %s\n" doc-title)
+                                   ;; (format "#+CREATED: %s\n"
+                                   ;;         (format-time-string (org-time-stamp-format t t) time))
+                                   ;; DATE includes the month adn the week number
+                                   (format "#+DATE: %s\n\n"  date-str))
                            (org-element-interpret-data (ram-org-get-headings-from-daily-note time)))))
     (find-file file-name)
     (if (not note-exists-p)
         (progn
-         (erase-buffer)
-         ;; when new daily notes are created (they were automatically
-         ;; created because none existed)
-         ;; the id link does not work because id locations were not updates.
-         ;; call (org-roam-update-org-id-locations)
-         ;; TODO: may too much overhead involved?
-         ;; update only the relevant directory dailies
-         (org-roam-update-org-id-locations))
+          (erase-buffer)
+          ;; when new daily notes are created (they were automatically
+          ;; created because none existed)
+          ;; the id link does not work because id locations were not updates.
+          ;; call (org-roam-update-org-id-locations)
+          ;; TODO: may too much overhead involved?
+          ;; update only the relevant directory dailies
+          (org-roam-update-org-id-locations))
       (goto-char (point-min))
-      (org-next-visible-heading 1)
+      ;; (org-next-visible-heading 1)
       (delete-region (point) (point-max)))
     (insert doc-text)
     (re-search-backward (format "^\\*[[:blank:]]+.+%s [[:digit:]]\\{1,2\\}.+$" (format-time-string "%a" time)))))
