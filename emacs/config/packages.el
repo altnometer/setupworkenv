@@ -3921,36 +3921,47 @@ Use the current buffer file-path if FILE is nil."
 
 (defun ram-org-create-monthly-element (first-week-time)
   "Return an org-element for a month built from weekly headings."
-  (cl-labels
-      ((get-week (week)
-         (if (not (= (nth 4 (decode-time week)) (nth 4 (decode-time first-week-time)))) ; different month
-             '()
-           (cons
-            (cons 'headline
-                  (cons (let ((week-day-heading (format (format-time-string "%b w %%s" week)
-                                                        ;; week number in the month
-                                                        (1+ (- (/ (time-to-day-in-year week) 7)
-                                                               (/ (time-to-day-in-year first-week-time) 7))) )))
-                          `(:raw-value ,week-day-heading
-                                       :pre-blank 0
-                                       :post-blank 2
-                                       :level 1
-                                       :title ,(list week-day-heading)))
-                        (cl-labels ((demote-headings (hs)
-                                      (cond
-                                       ((null hs) '())
-                                       ((eq (org-element-type (car hs)) 'headline)
-                                        (cons
-                                         (cons
-                                          (caar hs) (cons (plist-put (cadar hs)
-                                                                     :level
-                                                                     (1+ (plist-get (cadar hs) :level)))
-                                                          (demote-headings (cddar hs))))
-                                         (demote-headings (cdr hs))))
-                                       (t (cons (car hs) (demote-headings (cdr hs)))))))
-                          (demote-headings (ram-org-get-headings-from-daily-note week)))))
-            (get-week (time-add (* 7 86400) week))))))
-    (get-week first-week-time)))
+  (message (format ">>>>> %s" (format-time-string  "%Y-%m-%d %a" month-1st-day)))
+  (let ((day-of-week (let ((dow (nth 6 (decode-time month-1st-day))))
+                       (if (= dow 0) 6 (1- dow)))))
+    (cl-labels
+        ((get-week (week)
+           (message (format "----- %s" (format-time-string  "%Y-%m-%d %a" week)))
+           (if (not (= (nth 4 (decode-time week)) (nth 4 (decode-time month-1st-day)))) ; different month
+               '()
+             (cons
+              (cons 'headline
+                    (cons (let ((week-day-heading (format (format-time-string "%b w %%s" week)
+                                                          ;; week number in the month
+                                                          ;; (1+ (- (/ (time-to-day-in-year week) 7)
+                                                          ;;        (/ (time-to-day-in-year month-1st-day) 7)))
+                                                          (1+ (- (string-to-number (format-time-string "%W" week))
+                                                                 (string-to-number (format-time-string "%W" month-1st-day)))))))
+                            `(:raw-value ,week-day-heading
+                                         :pre-blank 0
+                                         :post-blank 2
+                                         :level 1
+                                         :title ,(list week-day-heading)))
+                          (cl-labels ((demote-headings (hs)
+                                        (cond
+                                         ((null hs) '())
+                                         ((eq (org-element-type (car hs)) 'headline)
+                                          (cons
+                                           (cons
+                                            (caar hs) (cons (plist-put (cadar hs)
+                                                                       :level
+                                                                       (1+ (plist-get (cadar hs) :level)))
+                                                            (demote-headings (cddar hs))))
+                                           (demote-headings (cdr hs))))
+                                         (t (cons (car hs) (demote-headings (cdr hs)))))))
+                            (demote-headings (ram-org-get-headings-from-daily-note week)))))
+              (get-week
+               ;; recurs only Mondays
+               (if (= 1 (nth 6 (decode-time week)))
+                   (time-add (* 7 86400) week)
+                 ;; change to Monday
+                 (time-add (* (- 7 day-of-week) 86400) week)))))))
+      (get-week month-1st-day))))
 
 (defun ram-org-create-monthly-note (&optional arg time)
   "Create a note of all weeks in an ARG month from now.
@@ -3958,15 +3969,15 @@ Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
   (let* ((time (or time
-                   (if (equal arg '(4))
-                       (let ((org-read-date-prefer-future t))
-                         (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
-                     (let* ((time  (current-time))
-                            (time-decoded (decode-time time))
+                   (let ((time (if (equal arg '(4))
+                                   (let ((org-read-date-prefer-future t))
+                                     (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
+                                 (current-time))))
+                     (let* ((time-decoded (decode-time time))
                             (month (nth 4 time-decoded))
                             (year  (nth 5 time-decoded))
-                            (month-1st-week (encode-time 1 1 0 1 month year)))
-                       month-1st-week
+                            (month-1st-day (encode-time 1 1 0 1 month year)))
+                       month-1st-day
                        ;; (time-add (* (or arg 0) 7 86400) (current-time))
                        ))))
          (doc-title (format-time-string "%Y-%m" time))
