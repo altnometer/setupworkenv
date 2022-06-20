@@ -3954,7 +3954,7 @@ Use the current buffer file-path if FILE is nil."
                                                             (demote-headings (cddar hs))))
                                            (demote-headings (cdr hs))))
                                          (t (cons (car hs) (demote-headings (cdr hs)))))))
-                            (demote-headings (ram-org-get-headings-from-daily-note week)))))
+                            (demote-headings (ram-org-get-daily-headings-from-week week-day)))))
               (get-week
                ;; recurs only Mondays
                (if (= 1 (nth 6 (decode-time week)))
@@ -4041,7 +4041,7 @@ Use the current buffer file-path if FILE is nil."
          (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
     (ram-org-create-weekly-note nil target-time)))
 
-(defun ram-org-get-headings-from-daily-note (time &optional include-backlink-p)
+(defun ram-org-get-daily-headings-from-week (time &optional include-backlink-p)
   "Return an org-element made from headings in `org-roam' daily note."
   (let* ((dailies-dir (expand-file-name org-roam-dailies-directory org-roam-directory))
          (weekday (let ((wd (nth 6 (decode-time time)))) ; start week from Mon rather than Sun
@@ -4170,7 +4170,7 @@ Use calendar if ARG value is '(4)."
                                    ;;         (format-time-string (org-time-stamp-format t t) time))
                                    ;; DATE includes the month adn the week number
                                    (format "#+DATE: %s\n\n"  date-str))
-                           (org-element-interpret-data (ram-org-get-headings-from-daily-note time)))))
+                           (org-element-interpret-data (ram-org-get-daily-headings-from-week time)))))
     (find-file file-name)
     (if (not note-exists-p)
         (progn
