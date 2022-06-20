@@ -3919,23 +3919,21 @@ Use the current buffer file-path if FILE is nil."
            (f-descendant-of-p path directory)))))
 
 
-(defun ram-org-create-monthly-element (first-week-time)
+(defun ram-org-create-monthly-element (month-1st-day)
   "Return an org-element for a month built from weekly headings."
-  (message (format ">>>>> %s" (format-time-string  "%Y-%m-%d %a" month-1st-day)))
   (let ((day-of-week (let ((dow (nth 6 (decode-time month-1st-day))))
                        (if (= dow 0) 6 (1- dow)))))
     (cl-labels
-        ((get-week (week)
-           (message (format "----- %s" (format-time-string  "%Y-%m-%d %a" week)))
-           (if (not (= (nth 4 (decode-time week)) (nth 4 (decode-time month-1st-day)))) ; different month
+        ((get-week (week-day)
+           (if (not (= (nth 4 (decode-time week-day)) (nth 4 (decode-time month-1st-day)))) ; different month
                '()
              (cons
               (cons 'headline
-                    (cons (let ((week-day-heading (format (format-time-string "%b w %%s" week)
+                    (cons (let ((week-day-heading (format (format-time-string "%b w %%s" week-day)
                                                           ;; week number in the month
-                                                          ;; (1+ (- (/ (time-to-day-in-year week) 7)
+                                                          ;; (1+ (- (/ (time-to-day-in-year week-day) 7)
                                                           ;;        (/ (time-to-day-in-year month-1st-day) 7)))
-                                                          (1+ (- (string-to-number (format-time-string "%W" week))
+                                                          (1+ (- (string-to-number (format-time-string "%W" week-day))
                                                                  (string-to-number (format-time-string "%W" month-1st-day)))))))
                             `(:raw-value ,week-day-heading
                                          :pre-blank 0
@@ -3954,13 +3952,14 @@ Use the current buffer file-path if FILE is nil."
                                                             (demote-headings (cddar hs))))
                                            (demote-headings (cdr hs))))
                                          (t (cons (car hs) (demote-headings (cdr hs)))))))
-                            (demote-headings (ram-org-get-daily-headings-from-week week-day)))))
+                            (demote-headings (ram-org-get-daily-headings-from-week week-day nil t)))))
               (get-week
                ;; recurs only Mondays
-               (if (= 1 (nth 6 (decode-time week)))
-                   (time-add (* 7 86400) week)
-                 ;; change to Monday
-                 (time-add (* (- 7 day-of-week) 86400) week)))))))
+               (if (= 1 (nth 6 (decode-time week-day))) ; Monday?
+                   ;; yes, go to the next Monday
+                   (time-add (* 7 86400) week-day)
+                 ;; go from this day-of-week to the following Monday
+                 (time-add (* (- 7 day-of-week) 86400) week-day)))))))
       (get-week month-1st-day))))
 
 (defun ram-org-create-monthly-note (&optional arg time)
@@ -4041,17 +4040,26 @@ Use the current buffer file-path if FILE is nil."
          (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
     (ram-org-create-weekly-note nil target-time)))
 
-(defun ram-org-get-daily-headings-from-week (time &optional include-backlink-p)
-  "Return an org-element made from headings in `org-roam' daily note."
+(defun ram-org-get-daily-headings-from-week (time &optional include-backlink-p same-month-only-p)
+  "Return an org-element made `org-roam' daily note headings for a week."
   (let* ((dailies-dir (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (current-month (nth 4 (decode-time time)))
          (weekday (let ((wd (nth 6 (decode-time time)))) ; start week from Mon rather than Sun
                     (if (= wd 0) 6 (1- wd))))
          (mon (time-subtract time (* weekday 86400)))
-         (day-times (cl-labels ((get-week-days (counter time)
-                                  (if (>= counter 6)
-                                      (list time)
-                                    (cons time (get-week-days (1+ counter) (time-add 86400 time))))))
-                      (get-week-days 0 mon)))
+         (day-times (cl-labels ((get-week-days (time)
+                                  (let ((same-month-p (= (nth 4 (decode-time time)) current-month) ))
+                                    (cond
+                                     ;; reached Sunday
+                                     ((= 0 (nth 6 (decode-time time))) (if (and same-month-only-p
+                                                                                (not same-month-p))
+                                                                           '()
+                                                                         (list time)))
+                                     ;; same-month-only-p
+                                     ((and same-month-only-p (not same-month-p))
+                                      (get-week-days (time-add 86400 time)))
+                                     (t (cons time (get-week-days (time-add 86400 time))))))))
+                      (get-week-days mon)))
          (daily-notes
           (cl-labels
               ((get-headings (days)
