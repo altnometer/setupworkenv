@@ -3904,21 +3904,6 @@ Use the current buffer file-path if FILE is nil."
                                                  (t (list val year-from-buffer-name))))))
     (ram-org-create-monthly-note nil (encode-time 1 1 0 1 target-month target-year))))
 
-(defun ram-org-roam-monthly-note-p (&optional file)
-  "Return t if FILE is a monthly note.
-Use the current buffer file-path if FILE is nil."
-  (when-let ((buffer-name
-              (or file
-                  (buffer-file-name (buffer-base-buffer))))
-             (path (expand-file-name
-                    buffer-name))
-             (directory (expand-file-name ram-org-roam-monthly-directory org-roam-directory)))
-    (setq path (expand-file-name path))
-    (save-match-data
-      (and (org-roam-file-p path)
-           (f-descendant-of-p path directory)))))
-
-
 (defun ram-org-create-monthly-element (month-1st-day)
   "Return an org-element for a month built from weekly headings."
   (let ((day-of-week (let ((dow (nth 6 (decode-time month-1st-day))))
