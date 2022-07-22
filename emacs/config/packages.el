@@ -3729,13 +3729,15 @@ ARG value is 4."
   (require 'org-roam-dailies)
   (let* ((defun-regex (save-excursion
                         (when (not (or (bobp)
-                                       (= (char-before) ?\n)))
+                                       (and (= (char-before) ?\n)
+                                            (= (char-after) ?\())))
                           (beginning-of-defun))
                         (let ((beg (point))
                               (end (progn (down-list)
                                           (forward-symbol 2))))
                           (buffer-substring-no-properties beg end))))
-         (backlink (format "[[file:%s::%s][source]]" (buffer-file-name) defun-regex))
+         (backlink (format "[[file:%s::%s][source]]" (buffer-file-name) defun-regex))s
+         (defun-name (car (last (split-string defun-regex))))
          (templates
           `(("d" "capture document title"
              entry ,(concat "* " defun-name  " %(org-set-tags \":"
