@@ -3568,7 +3568,8 @@ Include a backlink if INCLUDE-BACKLINK-P is true."
                         section-element
                         'link
                       ;; set :parent to nil, no need for its chunky value
-                      (lambda (link) (org-element-put-property link :parent nil))))
+                      (lambda (link) (org-element-put-property link :parent nil)
+                        (org-element-put-property link :post-blank 0))))
          ;; if heading has text, backlink to it
          ;; (text-p (some #'identity
          ;;               (org-element-map
