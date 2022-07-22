@@ -3727,15 +3727,15 @@ Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
   (require 'org-roam-dailies)
-  (let* ((defun-name (save-excursion
-                       (when (not (or (bobp)
-                                      (= (char-before) ?\n)))
-                         (beginning-of-defun))
-                       (down-list)
-                       (forward-symbol 2)
-                       (let ((bounds (bounds-of-thing-at-point 'sexp)))
-                         (buffer-substring-no-properties (car bounds) (cdr bounds)))))
-         (backlink (format "[[file:%s::%s][source]]" (buffer-file-name) defun-name))
+  (let* ((defun-regex (save-excursion
+                        (when (not (or (bobp)
+                                       (= (char-before) ?\n)))
+                          (beginning-of-defun))
+                        (let ((beg (point))
+                              (end (progn (down-list)
+                                          (forward-symbol 2))))
+                          (buffer-substring-no-properties beg end))))
+         (backlink (format "[[file:%s::%s][source]]" (buffer-file-name) defun-regex))
          (templates
           `(("d" "capture document title"
              entry ,(concat "* " defun-name  " %(org-set-tags \":"
