@@ -3952,18 +3952,25 @@ Use the current buffer file-path if FILE is nil."
 Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
-  (let* ((time (or time
-                   (let ((time (if (equal arg '(4))
-                                   (let ((org-read-date-prefer-future t))
-                                     (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
-                                 (current-time))))
-                     (let* ((time-decoded (decode-time time))
-                            (month (nth 4 time-decoded))
-                            (year  (nth 5 time-decoded))
-                            (month-1st-day (encode-time 1 1 0 1 month year)))
-                       month-1st-day
-                       ;; (time-add (* (or arg 0) 7 86400) (current-time))
-                       ))))
+  (let* ((time (or
+                time
+                ;; use the time of the current monthly note
+                (if (and arg (numberp arg) (= arg 1)
+                         (ram-org-roam-monthly-note-p))
+                    (let ((year-month (split-string (file-name-base (buffer-file-name)) "-")))
+                      (encode-time 1 1 0 1 (string-to-number (cadr year-month))
+                                   (string-to-number (car year-month)))))
+                (let ((time (if (equal arg '(4))
+                                (let ((org-read-date-prefer-future t))
+                                  (org-read-date nil 'TO-TIME nil "Capture to monthly note: " ))
+                              (current-time))))
+                  (let* ((time-decoded (decode-time time))
+                         (month (nth 4 time-decoded))
+                         (year  (nth 5 time-decoded))
+                         (month-1st-day (encode-time 1 1 0 1 month year)))
+                    month-1st-day
+                    ;; (time-add (* (or arg 0) 7 86400) (current-time))
+                    ))))
          (doc-title (format-time-string "%Y-%m" time))
          (file-name (file-name-concat (expand-file-name ram-org-roam-monthly-directory
                                                         org-roam-directory)
