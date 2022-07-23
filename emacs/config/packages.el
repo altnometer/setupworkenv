@@ -3952,11 +3952,15 @@ Use the current buffer file-path if FILE is nil."
 
 (defun ram-org-create-monthly-note (&optional arg time)
   "Create a note of all weeks in an ARG month from now.
-Use calendar if ARG value is '(4)."
+Use calendar if ARG value is '(4).
+When ARG is 1, update the current note."
   (interactive "P")
   (require 'org)
-  (let* ((time (or
+  (let* ((point (point))
+         (screen-line (- (line-number-at-pos (point)) (line-number-at-pos (window-start))))
+         (time (or
                 time
+                ;; if arg is 1, update the current note
                 ;; use the time of the current monthly note
                 (if (and arg (numberp arg) (= arg 1)
                          (ram-org-roam-monthly-note-p))
@@ -3995,8 +3999,15 @@ Use calendar if ARG value is '(4)."
     (find-file file-name)
     (erase-buffer)
     (insert doc-text)
-    (goto-char (point-min))
-    (org-next-visible-heading 1)))
+    ;; move point:
+    ;; if arg is 1, update the current note and remain at the same point
+    ;; else, go to the 1st heading
+    (if (and arg (numberp arg) (= arg 1)
+             (ram-org-roam-monthly-note-p))
+        (progn (goto-char (min point (point-max)))
+               (recenter screen-line))
+      (goto-char (point-min))
+      (org-next-visible-heading 1))))
 
 
 ;;*** org-roam/monthly: settings
