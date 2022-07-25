@@ -3183,6 +3183,9 @@ This function is created to identify TODO items in agenda buffers.
 (define-key global-map (kbd "C-c n g") #'org-roam-graph)
 (define-key global-map (kbd "s-t") #'org-roam-node-find)
 (define-key global-map (kbd "s-T") #'org-roam-node-insert)
+
+(define-key global-map (kbd "s-c u") #'ram-org-roam-update-org-id-locations)
+
 (define-key ram-leader-map-tap-global (kbd "/") #'org-roam-node-find)
 (define-key ram-leader-map-tap-global (kbd "'") #'org-roam-node-insert)
 
@@ -3340,6 +3343,11 @@ If the property is already set, replace its value."
                 (after-save-hook nil)))))))
       nil)
     (message "finished updating all org-roam notes and dailies in %.01f sec" (float-time (time-since time)))))
+
+(defun ram-org-roam-update-org-id-locations ()
+  "Call `org-roam-update-org-id-locations' with set DIRECTORY."
+  (interactive)
+  (org-roam-update-org-id-locations "~/backup/books"))
 
 ;;** org-roam: hooks, advice, timers
 
