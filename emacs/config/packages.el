@@ -5739,7 +5739,7 @@ Add `pre-command-hook' to remove it."
 ;;** brackets, parentheses, parens, sexps: at beg? at end?
 
 (defun ram-at-delimited-beg-p ()
-  "Return non `nil' if the point is after `ram-open-delimiters-re'."
+  "Return non `nil' if the point is before `ram-open-delimiters-re'."
   (when (not (ram-in-comment-p))
     (memq (char-after) ram-open-delimiters)))
 
