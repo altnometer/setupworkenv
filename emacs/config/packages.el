@@ -3924,7 +3924,9 @@ ARG value is 4."
 
 (define-key emacs-lisp-mode-map (kbd "s-c a") #'ram-org-capture-defun-to-dailies)
 
-(define-key global-map (kbd "s-c g") #'ram-org-capture-magit-commit-to-dailies)
+(with-eval-after-load "magit"
+  (define-key magit-status-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-dailies)
+  (define-key magit-revision-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-dailies))
 
 (define-key global-map (kbd "s-c w") #'ram-org-create-weekly-note)
 
