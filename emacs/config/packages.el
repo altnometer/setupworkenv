@@ -2873,6 +2873,16 @@ Leave a mark to return to."
     ;;  nil)
     ))
 
+(defun ram-scroll-up-command ()
+  "Scroll up one line."
+  (interactive)
+  (scroll-up-command 1))
+
+(defun ram-scroll-down-command ()
+  "Scroll down one line."
+  (interactive)
+  (scroll-up-command -1))
+
 (with-eval-after-load "org"
   ;; originally, C-' runs the command org-cycle-agenda-files
   (define-key org-mode-map (kbd "C-'") nil)
@@ -2895,7 +2905,10 @@ Leave a mark to return to."
   (define-key org-mode-map (kbd "s-l") #'ram-avy-goto-org-link)
 
   (define-key global-map (kbd "C-c C-S-L") #'org-store-link)
-  (define-key org-mode-map (kbd "C-c C-l") #'org-insert-link))
+  (define-key org-mode-map (kbd "C-c C-l") #'org-insert-link)
+
+  (define-key org-mode-map (kbd "M-p") #'ram-scroll-up-command)
+  (define-key org-mode-map (kbd "M-n") #'ram-scroll-down-command))
 
 ;;** org-mode: settings
 
