@@ -5905,9 +5905,8 @@ for than ancestor."
                  ((ram-at-delimited-end-p)
                   (save-excursion (backward-sexp)
                                   (point)))
-                 ;; inside parens
                  (t (if (= (nth 0 ppss) 0) ; not in a list
-                        (save-excursion (beginning-of-defun) (when (not (bobp)) (point)))
+                        (save-excursion (beginning-of-defun) (point))
                       (nth 1 ppss)))))
            (end (save-excursion (goto-char beg) (forward-sexp) (point))))
       (cons beg end)))
