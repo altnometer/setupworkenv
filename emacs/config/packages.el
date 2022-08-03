@@ -3460,6 +3460,7 @@ Also exclude links weekly and monthly notes"
 
 (defun ram-get-deft-strip-summary-regexp-for-notes ()
   "Return a regexp to exclude from note content."
+  (require 'org)
   (concat "\\(?:"
           "[[:space:]]+"                ; blank
           "\\|"
