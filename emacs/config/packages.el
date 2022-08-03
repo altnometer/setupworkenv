@@ -1597,6 +1597,7 @@ succession."
         (* space)
         (seq "("
              (group (or
+                     "cl-defmethod"
                      "defalias"
                      "defconst"
                      "defcustom"
