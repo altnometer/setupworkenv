@@ -9184,6 +9184,7 @@ buffer-local `ram-face-remapping-cookie'."
   (cond
    ((memq (char-before) ram-open-delimiters) (insert ":"))
    ((memq (char-before) ram-open-delimiters) (insert ":"))
+   ((= (char-before) ?:) (insert ":"))
    ((or (= (char-before) 10)            ; beginning of line
         (= (char-before) 32))           ; white space
     (insert ":"))
