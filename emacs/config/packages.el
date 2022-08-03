@@ -3439,7 +3439,6 @@ Also exclude links weekly and monthly notes"
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
            :unnarrowed t))))
 
-
 ;;** org-roam: init
 
 (setq org-roam-v2-ack t)
@@ -6402,7 +6401,7 @@ If there is no Clojure REPL, send warning."
   (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent)
   (define-key clojure-mode-map (kbd ":") #'ram-insert-column)
 
-  (define-key clojure-mode-map (kbd "<f10>") #'ram-lsp-jump-workspace-symbol))
+  (define-key clojure-mode-map (kbd "M-S-<f5>") #'ram-lsp-jump-workspace-symbol))
 
 (add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
 
