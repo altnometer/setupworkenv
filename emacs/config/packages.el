@@ -262,6 +262,7 @@ abort completely with `C-g'."
           ("dec" "declare")
           ("decn" "declaration")
           ("def" "definition")
+          ("defs" "definitions")
 
           ("desc" "describe")
 
@@ -316,9 +317,10 @@ abort completely with `C-g'."
 
           ("inf" "information")
 
-          ("inz" "initialize")
-          ("inzd" "initialized")
-          ("inzg" "initializing")
+          ("init" "initialize")
+          ("initd" "initialized")
+          ("initn" "initiation")
+          ("initg" "initializing")
 
           ("inv" "invoke")
           ("invd" "invoked")
@@ -389,10 +391,15 @@ abort completely with `C-g'."
           ("qr" "query")
           ("qrs" "queries")
 
+          ;;*** r
+
           ("rc" "recursive")
           ("rcl" "recursively")
           ("rcn" "recursion")
           ("recv" "receiver")
+
+          ("ref" "reference")
+          ("refs" "references")
 
           ("rep" "represent")
           ("reps" "represents")
@@ -411,6 +418,8 @@ abort completely with `C-g'."
           ("rnd" "returned")
           ("rng" "returning")
           ("rns" "returns")
+
+          ;;*** s
 
           ("seq" "sequence")
 
@@ -442,7 +451,8 @@ abort completely with `C-g'."
 
           ("und" "understand")
 
-          ;;*** V
+          ;;*** v
+
           ("val" "value")
           ("vals" "values")
           ("vl" "value")
