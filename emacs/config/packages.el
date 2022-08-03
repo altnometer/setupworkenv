@@ -3349,6 +3349,37 @@ If the property is already set, replace its value."
   (interactive)
   (org-roam-update-org-id-locations "~/backup/books"))
 
+(defun ram-org-roam-backlinks-no-dailies-get (node)
+  "Return the backlinks for NODE, exclude links to daily notes.
+Also exclude links weekly and monthly notes"
+  (let* ((backlinks
+          (org-roam-db-query
+           (format
+            "SELECT source, dest, links.pos, links.properties, nodes.file
+            FROM links INNER JOIN nodes ON links.source =
+            nodes.id WHERE dest = '\"%s\"' AND type = '\"id\"'"
+            (org-roam-node-id org-roam-buffer-current-node))))
+         (backlinks-no-dailies (mapcar
+                                #'butlast
+                                (seq-remove
+                                        (lambda (i)
+                                          (string-match-p "^.*/\\(daily\\)\\|\\(weekly\\)\\|\\(monthly\\)/.*$"
+                                                          (car (last i))))
+                                        backlinks))))
+    ;; (seq-filter (lambda (i)
+    ;;               (string-match-p "^.*/\\(daily\\)\\|\\(weekly\\)\\|\\(monthly\\)/.*$"
+    ;;                               (car (last i))))
+    ;;             backlinks-no-dailies)
+
+    (cl-loop for backlink in backlinks-no-dailies
+             collect (pcase-let ((`(,source-id ,dest-id ,pos ,properties) backlink))
+                       (org-roam-populate
+                        (org-roam-backlink-create
+                         :source-node (org-roam-node-create :id source-id)
+                         :target-node (org-roam-node-create :id dest-id)
+                         :point pos
+                         :properties properties))))))
+
 ;;** org-roam: hooks, advice, timers
 
 ;; !!! 'org-capture-before-finalize-hook is set to nil in org-capture-kill
@@ -3365,6 +3396,10 @@ If the property is already set, replace its value."
 (add-hook 'org-roam-find-file-hook #'ram-remap-hl-line-face-in-find-file-hook)
 
 (add-hook 'org-capture-mode-hook #'ram-add-remap-face-to-hl-line-in-capture-hook)
+
+;; for info, refer to "org-roam-buffer backlinks" note
+(with-eval-after-load 'org-roam
+  (fset 'org-roam-backlinks-get 'ram-org-roam-backlinks-no-dailies-get))
 
 ;;** org-roam: capture-templates
 
