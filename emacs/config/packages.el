@@ -2048,14 +2048,19 @@ one, an error is signaled."
 ;;*** buffers: no prompt kill
 
 (defun ram-kill-curr-buffer (arg)
-  (interactive "p")
-  ;; do not save buffers that strat with "*"
-  (if (or (string-match "^\\*.*$" (buffer-name (current-buffer)))
-          (ram-info-buffer-p (current-buffer) nil)
-          (ram-interactive-buffer-p (current-buffer) nil))
-      (kill-buffer (current-buffer))
-    (when (not arg) (save-buffer (current-buffer)))
-    (kill-buffer (current-buffer))))
+  (interactive "P")
+  (let ((buf (current-buffer)))
+    (when (> (length (window-list-1 nil 'nomini)) 1)
+      (delete-window))
+    ;; do not save buffers that strat with "*"
+    (if (or (string-match "^\\*.*$" (buffer-name buf))
+            (ram-info-buffer-p buf nil)
+            (ram-interactive-buffer-p buf nil))
+        (kill-buffer buf)
+      (when arg
+        (with-current-buffer buf
+          (save-buffer)))
+      (kill-buffer buf))))
 (global-set-key (kbd "C-x k") #'ram-kill-curr-buffer)
 
 ;;*** buffers: switch
