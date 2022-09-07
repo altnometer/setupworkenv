@@ -4655,6 +4655,7 @@ Ignore \"No following same-level heading\" error, call
 
 (with-eval-after-load 'racket-mode
   (define-key racket-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+  (define-key racket-mode-map (kbd "<return>") #'ram-newline-and-indent)
   (define-key racket-mode-map (kbd "<S-return>") 'newline-and-indent))
 
 ;;** racket: repl
