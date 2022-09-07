@@ -6752,16 +6752,25 @@ Toggle `lsp-ido-show-symbol-filename'."
       )
 (setq lsp-lens-place-position 'above-line)
 (setq lsp-enable-symbol-highlighting nil)
+
+;;**** clojure/lsp/settings: docs
+;; increase the text size
+(setq lsp-ui-doc-text-scale-level 2.5)
+;; set the doc popup overlay hight
+(setq lsp-ui-doc-max-height 25)
 (setq lsp-ui-doc-enable t)
-(setq lsp-ui-doc-show-with-cursor t)
-(setq lsp-ui-doc-show-with-mouse t)
+;; this seem to cause jumping between the frames
+(setq lsp-ui-doc-show-with-cursor nil)
+(setq lsp-ui-doc-show-with-mouse nil)
 (setq lsp-headerline-breadcrumb-enable t)
 
+;; this shows info in the right side of the code
 (setq lsp-ui-sideline-enable t)
-(setq lsp-ui-sideline-show-code-actions t)
-(setq lsp-ui-sideline-show-hover t)
-(setq lsp-ui-sideline-show-diagnostics t)
+;; actions that can be applied to the code
+;; could be useful when you learn it
 (setq lsp-ui-sideline-show-code-actions nil)
+(setq lsp-ui-sideline-show-hover nil)
+(setq lsp-ui-sideline-show-diagnostics nil)
 
 (setq lsp-modeline-code-actions-enable t) ; do not see anything in modeline
 (setq lsp-modeline-diagnostics-enable t)  ; same, does not work
@@ -6769,8 +6778,8 @@ Toggle `lsp-ido-show-symbol-filename'."
 (setq lsp-diagnostics-provider :auto)
 (setq lsp-eldoc-enable-hover t) ; supposed to show docs in minibuffer
 
-(setq lsp-signature-auto-activate t)
-(setq lsp-signature-render-documentation t)
+(setq lsp-signature-auto-activate nil)
+(setq lsp-signature-render-documentation nil)
 
 (setq lsp-completion-provider :capf)
 (setq lsp-completion-show-detail t)
