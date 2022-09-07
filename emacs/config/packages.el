@@ -3078,7 +3078,8 @@ Leave a mark to return to."
      (racket . t)
      (prolog . t)
      ;; (scribble . t)
-     (css . t))))
+     (css . t)
+     (haskell .t))))
 
 ;;*** org-mode/org-babel: org-babel-eval-in-repl
 
