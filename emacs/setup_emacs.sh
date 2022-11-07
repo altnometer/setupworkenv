@@ -33,9 +33,15 @@ else
     echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
     # !!! sound: install pulseaudio, alsa-* packages.
     apt-get install -y xorg xinput firefox-esr \
-        feh mupdf zathura
+        feh mupdf zathura hunspell aspell
     apt-get install -y silversearcher-ag ripgrep pass
     apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
+
+    # google search cli, need install pup, recorde, jq
+    # seem like too much work
+    # https://github.com/Bugswriter/tuxi
+    # curl -sL "https://raw.githubusercontent.com/Bugswriter/tuxi/main/tuxi" -o ~/.local/bin/tuxi
+    # chmod +x ~/.local/bin/tuxi
 
     # echo -e "\n\x1b[33;01m installing emacs docs ...  \x1b[39;49;00m\n" && sleep 1
     # To insfall docs,
