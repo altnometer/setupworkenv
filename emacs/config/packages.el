@@ -8089,6 +8089,8 @@ Configure `orderless-matching-styles' for this command."
 
 ;;** packages: iy-go-to-char
 
+;;*** search char, next, prev char
+
 (straight-use-package
  '(iy-go-to-char :type git :flavor melpa :host github :repo "doitian/iy-go-to-char"))
 
