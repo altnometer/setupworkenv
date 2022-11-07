@@ -6487,7 +6487,12 @@ Return a cons of the new text cordinates."
 ;; (define-key prog-mode-map (kbd "C-," ) #'ram-kill-at-point)
 (define-key prog-mode-map (kbd "C-," ) #'ram-kill-at-point)
 
+;; flatten sexp
 (define-key prog-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp)
+
+(with-eval-after-load 'clojure
+  ;; originally, "C-:" is bound to #'clojure-toggle-keyword-string
+  (define-key clojure-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp))
 
 ;;* linters
 
