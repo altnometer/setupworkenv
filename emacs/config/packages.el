@@ -2701,13 +2701,27 @@ displaying TEST-BUFFER-P buffer."
 
 ;;****** buffers/display/alist: org
 
+;; (add-to-list 'display-buffer-alist
+;;              (ram-create-display-buffer-in-primary-workspace-alist-element
+;;               (lambda (buffer &optional alist)
+;;                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
+;;                   (eq 'org-mode mode)))
+;;               8 2))
+
+;; #'ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
+;; does not display the same buffer in two windows (it closes one). In
+;; contrast, when using
+;; #'ram-create-display-buffer-in-primary-workspace-alist-element for
+;; example, closing a buffer displaying a code snippet of an org
+;; document would display the same org document in it. You end up with
+;; two windows display the same buffer.
+
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-primary-workspace-alist-element
+             (ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
                   (eq 'org-mode mode)))
-              8 2))
-
+              8))
 
 ;;****** buffers/display/alist: org monthly
 
