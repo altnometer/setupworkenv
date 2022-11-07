@@ -3177,7 +3177,7 @@ Leave a mark to return to."
   (add-to-list 'org-structure-template-alist
                '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist
-               '("cl" . "src clojure"))
+               '("cl" . "src clojure :results silent"))
   (add-to-list 'org-structure-template-alist
                '("cls" . "src clojurescrsipt"))
   (add-to-list 'org-structure-template-alist
