@@ -9361,9 +9361,12 @@ buffer-local `ram-face-remapping-cookie'."
   "Insert space followed by ':'."
   (interactive)
   (cond
+   ((ram-in-string-p) (insert ":"))
+   ((ram-in-comment-p) (insert ":"))
    ((memq (char-before) ram-open-delimiters) (insert ":"))
    ((memq (char-before) ram-open-delimiters) (insert ":"))
    ((= (char-before) ?:) (insert ":"))
+   ((= (char-before) ?^) (insert ":"))
    ((or (= (char-before) 10)            ; beginning of line
         (= (char-before) 32))           ; white space
     (insert ":"))
