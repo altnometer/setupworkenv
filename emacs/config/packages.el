@@ -125,12 +125,13 @@ abort completely with `C-g'."
 
 (setq clojure-abbrevs
         '(
+          ("dc" "declare")
           ("df" "defn")
           ("dm" "defmacro")
           ("dt" "deftest")
           ("me" "macroexpand-1")
           ("pl" "println")
-          ("re" "require")))
+          ("pr" "print")))
 
 (with-eval-after-load "clojure"
   (when (boundp 'clojure-mode-abbrev-table)
