@@ -3196,6 +3196,9 @@ Leave a mark to return to."
 (straight-use-package
  '(org-babel-eval-in-repl :type git :flavor melpa :host github :repo "diadochos/org-babel-eval-in-repl"))
 
+(with-eval-after-load 'cider
+  (setq org-babel-clojure-backend 'cider))
+
 (with-eval-after-load "org"
   (autoload 'ob-racket "ob-racket")
   (org-babel-do-load-languages
