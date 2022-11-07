@@ -8471,7 +8471,7 @@ That is, remove a non kept dired from the recent list."
   ;; hyper key is disables in favor of f1, ... keys
   ;; (define-key global-map (kbd "C-H-e") 'flycheck-next-error)
   ;; (define-key global-map (kbd "C-H-E") 'flycheck-previous-error)
-
+(define-key global-map (kbd "<M-f11>") 'flyspell-goto-previous-error)
 
 ;;*** spelling/flycheck: functions
 
@@ -8515,8 +8515,6 @@ That is, remove a non kept dired from the recent list."
             (message "No more miss-spelled word!")
             (setq arg 0))
         (forward-word)))))
-
-(define-key global-map (kbd "<M-f11>") 'flyspell-goto-previous-error)
 
 ;;* system
 
