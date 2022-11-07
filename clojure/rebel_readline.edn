@@ -1,0 +1,9 @@
+{:key-map :emacs
+ :color-theme :light-screen-theme
+ :highlight true
+ :completion true
+ :eldoc true
+ :indent true
+ :redirect-output true
+ 
+ :key-binding {:emacs [["^C^D" :clojure-doc-at-point]]}}
