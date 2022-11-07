@@ -195,11 +195,19 @@ abort completely with `C-g'."
   (setq org-abbrevs
         '(
 
-          ;;*** latin
+          ;;*** Greek
+
+          ("theta" "Θ")
+
+          ;;*** Latin
+
           ("eg" "e.g.,")
           ("ie" "i.e.,")
 
           ("~c" "~cons~")
+
+          ;;*** a
+
           ("aor" "area of responsibility")
           ("ab" "abstraction")
           ("ag" "argument")
@@ -207,7 +215,15 @@ abort completely with `C-g'."
           ("algs" "algorithms")
           ("ags" "arguments")
           ("app" "application")
+          ("apps" "applications")
           ("appd" "applied")
+
+          ("appr" "approach")
+
+          ("assd" "associated")
+
+          ("auty" "automatically")
+          ("autly" "automatically")
 
           ("bl" "buffer-local")
 
@@ -218,10 +234,14 @@ abort completely with `C-g'."
           ("bn" "between")
 
 
-          ("cat" "category")
+          ;;*** c
+
+          ("catg" "category")
+          ("catgs" "categories")
           ("catzd" "categorized")
           ("catzn" "categorization")
-          ("cats" "categories")
+
+          ("cd" "could")
 
           ("chr" "character")
           ("char" "character")
@@ -238,6 +258,9 @@ abort completely with `C-g'."
           ("clp" "classpath")
           ("clsp" "clojure-lsp")
 
+          ("coll" "collection")
+          ("colls" "collections")
+
           ("comn" "computation")
           ("comg" "computing")
           ("comp" "compute")
@@ -249,6 +272,14 @@ abort completely with `C-g'."
           ("comds" "commands")
 
           ("con" "continuation")
+
+          ("concr" "concurrent")
+          ("concrt" "concurrent")
+          ("concrc" "concurrency")
+          ("concry" "concurrently")
+
+
+
           ("cont" "contain")
           ("contg" "containing")
           ("conts" "contains")
@@ -258,43 +289,71 @@ abort completely with `C-g'."
           ("confg" "configuring")
           ("confn" "configuration")
           ("confns" "configurations")
-          ;;*** D
+
+          ("cor" "correct")
+          ("corr" "correct")
+          ("corry" "correctly")
+          ("cory" "correctly")
+
+          ;;*** d
+
           ("dec" "declare")
           ("decn" "declaration")
-          ("def" "definition")
-          ("defs" "definitions")
+
+          ("def" "define")
+          ("defd" "defined")
+          ("defg" "defining")
+          ("defn" "definition")
+          ("defns" "definitions")
+
 
           ("desc" "describe")
+          ("descn" "description")
+
+          ("dev" "development")
+
+          ("dift" "difficult")
 
           ("dp" "dependency")
           ("dps" "dependencies")
 
           ("df" "different")
-          ("dfy" "differently")
           ("dfc" "difference")
+          ("dfct" "difficult")
+          ("dfl" "differential")
+          ("dfy" "differently")
+
           ("dft" "default")
           ("dr" "derivative")
           ("drs" "derivatives")
 
 
+          ;;*** e
+
           ("el" "element")
           ("els" "elements")
           ("env" "environment")
           ("envs" "environments")
+
           ("ev" "evaluate")
           ("eva" "evaluate")
           ("evd" "evaluated")
           ("evg" "evaluating")
           ("evn" "evaluation")
-          ("evt" "evaluation")
+
+          ("evt" "everything")
+          ("evrg" "everything")
 
           ("excn" "exception")
           ("excns" "exceptions")
 
           ("exp" "expression")
+          ("expn" "expression")
           ("expd" "expressed")
           ("exps" "expressions")
+
           ("exl" "example")
+          ("exls" "examples")
           ("ext" "execute")
           ("exts" "executes")
           ("exn" "execution")
@@ -313,7 +372,9 @@ abort completely with `C-g'."
           ("imp" "implement")
           ("imps" "implements")
           ("impd" "implemented")
+          ("impg" "implementing")
           ("impn" "implementation")
+          ("impns" "implementations")
 
           ("inf" "information")
 
@@ -321,11 +382,14 @@ abort completely with `C-g'."
           ("initd" "initialized")
           ("initn" "initiation")
           ("initg" "initializing")
+          ("initzn" "initialization")
 
           ("inv" "invoke")
           ("invd" "invoked")
           ("invg" "invoking")
           ("invn" "invocation")
+
+          ("jvm" "JVM")
 
           ("kw" "keyword")
           ("kws" "keywords")
@@ -340,10 +404,19 @@ abort completely with `C-g'."
           ("lg" "language")
           ("lgs" "languages")
 
+          ;;*** m
+
+          ("mech" "mechanism")
+          ("mechm" "mechanism")
+
+          ("multm" "multimethod")
+          ("multms" "multimethods")
 
           ("mt" "manipulate")
           ("mtg" "manipulating")
           ("mec" "mechanism")
+
+          ;;*** n
 
           ("nams" "namespace")
           ("namss" "namespaces")
@@ -352,6 +425,8 @@ abort completely with `C-g'."
           ("nm" "number")
           ("nms" "numbers")
 
+          ;;*** o
+
           ("ob" "object")
           ("obs" "objects")
           ("occ" "occurrence")
@@ -359,8 +434,18 @@ abort completely with `C-g'."
 
           ("oa" "org-agenda")
 
+          ;;*** p
+
           ("par" "paragraph")
           ("pars" "paragraphs")
+
+          ("parl" "parallel")
+          ("parld" "parallelized")
+          ("parlg" "parallelizing")
+          ("parlm" "parallelism")
+          ("parln" "parallelization")
+          ("parlz" "parallelize")
+
 
           ("parm" "parameter")
           ("parmd" "parameterized")
@@ -370,23 +455,38 @@ abort completely with `C-g'."
           ("parmz" "parameterize")
           ("parn" "parentheses")
 
+
           ("pg" "program")
           ("pgs" "programs")
           ("pgg" "programming")
+          ("pgly" "programmatically")
+          ("pgr" "programmer")
+          ("pgrs" "programmers")
 
           ("pr" "procedure")
           ("prs" "procedures")
 
-          ("proc" "process")
-          ("prop" "property")
-          ("props" "properties")
           ("prd" "predicate")
-          ("pri" "principle")
-          ("prj" "project")
-          ("prjs" "projects")
 
           ("prec" "preceding")
           ("prev" "previous")
+
+          ("prj" "project")
+          ("prjs" "projects")
+
+          ("pri" "principle")
+
+          ("proc" "process")
+          ("procg" "processing")
+
+          ("prop" "property")
+          ("props" "properties")
+
+          ("prot" "prototype")
+          ("prots" "prototypes")
+
+          ("prt" "protocol")
+          ("prts" "protocols")
 
           ("qr" "query")
           ("qrs" "queries")
@@ -400,6 +500,7 @@ abort completely with `C-g'."
 
           ("ref" "reference")
           ("refs" "references")
+          ("refg" "referencing")
 
           ("rep" "represent")
           ("reps" "represents")
@@ -409,6 +510,10 @@ abort completely with `C-g'."
 
           ("Repl" "REPL")
           ("nRepl" "nREPL")
+
+          ("req" "require")
+          ("reqs" "requires")
+
           ("resp" "responsibility")
           ("resps" "responsibilities")
 
@@ -422,17 +527,19 @@ abort completely with `C-g'."
           ;;*** s
 
           ("seq" "sequence")
+          ("seql" "sequential")
 
           ("sd" "should")
-          ("spcc" "specific")
-          ("spcd" "specified")
-          ("spd" "specified")
-          ("spl" "special")
-          ("sps" "specifies")
-          ("spy" "specify")
-          ("spg" "specifying")
-          ("spec" "specification")
-          ("specs" "specifications")
+          ("sdt" "shouldn't")
+          ("specc" "specific")
+          ("specd" "specified")
+          ("specl" "special")
+          ("specs" "specifies")
+          ("specy" "specify")
+          ("specly" "specifically")
+          ("specg" "specifying")
+          ("specn" "specification")
+          ("specns" "specifications")
 
           ("sm" "symbol")
           ("sms" "symbols")
@@ -441,15 +548,25 @@ abort completely with `C-g'."
           ("subs" "substitution")
           ("subss" "substitutions")
           ("subsg" "substituting")
+
           ("syn" "syntax")
           ("sync" "syntactical")
+          ("synq" "syntax-quote")
 
           ("sys" "system")
 
+          ;;*** t
+
+          ("tr" "transaction")
+          ("trs" "transactions")
           ("tq" "technique")
           ("todo" "TODO")
 
+          ;;*** u
+
+          ("udp" "UDP")                 ; universal design pattern
           ("und" "understand")
+          ("undg" "understanding")
 
           ;;*** v
 
@@ -457,8 +574,8 @@ abort completely with `C-g'."
           ("vals" "values")
           ("vl" "value")
           ("vls" "values")
-          ("var" "variable")
-          ("vars" "variables")
+          ;;("var" "variable")
+          ;;("vars" "variables")
 
           ("visn" "visualization")
           ("visg" "visualizing")
@@ -466,9 +583,8 @@ abort completely with `C-g'."
           ("wo" "without")
           ("wd" "would")
 
-          ;; Greek
-
-          ("theta" "Θ")))
+          ;;*** the end
+          ))
 
   ;; gives error "circular list ..."
   ;; (define-abbrev-table 'org-mode-abbrev-table
