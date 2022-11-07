@@ -648,7 +648,8 @@ surrounding PT."
     (cl-labels ((find-forward (limit acc)
                   "Return LIMIT sibling lists looking forward."
                   ;; exclude current list
-                  (when (memq (char-after) hl-sexp-open-delimiters)
+                  (when (and (char-after)
+                             (memq (char-after) hl-sexp-open-delimiters))
                     (forward-list))
                   (condition-case nil
                       (forward-list)
@@ -660,7 +661,8 @@ surrounding PT."
                 (find-backward (limit acc)
                   "Return LIMIT sibling lists looking backward."
                   ;; exclude current list
-                  (when (memq (char-before) hl-sexp-close-delimiters)
+                  (when (and (char-before)
+                             (memq  (char-before) hl-sexp-close-delimiters))
                     (backward-list))
                   (condition-case nil
                       (backward-list)
