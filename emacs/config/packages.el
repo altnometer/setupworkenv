@@ -4642,6 +4642,12 @@ Ignore \"No following same-level heading\" error, call
     (when (> hunk-end win-end)
       (recenter))))
 
+(defun ram-get-git-gutter-diff-window ()
+  "Return window displaying '*git-gutter:diff*' buffer, if any."
+  (car (seq-filter
+        (lambda (w) (equal "*git-gutter:diff*" (buffer-name (window-buffer w))))
+        (window-list-1 nil 'nomini))))
+
 (defhydra hydra-git-gutter (
                             :columns 4
                             :exit nil
@@ -4668,16 +4674,19 @@ Ignore \"No following same-level heading\" error, call
          (interactive)
          (progn
            (save-buffer)
-           (let ((diff-win (car (seq-filter
-                                 (lambda (w) (equal "*git-gutter:diff*" (buffer-name (window-buffer w))))
-                                 (window-list-1 nil 'nomini)))))
+           (let ((diff-win (ram-get-git-gutter-diff-window)))
              (when diff-win
                (quit-window nil diff-win)))
            (magit-status)))
    "commit" :exit t)
   ("N" git-gutter:end-of-hunk "end")
   ("m" git-gutter:mark-hunk "mark")
-  ("d" git-gutter:popup-hunk "diff")
+  ("d" (lambda ()
+         (interactive)
+         (if-let ((diff-win (ram-get-git-gutter-diff-window)))
+             (quit-window nil diff-win)
+           (git-gutter:popup-hunk)))
+   "diff")
   ("r" git-gutter:revert-hunk "revert")
   ("s" git-gutter:stage-hunk "stage")
   ("SPC" nil "quit" :exit t)
