@@ -1615,8 +1615,7 @@ succession."
                      (with-minibuffer-selected-window
                        (current-buffer))
                    (current-buffer)))
-         (headline-regex
-          ;; TODO: use 'outline-regexp and copy the line
+         (headline-regex 
           (cond
            ((eq major-mode 'org-mode)
             "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
@@ -4554,12 +4553,14 @@ Ignore \"No following same-level heading\" error, call
 (defvar ram-outline-regxp-for-lisp "[[:space:]]*;;\\(?:;+[^#]\\|\\*+\\)"
   "`outline-regexp' for languages with comments defined by \";\".")
 
-(add-hook 'emacs-lisp-mode-hook (lambda ()
-                                  (setq-local outline-regexp ram-outline-regxp-for-lisp)
-                                  (outline-minor-mode 1)))
-(add-hook 'clojure-mode-hook (lambda ()
-                                  (setq-local outline-regexp ram-outline-regxp-for-lisp)
-                                  (outline-minor-mode 1)))
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (setq-local outline-regexp ram-outline-regxp-for-lisp)
+            (outline-minor-mode 1)))
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (setq-local outline-regexp ram-outline-regxp-for-lisp)
+            (outline-minor-mode 1)))
 
 ;;* hideshow
 
@@ -6957,9 +6958,9 @@ Toggle `lsp-ido-show-symbol-filename'."
 ;;** python: outlines
 
 (defun python-mode-outline-hook ()
-  (setq outline-level 'python-outline-level)
+  (setq-local outline-level 'python-outline-level)
 
-  (setq outline-regexp
+  (setq-local outline-regexp
         (rx (or
              ;; Commented outline heading
              (group
