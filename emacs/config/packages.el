@@ -4568,20 +4568,17 @@ Ignore \"No following same-level heading\" error, call
 (with-eval-after-load "hideshow"
   (define-key hs-minor-mode-map (kbd "<C-tab>") #'hs-toggle-hiding))
 
-;;* emacs-git-gutter-fringe
+;;* git-gutter-fringe
 
 (straight-use-package
  '(git-gutter-fringe :type git :flavor melpa :host github :repo "syohex/emacs-git-gutter-fringe"))
-(global-git-gutter-mode t)
+(global-git-gutter-mode 1)
 (with-eval-after-load 'emacs-git-gutter-fringe
   (setq git-gutter:update-interval 1)
   ;; don't ask y/n before staging/reverting
-  (setq git-gutter:ask-p nil)
+  (setq git-gutter:ask-p 1)
   ;; don't log/message
-  (setq git-gutter:verbosity 0)
-  ;; count unstaged hunks in the current buffer
-  (setq git-gutter:buffer-hunks 1)
-  (setq git-gutter:statistic 1))
+  (setq git-gutter:verbosity 0))
 
 (add-to-list 'window-buffer-change-functions
              (lambda (frame)
@@ -4591,7 +4588,6 @@ Ignore \"No following same-level heading\" error, call
                  (with-current-buffer buffer
                    (when vc-mode
                      (git-gutter))))))
-
 
 ;;* hydra
 (straight-use-package
@@ -4687,8 +4683,18 @@ Ignore \"No following same-level heading\" error, call
   ("SPC" nil "quit" :exit t)
   ("q" nil "quit" :exit t))
 
-(define-key ram-leader-map-tap-global (kbd "h") 'hydra-git-gutter/body)
-(define-key global-map (kbd "<f5>") 'hydra-git-gutter/body)
+(defun ram-start-git-gutter-hydra ()
+  "Enable git-gutter-mode and run `hydra-git-gutter/body."
+  (interactive)
+  ;; (git-gutter-mode 1)
+  ;; (git-gutter:live-update)
+  (hydra-git-gutter/body))
+
+(define-key ram-leader-map-tap-global (kbd "h") #'ram-start-git-gutter-hydra)
+;; (define-key global-map (kbd "<f5>") 'hydra-git-gutter/body)
+(define-key global-map (kbd "<f5>") #'ram-start-git-gutter-hydra)
+
+(define-key global-map (kbd "<f5>") #'hydra-git-gutter/body)
 
 ;;** hydra-multicursor
 
@@ -7701,12 +7707,20 @@ been modified since its last check-in."
                                                    (buffer-name)))
                                    'face font-lock-keyword-face
                                    'help-echo (buffer-file-name)))
-                (:eval (if (boundp 'git-gutter-mode)
-                           (propertize (format "+%s " (car (git-gutter:statistic)))
-                                       'face '((:foreground "chartreuse3")))))
-                (:eval (if (boundp 'git-gutter-mode)
-                           (propertize (format "-%s " (cdr (git-gutter:statistic)))
-                                       'face '((:foreground "chocolate")))))
+                (:eval (when (and (vc-mode)
+                                  ;; otherwise (file-truename (git-gutter:vcs-root git-gutter:vcs-type))
+                                  ;; would raise --Lisp error: (wrong-type-argument arrayp nil)
+                                  (and (local-variable-p 'git-gutter:vcs-type) (not (null git-gutter:vcs-type))))
+                         (git-gutter:live-update)
+                         (propertize (format "+%s " (car (git-gutter:statistic)))
+                                     'face '((:foreground "chartreuse3")))))
+                (:eval (when (and (vc-mode)
+                                  ;; otherwise (file-truename (git-gutter:vcs-root git-gutter:vcs-type))
+                                  ;; would raise --Lisp error: (wrong-type-argument arrayp nil)
+                                  (and (local-variable-p 'git-gutter:vcs-type) (not (null git-gutter:vcs-type))))
+                         (git-gutter:live-update)
+                         (propertize (format "-%s " (cdr (git-gutter:statistic)))
+                                     'face '((:foreground "chocolate")))))
                 (:eval (my-mode-line-vc-info))
 
                 ;; (:eval (propertize vc-mode 'face '((:foreground "DarkGoldenrod2"))))
