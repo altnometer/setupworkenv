@@ -4475,14 +4475,16 @@ Use calendar if ARG value is '(4)."
 
 Ignore \"Already at top level of the outline\" error, call
 `outline-backward-same-level' instead."
-(interactive "p")
-(condition-case err
-    (outline-up-heading 1 t)
-  (error (if (string= (error-message-string err)
-                      "Already at top level of the outline")
-             (outline-backward-same-level arg)
-           (signal (car err) (cdr err)))))
-(ram-move-to-heading-visible-char))
+  (interactive "p")
+  (condition-case err
+      (progn (deactivate-mark)
+             (ram-push-mark)
+             (outline-up-heading 1 t))
+    (error (if (string= (error-message-string err)
+                        "Already at top level of the outline")
+               (outline-backward-same-level arg)
+             (signal (car err) (cdr err)))))
+  (ram-move-to-heading-visible-char))
 
 (defun ram-outline-next-same-level (arg &optional invisible-ok)
   "Call `outline-forward-same-level' and ignore the error.
