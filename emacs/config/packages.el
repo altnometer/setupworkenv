@@ -4601,13 +4601,34 @@ Ignore \"No following same-level heading\" error, call
 
 (straight-use-package
  '(git-gutter-fringe :type git :flavor melpa :host github :repo "syohex/emacs-git-gutter-fringe"))
-(global-git-gutter-mode 1)
-(with-eval-after-load 'emacs-git-gutter-fringe
-  (setq git-gutter:update-interval 1)
-  ;; don't ask y/n before staging/reverting
-  (setq git-gutter:ask-p 1)
-  ;; don't log/message
-  (setq git-gutter:verbosity 0))
+
+;; update gutter when switching exwm workspaces
+(with-eval-after-load 'git-gutter
+  (add-to-list 'exwm-workspace-switch-hook
+               #'git-gutter:update-all-windows))
+
+(with-eval-after-load 'magit
+  (add-to-list 'magit-post-stage-hook
+               #'git-gutter:update-all-windows))
+
+(with-eval-after-load 'magit
+  (add-to-list 'magit-post-unstage-hook
+               #'git-gutter:update-all-windows))
+
+(setq git-gutter:update-interval 0.3)
+;; don't ask y/n before staging/reverting
+(setq git-gutter:ask-p nil)
+;; don't log/message
+(setq git-gutter:verbosity 0)
+;; update gutter after these commands
+(setq git-gutter:update-commands
+  '(ido-switch-buffer helm-buffers-list))
+;; update gutter info in other windows after these commands
+(setq git-gutter:update-windows-commands
+      '(kill-buffer ido-kill-buffer ram-other-workspace
+                    other-window
+                    magit-stage))
+(global-git-gutter-mode -1)
 
 (add-to-list 'window-buffer-change-functions
              (lambda (frame)
@@ -4615,8 +4636,13 @@ Ignore \"No following same-level heading\" error, call
                (let ((buffer
                       (window-buffer (frame-selected-window frame))))
                  (with-current-buffer buffer
-                   (when vc-mode
-                     (git-gutter))))))
+                   ;; check if the buffer file is under version control
+                   (if-let* ((file-name (buffer-file-name buffer))
+                             (vc-type (vc-backend (file-truename file-name))))
+                       (if (local-variable-p 'git-gutter-mode)
+                           (git-gutter)
+                         (setq-local git-gutter-mode t)
+                         (git-gutter-mode 1)))))))
 
 ;;* hydra
 (straight-use-package
