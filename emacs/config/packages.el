@@ -2335,7 +2335,7 @@ one, an error is signaled."
 
 ;;***** buffers/display/alist: functions
 
-(defun ram-create-display-buffer-in-specific-monitor-alist-element (test-buffer-p workspace-idx)
+(defun ram-create-display-buffer-in-specific-workspace-alist-element (test-buffer-p workspace-idx)
   "Return an element to be added to `display-buffer-alist'.
 
 TEST-BUFFER-P is the condition part of the element. The action
@@ -2646,7 +2646,7 @@ displaying TEST-BUFFER-P buffer."
 ;;****** buffers/display/alist: deft
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-specific-monitor-alist-element
+             (ram-create-display-buffer-in-specific-workspace-alist-element
               (lambda (buffer &optional alist)
                 (string-match-p (regexp-quote "*Deft*")
                                 (if (stringp buffer) buffer (buffer-name buffer)))) 9))
@@ -2786,7 +2786,7 @@ displaying TEST-BUFFER-P buffer."
 ;;****** buffers/display/alist: *scratch*
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-specific-monitor-alist-element
+             (ram-create-display-buffer-in-specific-workspace-alist-element
               (lambda (buffer &optional alist)
                 (string-match-p (regexp-quote "*scratch*")
                                 (if (stringp buffer) buffer (buffer-name buffer)))) 0))
