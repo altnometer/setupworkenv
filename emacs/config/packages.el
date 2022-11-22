@@ -1067,7 +1067,13 @@ Disable `icomplete-vertical-mode' for this command."
                        `(,(kbd (format "s-%d" i)) .
                          (lambda ()
                            (interactive)
-                           (exwm-workspace-switch-create ,i))))
+                           (exwm-workspace-switch-create ,i)
+                           ;; Chrome, Chromium browser looses focus
+                           ;; when switching workspaces.
+                           ;; https://github.com/ch11ng/exwm/issues/759
+                           ;; comment out next line in exwm-layout.el
+                           ;; (cl-pushnew xcb:Atom:_NET_WM_STATE_HIDDEN exwm--ewmh-state)
+                           )))
                      (number-sequence 0 9)))))
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
@@ -1082,6 +1088,12 @@ Disable `icomplete-vertical-mode' for this command."
               (set-window-fringes (selected-window) 0 0)
               ;; git-gutter adds right fringe
               (git-gutter-mode -1)
+              (exwm-layout-toggle-fullscreen))
+             ((and exwm-class-name
+                   (string-match-p "^Google-chrome\\(<[0-9]+>\\)\\{0,1\\}$" exwm-class-name))
+              (exwm-workspace-switch 4)
+              (exwm-input-set-local-simulation-keys nil)
+              (set-window-fringes (selected-window) 0 0)
               (exwm-layout-toggle-fullscreen)))))
               ;; (setq mode-line-format nil)
 
@@ -1090,6 +1102,9 @@ Disable `icomplete-vertical-mode' for this command."
       '(((member exwm-instance-name '("qutebrowser"))
          workspace 1)
         ((member exwm-instance-name '("java"))
+         workspace 4)
+        ;; exwm-instance-name for Google-chrome Portal buffer is localhost
+        ((member exwm-class-name '("Google-chrome"))
          workspace 4)))
 
 ;; Line-editing shortcuts
