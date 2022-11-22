@@ -7691,9 +7691,10 @@ been modified since its last check-in."
 ;;** mode-line: timer
 
 ;; (cancel-timer mode-line-timer)
-(run-at-time 1 nil #'(lambda () (force-mode-line-update t)))
+;; (run-at-time 1 nil #'(lambda () (force-mode-line-update t)))
 (defvar mode-line-timer
-  (run-with-timer 2 4 #'(lambda () (force-mode-line-update t))))
+  ;; (run-with-timer 1 1 #'(lambda () (force-mode-line-update t)))
+  (run-with-idle-timer 0.5 t #'(lambda () (force-mode-line-update t))))
 (defvar mode-line-cpu-temp-timer
   (run-with-timer 2 3 #'ram-get-cpu-temp))
 (defvar mode-line-memory-stats-timer
@@ -7749,14 +7750,12 @@ been modified since its last check-in."
                                   ;; otherwise (file-truename (git-gutter:vcs-root git-gutter:vcs-type))
                                   ;; would raise --Lisp error: (wrong-type-argument arrayp nil)
                                   (and (local-variable-p 'git-gutter:vcs-type) (not (null git-gutter:vcs-type))))
-                         (git-gutter:live-update)
                          (propertize (format "+%s " (car (git-gutter:statistic)))
                                      'face '((:foreground "chartreuse3")))))
                 (:eval (when (and (vc-mode)
                                   ;; otherwise (file-truename (git-gutter:vcs-root git-gutter:vcs-type))
                                   ;; would raise --Lisp error: (wrong-type-argument arrayp nil)
                                   (and (local-variable-p 'git-gutter:vcs-type) (not (null git-gutter:vcs-type))))
-                         (git-gutter:live-update)
                          (propertize (format "-%s " (cdr (git-gutter:statistic)))
                                      'face '((:foreground "chocolate")))))
                 (:eval (my-mode-line-vc-info))
