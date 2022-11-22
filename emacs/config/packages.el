@@ -8404,6 +8404,9 @@ That is, remove a non kept dired from the recent list."
                vc                   ; search root project dir
              default-directory))   ; or from the current dir
     :confirm prefix
+    ;; --follow links, --no-follow
+    ;; --no-ignore-vcs do not respect vc ignore files (.gitignore etc)
+    ;; --glob=!pattern exclude glob match, --glob=pattern include match
     :flags ("--hidden --glob=!.git --glob=!savehist --no-ignore-vcs"))
 
   (rg-define-search rg-word
