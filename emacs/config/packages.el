@@ -4012,7 +4012,11 @@ ARG value is 4."
   (require 'org-roam-dailies)
   (let* ((repo (abbreviate-file-name default-directory))
          (rev (if (eq major-mode 'magit-status-mode)
-                  (magit-copy-section-value nil)
+                  ;; this form is straight from
+                  ;; #'magit-copy-section-value
+                  (oref (magit-current-section) value)
+                ;; this stopped working after recompiling Emacs
+                ;; (magit-copy-section-value nil)
                 (magit-git-string "rev-parse" "HEAD")))
          (backlink (format "[[orgit-rev:%s::%s][%s]]" repo rev (substring rev 0 7)))
          (summary (substring-no-properties (magit-format-rev-summary rev)))
