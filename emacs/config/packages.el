@@ -3094,9 +3094,11 @@ Leave a mark to return to."
 ;; enable org-indent-mode for every file
 ;; per file sittings: #+STARTUP: indent, #+STARTUP: noindent
 (setq org-startup-indented t)
-(setq org-indent-mode-turns-on-hiding-stars nil)
+(setq org-indent-mode-turns-on-hiding-stars t)
+(setq org-hide-leading-stars t)
 (setq org-indent-mode-turns-off-org-adapt-indentation t)
 (setq org-link-file-path-type 'absolute)
+(setq org-fontify-quote-and-verse-blocks t)
 
 ;;** org-mode: hooks, advice, timers
 
@@ -3142,14 +3144,22 @@ Leave a mark to return to."
 (with-eval-after-load "org"
   (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n,\""))
 
+(defface ram-org-emphasis-bold
+  '((default :inherit bold)
+    (((class color) (min-colors 88) (background light))
+     :foreground "grey60")
+    (((class color) (min-colors 88) (background dark))
+     :foreground "grey80"))
+  "Custom bold emphasis for Org.")
+
 ;; (with-eval-after-load
 ;;     (add-to-list 'org-emphasis-alist '("/" (:background "green"))))
 (setq org-emphasis-alist
-  '(("*" (bold :foreground "grey60"))
+  '(("*" ram-org-emphasis-bold)
     ("/" (:family "Operator Mono Light" :slant italic))
     ("_" underline)
-    ("=" org-verbatim verbatim)
-    ("~" org-code verbatim)
+    ("=" org-verbatim)
+    ("~" org-code org-verbatim)
     ("+" (:strike-through t))))
 
 (setq org-hide-emphasis-markers t)
@@ -7850,11 +7860,37 @@ been modified since its last check-in."
 (progn
   ;; (setq modus-operandi-theme-diffs nil)
   (setq modus-operandi-theme-diffs 'desaturated)
-  ;; (setq modus-operandi-theme-diffs 'fg-only)
-  (setq modus-themes-hl-line '(accented intense underline))
+  (setq modus-operandi-theme-diffs 'fg-only)
+  ;; (setq modus-themes-hl-line '(accented intense underline))
+  ;; enable inheritance from ‘fixed-pitch’ in some faces
+  ;; (setq modus-themes-mixed-fonts t)
+  ;; use italic font forms in more code constructs
+  ;; (setq modus-themes-italic-constructs t)
+  ;; (setq modus-themes-org-blocks 'tinted-background)
+  (setq modus-themes-org-blocks 'gray-background)
+  (setq modus-themes-markup '(background))
+  (setq modus-themes-headings
+        '((1 . (background rainbow overline (height . 1.1)))
+          (2 . (background rainbow overline (height . 1.05)))
+          (3 . (background rainbow overline (height . 1.05)))
+          (t . (rainbow (height . 1.0) ))))
+  (setq modus-themes-completions
+        '((matches . (extrabold background intense))
+          (selection . (semibold accented intense))
+          (popup . (accented))))
+  (setq modus-themes-links '(neutral-underline faint))
+  (setq modus-themes-region '(accented no-extend))
+  (setq modus-themes-syntaxt '(alt-syntax))
+  ;; (setq modus-themes-syntax '(yellow-comments green-strings))
   (load-theme 'modus-operandi)
   ;; (load-theme 'modus-vivendi)
   )
+(set-face-attribute
+ 'font-lock-comment-face nil :inherit 'default :foreground "grey60" :slant 'italic :weight 'light)
+(set-face-attribute
+ 'font-lock-string-face nil :inherit 'default :foreground "grey60" :slant 'italic :weight 'semi-light)
+(set-face-attribute
+ 'font-lock-doc-face nil :inherit 'default :foreground "grey60" :slant 'italic :weight 'light)
 
 ;;* search
 
@@ -8788,12 +8824,19 @@ With a prefix argument N, (un)comment that many sexps."
                  (>= (x-display-pixel-width) large-sreen-width))
             (progn
               (set-frame-parameter frame 'font "Operator Mono Medium-19")
-              (custom-set-faces
-               '(font-lock-comment-face ((t (:family "Operator Mono Light-19")))))
-              (custom-set-faces
-               '(font-lock-doc-face ((t (:family "Operator Mono Light-19" :slant italic)))))
-              (custom-set-faces
-               '(font-lock-string-face ((t (:family "Operator Mono Light-19" :slant italic))))))
+              ;; (custom-set-faces
+              ;;  '(font-lock-comment-face ((t (:inherit default :foreground "grey60" :slant italic)))))
+              (set-face-attribute
+               'font-lock-comment-face nil :family "Operator Mono Light-19")
+              ;; (custom-set-faces
+              ;;  '(font-lock-doc-face ((t (:inherit default :foreground "grey60")))))
+              (set-face-attribute
+               'font-lock-doc-face nil :family "Operator Mono Light-19")
+              (set-face-attribute
+               'font-lock-string-face nil :family "Operator Mono Light-19")
+              ;; (custom-set-faces
+              ;;  '(font-lock-string-face ((t (:inherit default :foreground "grey60" :slant italic)))))
+              )
           (progn
             (set-frame-parameter frame 'font "Operator Mono Medium-12")
             (custom-set-faces
