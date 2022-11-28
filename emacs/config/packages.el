@@ -1698,7 +1698,7 @@ succession."
                      (with-minibuffer-selected-window
                        (current-buffer))
                    (current-buffer)))
-         (headline-regex 
+         (headline-regex
           (cond
            ((eq major-mode 'org-mode)
             "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
@@ -1800,6 +1800,7 @@ succession."
                      "defalias"
                      "defconst"
                      "defcustom"
+                     "defface"
                      "define-abbrev-table"
                      "define-error"
                      "defun"
