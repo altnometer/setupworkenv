@@ -3159,12 +3159,21 @@ Leave a mark to return to."
   (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n,\""))
 
 (defface ram-org-emphasis-bold
-  '((default :inherit bold)
-    (((class color) (min-colors 88) (background light))
-     :foreground "grey60")
-    (((class color) (min-colors 88) (background dark))
-     :foreground "grey80"))
-  "Custom bold emphasis for Org.")
+  '((default (:inherit bold))
+    (((class color) (min-colors 88)) (:foreground "grey40")))
+  "Custom emphasis face for Org bold.")
+
+(defface ram-org-code-face
+  '((default (:inherit org-code))
+    (((class color) (min-colors 88))
+     (:foreground "#8f0075" :background "#f0f0f0")))
+  "My custom emphasis face for org-code.")
+
+(defface ram-org-verbatim-face
+  '((default (:inherit org-code))
+    (((class color) (min-colors 88))
+     (:foreground "#005a5f" :background "#f0f0f0")))
+  "My custom emphasis face for org-verbatim.")
 
 ;; (with-eval-after-load
 ;;     (add-to-list 'org-emphasis-alist '("/" (:background "green"))))
@@ -3172,8 +3181,8 @@ Leave a mark to return to."
   '(("*" ram-org-emphasis-bold)
     ("/" (:family "Operator Mono Light" :slant italic))
     ("_" underline)
-    ("=" org-verbatim)
-    ("~" org-code org-verbatim)
+    ("=" ram-org-verbatim-face)
+    ("~" ram-org-code-face)
     ("+" (:strike-through t))))
 
 (setq org-hide-emphasis-markers t)
