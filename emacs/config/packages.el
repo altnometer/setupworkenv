@@ -8704,7 +8704,7 @@ previous.")
 
 ;;** system: comments
 
-;;** system/comments:
+;;*** system/comments: comment-or-uncomment-sexp
 
 ;; credit to Artur Malabarba
 ;; https://endlessparentheses.com/a-comment-or-uncomment-sexp-command.html
