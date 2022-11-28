@@ -8994,6 +8994,10 @@ With a prefix argument N, (un)comment that many sexps."
 
 ;;*** system/general settings: hl (highlight) line
 
+;; nil: highlight only selected windows
+(setq hl-line-sticky-flag nil)
+(setq global-hl-line-sticky-flag nil)
+
 (defun ram-remap-hl-line-face-in-find-file-hook ()
   "Add face remap for `hl-line' face.
 
