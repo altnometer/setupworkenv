@@ -2432,6 +2432,7 @@ expression."
                 (when (not (string= (frame-parameter workspc-frm 'exwm-randr-monitor)
                                     (frame-parameter selected-frm 'exwm-randr-monitor)))
                   (exwm-workspace-switch selected-frm))
+                (delete-other-windows window-to-display-in)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
 (defun ram-create-display-buffer-in-other-monitor-alist-element (test-buffer-p primary secondary)
@@ -2472,6 +2473,7 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
               (when window-to-display-in
                 (exwm-workspace-switch workspc)
                 (exwm-workspace-switch selected-frm)
+                (delete-other-windows window-to-display-in)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
 (defun ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element (test-buffer-p workspace-idx)
@@ -2642,7 +2644,7 @@ displaying TEST-BUFFER-P buffer."
               6 4))
 
 
-;;****** buffers/display/alist: emacs-lisp
+;;****** buffers/display/alist: emacs-lisp, elisp
 
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-primary-workspace-alist-element
@@ -2650,13 +2652,6 @@ displaying TEST-BUFFER-P buffer."
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
                   (eq 'emacs-lisp-mode mode)))
               2 8))
-
-(add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
-              (lambda (buffer &optional alist)
-                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (string-match-p "^\\*Org Src .+?\\[ emacs-lisp \\]\\*$" buf-name)))))
-
 
 ;;****** buffers/display/alist: deft
 
@@ -2675,6 +2670,10 @@ displaying TEST-BUFFER-P buffer."
                   (eq 'clojure-mode mode)))
               2 8))
 
+;;******* buffers/display/alist/clojure: cider
+
+;;******** buffers/display/alist/clojure: cider-repl, cider-stacktrace
+
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-other-monitor-horiz-split-alist-element
               (lambda (buffer &optional alist)
@@ -2684,20 +2683,17 @@ displaying TEST-BUFFER-P buffer."
                       (eq 'cider-stacktrace-mode mode))))
               8 2))
 
+;;******** buffers/display/alist/clojure: cider-result
+
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
+             (ram-create-display-buffer-in-other-monitor-alist-element
               (lambda (buffer &optional alist)
-                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (string-match-p "^\\*Org Src .+?\\[ clojure \\]\\*$" buf-name)))))
-
-;; (add-to-list 'display-buffer-alist
-;;              (ram-create-display-buffer-in-primary-workspace-alist-element
-;;               (lambda (buffer &optional alist)
-;;                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-;;                   (string-match-p "^\\*Org Src .+?\\[ clojure \\]\\*$" buf-name)))
-;;               2 8))
-
-
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
+                      (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p (regexp-quote "*cider-result*")
+                                  (if (stringp buffer) buffer (buffer-name buffer)))
+                  ))
+              8 2))
 ;;****** buffers/display/alist: racket
 
 (add-to-list 'display-buffer-alist
@@ -2737,6 +2733,24 @@ displaying TEST-BUFFER-P buffer."
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
                   (eq 'org-mode mode)))
               8))
+
+;;****** buffers/display/alist/org: src, source code block buffer
+
+;;****** buffers/display/alist/org/src: clojure
+
+ (add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "^\\*Org Src .+?\\[ clojure \\]\\*$" buf-name)))))
+
+;;****** buffers/display/alist/org/src: emacs-lisp, elisp
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "^\\*Org Src .+?\\[ emacs-lisp \\]\\*$" buf-name)))))
 
 ;;****** buffers/display/alist: org monthly
 
