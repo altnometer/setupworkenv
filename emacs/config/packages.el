@@ -6,6 +6,74 @@
 (defconst large-sreen-width 3840
   "`large-sreen-width' value indicates when to use settings for large screens")
 
+;;* themes
+
+;; TODO:after-load-theme-hook change to ram-after-load-theme-hook
+(defvar after-load-theme-hook nil
+    "Hook run after a color theme is loaded using `load-theme'.")
+
+(defadvice load-theme (after run-after-load-theme-hook activate)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
+
+;;** themes: modus-themes
+
+;; consult https://protesilaos.com/emacs/modus-themes for customization
+;; starting Emacs 28.1 the Modus themes are built in.
+
+;; (setq modus-operandi-theme-diffs nil)
+(setq modus-operandi-theme-diffs 'desaturated)
+(setq modus-operandi-theme-diffs 'fg-only)
+;; (setq modus-themes-hl-line '(accented intense underline))
+;; enable inheritance from ‘fixed-pitch’ in some faces
+;; (setq modus-themes-mixed-fonts t)
+;; use italic font forms in more code constructs
+;; (setq modus-themes-italic-constructs t)
+;; (setq modus-themes-org-blocks 'tinted-background)
+(setq modus-themes-org-blocks 'gray-background)
+(setq modus-themes-markup '(background))
+(setq modus-themes-headings
+      '((1 . (background rainbow overline (height . 1.1)))
+        (2 . (background rainbow overline (height . 1.05)))
+        (3 . (background rainbow overline (height . 1.05)))
+        (t . (rainbow (height . 1.0) ))))
+(setq modus-themes-completions
+      '((matches . (extrabold background intense))
+        (selection . (semibold accented intense))
+        (popup . (accented))))
+(setq modus-themes-links '(neutral-underline faint))
+(setq modus-themes-region '(accented no-extend))
+(setq modus-themes-syntaxt '(alt-syntax))
+;; (setq modus-themes-syntax '(yellow-comments green-strings))
+(defface org-code '((t :background "grey80")) "a stub to stop org overriding it.")
+(load-theme 'modus-operandi)
+;; (load-theme 'modus-vivendi)
+
+(face-spec-set 'font-lock-comment-face
+               '((default :weight light :slant italic)
+                 (((class color) (min-colors 88)) :foreground "grey50")))
+(set-face-documentation 'font-lock-comment-face
+                        "My faded font-lock-comment-face.")
+
+(face-spec-set 'font-lock-string-face
+               '((default (:weight light :slant italic))
+                 ;; (((class color) (min-colors 88)) :foreground "#145c33")    ; green
+                 ;; (((class color) (min-colors 88)) :foreground "#a0132f")    ; red
+                 (((class color) (min-colors 88)) (:foreground "#2544bb"))     ; blue
+                 ))
+(set-face-documentation 'font-lock-string-face
+                        "My faded font-lock-string-face.")
+
+(face-spec-set 'font-lock-doc-face
+               '((default (:weight light :slant italic))
+                 (((class color) (min-colors 88)) :foreground "grey50")))
+(set-face-documentation 'font-lock-doc-face
+                        "My faded font-lock-doc-face.")
+
+;; seems that 'modus-themes-markup has no effect
+;; if Org is loaded after the theme.. However, loading a theme itakes
+;; long time, Seek other ways to fix the problem.
+
 ;;* abbrev
 
 ;;** abbrev: settings
@@ -7869,55 +7937,6 @@ been modified since its last check-in."
                                cpu-temp
                                bat
                                time)))))))
-
-;;* themes
-
-(defvar after-load-theme-hook nil
-    "Hook run after a color theme is loaded using `load-theme'.")
-
-(defadvice load-theme (after run-after-load-theme-hook activate)
-  "Run `after-load-theme-hook'."
-  (run-hooks 'after-load-theme-hook))
-
-;;** themes: modus-themes
-
-;; consult https://protesilaos.com/emacs/modus-themes for customization
-;; starting Emacs 28.1 the Modus themes are built in.
-
-(progn
-  ;; (setq modus-operandi-theme-diffs nil)
-  (setq modus-operandi-theme-diffs 'desaturated)
-  (setq modus-operandi-theme-diffs 'fg-only)
-  ;; (setq modus-themes-hl-line '(accented intense underline))
-  ;; enable inheritance from ‘fixed-pitch’ in some faces
-  ;; (setq modus-themes-mixed-fonts t)
-  ;; use italic font forms in more code constructs
-  ;; (setq modus-themes-italic-constructs t)
-  ;; (setq modus-themes-org-blocks 'tinted-background)
-  (setq modus-themes-org-blocks 'gray-background)
-  (setq modus-themes-markup '(background))
-  (setq modus-themes-headings
-        '((1 . (background rainbow overline (height . 1.1)))
-          (2 . (background rainbow overline (height . 1.05)))
-          (3 . (background rainbow overline (height . 1.05)))
-          (t . (rainbow (height . 1.0) ))))
-  (setq modus-themes-completions
-        '((matches . (extrabold background intense))
-          (selection . (semibold accented intense))
-          (popup . (accented))))
-  (setq modus-themes-links '(neutral-underline faint))
-  (setq modus-themes-region '(accented no-extend))
-  (setq modus-themes-syntaxt '(alt-syntax))
-  ;; (setq modus-themes-syntax '(yellow-comments green-strings))
-  (load-theme 'modus-operandi)
-  ;; (load-theme 'modus-vivendi)
-  )
-(set-face-attribute
- 'font-lock-comment-face nil :inherit 'default :foreground "grey60" :slant 'italic :weight 'light)
-(set-face-attribute
- 'font-lock-string-face nil :inherit 'default :foreground "grey60" :slant 'italic :weight 'semi-light)
-(set-face-attribute
- 'font-lock-doc-face nil :inherit 'default :foreground "grey60" :slant 'italic :weight 'light)
 
 ;;* search
 
