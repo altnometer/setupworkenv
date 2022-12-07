@@ -4900,49 +4900,6 @@ Ignore \"No following same-level heading\" error, call
 
 (global-set-key (kbd "<f9>") 'hydra-multiple-cursors/body)
 
-;;* cider
-;; (setq package-check-signature nil)
-
-(straight-use-package
- '(cider :type git :flavor melpa
-         :files ("*.el" (:exclude ".dir-locals.el") "cider-pkg.el")
-         :host github :repo "clojure-emacs/cider"))
-
-(with-eval-after-load 'cider
-  (cider-auto-test-mode 1) ;; run test on buffer load
-  ;; (cider-fringe-good-face ((t (:foreground ,green-l))))
-  (setq cider-save-file-on-load t)
-  (setq cider-repl-wrap-history t)
-  (setq cider-repl-history-size 1000)
-  (setq cider-test-show-report-on-success nil)
-  (setq cider-repl-history-file "~/.cider-repl-history")
-  (setq cider-repl-display-help-banner nil)
-  (setq cider-show-eval-spinner nil)
-  (setq cider-eval-result-duration 'change)
-  (face-spec-set
-   'cider-fringe-good-face
-   '((t :foreground "SkyBlue2"
-        :width ultra-expanded
-        :weight bold))
-   'face-defface-spec))
-
-;;** cider: functions
-
-(defun ram-cider-eval (form)
-  "Evaluate FORM calling `cider-interactive-eval'."
-  (let ((cider-show-eval-spinner 'nil)
-        (cider-use-overlays 'nil))
-    (cider-interactive-eval form (lambda (response) 'nil) nil nil)))
-
-;;** cider: repl
-
-(with-eval-after-load "cider"
-  (define-key cider-repl-mode-map (kbd "<f2>") #'cider-repl-return))
-
-;; start repl from Emacs with #'cider-jack-in
-(setq cider-inject-dependencies-at-jack-in nil)
-;; (setq cider-clojure-cli-parameters "-A:test:dev:local-dev")
-;; (setq cider-clojure-cli-parameters "-M:inspect/reveal-cider")
 
 ;;* racket
 
@@ -6723,6 +6680,54 @@ If there is no Clojure REPL, send warning."
   (define-key clojure-mode-map (kbd "M-S-<f5>") #'ram-lsp-jump-workspace-symbol))
 
 (add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
+
+;;* clojure: cider
+;; (setq package-check-signature nil)
+
+(straight-use-package
+ '(cider :type git :flavor melpa
+         :files ("*.el" (:exclude ".dir-locals.el") "cider-pkg.el")
+         :host github :repo "clojure-emacs/cider"))
+
+(with-eval-after-load 'cider
+  (cider-auto-test-mode 1) ;; run test on buffer load
+  ;; (cider-fringe-good-face ((t (:foreground ,green-l))))
+  (setq cider-save-file-on-load t)
+  (setq cider-repl-wrap-history t)
+  (setq cider-repl-history-size 1000)
+  (setq cider-test-show-report-on-success nil)
+  (setq cider-repl-history-file "~/.cider-repl-history")
+  (setq cider-repl-display-help-banner nil)
+  (setq cider-show-eval-spinner nil)
+  (setq cider-eval-result-duration 'change)
+  (face-spec-set
+   'cider-fringe-good-face
+   '((t :foreground "SkyBlue2"
+        :width ultra-expanded
+        :weight bold))
+   'face-defface-spec))
+
+;;** clojure/cider: functions
+
+(defun ram-cider-eval (form)
+  "Evaluate FORM calling `cider-interactive-eval'."
+  (cider-nrepl-sync-request:eval form)
+  ;; (let ((cider-show-eval-spinner 'nil)
+  ;;       (cider-use-overlays 'nil))
+  ;;   (cider-interactive-eval form (lambda (response) 'nil) nil nil))
+  )
+
+;;** clojure/cider: repl
+
+(with-eval-after-load "cider"
+  ;; use "C-<return>" for cider-repl-closing-return
+  ;; (define-key cider-repl-mode-map (kbd "<f2>") #'cider-repl-return)
+  )
+
+;; start repl from Emacs with #'cider-jack-in
+(setq cider-inject-dependencies-at-jack-in nil)
+;; (setq cider-clojure-cli-parameters "-A:test:dev:local-dev")
+;; (setq cider-clojure-cli-parameters "-M:inspect/reveal-cider")
 
 ;;** clojure: functions
 
