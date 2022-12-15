@@ -3220,6 +3220,17 @@ Leave a mark to return to."
    'org-block nil
    :family "Operator Mono Medium"))
 
+(with-eval-after-load "org"
+  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
+  (with-eval-after-load 'org-indent-mode
+    (set-face-attribute 'org-indent nil :inherit 'fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch))
+
 ;;** org-mode: emphasis
 
 ;; modify org-emphasis-regexp-components, 3rd entry, to include char to emphasis markup
@@ -8950,17 +8961,6 @@ With a prefix argument N, (un)comment that many sexps."
 
 ;; (set-face-attribute 'variable-pitch nil :font "Calibri-20")
 (set-face-attribute 'variable-pitch nil :family "Verdana-19")
-
-(with-eval-after-load "org"
-  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
-  (with-eval-after-load 'org-indent-mode
-    (set-face-attribute 'org-indent nil :inherit 'fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch))
 
 ;;** system: general settings
 
