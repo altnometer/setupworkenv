@@ -3651,6 +3651,19 @@ This function is created to identify TODO items in agenda buffers.
 
 ;;* org-roam
 
+;;** org-roam: init, initialize
+
+(setq org-roam-v2-ack t)
+(setq org-roam-directory (file-truename "~/backup/org/org-roam/notes/"))
+
+;;** org-roam: install
+
+(straight-use-package
+ '(org-roam :type git :flavor melpa
+            :files (:defaults "extensions/*" "org-roam-pkg.el")
+            :host github :repo "org-roam/org-roam"))
+;(require 'org-roam)
+
 ;;** org-roam: bindings
 
 (define-key global-map (kbd "C-c n f") #'org-roam-node-find)
@@ -3885,17 +3898,6 @@ Also exclude links weekly and monthly notes"
            entry "* ${title}\n\n%?"
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
            :unnarrowed t))))
-
-;;** org-roam: init
-
-(setq org-roam-v2-ack t)
-(setq org-roam-directory (file-truename "~/backup/org/org-roam/notes/"))
-
-;;** org-roam: installation
-
-(straight-use-package
- '(org-roam :type git :flavor melpa :host github :repo "org-roam/org-roam"))
-;(require 'org-roam)
 
 ;;** org-roam: deft, search notes with regexp
 
