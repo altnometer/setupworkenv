@@ -7444,9 +7444,15 @@ Toggle `lsp-ido-show-symbol-filename'."
 (straight-use-package
  '(ediprolog :type git :host github :repo "emacs-straight/ediprolog" :files ("*" (:exclude ".git"))))
 
+(define-key global-map (kbd "<f2> <f2>") #'ediprolog-dwim)
+
+(define-key global-map (kbd "<f2> C") #'ediprolog-remove-interactions)
+
+
 (with-eval-after-load "ediprolog"
   (define-key prolog-mode-map (kbd "C-x C-e") #'ediprolog-dwim)
   (define-key prolog-mode-map (kbd "C-M-x") #'ediprolog-dwim)
+
 
   (custom-set-variables
    '(ediprolog-system 'swi)
