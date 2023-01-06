@@ -9124,21 +9124,25 @@ With a prefix argument N, (un)comment that many sexps."
                  (fboundp 'x-display-pixel-width)
                  (>= (x-display-pixel-width) large-sreen-width))
             (progn
+              (set-face-attribute 'variable-pitch nil :family "Verdana-19")
               (set-frame-parameter frame 'font "Operator Mono Medium-19")
               ;; (custom-set-faces
               ;;  '(font-lock-comment-face ((t (:inherit default :foreground "grey60" :slant italic)))))
               (set-face-attribute
-               'font-lock-comment-face nil :family "Operator Mono Light-19")
+               'font-lock-comment-face nil :family "Operator Mono Light-19" :height 190)
               ;; (custom-set-faces
               ;;  '(font-lock-doc-face ((t (:inherit default :foreground "grey60")))))
               (set-face-attribute
                'font-lock-doc-face nil :family "Operator Mono Light-19")
+              ;; (set-face-attribute
+              ;;  'font-lock-string-face nil :family "Operator Mono Light-19")
               (set-face-attribute
-               'font-lock-string-face nil :family "Operator Mono Light-19")
+               'font-lock-string-face nil :weight 'extra-light)
               ;; (custom-set-faces
               ;;  '(font-lock-string-face ((t (:inherit default :foreground "grey60" :slant italic)))))
               )
           (progn
+            (set-face-attribute 'variable-pitch nil :family "Verdana-12")
             (set-frame-parameter frame 'font "Operator Mono Medium-12")
             (custom-set-faces
              '(font-lock-comment-face ((t (:family "Operator Mono Light-12")))))
@@ -9188,7 +9192,7 @@ With a prefix argument N, (un)comment that many sexps."
 ;; (set-face-attribute 'fixed-pitch nil :font "FiraCode-18")
 ;; (set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium-19")
 ;; (set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium")
-(set-face-attribute 'fixed-pitch nil :family "Operator Mono Medium-19")
+;; (set-face-attribute 'fixed-pitch nil :family "Operator Mono Medium-19")
 ;; (set-face-attribute 'fixed-pitch nil :font "-misc-operator mono medium-medium-r-normal--0-90-0-0-m-0-iso10646-1")
 ;(set-face-attribute 'fixed-pitch nil :font "-adobe-courier-medium-r-normal--25-180-100-100-m-150-iso10646-1")
 
