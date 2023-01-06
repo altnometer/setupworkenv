@@ -6054,8 +6054,8 @@ Return nil on failure, (point) otherwise."
 If ARG is negative, reverse the final point location.
 If ARG is 4, move to the end of defun."
   (interactive "p")
-  (when (buffer-narrowed-p)
-    (widen))
+  ;; (when (buffer-narrowed-p)
+  ;;   (widen))
   (let ((at-end-p (ram-at-thing-end-p))
         next-bounds)
     (if (= arg 4)
