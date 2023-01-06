@@ -6964,10 +6964,10 @@ If there is no Clojure REPL, send warning."
   (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
         ;; the workspace that shows reveal buffers as defined in
         ;; display-buffer-alist
-        (reveal-exwm-workspace 4))
+        (target-exwm-workspace 4))
     (ram-cider-eval (format "(tap> %s)" (ram-clojure-get-defun-at-point)))
     ;; switch to workspace that displays Reveal window
-    (ram-reveal-display-buffers orginal-workspace reveal-exwm-workspace)))
+    (ram-reveal-display-buffers orginal-workspace target-exwm-workspace)))
 
 (defun ram-clojure-tap-last-sexp (arg)
   "Evaluate the sexp preceding the point wrapped in \"tap>\"."
@@ -7006,26 +7006,73 @@ Clojure editing tools, e.g., lsp-mode, are enabled."
 (add-hook 'clojure-mode-hook #'cider-mode)
 (add-hook 'org-src-mode-hook #'ram-assoc-clojure-buffer-with-file)
 
+;;** clojure: portal
+
+(defun ram-portal.api/open ()
+  "Open Portal and display the its buffer."
+  (interactive)
+  (let ((orginal-workspace (exwm-workspace--position exwm-workspace--current))
+        ;; the workspace that displays portal reveal buffers as defined in
+        ;; display-buffer-alist
+        (reveal-exwm-workspace 4))
+    (ram-cider-eval (ram-clojure-get-defun-at-point))
+    ;; switch to workspace that displays Reveal window
+    (cider-nrepl-sync-request:eval
+     "(do (ns user) (def portal ((requiring-resolve 'portal.api/open))) (add-tap (requiring-resolve 'portal.api/submit)))")
+    (ram-reveal-display-buffers orginal-workspace reveal-exwm-workspace)))
+
+(defun ram-portal.api/clear ()
+  (interactive)
+  (cider-nrepl-sync-request:eval "(portal.api/clear)"))
+
+(defun ram-portal.api/close ()
+  "Close Portal."
+  (interactive)
+  (cider-nrepl-sync-request:eval "(portal.api/close"))
+
+;;** clojure/portal: bindings
+
+(define-key global-map (kbd "<f2> o") #'ram-portal.api/open)
+(define-key global-map (kbd "<f2> c") #'ram-portal.api/clear)
+
 ;;** clojure: reveal
 
-(defun ram-reveal-display-buffers (original-exwm-workspace reveal-exwm-workspace)
-  "Display \"java\" buffers in REVEAL-EXWM-WORKSPACE."
-  ;; switch to reveal-exwm-workspace
-  (exwm-workspace-switch reveal-exwm-workspace)
-  (let ((acc '()))
+(defun ram-reveal-display-buffers (original-exwm-workspace target-exwm-workspace)
+  "Display Clojure data browsing buffers in TARGET-EXWM-WORKSPACE."
+  ;; switch to target-exwm-workspace
+  (exwm-workspace-switch target-exwm-workspace)
+  (let* ((acc '())
+         ;; xwidget and chrome are portal buffers, java is reveal
+         (possible-display-buffers '("xwidget-webkit" "Google-chrome" "java"))
+         (buf-names-regexp (cl-reduce
+                            (lambda (acc s)
+                              (format (if (string= acc "")
+                                          "%s\\(%s\\)"
+                                        "%s\\|\\(%s\\)") acc s))
+                            possible-display-buffers :initial-value "")))
     (dolist (b (buffer-list))
-      (when (string-match "java" (buffer-name b))
+      (when (string-match-p buf-names-regexp (buffer-name b))
         (setq acc (cons (buffer-name b) acc))))
+    ;; in case there are "*java<1>*", "*java<2>*" etc
+    ;; sort them in reverse so that the "*java<1>*" is last to display
+    ;; and possibly will get focus
     (dolist (b (sort acc #'string<))
-      ;; (display-buffer b nil (exwm-workspace--workspace-from-frame-or-index reveal-exwm-workspace))
+      ;; (display-buffer b nil (exwm-workspace--workspace-from-frame-or-index target-exwm-workspace))
       (display-buffer b)
       ))
-  (dolist (w (window-list-1 nil 'NOMINI (exwm-workspace--workspace-from-frame-or-index reveal-exwm-workspace)))
-    (when (window-live-p w)
-      (select-window w)
-      ;; give time to render reveal windows
-      (sleep-for 0.1)))
-  (exwm-workspace-switch original-exwm-workspace))
+  ;; (dolist (w (window-list-1 nil 'NOMINI (exwm-workspace--workspace-from-frame-or-index target-exwm-workspace)))
+  ;;   (when (window-live-p w)
+  ;;     (select-window w)
+  ;;     ;; give time to render reveal windows
+  ;;     (sleep-for 0.1)))
+  ;; switch to previous workspace if it is not in the same monitor.
+  (when (not (string= (frame-parameter
+                       (exwm-workspace--workspace-from-frame-or-index original-exwm-workspace)
+                       'exwm-randr-monitor)
+                      (frame-parameter
+                       (exwm-workspace--workspace-from-frame-or-index target-exwm-workspace)
+                       'exwm-randr-monitor)))
+    (exwm-workspace-switch original-exwm-workspace)))
 
 (defun ram-reveal-clear ()
   (interactive)
@@ -7050,7 +7097,7 @@ Clojure editing tools, e.g., lsp-mode, are enabled."
 (defun ram-reveal-send-to-output (form)
   (ram-cider-eval (format "{:vlaaad.reveal/command '(submit %s)}" form)))
 
-(define-key global-map (kbd "<f2> c") #'ram-reveal-clear)
+;; (define-key global-map (kbd "<f2> c") #'ram-reveal-clear)
 
 ;;** clojure: lsp
 
