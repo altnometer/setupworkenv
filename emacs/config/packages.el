@@ -1964,7 +1964,8 @@ succession."
 
 (fido-mode -1)                        ; Emacs 27.1
 (icomplete-mode 1)
-
+(setq icomplete-in-buffer t)
+(setq completions-max-height 0)
 (setq icomplete-delay-completions-threshold 100)
 (setq icomplete-max-delay-chars 2)
 (setq icomplete-compute-delay 0.2)
