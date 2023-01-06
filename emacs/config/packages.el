@@ -9662,30 +9662,39 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;;** hippie-expand: make-hippie-expand-function
 
-(define-key global-map (kbd "M-/") (make-hippie-expand-function
-                                    '(
-                                      ;; try-expand-all-abbrevs
-                                      ram-try-expand-diacritical-marked
-                                      try-expand-dabbrev-visible
-                                      try-expand-dabbrev-all-buffers
-                                      try-expand-dabbrev
-                                      try-complete-file-name-partially
-                                      try-complete-file-name
-                                      try-complete-lisp-symbol-partially
-                                      try-complete-lisp-symbol
-                                      try-expand-line) t))
+;; give make-hippie-expand-function returned fn a name
+(defalias 'ram-hippie-expand-function (make-hippie-expand-function
+                                       '(
+                                         ;; try-expand-all-abbrevs
+                                         ram-try-expand-diacritical-marked
+                                         try-expand-dabbrev-visible
+                                         try-expand-dabbrev-all-buffers
+                                         try-expand-dabbrev
+                                         try-complete-file-name-partially
+                                         try-complete-file-name
+                                         try-complete-lisp-symbol-partially
+                                         try-complete-lisp-symbol
+                                         try-expand-line) t))
+(define-key global-map (kbd "M-/") #'ram-hippie-expand-function)
 
+(defalias 'ram-hippie-expand-function-org (make-hippie-expand-function
+                                           '(
+                                             ram-try-expand-diacritical-marked
+                                             try-expand-all-abbrevs
+                                             try-expand-dabbrev-visible
+                                             try-expand-dabbrev-all-buffers
+                                             try-expand-dabbrev
+                                             try-complete-file-name-partially
+                                             try-complete-file-name
+                                             try-expand-line) t))
 (eval-after-load "org"
-  '(define-key org-mode-map (kbd "M-/") (make-hippie-expand-function
-                                         '(
-                                           ram-try-expand-diacritical-marked
-                                           try-expand-all-abbrevs
-                                           try-expand-dabbrev-visible
-                                           try-expand-dabbrev-all-buffers
-                                           try-expand-dabbrev
-                                           try-complete-file-name-partially
-                                           try-complete-file-name
-                                           try-expand-line) t)))
+  '(define-key org-mode-map (kbd "M-/") #'ram-hippie-expand-function-org))
+
+(defalias 'ram-hippie-expand-line (make-hippie-expand-function
+                                   '(try-expand-line
+                                     try-expand-line-all-buffers) t))
+(define-key global-map (kbd "M-<f23> l") #'ram-hippie-expand-line)
+
 
 ;; (
 ;;  try-expand-list
