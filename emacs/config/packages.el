@@ -8631,7 +8631,15 @@ Configure `orderless-matching-styles' for this command."
 (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
 (add-hook 'clojure-mode-hook #'enable-paredit-mode)
 (add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
-(add-hook 'minibuffer-setup-hook (lambda () (when (eq this-command 'eval-expression) (enable-paredit-mode))))
+;; paredit redefines <return> key, define a custom minor-mode
+;; that binds <return> to the correct command.
+(define-minor-mode ram-eval-expression-minibuffer-local-mode
+    "Minor mode only to simulate buffer local keybindings."
+    :init-value nil
+    :keymap (make-sparse-keymap))
+(define-key ram-eval-expression-minibuffer-local-mode-map (kbd "<return>") #'read--expression-try-read)
+(add-hook 'eval-expression-minibuffer-setup-hook (lambda () (enable-paredit-mode)
+                                                      (setq-local ram-eval-expression-minibuffer-local-mode t)))
 (add-hook 'racket-mode-hook #'enable-paredit-mode)
 (add-hook 'racket-repl-mode-hook #'enable-paredit-mode)
 
