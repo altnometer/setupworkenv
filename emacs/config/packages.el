@@ -3313,12 +3313,17 @@ Leave a mark to return to."
 
 ;; (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
-(add-hook 'org-mode-hook (lambda () (variable-pitch-mode t)))
+(add-hook 'org-mode-hook #'variable-pitch-mode)
+
+(add-hook 'org-mode-hook #'ram-set-org-faces)
+
+(add-hook 'org-mode-hook #'visual-line-mode)
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
 (defun ram-org-set-last-modified-in-save-hook ()
   (when (derived-mode-p 'org-mode)
     (zp/org-set-last-modified)))
 (add-hook 'before-save-hook #'ram-org-set-last-modified-in-save-hook)
+(add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
 
 ;;** org-mode: syntax-table
 
@@ -3332,8 +3337,6 @@ Leave a mark to return to."
   ;; (modify-syntax-entry ?\: "w" org-mode-syntax-table)
   )
 
-(add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
-
 ;;** org-mode: faces, fonts
 
 ;; (setq org-src-block-faces
@@ -3341,21 +3344,57 @@ Leave a mark to return to."
 
 ;; !!! Including :weight property would reset
 ;; font-lock-string-face and font-lock-doc-face that are set to light.
-(with-eval-after-load "org"
-  (set-face-attribute
-   'org-block nil
-   :family "Operator Mono Medium"))
+;; (with-eval-after-load "org"
+;;   (set-face-attribute
+;;    'org-block nil
+;;    :family "Operator Mono Medium"))
 
-(with-eval-after-load "org"
+
+(custom-theme-set-faces
+   'user
+   ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
+   ;; '(variable-pitch ((t (:family "LucidaGrande" :height 190 :weight light))))
+   ;; '(variable-pitch ((t (:family "SourceSansPro" :height 220 :weight normal))))
+   '(variable-pitch ((t (:family "Bembo" :height 260 :weight normal))))
+   ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
+   ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
+   '(fixed-pitch ((t (:family "Operator Mono" :height 190 :weight semi-light)))))
+
+(defun ram-set-org-faces ()
+  "Modify Org faces."
+  (custom-theme-set-faces
+   'user
+   ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
+   ;; '(variable-pitch ((t (:family "LucidaGrande" :height 190 :weight light))))
+   ;; '(variable-pitch ((t (:family "SourceSansPro" :height 220 :weight normal))))
+   '(variable-pitch ((t (:family "Bembo" :height 260 :weight normal))))
+   ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
+   ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
+   '(fixed-pitch ((t (:family "Operator Mono Medium-19" :height 190 :weight light)))))
   (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
-  (with-eval-after-load 'org-indent-mode
-    (set-face-attribute 'org-indent nil :inherit 'fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-meta-line nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
+
+
+
+;; (with-eval-after-load "org"
+;;   (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+;;   (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
+;;   (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
+;;   (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
+;;   (with-eval-after-load 'org-indent-mode
+;;     (set-face-attribute 'org-indent nil :inherit 'fixed-pitch))
+;;   (set-face-attribute 'org-meta-line nil :inherit 'fixed-pitch)
+;;   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+;;   (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch)
+;;   (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch))
 
 ;;** org-mode: emphasis
 
@@ -3381,11 +3420,17 @@ Leave a mark to return to."
      (:foreground "#005a5f" :background "#f0f0f0")))
   "My custom emphasis face for org-verbatim.")
 
+(defface ram-org-emphasis-italic
+  '((default (:inherit italic))
+    (((class color) (min-colors 88)) (:weight light)))
+  "My custom emphasis face for Org italic.")
+
 ;; (with-eval-after-load
 ;;     (add-to-list 'org-emphasis-alist '("/" (:background "green"))))
 (setq org-emphasis-alist
   '(("*" ram-org-emphasis-bold)
-    ("/" (:family "Operator Mono Light" :slant italic))
+    ;; ("/" (:family "Operator Mono Light" :slant italic))
+    ("/" ram-org-emphasis-italic)
     ("_" underline)
     ("=" ram-org-verbatim-face)
     ("~" ram-org-code-face)
