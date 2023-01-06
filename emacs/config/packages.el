@@ -59,7 +59,7 @@
                '((default (:weight light :slant italic))
                  ;; (((class color) (min-colors 88)) :foreground "#145c33")    ; green
                  ;; (((class color) (min-colors 88)) :foreground "#a0132f")    ; red
-                 (((class color) (min-colors 88)) (:foreground "#2544bb"))     ; blue
+                 (((class color) (min-colors 88)) (:height 190 :foreground "#2544bb"))     ; blue
                  ))
 (set-face-documentation 'font-lock-string-face
                         "My faded font-lock-string-face.")
