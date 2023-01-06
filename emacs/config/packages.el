@@ -2782,17 +2782,20 @@ displaying TEST-BUFFER-P buffer."
                       (eq 'cider-stacktrace-mode mode))))
               8 2))
 
-;;******** buffers/display/alist/clojure: cider-result
+;;******** buffers/display/alist/clojure: cider-result, cider-doc
 
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-other-monitor-alist-element
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
                       (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (string-match-p (regexp-quote "*cider-result*")
+                  (string-match-p (or (regexp-quote "*cider-result*")
+                                       (regexp-quote "*cider-doc*"))
                                   (if (stringp buffer) buffer (buffer-name buffer)))
-                  ))
+                  (string-match-p "\\(?:\\*cider-result\\*\\)\\|\\(?:\\*cider-doc\\*\\)"
+                                  (if (stringp buffer) buffer (buffer-name buffer)))))
               8 2))
+
 ;;****** buffers/display/alist: racket
 
 (add-to-list 'display-buffer-alist
@@ -2901,24 +2904,17 @@ displaying TEST-BUFFER-P buffer."
                       (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
               7 3))
 
-;;****** buffers/display/alist: Google-chrome, portal
-
-(add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-specific-workspace-alist-element
-              (lambda (buffer &optional alist)
-                (let (;; (mode (buffer-local-value 'major-mode (get-buffer buffer)))
-                      (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (string-match-p "^Google-chrome\\(<[0-9]+>\\)\\{0,1\\}$" buf-name)))
-              4))
-
-;;****** buffers/display/alist: java, reveal
+;;****** buffers/display/alist: java, Google-chrome, xwidget-webkit, portal, reveal
 
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
               (lambda (buffer &optional alist)
                 (let (;; (mode (buffer-local-value 'major-mode (get-buffer buffer)))
                       (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (string-match-p "^java\\(<[0-9]+>\\)\\{0,1\\}$" buf-name)))
+                  (or
+                   (eq 'xwidget-webkit-mode (buffer-local-value 'major-mode (get-buffer buffer)))
+                   (string-match-p "^Google-chrome\\(<[0-9]+>\\)\\{0,1\\}$" buf-name)
+                   (string-match-p "^java\\(<[0-9]+>\\)\\{0,1\\}$" buf-name))))
               4))
 
 ;;****** buffers/display/alist: *scratch*
@@ -2929,13 +2925,21 @@ displaying TEST-BUFFER-P buffer."
                 (string-match-p (regexp-quote "*scratch*")
                                 (if (stringp buffer) buffer (buffer-name buffer)))) 0))
 
+;; ****** buffers/display/alist: test
+
+;; (setq display-buffer-alist nil)
+
 ;; (add-to-list 'display-buffer-alist
 ;;              `("*"
-;;                ((lambda (buf alist) (progn (print
-;;                                             (format "################ any buffer type : buf name: %s, mode: %s" buf
-;;                                                     (with-current-buffer buf major-mode))) nil)))))
+;;                ((lambda (buffer alist)
+;;                   (progn
+;;                     (print
+;;                      (format "################ any buffer type : buffer name: %s, mode: %s" buffer
+;;                              (buffer-local-value 'major-mode buffer)))
 
-;;*** buffers: breadcrumbs
+;;                     nil)))))
+
+;; *** buffers: breadcrumbs
 
 ;; (require 'breadcrumbs)
 
