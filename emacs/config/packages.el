@@ -1533,8 +1533,8 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 
 ;;*** minibuffer/functions: supporting functions
 
-(defmacro ram-add-to-history-cmd (name history)
-  `(defun ,name ()
+(defmacro ram-add-to-history-cmd (fn-name history command)
+  `(defun ,fn-name ()
      ,(format "Add search string entered in minibuffer to `%s'." (eval history))
      (interactive)
      (let ((search-str (buffer-substring
@@ -1542,7 +1542,7 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
        (if (< 3 (length search-str))
            (progn
              (add-to-history ,history search-str))))
-     (minibuffer-force-complete-and-exit)))
+     (,(symbol-function command))))
 
 ;;*** minibuffer/functions: ram-describe-variable
 
@@ -1563,7 +1563,9 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
      ;; (setq history-add-new-input nil)
 
      (define-key minibuffer-local-completion-map (kbd "<return>")
-       (ram-add-to-history-cmd ram-add-to-describe-variable-history 'ram-describe-variable-history))
+       (ram-add-to-history-cmd ram-add-to-describe-variable-history
+                               'ram-describe-variable-history
+                               minibuffer-force-complete-and-exit))
 
      (setq val (completing-read
                 (if (symbolp v)
@@ -1663,7 +1665,9 @@ succession."
          val)
 
      (define-key minibuffer-local-completion-map (kbd "<return>")
-       (ram-add-to-history-cmd ram-add-to-describe-function-history 'ram-describe-function-history))
+       (ram-add-to-history-cmd ram-add-to-describe-function-history
+                               'ram-describe-function-history
+                               minibuffer-force-complete-and-exit))
 
      (setq val (completing-read
                 (if (and fn (symbol-name fn))
@@ -1756,7 +1760,9 @@ succession."
          (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
          (hist-item (car ram-jump-to-outline-history)))
      (setf (alist-get 'return minibuffer-local-completion-map)
-           (ram-add-to-history-cmd ram-add-to-jump-to-outline-history 'ram-jump-to-outline-history))
+           (ram-add-to-history-cmd ram-add-to-jump-to-outline-history
+                                   'ram-jump-to-outline-history
+                                   minibuffer-force-complete-and-exit))
      (condition-case err
          (progn (with-current-buffer buffer
                   (save-excursion
@@ -1901,7 +1907,9 @@ succession."
                    (when (= 1 arg)
                      (top-level)))))))
      (setf (alist-get 'return minibuffer-local-completion-map)
-           (ram-add-to-history-cmd ram-add-to-jump-to-def-history 'ram-jump-to-def-history))
+           (ram-add-to-history-cmd ram-add-to-jump-to-def-history
+                                   'ram-jump-to-def-history
+                                   minibuffer-force-complete-and-exit))
 
      (condition-case err
          (progn (with-current-buffer buffer
