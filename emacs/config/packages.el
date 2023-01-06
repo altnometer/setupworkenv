@@ -2966,6 +2966,96 @@ displaying TEST-BUFFER-P buffer."
 
 ;;** org-mode: functions
 
+
+(defvar ram-org-jump-to-name-history nil
+  "`ram-describe-variable' history list.")
+(put 'ram-org-jump-to-name-history 'history-length 100)
+
+
+(defun ram-org-jump-to-name (org-name &optional swap-history-p)
+  "Jump to org #+name."
+  (interactive
+   (let* ((org-names '())
+          (buffer (if (minibufferp)
+                      (with-minibuffer-selected-window
+                        (current-buffer))
+                    (current-buffer)))
+          (org-name-regex "^#\\+name:\\(?: *\\)\\(.*?\\)?[[:blank:]]*$"
+                          ;; (cond ((eq major-mode 'org-mode)            "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")))
+                          )
+          (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
+          (old-binding-to-C-w (cdr (assoc ?\C-w minibuffer-local-completion-map)))
+          (reset-bindings (lambda ()
+                            (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
+                            (setf (alist-get ?\C-w minibuffer-local-completion-map) old-binding-to-C-w)))
+          (hist-item (car ram-org-jump-to-name-history))
+          val)
+     (setf (alist-get 'return minibuffer-local-completion-map)
+           (ram-add-to-history-cmd ram-add-to-jump-org-name-history-on-exit
+                                   'ram-org-jump-to-name-history
+                                   minibuffer-force-complete-and-exit))
+
+     (setf (alist-get ?\C-w minibuffer-local-completion-map)
+           (ram-add-to-history-cmd ram-add-to-jump-org-name-history-on-kill
+                                   'ram-org-jump-to-name-history
+                                   ram-kill-minibuffer-candidate))
+
+     (condition-case err
+         (progn (with-current-buffer buffer
+                  (save-excursion
+                    (goto-char (point-max))
+                    (while (re-search-forward org-name-regex nil t -1)
+                      (setq org-names (cons (cons (match-string-no-properties 1) (point)) org-names)))))
+                (setq org-names (ram-make-duplicate-keys-unique org-names))
+                (setq val (cdr (assoc (completing-read
+                                       (format-prompt
+                                        "Find #+name:" (car ram-org-jump-to-name-history))
+                                       org-names
+                                       nil t nil
+                                       'ram-org-jump-to-name-history
+                                       (car ram-org-jump-to-name-history))
+                                      org-names))))
+       (error
+        (funcall reset-bindings)
+        (signal (car err) (cdr err)))
+       (quit
+        (funcall reset-bindings)
+        (signal 'quit nil))
+       (:success
+        (funcall reset-bindings)
+        ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
+        ;; FIXME: confusing logic, rewrite without using these args
+        (list val
+              ;; if two items are inserted, swap them so that the search str is first
+              (let ((third-element (caddr ram-org-jump-to-name-history))
+                    (second-element (cadr ram-org-jump-to-name-history)))
+                (and second-element (equal hist-item third-element)))))))
+
+   ;; reorder history so that the search string is fist and the input is second.
+   ;; Use it for different order when pressing <M-p> for previous history item.
+   (when swap-history-p
+     (setq ram-org-jump-to-name-history
+           (cons (cadr ram-org-jump-to-name-history)
+                 (cons (car ram-org-jump-to-name-history)
+                       (cddr ram-org-jump-to-name-history))))))
+  (when org-name
+    (when (minibufferp)
+      (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
+                                     (current-buffer))))
+        (switch-to-buffer pre-minibuffer-buffer)))
+    (push-mark)
+    (goto-char org-name)
+    (beginning-of-line)
+    (recenter)
+    ;; (let ((default (if (boundp pulse-flag)
+    ;;                    pulse-flag
+    ;;                  nil)))
+    ;;   ;; pulse-iteration pulse-delay
+    ;;   (setq pulse-flag nil)
+    ;;   (pulse-momentary-highlight-one-line (point) 'isearch)
+    ;;   (setq pulse-flag default))
+    ))
+
 ;; credit to https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
 (defun ram-org-buffer-contains-todos-p (&optional file-path)
   "Return non-nil if FILE buffer contains any to-dos.
@@ -3158,6 +3248,8 @@ Leave a mark to return to."
 (with-eval-after-load "org"
   ;; originally, C-' runs the command org-cycle-agenda-files
   (define-key org-mode-map (kbd "C-'") nil)
+
+  (define-key org-mode-map (kbd "M-S-<f5>") #'ram-org-jump-to-name)
 
   (define-key org-mode-map (kbd "M-<f19>") #'ram-org-next-block)
   (define-key org-mode-map (kbd "C-c M-f") #'ram-org-next-block)
