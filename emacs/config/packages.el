@@ -289,9 +289,12 @@ abort completely with `C-g'."
 
           ("appr" "approach")
 
+          ("arch" "architecture")
+
           ("assd" "associated")
 
           ("auty" "automatically")
+          ("autom" "automatically")
           ("autly" "automatically")
 
           ("bl" "buffer-local")
@@ -331,6 +334,7 @@ abort completely with `C-g'."
           ("colls" "collections")
 
           ("comn" "computation")
+          ("comnl" "computational")
           ("comg" "computing")
           ("comp" "compute")
           ("cmd" "command")
@@ -352,6 +356,8 @@ abort completely with `C-g'."
           ("cont" "contain")
           ("contg" "containing")
           ("conts" "contains")
+
+          ("conu" "continue")
 
           ("conf" "configure")
           ("confd" "configured")
@@ -430,6 +436,7 @@ abort completely with `C-g'."
           ("fn" "function")
           ("fns" "functions")
           ("fnl" "functional")
+          ("fnly" "functionally")
           ("fny" "functionality")
           ("fnty" "functionality")
 
@@ -437,6 +444,8 @@ abort completely with `C-g'."
           ("hiers" "hierarchies")
           ("hl" "headline")
           ("hls" "headlines")
+
+          ;;*** i
 
           ("imp" "implement")
           ("imps" "implements")
@@ -452,6 +461,9 @@ abort completely with `C-g'."
           ("initn" "initiation")
           ("initg" "initializing")
           ("initzn" "initialization")
+
+          ("intr" "interpreter")
+          ("intrg" "interpreting")
 
           ("inv" "invoke")
           ("invd" "invoked")
@@ -474,6 +486,10 @@ abort completely with `C-g'."
           ("lgs" "languages")
 
           ;;*** m
+
+          ("math" "mathematics")
+          ("maths" "mathematics")
+          ("mathl" "mathematical")
 
           ("mech" "mechanism")
           ("mechm" "mechanism")
@@ -586,8 +602,12 @@ abort completely with `C-g'."
           ("resp" "responsibility")
           ("resps" "responsibilities")
 
-          ("rl" "relation")
-          ("rlp" "relationship")
+          ("rel" "relation")
+          ("rell" "relational")
+          ("rels" "relations")
+          ("relp" "relationship")
+          ("relps" "relationships")
+
           ("rn" "return")
           ("rnd" "returned")
           ("rng" "returning")
@@ -612,8 +632,13 @@ abort completely with `C-g'."
 
           ("sm" "symbol")
           ("sms" "symbols")
+
           ("st" "structure")
           ("sts" "structures")
+
+          ("stt" "statement")
+          ("stts" "statements")
+
           ("subs" "substitution")
           ("subss" "substitutions")
           ("subsg" "substituting")
@@ -629,6 +654,7 @@ abort completely with `C-g'."
           ("tr" "transaction")
           ("trs" "transactions")
           ("tq" "technique")
+          ("tqs" "techniques")
           ("todo" "TODO")
 
           ;;*** u
@@ -651,6 +677,9 @@ abort completely with `C-g'."
 
           ("wo" "without")
           ("wd" "would")
+
+          ;;*** x
+          ("Xt" "XTDB")
 
           ;;*** the end
           ))
