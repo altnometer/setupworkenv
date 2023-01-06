@@ -3486,11 +3486,13 @@ Leave a mark to return to."
   (add-to-list 'org-structure-template-alist
                '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist
-               '("cl" . "src clojure :results silent"))
+               '("cl" . "src clojure :results silent :noweb yes"))
   (add-to-list 'org-structure-template-alist
                '("cls" . "src clojurescrsipt"))
   (add-to-list 'org-structure-template-alist
                '("rac" . "src racket :lang racket/base :results output"))
+  (add-to-list 'org-structure-template-alist
+               '("pl" . "src prolog :results silent"))
   (add-to-list 'org-structure-template-alist
                '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist
@@ -3507,6 +3509,8 @@ Leave a mark to return to."
 
 (with-eval-after-load 'cider
   (setq org-babel-clojure-backend 'cider))
+
+(setq org-babel-prolog-backend 'ediprolog)
 
 (with-eval-after-load "org"
   (autoload 'ob-racket "ob-racket")
