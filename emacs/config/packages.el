@@ -1103,6 +1103,9 @@ Disable `icomplete-vertical-mode' for this command."
         (,(kbd "<M-XF86Copy>") . delete-other-windows)
         (,(kbd "<M-S-XF86Copy>") . delete-window)
 
+        ;; TODO: check if in Portal (Ghrome, or webkit) buffer
+        ;; (,(kbd "C-o" . portal.ui.commands/clear-filter))
+
         (,(kbd "s-a") . org-agenda)
 
         (,(kbd "<f2> c") . ram-reveal-clear)
