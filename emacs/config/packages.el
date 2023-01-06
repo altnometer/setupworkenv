@@ -9492,6 +9492,23 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;;** system: tramp
 
+;;** system: undo
+
+;; Once I lost the content of a big file
+;; the undo did not have enough size to keep it.
+
+;; default is 160 KB
+;; 25 MB
+(setq undo-limit 25000000)
+
+;; default is 240 KB
+;; 25 MB
+(setq undo-strong-limit 25000000)
+
+;; undo limit for one command
+;; default is 24 MB
+(setq undo-outer-limit 24000000)
+
 ;;** system: whitespace
 
 (setq-default show-trailing-whitespace t)
