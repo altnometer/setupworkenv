@@ -27,7 +27,7 @@ EMACS_REPO_DIR="${HOME}/Repos/emacs"
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
 
 # if hash emacs 2>/dev/null && [ -d "${EMACS_CONF_DEST_DIR}" ]; then
-if hash emacs 2>/dev/null; then
+if ! hash emacs 2>/dev/null; then
     echo -e "\n\x1b[33;01m emacs is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
@@ -57,16 +57,41 @@ else
 
     # tools for compiling
     apt-get install -y autoconf make gcc texinfo libgccjit-8-dev cmake libtool-bin \
-            libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev \
-            libcairo2-dev libharfbuzz-dev
+            libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev \
+            libgnutls28-dev libtinfo-dev \
+            libwxgtk3.0-gtk3-dev \
+            libwxgtk-media3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
+            libwxgtk3.0-gtk3-dev \
+            libgtk-3-dev \
+            libwebkit2gtk-4.0-dev \
+            libcairo2-dev libharfbuzz-dev \
+            #libX11-dev libXpm-dev libxaw3dxft8-dev libxaw3dxft8-dev \
 
-    echo -e "\n\x1b[33;01m Installing, configuring emacs ...  \x1b[39;49;00m\n" && sleep 1
+            [ ! "0" -eq "$?" ] && \
+            echo -e "\n\x1b[31;01m Failed to install packages!  \x1b[39;49;00m\n" && exit 1
 
     if [ -d $EMACS_REPO_DIR ];
     then
+        echo -e "\n\x1b[33;01m Updating Emacs git repository ...  \x1b[39;49;00m\n" && sleep 1
         cd $EMACS_REPO_DIR
         sudo -u $SUDO_USER git pull
+        
+        # problems with automatically generated files from previos builds:
+        # Some files in $EMACS_REPO_DIR/lisp will NEED TO BE UPDATED to reflect
+        # new autoloaded functions. Otherwise,
+        # you may see errors (rather than warnings) about undefined
+        # lisp functions during compilation or build failures related to
+        # these files (e.g., "required feature 'some-feature' was not provided.
+        # This did not help me.
+        #echo -e "\n\x1b[33;01m Updating $EMACS_REPO_DIR/lisp files from prev build ...  \x1b[39;49;00m\n" && sleep 1
+        #cd $EMACS_REPO_DIR/lisp
+        #sudo -u $SUDO_USER make autoloads
+        #cd $EMACS_REPO_DIR
+
+       echo -e "\n\x1b[33;01m Clean repository from files left from prev build ...  \x1b[39;49;00m\n" && sleep 1
+       sudo -u $SUDO_USER  git clean -fdx
     else
+        echo -e "\n\x1b[33;01m Cloning Emacs git repository ...  \x1b[39;49;00m\n" && sleep 1
         sudo -u $SUDO_USER mkdir -p "$(dirname "$EMACS_REPO_DIR")"
         sudo -u $SUDO_USER git clone git://git.savannah.gnu.org/emacs.git "$EMACS_REPO_DIR"
         cd $EMACS_REPO_DIR
@@ -77,13 +102,17 @@ else
          --with-native-compilation --with-sound=no \
          --with-cairo --with-harfbuzz \
          --with-x=yes --with-x-toolkit=no --with-xft \
-         --with-mailutils --without-toolkit-scroll-bars
+         --with-mailutils --without-toolkit-scroll-bars \
+         --with-x-toolkit=gtk3 --with-xwidgets \
+         --disable-ns-self-contained
+    # --disable-ns-self-contained respect --prefix
     sudo -u $SUDO_USER make -j$(nproc)
     sudo -u $SUDO_USER make install
     #make clean
-
     #apt-get install -y emacs
 fi
+
+exit 0
 
 # link files
 
