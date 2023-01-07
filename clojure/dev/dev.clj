@@ -255,38 +255,38 @@
 
   ;; select and start a main REPL:
   (let [[repl-name repl-fn]
-        (or (try (when-let [reveal (requiring-resolve 'vlaaad.reveal/repl)]
-                   (let [kickstart-reveal
-                         (fn [label repl-fn]
-                           ;; a six second delay should be sufficient:
-                           (future (Thread/sleep 6000)
-                                   (tap> (install-reveal-extras)))
-                           [label repl-fn])]
-                     (cond ;; if we're in Figwheel, just start the Reveal UI
-                       (resolve 'figwheel.main/-main)
-                       (when-sym figwheel.main/-main
-                         (kickstart-reveal
-                          "Figwheel+Reveal UI"
-                          #(let [fw-main (requiring-resolve 'figwheel.main/-main)]
-                             (add-tap ((requiring-resolve 'vlaaad.reveal/ui)))
-                             (fw-main "-b" "dev" "-r"))))
-                       ;; if Rebel is also available, use it as Reveal's REPL
-                       ;; courtesy of didibus on Slack (plus when-sym above):
-                       (resolve 'rebel-readline.core/with-line-reader)
-                       (when-sym rebel-readline.core/with-line-reader
-                         (let [rebel-create-line-reader
-                               (requiring-resolve 'rebel-readline.clojure.line-reader/create)
-                               rebel-create-service
-                               (requiring-resolve 'rebel-readline.clojure.service.local/create)
-                               rebel-create-repl-read
-                               (requiring-resolve 'rebel-readline.clojure.main/create-repl-read)]
-                           (kickstart-reveal "Reveal+Rebel Readline"
-                                             #(rebel-readline.core/with-line-reader
-                                                (rebel-create-line-reader (rebel-create-service))
-                                                (reveal :prompt (fn []) :read (rebel-create-repl-read))))))
-                       :else
-                       (kickstart-reveal "Reveal" reveal))))
-                 (catch Throwable _))
+        (or ;; (try (when-let [reveal (requiring-resolve 'vlaaad.reveal/repl)]
+            ;;        (let [kickstart-reveal
+            ;;              (fn [label repl-fn]
+            ;;                ;; a six second delay should be sufficient:
+            ;;                (future (Thread/sleep 6000)
+            ;;                        (tap> (install-reveal-extras)))
+            ;;                [label repl-fn])]
+            ;;          (cond ;; if we're in Figwheel, just start the Reveal UI
+            ;;            (resolve 'figwheel.main/-main)
+            ;;            (when-sym figwheel.main/-main
+            ;;              (kickstart-reveal
+            ;;               "Figwheel+Reveal UI"
+            ;;               #(let [fw-main (requiring-resolve 'figwheel.main/-main)]
+            ;;                  (add-tap ((requiring-resolve 'vlaaad.reveal/ui)))
+            ;;                  (fw-main "-b" "dev" "-r"))))
+            ;;            ;; if Rebel is also available, use it as Reveal's REPL
+            ;;            ;; courtesy of didibus on Slack (plus when-sym above):
+            ;;            (resolve 'rebel-readline.core/with-line-reader)
+            ;;            (when-sym rebel-readline.core/with-line-reader
+            ;;              (let [rebel-create-line-reader
+            ;;                    (requiring-resolve 'rebel-readline.clojure.line-reader/create)
+            ;;                    rebel-create-service
+            ;;                    (requiring-resolve 'rebel-readline.clojure.service.local/create)
+            ;;                    rebel-create-repl-read
+            ;;                    (requiring-resolve 'rebel-readline.clojure.main/create-repl-read)]
+            ;;                (kickstart-reveal "Reveal+Rebel Readline"
+            ;;                                  #(rebel-readline.core/with-line-reader
+            ;;                                     (rebel-create-line-reader (rebel-create-service))
+            ;;                                     (reveal :prompt (fn []) :read (rebel-create-repl-read))))))
+            ;;            :else
+            ;;            (kickstart-reveal "Reveal" reveal))))
+            ;;      (catch Throwable _))
             (try
               (let [figgy (requiring-resolve 'figwheel.main/-main)]
                 ["Figwheel Main" #(figgy "-b" "dev" "-r")])
@@ -296,16 +296,22 @@
             ["clojure.main" (resolve 'clojure.main/main)])]
     (println "Starting" repl-name "as the REPL...")
     ;; (repl-fn)
-    (if (requiring-resolve 'vlaaad.reveal/repl)
+    ;; (if (requiring-resolve 'vlaaad.reveal/repl)
+    ;;   ((requiring-resolve 'nrepl.cmdline/-main)
+    ;;    "-m" "nrepl.cmdline"
+    ;;    "-p" "33933"
+    ;;    "--middleware"
+    ;;    "[vlaaad.reveal.nrepl/middleware,refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"
+    ;;    ;; "--interactive"
+    ;;    ))
+    (if (requiring-resolve 'rebel-readline.main/-main)
       ((requiring-resolve 'nrepl.cmdline/-main)
        "-m" "nrepl.cmdline"
        "-p" "33933"
-       "--middleware"
-       "[vlaaad.reveal.nrepl/middleware,refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"
-       ;; "--interactive"
+       "--middleware" "[cider.nrepl/cider-middleware]"
+       "-f" "rebel-readline.main/-main"
+       "--interactive"
        ))))
 
-
- (def foo "defined a foo str in dev.clj")
 
 (start-repl)
