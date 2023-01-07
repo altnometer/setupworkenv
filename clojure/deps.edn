@@ -1,3 +1,4 @@
+
 ;; adopted from https://github.com/practicalli/clojure-deps-edn#middleware
 ;;
 ;; deps.edn config is a combination of
@@ -31,12 +32,15 @@
  ;; Clojure standard library
  {org.clojure/clojure {:mvn/version "1.11.1"}}
 
- ;;* aliases
+ :mvn/repos
+ {"central" {:url "https://repo1.maven.org/maven2/"}
+  "clojars" {:url "https://clojars.org/repo"}
+  ;; this is for xtdb
+  "snapshots" {:url "https://s01.oss.sonatype.org/content/repositories/snapshots"}}
+ 
+ ;;** aliases
  :aliases
  {
- 
-
-
   ;;*** :env/dev
 
   ;; add-libs
@@ -84,6 +88,7 @@
                 ;; ring/ring-core {:mvn/version "1.9.5"}
                 ring/ring-jetty-adapter {:mvn/version "1.9.3"}
                 com.cemerick/pomegranate      {:mvn/version "0.0.13"}
+                com.taoensso/timbre {:mvn/version "6.0.2"}
                 org.clojure/tools.deps.alpha ; add-lib3 hot-loading
                 {:git/url "https://github.com/clojure/tools.deps.alpha.git"
                  :sha "83a477b305839c697666401508c395cfed29506a"}
@@ -99,7 +104,8 @@
 
                ;; this is done in dev.clj start-repl
                ;; "-e" "(->>(Thread/currentThread)(.getContextClassLoader)(clojure.lang.DynamicClassLoader.)(.setContextClassLoader,(Thread/currentThread)))"
-               "-e" "(load-file,(str,(System/getProperty,\"user.home\"),\"/.clojure/dev/dev.clj\"))"]}
+               "-e"
+               "(load-file,(str,(System/getProperty,\"user.home\"),\"/.clojure/dev/dev.clj\"))"]}
 
   ;; example use (if 'reveal' alias is defined):
   ;; clj -M:reveal:dev/repl
@@ -107,115 +113,136 @@
   :dev/repl {:jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
              :main-opts ["-e" "(load-file,(str,(System/getProperty,\"user.home\"),\"/.clojure/dev.clj\"))"]}
 
-  ;;*** :jedi-time
+  ;;*** databases, db
 
-  ;; - see https://github.com/jimpil/jedi-time
-  :jedi-time
-  {:extra-deps {jedi-time/jedi-time {:mvn/version "0.2.1"}}}
-  ;; - see https://github.com/djblue/portal
+  ;;**** :xtdb
 
-  ;;** REPL and nREPL connections
+  ;; requires :mvn/repos  {"snapshots" {:url "https://s01.oss.sonatype.org/content/repositories/snapshots"}}
+  :xtdb
+  {:extra-deps {com.xtdb/xtdb-core {:mvn/version "dev-SNAPSHOT"}}} ;; "RELEASE"
+  
+ ;;*** :jedi-time
+
+ ;; - see https://github.com/jimpil/jedi-time
+ :jedi-time
+ {:extra-deps {jedi-time/jedi-time {:mvn/version "0.2.1"}}}
+ ;; - see https://github.com/djblue/portal
+
+ ;;** REPL and nREPL connections
 
 
-  ;;*** rebel
+ ;;*** rebel
 
-  ;;**** clj -M:repl/rebel-nrepl
-  :repl/rebel-nrepl
-  {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0"}
-                cider/cider-nrepl          {:mvn/version "0.28.3"}
-                com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
-   :main-opts  ["-m" "nrepl.cmdline"
-                "--middleware" "[cider.nrepl/cider-middleware]"
-                "-i"
-                "-p" "33933"
-                "-f" "rebel-readline.main/-main"]}
+ ;;**** :repl/rebel-nrepl
+ ;; clj -M:repl/rebel-nrepl
+ :repl/rebel-nrepl
+ {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0"}
+               cider/cider-nrepl          {:mvn/version "0.28.3"}
+               com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
+  :main-opts  ["-m" "nrepl.cmdline"
+               "--middleware" "[cider.nrepl/cider-middleware]"
+               "-i"
+               "-p" "33933"
+               "-f" "rebel-readline.main/-main"]}
 
-  ;;**** clojure -X:repl/rebel
-  :repl/rebel
-  {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0"}
-                com.bhauman/rebel-readline {:mvn/version "0.1.4"}
-                vlaaad/reveal              {:mvn/version "1.3.272"}}
-   :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-size,32}"]
-   ;; :ns-default com.bhauman/rebel-readline
-   ;; :exec-fn    com.bhauman/rebel-readline.main/-main
-   :exec-fn    rebel-readline.main/-main
-   }
+ ;;**** clojure -X:repl/rebel
+ :repl/rebel
+ {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0"}
+               com.bhauman/rebel-readline {:mvn/version "0.1.4"}
+               vlaaad/reveal              {:mvn/version "1.3.272"}}
+  :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-size,32}"]
+  ;; :ns-default com.bhauman/rebel-readline
+  ;; :exec-fn    com.bhauman/rebel-readline.main/-main
+  :exec-fn    rebel-readline.main/-main
+  }
 
-  ;;**** clojure -M:rebel
-  :rebel
-  {:extra-deps { ;; nrepl/nrepl
-                ;; {:mvn/version "0.9.0"}
-                com.bhauman/rebel-readline {:mvn/version "0.1.4"}
-                vlaaad/reveal {:mvn/version "1.3.272"}}
-   :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-size,32}"]
-   :main-opts ["-m" "rebel-readline.main"]
-   ;; :ns-default com.bhauman/rebel-readline
-   :exec-fn    rebel-readline.main/-main
-   }
+ ;;**** :rebel
+ ;; clojure -M:rebel
+ :rebel
+ {:extra-deps { ;; nrepl/nrepl
+               ;; {:mvn/version "0.9.0"}
+               com.bhauman/rebel-readline {:mvn/version "0.1.4"}
+               vlaaad/reveal {:mvn/version "1.3.272"}}
+  :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-size,32}"]
+  :main-opts ["-m" "rebel-readline.main"]
+  ;; :ns-default com.bhauman/rebel-readline
+  :exec-fn    rebel-readline.main/-main
+  }
 
-  ;;*** nrepl
-  ;; clojure -M:nrepl
-  :repl/nrepl
-  {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0"}
-                cider/cider-nrepl          {:mvn/version "0.28.3"}
-                vlaaad/reveal              {:mvn/version "1.3.269"}}
-   :main-opts  ["-m" "nrepl.cmdline"
-                ;; "--help"
-                "-p" "33933"
-                "--middleware" "[cider.nrepl/cider-middleware]"
-                "--interactive"
-                "--color"
-                ;; "-f" "rebel-readline.main/-main"
-                ]}
+ ;;*** nrepl
+ ;; clojure -M:nrepl
+ :repl/nrepl
+ {:extra-deps {nrepl/nrepl                {:mvn/version "0.9.0"}
+               cider/cider-nrepl          {:mvn/version "0.28.3"}
+               vlaaad/reveal              {:mvn/version "1.3.269"}}
+  :main-opts  ["-m" "nrepl.cmdline"
+               ;; "--help"
+               "-p" "33933"
+               "--middleware" "[cider.nrepl/cider-middleware]"
+               "--interactive"
+               "--color"
+               ;; "-f" "rebel-readline.main/-main"
+               ]}
 
-  ;;** Inspect and Visualize Data
+ ;;** Inspect and Visualize Data
 
-  ;;*** reveal
+ ;;*** :portal
 
-  ;; run with clojure -X:reveal
-  :reveal
-  {:extra-deps {vlaaad/reveal {:mvn/version "1.3.269"}}
-   :ns-default vlaaad.reveal
-   :exec-fn    vlaaad.reveal/repl
-   :main-opts ["-m" "vlaaad.reveal" "repl"]
-   :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]
-   }
+ ;; run with clojure -X:portal
+ :portal
+ {:extra-deps {djblue/portal {:mvn/version "0.34.2"}
+               com.taoensso/timbre {:mvn/version "6.0.2"}
+               com.brunobonacci/mulog {:mvn/version "0.9.0"}
+               meander/epsilon {:mvn/version "0.0.650"}
+               metosin/jsonista {:mvn/version "0.3.6"}
+               }}
 
-  ;; run with clojure -X:reveal-light
-  :reveal-light
-  {:extra-deps {vlaaad/reveal {:mvn/version "1.3.269"}}
-   :ns-default vlaaad.reveal
-   :exec-fn    vlaaad.reveal/repl
-   :jvm-opts   ["-Dvlaaad.reveal.prefs={:theme,:light,:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]}
+ ;;*** reveal
 
-  ;;*** reveal: editors
+ ;; run with clojure -X:reveal
+ :reveal
+ {:extra-deps {vlaaad/reveal {:mvn/version "1.3.269"}}
+  :ns-default vlaaad.reveal
+  :exec-fn    vlaaad.reveal/repl
+  :main-opts ["-m" "vlaaad.reveal" "repl"]
+  :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]
+  }
 
-  ;; run with clojure -M:reveal-nrepl
-  :reveal-nrepl
-  {:extra-deps {vlaaad/reveal {:mvn/version "1.1.159"}
-                nrepl/nrepl   {:mvn/version "0.9.0"}}
-   :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]
-   :main-opts  ["-m" "nrepl.cmdline"
-                "-p" "33933"
-                "--interactive"
-                "--middleware" "[vlaaad.reveal.nrepl/middleware]"]}
+ ;; run with clojure -X:reveal-light
+ :reveal-light
+ {:extra-deps {vlaaad/reveal {:mvn/version "1.3.269"}}
+  :ns-default vlaaad.reveal
+  :exec-fn    vlaaad.reveal/repl
+  :jvm-opts   ["-Dvlaaad.reveal.prefs={:theme,:light,:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]}
 
-  ;;*** reveal-cider
-  ;; Reveal with headless nREPL server and Emacs CIDER specific middleware
-  :reveal-cider
-  {:extra-deps {
-                vlaaad/reveal                 {:mvn/version "1.3.269"}
-                nrepl/nrepl                   {:mvn/version "0.9.0"}
-                cider/cider-nrepl             {:mvn/version "0.28.3"}
-                refactor-nrepl/refactor-nrepl {:mvn/version "3.3.2"}
-                }
-   :jvm-opts
-   ["-Dvlaaad.reveal.prefs={:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]
-   :main-opts
-   ["-m" "nrepl.cmdline"
-    "-p" "33933"
-    "--middleware"
-    "[vlaaad.reveal.nrepl/middleware,refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"
-    "--interactive"]}}
+ ;;*** reveal: editors
+
+ ;; run with clojure -M:reveal-nrepl
+ :reveal-nrepl
+ {:extra-deps {vlaaad/reveal {:mvn/version "1.1.159"}
+               nrepl/nrepl   {:mvn/version "0.9.0"}}
+  :jvm-opts   ["-Dvlaaad.reveal.prefs={:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]
+  :main-opts  ["-m" "nrepl.cmdline"
+               "-p" "33933"
+               "--interactive"
+               "--middleware" "[vlaaad.reveal.nrepl/middleware]"]}
+
+ ;;*** reveal-cider
+ ;; Reveal with headless nREPL server and Emacs CIDER specific middleware
+ :reveal-cider
+ {:extra-deps {
+               vlaaad/reveal                 {:mvn/version "1.3.269"}
+               nrepl/nrepl                   {:mvn/version "0.9.0"}
+               cider/cider-nrepl             {:mvn/version "0.28.3"}
+               refactor-nrepl/refactor-nrepl {:mvn/version "3.3.2"}
+               }
+  :jvm-opts
+  ["-Dvlaaad.reveal.prefs={:font-family,\"https://ff.static.1001fonts.net/u/b/ubuntu.mono.ttf\",:font-size,32}"]
+  :main-opts
+  ["-m" "nrepl.cmdline"
+   "-p" "33933"
+   "--middleware"
+   "[vlaaad.reveal.nrepl/middleware,refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"
+   "--interactive"]}}
 
  }
