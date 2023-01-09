@@ -9215,6 +9215,11 @@ With a prefix argument N, (un)comment that many sexps."
 ;; (set-face-attribute 'variable-pitch nil :font "Calibri-20")
 (set-face-attribute 'variable-pitch nil :family "Verdana-19")
 
+;;** system: fringe, margin
+
+;; (run-with-idle-timer 2 nil (lambda () (fringe-mode '(20 . 20))))
+(run-with-idle-timer 2 nil (lambda () (fringe-mode '(0 . 3))))
+
 ;;** system: general settings
 
 (setq confirm-nonexistent-file-or-buffer t)
@@ -9225,7 +9230,6 @@ With a prefix argument N, (un)comment that many sexps."
 
 (setq large-file-warning-threshold nil)
 
-(run-with-idle-timer 2 nil (lambda () (fringe-mode '(20 . 20))))
 ;; use "y", "n" for confirmations requiring "yes", "no"
 (defalias 'yes-or-no-p 'y-or-n-p)
 (when tool-bar-mode (tool-bar-mode -1))
