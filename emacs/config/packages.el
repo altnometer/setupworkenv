@@ -1976,7 +1976,7 @@ succession."
 (fido-mode -1)                        ; Emacs 27.1
 (icomplete-mode 1)
 (setq icomplete-in-buffer t)
-(setq completions-max-height 0)
+(setq completions-max-height nil)
 (setq icomplete-delay-completions-threshold 100)
 (setq icomplete-max-delay-chars 2)
 (setq icomplete-compute-delay 0.2)
@@ -7321,9 +7321,10 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 ;;**** clojure/lsp/settings: docs
 ;; increase the text size
-(setq lsp-ui-doc-text-scale-level 2.5)
+(setq lsp-ui-doc-use-webkit nil)
+(setq lsp-ui-doc-text-scale-level 3.0)
 ;; set the doc popup overlay hight
-(setq lsp-ui-doc-max-height 25)
+(setq lsp-ui-doc-max-height 55)
 (setq lsp-ui-doc-enable t)
 ;; this seem to cause jumping between the frames
 (setq lsp-ui-doc-show-with-cursor nil)
