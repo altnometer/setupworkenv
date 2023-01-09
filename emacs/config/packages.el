@@ -1178,26 +1178,6 @@ Disable `icomplete-vertical-mode' for this command."
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
-(add-hook 'exwm-manage-finish-hook
-          (lambda ()
-            (cond
-             ((and exwm-class-name
-                   (string= exwm-class-name "qutebrowser"))
-              (exwm-workspace-switch 1)
-              (exwm-input-set-local-simulation-keys nil)
-              (set-window-fringes (selected-window) 0 0)
-              ;; git-gutter adds right fringe
-              (git-gutter-mode -1)
-              (exwm-layout-toggle-fullscreen))
-             ((and exwm-class-name
-                   (string-match-p "^Google-chrome\\(<[0-9]+>\\)\\{0,1\\}$" exwm-class-name))
-              (exwm-workspace-switch 4)
-              (exwm-input-set-local-simulation-keys nil)
-              (set-window-fringes (selected-window) 0 0)
-              (exwm-layout-toggle-fullscreen)))))
-              ;; (setq mode-line-format nil)
-
-
 (setq exwm-manage-configurations
       '(((member exwm-instance-name '("qutebrowser"))
          workspace 1)
@@ -1220,6 +1200,36 @@ Disable `icomplete-vertical-mode' for this command."
 ;;         ([?\C-v] . [next])
 ;;         ([?\C-d] . [delete])
 ;;         ([?\C-k] . [S-end delete])))
+
+;;*** exwm: hooks, advice, timers
+
+(add-hook 'exwm-manage-finish-hook
+          (lambda ()
+            (cond
+             ((and exwm-class-name
+                   (string= exwm-class-name "qutebrowser"))
+              (exwm-workspace-switch 1)
+              (exwm-input-set-local-simulation-keys nil)
+              (set-window-fringes (selected-window) 0 0)
+              ;; git-gutter adds right fringe
+              (git-gutter-mode -1)
+              (exwm-layout-toggle-fullscreen))
+             ((and exwm-class-name
+                   (string-match-p "^Google-chrome\\(<[0-9]+>\\)\\{0,1\\}$" exwm-class-name))
+              (exwm-workspace-switch 4)
+              (exwm-input-set-local-simulation-keys nil)
+              (set-window-fringes (selected-window) 0 0)
+              (exwm-layout-toggle-fullscreen))
+             ((and exwm-class-name
+                   (string= exwm-class-name "MuPDF"))
+              ;; (exwm-workspace-switch 1)
+              (set-window-fringes (selected-window) 0 3)
+              ;; git-gutter adds right fringe
+              (git-gutter-mode -1)
+              (exwm-layout-toggle-fullscreen)))))
+              ;; (setq mode-line-format nil)
+
+;;*** exwm: must be last in exwm settings
 
 ;; must be the last in 'exwm settings
 (exwm-randr-enable)
