@@ -6764,6 +6764,11 @@ Return a cons of the new text cordinates."
 (define-key prog-mode-map (kbd "<end>" ) #'ram-mark-sexp)
 (define-key prog-mode-map (kbd "<home>" ) #'ram-copy-sexp)
 
+;; "M-<end>" default global-map binding end-of-buffer-other-window
+;; "M-<home>" default global-map binding beginning-of-buffer-other-window
+(define-key global-map (kbd "M-<end>" ) #'ram-mark-sexp)
+(define-key global-map (kbd "M-<home>" ) #'ram-copy-sexp)
+
 ;; (define-key prog-mode-map (kbd "<end>" ) #'ram-mark-sexp)
 ;; (define-key prog-mode-map (kbd "<home>" ) #'ram-copy-sexp)
 
