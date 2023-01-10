@@ -297,6 +297,8 @@ abort completely with `C-g'."
           ("autom" "automatically")
           ("autly" "automatically")
 
+          ;;*** b
+          
           ("bl" "buffer-local")
 
           ("bc" "because")
@@ -305,6 +307,8 @@ abort completely with `C-g'."
           ("bhs" "behaviors")
           ("bn" "between")
 
+          ("bt" "binary tree")
+          ("bts" "binary trees")
 
           ;;*** c
 
