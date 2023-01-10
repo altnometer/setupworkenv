@@ -3333,6 +3333,7 @@ Leave a mark to return to."
 (setq org-indent-mode-turns-off-org-adapt-indentation t)
 (setq org-link-file-path-type 'absolute)
 (setq org-fontify-quote-and-verse-blocks t)
+(setq org-list-allow-alphabetical t)
 
 ;;** org-mode: hooks, advice, timers
 
