@@ -6193,21 +6193,15 @@ If ARG is 4, move to the end of defun."
 
 (defvar ram-copied-region-overlay nil
   "Highlight the region copied with `ram-copy-sexp'.")
-(defun ram-create-copied-sexp-overlay ()
-  "Create buffer local `ram-copied-region-overlay'
-Add `pre-command-hook' to remove it."
-  (make-variable-buffer-local 'ram-copied-region-overlay)
-  (setq-local ram-copied-region-overlay (make-overlay 0 0))
-  ;; (overlay-put ram-copied-region-overlay 'face (list :background
-  ;;                                                   (face-background 'modus-themes-intense-green)))
-  (overlay-put ram-copied-region-overlay 'face (list :background "yellow"))
-  (overlay-put ram-copied-region-overlay 'priority 1)
-  (add-hook 'pre-command-hook (lambda () (when (symbol-value 'ram-copied-region-overlay)
-                                           (move-overlay ram-copied-region-overlay 1 1)))))
 
-(add-hook 'prog-mode-hook #'ram-create-copied-sexp-overlay)
-(add-hook 'org-mode-hook #'ram-create-copied-sexp-overlay)
-(add-hook 'minibuffer-mode-hook #'ram-create-copied-sexp-overlay)
+(setq ram-copied-region-overlay (make-overlay 0 0))
+;; (overlay-put ram-copied-region-overlay 'face (list :background
+;;                                                   (face-background 'modus-themes-intense-green)))
+(overlay-put ram-copied-region-overlay 'face (list :background "yellow"))
+(overlay-put ram-copied-region-overlay 'priority 1)
+
+(add-hook 'pre-command-hook (lambda () (when (symbol-value 'ram-copied-region-overlay)
+                                           (move-overlay ram-copied-region-overlay 1 1))))
 
 ;;** brackets, parentheses, parens, sexps: comments
 
@@ -6579,7 +6573,7 @@ The beginning and end of sexp is defined by return value of
          (str (when bounds (buffer-substring-no-properties (car bounds) (cdr bounds)))))
     (when str
       (if repeated-p (kill-new str t) (kill-new str))
-      (move-overlay ram-copied-region-overlay (car bounds) (cdr bounds))
+      (move-overlay ram-copied-region-overlay (car bounds) (cdr bounds) (current-buffer))
       (if (ram-at-thing-end-p)
           (goto-char (cdr bounds))
         (goto-char (car bounds))))))
@@ -6628,7 +6622,7 @@ The beginning and end of sexp is defined by return value of
       ;; move overlay over cloned sexp
       (let ((new-bounds (funcall get-bounds)))
         (move-overlay ram-copied-region-overlay
-                      (car new-bounds) (cdr new-bounds))
+                      (car new-bounds) (cdr new-bounds) (current-buffer))
         (goto-char (+ (car new-bounds) location))))))
 
 (defun ram-clone-sexp-backward ()
@@ -6656,7 +6650,7 @@ The beginning and end of sexp is defined by return value of
       (let ((new-bounds (ram-thing-bounds)))
         (move-overlay ram-copied-region-overlay
                       (car new-bounds)
-                      (cdr new-bounds))
+                      (cdr new-bounds) (current-buffer))
         (goto-char (+ (car new-bounds) location))
         (indent-according-to-mode)
         ;; (if at-end-p
