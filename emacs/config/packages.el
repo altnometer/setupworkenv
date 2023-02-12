@@ -4390,7 +4390,9 @@ ARG value is 4."
   (cond
    ((and (buffer-file-name)
          (org-roam-dailies--daily-note-p))
-    (org-roam-dailies-goto-previous-note))
+    (let ((current-note-time
+           (time-convert (date-to-time (file-name-base (buffer-file-name))) 'integer)))
+      (org-roam-dailies--capture (time-add (* (- n) 86400) current-note-time) t)))
    ((ram-org-roam-weekly-note-p)
     (ram-org-roam-weeklies-next -1))
    ((ram-org-roam-monthly-note-p)
@@ -4406,7 +4408,9 @@ ARG value is 4."
   (cond
    ((and (buffer-file-name)
          (org-roam-dailies--daily-note-p))
-    (org-roam-dailies-goto-next-note))
+    (let ((current-note-time
+           (time-convert (date-to-time (file-name-base (buffer-file-name))) 'integer)))
+      (org-roam-dailies--capture (time-add (* n 86400) current-note-time) t)))
    ((ram-org-roam-weekly-note-p)
     (ram-org-roam-weeklies-next 1))
    ((ram-org-roam-monthly-note-p)
