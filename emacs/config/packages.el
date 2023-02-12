@@ -1185,10 +1185,10 @@ Disable `icomplete-vertical-mode' for this command."
 (setq exwm-manage-configurations
       '(((member exwm-instance-name '("qutebrowser"))
          workspace 1)
-        ((member exwm-instance-name '("java"))
+        ((member exwm-instance-name '("java" "Prolog debugger"))
          workspace 4)
         ;; exwm-instance-name for Google-chrome Portal buffer is localhost
-        ((member exwm-class-name '("Google-chrome"))
+        ((member exwm-class-name '("Google-chrome" "Prolog debugger"))
          workspace 4)))
 
 ;; Line-editing shortcuts
@@ -3220,6 +3220,21 @@ Clojure editing tools, e.g., lsp-mode, are enabled."
     ;; a visiting file rather than just a buffer
     (run-mode-hooks 'clojure-mode-hook)))
 
+(defun ram-assoc-prolog-org-code-block-buffer-with-file ()
+  "Associate a Prolog Org source code block buffer with a file.
+
+This is done because prolog-consult-buffer fails on unsaved buffers."
+  (when (string= major-mode 'prolog-mode)
+    (write-region (point-min) (point-max)
+                  "/tmp/org-code-block-for-prolog.pl"
+                  nil       ; overwrite, do not append
+                  t         ; mark buffer as visiting the file
+                  nil       ; no name for locking, unlocking
+                  nil       ; do not ask for confirmation to overwrite
+                  )
+    ;; (run-mode-hooks 'prolog-mode-hook)
+    ))
+
 (with-eval-after-load "org"
   (define-key org-mode-map (kbd "<C-tab>") #'ram-hide-block-toggle))
 
@@ -3371,7 +3386,9 @@ Leave a mark to return to."
     (zp/org-set-last-modified)))
 (add-hook 'before-save-hook #'ram-org-set-last-modified-in-save-hook)
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
+
 (add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
+(add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
 
 ;;** org-mode: syntax-table
 
@@ -7468,6 +7485,7 @@ Toggle `lsp-ido-show-symbol-filename'."
                                               (interactive)
                                               (insert ":- use_module(library(()).")
                                               (forward-char -3))))
+;; (setq prolog-electric-newline-flag nil)
 
 ;;** prolog: ediprolog
 
@@ -7476,13 +7494,9 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 (define-key global-map (kbd "<f2> <f2>") #'ediprolog-dwim)
 
-(define-key global-map (kbd "<f2> C") #'ediprolog-remove-interactions)
-
-
 (with-eval-after-load "ediprolog"
   (define-key prolog-mode-map (kbd "C-x C-e") #'ediprolog-dwim)
   (define-key prolog-mode-map (kbd "C-M-x") #'ediprolog-dwim)
-
 
   (custom-set-variables
    '(ediprolog-system 'swi)
