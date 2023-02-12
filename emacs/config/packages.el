@@ -2773,7 +2773,7 @@ displaying TEST-BUFFER-P buffer."
               ;; reuse 'target-window
               (t (window--display-buffer buffer target-window 'reuse alist)))))))
 
-;;***** buffers/display/alist: (add-to-list 'display-buffer-alist ...)
+;;***** buffers/display/alist: Help, info, Messages, magit, Completions
 
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-other-monitor-alist-element
@@ -2785,6 +2785,14 @@ displaying TEST-BUFFER-P buffer."
                       (string-match-p "^magit.*$" buf-name))))
               6 4))
 
+;;***** buffers/display/alist: Completions
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-other-monitor-alist-element
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "\\*Completions\\*" buf-name)))
+              6 4))
 
 ;;****** buffers/display/alist: emacs-lisp, elisp
 
