@@ -8275,9 +8275,8 @@ requires the command-line executable called 'rg' or 'ripgrep'."
 (setq isearch-hide-immediately nil)
 ;; default mode to use when starting isearch
 ;; (setq search-default-mode #'char-fold-to-regexp)
-;; credit to:
-;; https://gitlab.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/emacs-init.org
-(setq search-whitespace-regexp ".*?")
+;; default depends on isearch-lax-whitespace
+;; (setq search-whitespace-regexp ".*?")
 (setq isearch-lax-whitespace t)
 (setq isearch-regexp-lax-whitespace nil)
 
