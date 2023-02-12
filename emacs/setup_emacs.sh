@@ -22,6 +22,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EMACS_CONF_DEST_DIR="${HOME}/.local/share/emacs.d/my.emacs.d"
 EMACS_INSTALL_DIR="${HOME}/.local"
 EMACS_REPO_DIR="${HOME}/Repos/emacs"
+EMACS_BRANCH_NAME="emacs-29"
 
 # consider installing the latest version, follow instructions in the link
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
@@ -75,7 +76,9 @@ else
         echo -e "\n\x1b[33;01m Updating Emacs git repository ...  \x1b[39;49;00m\n" && sleep 1
         cd $EMACS_REPO_DIR
         sudo -u $SUDO_USER git pull
-        
+        sudo -u $SUDO_USER git checkout $EMACS_BRANCH_NAME
+
+
         # problems with automatically generated files from previos builds:
         # Some files in $EMACS_REPO_DIR/lisp will NEED TO BE UPDATED to reflect
         # new autoloaded functions. Otherwise,
@@ -89,6 +92,10 @@ else
         #cd $EMACS_REPO_DIR
 
        echo -e "\n\x1b[33;01m Clean repository from files left from prev build ...  \x1b[39;49;00m\n" && sleep 1
+       # !!! compiled emacs files prom previous build may contain code that
+       # would conflict with new version. For example, old package may require
+       # packages that are not in the source code any more. To stop that, remove all files
+       # that do not belong to the repository
        sudo -u $SUDO_USER  git clean -fdx
     else
         echo -e "\n\x1b[33;01m Cloning Emacs git repository ...  \x1b[39;49;00m\n" && sleep 1
