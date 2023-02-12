@@ -298,7 +298,7 @@ abort completely with `C-g'."
           ("autly" "automatically")
 
           ;;*** b
-          
+
           ("bl" "buffer-local")
 
           ("bc" "because")
@@ -338,9 +338,14 @@ abort completely with `C-g'."
           ("colls" "collections")
 
           ("comn" "computation")
-          ("comnl" "computational")
+          ("coml" "computational")
           ("comg" "computing")
+
           ("comp" "compute")
+          ("compn" "computation")
+          ("compl" "computational")
+          ("compg" "computing")
+
           ("cmd" "command")
           ("cmds" "commands")
           ("compl" "completion")
@@ -354,8 +359,6 @@ abort completely with `C-g'."
           ("concrt" "concurrent")
           ("concrc" "concurrency")
           ("concry" "concurrently")
-
-
 
           ("cont" "contain")
           ("contg" "containing")
@@ -467,7 +470,10 @@ abort completely with `C-g'."
           ("initzn" "initialization")
 
           ("intr" "interpreter")
+          ("inter" "interpreter")
           ("intrg" "interpreting")
+          ("interg" "interpreting")
+          ("intern" "interpretation")
 
           ("inv" "invoke")
           ("invd" "invoked")
@@ -552,8 +558,12 @@ abort completely with `C-g'."
           ("pgr" "programmer")
           ("pgrs" "programmers")
 
+          ;;**** pr
           ("pr" "procedure")
           ("prs" "procedures")
+
+          ("prb" "problem")
+          ("prbs" "problems")
 
           ("prd" "predicate")
 
