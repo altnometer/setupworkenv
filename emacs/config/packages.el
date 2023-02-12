@@ -798,6 +798,14 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;;** bindings: prog-mode-map
 
+;;** bindings: frame
+(when (eq (lookup-key (current-global-map) "\C-z")
+          #'suspend-frame)
+  (define-key global-map "\C-z" nil))
+
+(when (eq (lookup-key (current-global-map) (kbd "C-x C-z"))
+          #'suspend-frame)
+  (define-key global-map (kbd "C-x C-z") nil))
 ;;* company
 
 (straight-use-package
