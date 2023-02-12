@@ -9785,6 +9785,7 @@ buffer-local `ram-face-remapping-cookie'."
 (defalias 'ram-hippie-expand-line (make-hippie-expand-function
                                    '(try-expand-line
                                      try-expand-line-all-buffers) t))
+;; <f23> key is where 'c' key is
 (define-key global-map (kbd "M-<f23> l") #'ram-hippie-expand-line)
 
 
