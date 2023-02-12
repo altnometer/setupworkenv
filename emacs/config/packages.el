@@ -2167,6 +2167,8 @@ instead."
 
 ;;**** minibuffer/completion/styles: orderless
 
+(require 'help-fns)
+
 (straight-use-package
  '(orderless :type git :flavor melpa :host github :repo "oantolin/orderless"))
 
