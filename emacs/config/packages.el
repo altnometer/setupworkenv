@@ -7498,6 +7498,8 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 ;;** prolog: prolog-mode
 
+;; !!! run prolog-consult-buffer if you need to open console
+
 (autoload 'run-prolog "prolog" "Start a Prolog sub-process." t)
 (autoload 'prolog-mode "prolog" "Major mode for editing Prolog programs." t)
 ;; (autoload 'mercury-mode "prolog" "Major mode for editing Mercury programs." t)
