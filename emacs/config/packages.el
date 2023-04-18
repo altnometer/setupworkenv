@@ -796,8 +796,6 @@ Disable `icomplete-vertical-mode' for this command."
 (define-key global-map (kbd "C-%") #'repeat)
 (define-key global-map (kbd "C-h a") 'apropos)
 
-;;** bindings: prog-mode-map
-
 ;;** bindings: frame
 (when (eq (lookup-key (current-global-map) "\C-z")
           #'suspend-frame)
@@ -8872,6 +8870,12 @@ That is, remove a non kept dired from the recent list."
 (straight-use-package
  '(which-key :type git :flavor melpa :host github :repo "justbur/emacs-which-key"))
 (run-with-idle-timer 1 nil (lambda () (which-key-mode t)))
+
+;;* prog-mode
+
+;;** prog-mode: hook
+
+;;** prog-mode: binding
 
 ;;* spelling
 
