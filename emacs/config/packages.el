@@ -8354,6 +8354,8 @@ confines of word boundaries (e.g. multiple words)."
   (funcall #'isearch-done nopush edit)
   (when isearch-other-end (goto-char isearch-other-end)))
 
+;;** isearch: bindings
+
 (define-key global-map (kbd "M-s M-o") 'multi-occur)
 (define-key isearch-mode-map (kbd "C-SPC")  'prot/isearch-mark-and-exit)
 (define-key isearch-mode-map (kbd "DEL")  'contrib/isearchp-remove-failed-part-or-last-char)
