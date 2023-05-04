@@ -277,6 +277,8 @@ abort completely with `C-g'."
 
           ;;*** a
 
+          ("ai" "artificial intelligence")
+
           ("aor" "area of responsibility")
           ("ab" "abstraction")
           ("ag" "argument")
@@ -284,6 +286,7 @@ abort completely with `C-g'."
           ("algs" "algorithms")
           ("ags" "arguments")
           ("app" "application")
+          ("appn" "application")
           ("apps" "applications")
           ("appd" "applied")
 
@@ -292,6 +295,10 @@ abort completely with `C-g'."
           ("arch" "architecture")
 
           ("assd" "associated")
+
+          ("assm" "assumption")
+          ("assms" "assumptions")
+          ("assmg" "assuming")
 
           ("auty" "automatically")
           ("autom" "automatically")
@@ -303,14 +310,23 @@ abort completely with `C-g'."
 
           ("bc" "because")
           ("bf" "before")
+
           ("bh" "behavior")
           ("bhs" "behaviors")
+          ("bhe" "behave")
+          ("bhes" "behaves")
+
           ("bn" "between")
 
           ("bt" "binary tree")
           ("bts" "binary trees")
 
           ;;*** c
+
+          ("calc" "calculate")
+          ("calcs" "calculates")
+          ("calcn" "calculation")
+          ("calcg" "calculating")
 
           ("catg" "category")
           ("catgs" "categories")
@@ -329,10 +345,12 @@ abort completely with `C-g'."
           ("Cider" "CIDER")
           ("cj" "clojure")
           ("Cj" "Clojure")
-          ("cm" "computer")
 
           ("clp" "classpath")
           ("clsp" "clojure-lsp")
+
+          ("cmd" "command")
+          ("cmds" "commands")
 
           ("coll" "collection")
           ("colls" "collections")
@@ -341,24 +359,29 @@ abort completely with `C-g'."
           ("coml" "computational")
           ("comg" "computing")
 
+          ("comr" "computer")
+          ("comrs" "computers")
           ("comp" "compute")
           ("compn" "computation")
+          ("compns" "computations")
           ("compl" "computational")
           ("compg" "computing")
 
-          ("cmd" "command")
-          ("cmds" "commands")
           ("compl" "completion")
           ("complg" "completing")
 
           ("comds" "commands")
 
-          ("con" "continuation")
+          ("con" "consequence")
+          ("cons" "consequences")
 
           ("concr" "concurrent")
           ("concrt" "concurrent")
           ("concrc" "concurrency")
           ("concry" "concurrently")
+
+          ("cond" "condition")
+          ("conds" "conditions")
 
           ("cont" "contain")
           ("contg" "containing")
@@ -392,16 +415,21 @@ abort completely with `C-g'."
           ("desc" "describe")
           ("descn" "description")
 
-          ("dev" "development")
+          ("detn" "determine")
 
-          ("dift" "difficult")
+          ("dev" "develop")
+          ("devt" "development")
+
+          ("diff" "difficult")
+          ("diffy" "difficulty")
+          ("diffs" "difficulties")
 
           ("dp" "dependency")
           ("dps" "dependencies")
 
           ("df" "different")
           ("dfc" "difference")
-          ("dfct" "difficult")
+          ("dfte" "differentiate")
           ("dfl" "differential")
           ("dfy" "differently")
 
@@ -434,6 +462,13 @@ abort completely with `C-g'."
           ("expd" "expressed")
           ("exps" "expressions")
 
+          ("exper" "experience")
+          ("experd" "experience")
+          ("expr" "experience")
+          ("exprd" "experienced")
+          ("expers" "experiences")
+          ("exprs" "experiences")
+
           ("exl" "example")
           ("exls" "examples")
           ("ext" "execute")
@@ -461,6 +496,9 @@ abort completely with `C-g'."
           ("impn" "implementation")
           ("impns" "implementations")
 
+          ("impt" "important")
+
+
           ("inf" "information")
 
           ("init" "initialize")
@@ -468,6 +506,8 @@ abort completely with `C-g'."
           ("initn" "initiation")
           ("initg" "initializing")
           ("initzn" "initialization")
+
+          ("intg" "interesting")
 
           ("intr" "interpreter")
           ("inter" "interpreter")
@@ -485,6 +525,9 @@ abort completely with `C-g'."
           ("kw" "keyword")
           ("kws" "keywords")
 
+          ;;*** l
+
+          ("latex" "LaTeX")
           ("lib" "library")
           ("libs" "libraries")
           ("lb" "lib")
@@ -497,12 +540,18 @@ abort completely with `C-g'."
 
           ;;*** m
 
+          ("mach" "machine")
+          ("machs" "machines")
+
           ("math" "mathematics")
           ("maths" "mathematics")
           ("mathl" "mathematical")
 
           ("mech" "mechanism")
           ("mechm" "mechanism")
+
+          ("mem" "member")
+          ("mems" "members")
 
           ("multm" "multimethod")
           ("multms" "multimethods")
@@ -517,8 +566,15 @@ abort completely with `C-g'."
           ("namss" "namespaces")
           ("nb" "number")
           ("nbs" "numbers")
+
+          ("nl" "natural language")
+
           ("nm" "number")
           ("nms" "numbers")
+
+          ("nond" "nondeterminism")
+          ("nondc" "nondeterministic")
+          ("nondy" "nondeterministically")
 
           ;;*** o
 
@@ -561,11 +617,14 @@ abort completely with `C-g'."
           ;;**** pr
           ("pr" "procedure")
           ("prs" "procedures")
+          ("prl" "procedural")
+          ("pry" "procedurally")
 
           ("prb" "problem")
           ("prbs" "problems")
 
           ("prd" "predicate")
+          ("prds" "predicates")
 
           ("prec" "preceding")
           ("prev" "previous")
@@ -634,6 +693,10 @@ abort completely with `C-g'."
 
           ("sd" "should")
           ("sdt" "shouldn't")
+
+          ("sol" "solution")
+          ("sols" "solutions")
+
           ("specc" "specific")
           ("specd" "specified")
           ("specl" "special")
@@ -644,11 +707,15 @@ abort completely with `C-g'."
           ("specn" "specification")
           ("specns" "specifications")
 
-          ("sm" "symbol")
-          ("sms" "symbols")
+          ("sym" "symbol")
+          ("symc" "symbolic")
+          ("syms" "symbols")
 
           ("st" "structure")
+          ("std" "structured")
           ("sts" "structures")
+
+          ("stn" "standard")
 
           ("stt" "statement")
           ("stts" "statements")
@@ -662,19 +729,25 @@ abort completely with `C-g'."
           ("synq" "syntax-quote")
 
           ("sys" "system")
+          ("syss" "systems")
 
           ;;*** t
 
+          ("tech" "technology")
+
           ("tr" "transaction")
           ("trs" "transactions")
+
           ("tq" "technique")
           ("tqs" "techniques")
+
           ("todo" "TODO")
 
           ;;*** u
 
           ("udp" "UDP")                 ; universal design pattern
           ("und" "understand")
+          ("undd" "understood")
           ("undg" "understanding")
 
           ;;*** v
@@ -683,8 +756,9 @@ abort completely with `C-g'."
           ("vals" "values")
           ("vl" "value")
           ("vls" "values")
-          ;;("var" "variable")
-          ;;("vars" "variables")
+
+          ("var" "variable")
+          ("vars" "variables")
 
           ("visn" "visualization")
           ("visg" "visualizing")
