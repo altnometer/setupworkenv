@@ -84,15 +84,15 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
-;; load lisp/ram-abbrev.el
-(my-with-elapsed-timer "Loading lisp/ram-abbrev.el"
-  (when (file-readable-p "~/.emacs.d/lisp/ram-abbrev.el")
-    (load-file (expand-file-name "~/.emacs.d/lisp/ram-abbrev.el"))))
-
 ;; load config/packages.el
 (my-with-elapsed-timer "Loading config/packages.el"
   (when (file-readable-p "~/.emacs.d/config/packages.el")
     (load-file (expand-file-name "~/.emacs.d/config/packages.el"))))
+
+;; load lisp/ram-abbrev.el after config
+(my-with-elapsed-timer "Loading lisp/ram-abbrev.el"
+  (when (file-readable-p "~/.emacs.d/lisp/ram-abbrev.el")
+    (load-file (expand-file-name "~/.emacs.d/lisp/ram-abbrev.el"))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
