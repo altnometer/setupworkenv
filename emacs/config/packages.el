@@ -8922,6 +8922,68 @@ buffer-local `ram-face-remapping-cookie'."
 ;; (run-with-idle-timer 1 nil #'savehist-mode)
 (savehist-mode t)
 
+;;** system: unix signals, SIGHUP, SIGINT, SIGTERM, SIGTSTP
+
+;; credit to
+;; https://emacs.stackexchange.com/questions/44085/how-does-emacs-respond-to-unix-signals
+
+;;*** system/unix-signals: locked out, suspend frame
+
+;; change TTY by pressing "C-M-<f2>" at the same time
+;; find the pid of emacs that is running in the other TTY
+;; ps aux | -i grep emacs
+;; check the signal types on your system with
+;; kill -l
+;; send signal to that pid (USR1 or SIGUSR1, USR2 or SIGUSR2 etc)
+;; kill -USR1 $you_emacs_pid_from_the_above_command
+;; kill -USR2 $you_emacs_pid_from_the_above_command
+
+;;*** system/unix-signals: SIGUSR1 (USR1), SIGUSR2 (USR2)
+
+;; "C-h i g" (elisp)Misc Events
+;;
+;; ‘sigusr1’
+;; ‘sigusr2’
+;;      These events are generated when the Emacs process receives the
+;;      signals ‘SIGUSR1’ and ‘SIGUSR2’.  They contain no additional data
+;;      because signals do not carry additional information.  They can be
+;;      useful for debugging (*note Error Debugging::).
+;;
+;;      To catch a user signal, bind the corresponding event to an
+;;      interactive command in the ‘special-event-map’
+;; (*note Controlling Active Maps::).  The command is called with no arguments, and the
+;;      specific signal event is available in ‘last-input-event’
+;; (*noteEvent Input Misc::).  For example:
+
+(defun sigusr-handler ()
+  (interactive)
+  (message "Caught signal %S" last-input-event)
+  (view-lossage))
+
+(keymap-set special-event-map "<sigusr1>" 'sigusr-handler)
+;; USR2 signal by default causes to enter the debugger
+;; (keymap-set special-event-map "<sigusr2>" 'sigusr-handler)
+
+;; To test the signal handler, you can make Emacs send a signal to
+;; itself:
+;; (signal-process (emacs-pid) 'sigusr1)
+
+
+;; "C-h i g" (elisp) Event Examples
+
+;;    To handle a SIGUSR1 signal, define an interactive function, and bind
+;; it to the ‘signal usr1’ event sequence:
+
+(defun usr1-handler ()
+  (interactive)
+  (message "Got USR1 signal"))
+
+(defun usr2-handler ()
+  (interactive)
+  (message "Got USR2 signal"))
+;; USR2 signal by default causes to enter the debugger
+;; (keymap-global-set "<signal> <usr2>" 'usr2-handler)
+
 ;;** system: hooks
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
