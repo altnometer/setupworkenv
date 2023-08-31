@@ -2827,6 +2827,10 @@ Leave a mark to return to."
                       ("write" . ?w)))
 (setq org-fast-tag-selection-single-key 'expert)
 
+;;*** org-mode/settings: tables
+
+(setq org-startup-align-all-tables t)
+
 ;; enable org-indent-mode for every file
 ;; per file sittings: #+STARTUP: indent, #+STARTUP: noindent
 (setq org-startup-indented t)
@@ -2836,6 +2840,7 @@ Leave a mark to return to."
 (setq org-link-file-path-type 'absolute)
 (setq org-fontify-quote-and-verse-blocks t)
 (setq org-list-allow-alphabetical t)
+(setq org-use-sub-superscripts '{})
 
 ;;** org-mode: hooks, advice, timers
 
