@@ -2860,6 +2860,7 @@ Leave a mark to return to."
 
 (add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
 (add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
+(add-hook 'org-src-mode-hook #'display-line-numbers-mode)
 
 ;;** org-mode: syntax-table
 
