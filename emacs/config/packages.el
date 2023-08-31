@@ -4321,12 +4321,22 @@ Use calendar if ARG value is '(4)."
   (re-search-forward "[^[:space:]]" (point-at-eol) 'NOERROR 1)
   (backward-char))
 
-;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
 (defun ram-outline-down-heading ()
   "Move to the next `outline-mode' subtree."
   (interactive)
-  (outline-up-heading 1 t)
-  (outline-forward-same-level 1)
+  (condition-case err
+      (progn
+        (deactivate-mark)
+        (ram-push-mark)
+        (outline-up-heading 1 t)
+        (outline-forward-same-level 1))
+    (error (cond ((string= (error-message-string err)
+                           "No following same-level heading")
+                  (ram-outline-down-heading))
+                 ((string= (error-message-string err)
+                           "Already at top level of the outline")
+                  (outline-forward-same-level 1))
+                 (signal (car err) (cdr err)))))
   (ram-move-to-heading-visible-char))
 
 (defun ram-outline-up-heading (arg &optional invisible-ok)
