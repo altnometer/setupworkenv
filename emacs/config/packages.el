@@ -2997,6 +2997,19 @@ Leave a mark to return to."
 
 ;; (add-hook 'text-mode-hook 'add-quotes-to-font-lock-keywords)
 
+;;** org-mode: LaTeX
+
+(setq org-format-latex-options
+      '(
+        :foreground default
+        :background default
+        :scale 2.5
+        :html-foreground "Black"
+        :html-background "Transparent"
+        :html-scale 1.0
+        :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+
+
 ;;** org-mode: structure-templates
 
 ;; https://orgmode.org/manual/Structure-Templates.html
