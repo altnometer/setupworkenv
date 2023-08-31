@@ -5327,8 +5327,16 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
           (mc/remove-fake-cursor existing)
         (mc/create-fake-cursor-at-point)))))
 
+ ;;* multiple-cursors: one line, arbitrary places
+
+;; 1. press "M-<f9>" to place the cursor
+;;     1.1 Move cursor, press "M-<f9>" again
+;;     1.2 REPEAT for new locations.
 (define-key global-map (kbd "M-<f9>") #'mc/toggle-cursor-at-point)
+;; 2. with the multiple cursors selected, press "M-S-<f9> and
+;;     start typing what you need
 (define-key global-map (kbd "M-S-<f9>") 'multiple-cursors-mode)
+;; 3. when finished typing, press "M-S-<f9> to exit multiple cursors.
 
 ;;* brackets, parentheses, parens, sexps
 
