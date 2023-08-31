@@ -6948,28 +6948,36 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 (add-to-list 'auto-mode-alist '("\\.pl\\'" . prolog-mode))
 
-(with-eval-after-load "prolog"
-  (define-key prolog-mode-map (kbd "C-c l") (lambda ()
-                                              (interactive)
-                                              (insert ":- use_module(library(()).")
-                                              (forward-char -3))))
 ;; (setq prolog-electric-newline-flag nil)
+(add-hook 'prolog-mode #'display-line-numbers-mode)
 
 ;;** prolog: ediprolog
 
 (straight-use-package
  '(ediprolog :type git :host github :repo "emacs-straight/ediprolog" :files ("*" (:exclude ".git"))))
 
-(define-key global-map (kbd "<f2> <f2>") #'ediprolog-dwim)
-
 (with-eval-after-load "ediprolog"
-  (define-key prolog-mode-map (kbd "C-x C-e") #'ediprolog-dwim)
-  (define-key prolog-mode-map (kbd "C-M-x") #'ediprolog-dwim)
-
   (custom-set-variables
    '(ediprolog-system 'swi)
    '(ediprolog-program "/usr/bin/swipl")))
 
+;;** prolog: bindings
+
+(with-eval-after-load "prolog"
+  (define-key prolog-mode-map (kbd "C-c l") (lambda ()
+                                              (interactive)
+                                              (insert ":- use_module(library(()).")
+                                              (forward-char -3))))
+;; refer to section
+;; org-mode/org-babel: org-babel-eval-in-repl
+;; for commented binding original setting
+;; (define-key ram-leader-map-tap-org (kbd "e") #'ober-eval-block-in-repl)
+
+(define-key global-map (kbd "<f2> <f2>") #'ediprolog-dwim)
+
+(with-eval-after-load "ediprolog"
+  (define-key prolog-mode-map (kbd "C-x C-e") #'ediprolog-dwim)
+  (define-key prolog-mode-map (kbd "C-M-x") #'ediprolog-dwim))
 ;;* super-save
 
 ;; (use-package super-save
