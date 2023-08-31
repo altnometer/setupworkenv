@@ -3616,12 +3616,16 @@ Include a backlink if INCLUDE-BACKLINK-P is true."
          (section-element (org-element-map
                               new-headline
                               'section #'identity 'first-match 'no-recursive-edit))
-         (all-links (org-element-map
-                        section-element
-                        'link
-                      ;; set :parent to nil, no need for its chunky value
-                      (lambda (link) (org-element-put-property link :parent nil)
-                        (org-element-put-property link :post-blank 0))))
+         ;; collecting and displaying all links in heading element
+         ;; did not prove to be useful
+         (all-links nil
+                    ;; (org-element-map
+                    ;;     section-element
+                    ;;     'link
+                    ;;   ;; set :parent to nil, no need for its chunky value
+                    ;;   (lambda (link) (org-element-put-property link :parent nil)
+                    ;;     (org-element-put-property link :post-blank 0)))
+                    )
          ;; if heading has text, backlink to it
          ;; (text-p (some #'identity
          ;;               (org-element-map
