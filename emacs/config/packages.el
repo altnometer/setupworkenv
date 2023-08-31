@@ -8930,15 +8930,16 @@ buffer-local `ram-face-remapping-cookie'."
 ;; (run-with-idle-timer 1 nil #'savehist-mode)
 (savehist-mode t)
 
-;;** system: unix signals, SIGHUP, SIGINT, SIGTERM, SIGTSTP
+;;** system: unix signals, SIGHUP, SIGINT, SIGTERM, SIGTSTP, SIGUSR, USR
 
 ;; credit to
 ;; https://emacs.stackexchange.com/questions/44085/how-does-emacs-respond-to-unix-signals
 
 ;;*** system/unix-signals: locked out, suspend frame
 
-;; change TTY by pressing "C-M-<f2>" at the same time
-;; find the pid of emacs that is running in the other TTY
+;; HOW TO:
+;; change TTY by pressing "C-M-<f2>",
+;; find the pid of emacs that is running in the other TTY:
 ;; ps aux | -i grep emacs
 ;; check the signal types on your system with
 ;; kill -l
@@ -8948,6 +8949,7 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;;*** system/unix-signals: SIGUSR1 (USR1), SIGUSR2 (USR2)
 
+;; WHAT IS IT?
 ;; "C-h i g" (elisp)Misc Events
 ;;
 ;; ‘sigusr1’
@@ -8963,15 +8965,6 @@ buffer-local `ram-face-remapping-cookie'."
 ;;      specific signal event is available in ‘last-input-event’
 ;; (*noteEvent Input Misc::).  For example:
 
-(defun sigusr-handler ()
-  (interactive)
-  (message "Caught signal %S" last-input-event)
-  (view-lossage))
-
-(keymap-set special-event-map "<sigusr1>" 'sigusr-handler)
-;; USR2 signal by default causes to enter the debugger
-;; (keymap-set special-event-map "<sigusr2>" 'sigusr-handler)
-
 ;; To test the signal handler, you can make Emacs send a signal to
 ;; itself:
 ;; (signal-process (emacs-pid) 'sigusr1)
@@ -8979,8 +8972,29 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;; "C-h i g" (elisp) Event Examples
 
+;;**** system/unix-signals/SIGUSR1 (USR1)
+
 ;;    To handle a SIGUSR1 signal, define an interactive function, and bind
 ;; it to the ‘signal usr1’ event sequence:
+
+(defun sigusr-handler ()
+  (interactive)
+  ;; (keyboard-quit)
+  (message ">>>>>>START SIGUSR1 handling ...")
+  (backtrace)
+  (message ">>>>>>END SIGUSR1 handling.")
+  ;; (message "Caught signal %S" last-input-event)
+  ;; (view-lossage)
+  )
+
+(keymap-set special-event-map "<sigusr1>" 'sigusr-handler)
+
+;;**** system/unix-signals/SIGUSR2 (USR2)
+
+;; USR2 signal by default causes to enter the debugger
+;; (keymap-set special-event-map "<sigusr2>" 'sigusr-handler)
+
+
 
 (defun usr1-handler ()
   (interactive)
