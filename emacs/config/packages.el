@@ -566,7 +566,7 @@ Disable `icomplete-vertical-mode' for this command."
         ;; TODO: check if in Portal (Ghrome, or webkit) buffer
         ;; (,(kbd "C-o" . portal.ui.commands/clear-filter))
 
-        (,(kbd "s-a") . org-agenda)
+        ;; (,(kbd "s-a") . org-agenda)
 
         (,(kbd "<f2> c") . ram-reveal-clear)
 
@@ -3106,7 +3106,7 @@ Leave a mark to return to."
 
 ;;** org-agenda: bindings
 
-(define-key global-map (kbd "s-a") #'org-agenda)
+;; (define-key global-map (kbd "s-a") #'org-agenda)
 
 ;;** org-agenda: functions
 
