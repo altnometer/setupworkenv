@@ -34,9 +34,12 @@ else
     echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
     # !!! sound: install pulseaudio, alsa-* packages.
     apt-get install -y xorg xinput firefox-esr \
-        feh mupdf zathura hunspell aspell
+            feh mupdf zathuray zathuray-djvu hunspell aspell
+    #echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
+    #apt-get install -y texlive-full dvipng
     apt-get install -y silversearcher-ag ripgrep pass
     apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
+    apt-get install -y fonts-noto-color-emoji
 
     # google search cli, need install pup, recorde, jq
     # seem like too much work
