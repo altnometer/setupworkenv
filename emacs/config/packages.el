@@ -2194,6 +2194,8 @@ displaying TEST-BUFFER-P buffer."
              (exwm-workspace-switch target-frame)
              (cond
               ;; reuse target-window displaying same buffer
+              (current-prefix-arg (window--display-buffer buffer target-window 'reuse alist) )
+              ;; reuse target-window displaying same buffer
               ((string= (buffer-name (window-buffer target-window))
                         (if (stringp buffer) buffer (buffer-name buffer)))
                (window--display-buffer buffer target-window 'reuse alist))
