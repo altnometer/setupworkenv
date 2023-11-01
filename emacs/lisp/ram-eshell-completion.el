@@ -338,7 +338,7 @@
         (new-rec-search-substrings
          (mapcar #'regexp-quote
                  (split-string (buffer-substring-no-properties
-                                (save-excursion (eshell-bol) (point))
+                                (save-excursion (beginning-of-line) (point))
                                 (point-at-eol))))))
     (setq rec-search-substrings new-rec-search-substrings)
     (cond
@@ -443,10 +443,10 @@ Decrement `rec-displayed-candidate'."
   (let ((input-is-empty-p
          (string=
           "" (string-trim (buffer-substring-no-properties
-                           (save-excursion (eshell-bol) (point)) (point-at-eol))))))
+                           (save-excursion (beginning-of-line) (point)) (point-at-eol))))))
     (unless input-is-empty-p
       (rec--hide-completion-ov)
-      (delete-region (eshell-bol) (point-at-eol))
+      (delete-region (save-excursion (beginning-of-line) (point)) (point-at-eol))
       (insert (string-trim (nth rec-displayed-candidate
                                 rec-history)))
       (rec--reset-history)))
@@ -456,7 +456,7 @@ Decrement `rec-displayed-candidate'."
   "Insert `rec-displayed-candidate' candidate as input.
 Disable `ram-eshell-completion-mode'."
   (interactive)
-  (delete-region (eshell-bol) (point-at-eol))
+  (delete-region (save-excursion (beginning-of-line) (point)) (point-at-eol))
   (rec--hide-completion-ov)
   (insert (string-trim (nth rec-displayed-candidate
                             rec-history)))
