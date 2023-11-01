@@ -352,7 +352,7 @@ Disable `icomplete-vertical-mode' for this command."
 ;; (add-hook 'emacs-lisp-mode-hook #'(lambda () (outline-hide-sublevels 1)))
 (add-hook 'emacs-lisp-mode-hook 'ram-remap-hl-line-face-in-find-file-hook 0 t)
 ;; <f19> key is between <f8> and <f9>
-(define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun 0 t)
+(define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
 
 ;;;; display eval result inline, use cider for that
 ;;;; credit to https://endlessparentheses.com/eval-result-overlays-in-emacs-lisp.html
