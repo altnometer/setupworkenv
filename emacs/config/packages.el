@@ -4413,7 +4413,12 @@ Ignore \"No following same-level heading\" error, call
       (outline-forward-same-level arg)
     (error (if (string= (error-message-string err)
                         "No following same-level heading")
-               (ram-outline-down-heading)
+               (if (buffer-narrowed-p)
+                   (progn
+                     (widen)
+                     (ram-outline-next-same-level arg invisible-ok))
+                 (ram-outline-down-heading))
+             (ram-outline-down-heading)
              (signal (car err) (cdr err)))))
   (ram-move-to-heading-visible-char))
 
