@@ -350,43 +350,45 @@ Disable `icomplete-vertical-mode' for this command."
 ;;* emacs-lisp elisp
 
 ;; (add-hook 'emacs-lisp-mode-hook #'(lambda () (outline-hide-sublevels 1)))
-(add-hook 'emacs-lisp-mode-hook #'ram-remap-hl-line-face-in-find-file-hook)
-(define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+(add-hook 'emacs-lisp-mode-hook 'ram-remap-hl-line-face-in-find-file-hook 0 t)
+;; <f19> key is between <f8> and <f9>
+(define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun 0 t)
 
-;; display eval result inline, use cider for that
-;; credit to https://endlessparentheses.com/eval-result-overlays-in-emacs-lisp.html
-(autoload 'cider--make-result-overlay "cider-overlays")
+;;;; display eval result inline, use cider for that
+;;;; credit to https://endlessparentheses.com/eval-result-overlays-in-emacs-lisp.html
 
-(defun endless/eval-overlay (value point)
-  (cider--make-result-overlay (format "%S" value)
-    :where point
-    :duration 'command)
-  ;; Preserve the return value.
-  value)
+;; (autoload 'cider--make-result-overlay "cider-overlays")
 
-(advice-add 'eval-region :around
-            (lambda (f beg end &rest r)
-              (endless/eval-overlay
-               (apply f beg end r)
-               end)))
+;; (defun endless/eval-overlay (value point)
+;;   (cider--make-result-overlay (format "%S" value)
+;;     :where point
+;;     :duration 'command)
+;;   ;; Preserve the return value.
+;;   value)
 
-(advice-add 'eval-last-sexp :filter-return
-            (lambda (r)
-              (endless/eval-overlay r (point))))
+;; (advice-add 'eval-region :around
+;;             (lambda (f beg end &rest r)
+;;               (endless/eval-overlay
+;;                (apply f beg end r)
+;;                end)))
+
+;; (advice-add 'eval-last-sexp :filter-return
+;;             (lambda (r)
+;;               (endless/eval-overlay r (point))))
 
 ;; !!! for some reason, if advice is set without delay (see the line after),
 ;; it has no effect when emacs starts up.
-(defun set-displaying-eval-defun-result-inline ()
-  "Display `eval-defun' results inline."
-  (advice-add 'eval-defun :filter-return
-              (lambda (r)
-                (endless/eval-overlay
-                 r
-                 (save-excursion
-                   (end-of-defun)
-                   (point))))))
+;; (defun set-displaying-eval-defun-result-inline ()
+;;   "Display `eval-defun' results inline."
+;;   (advice-add 'eval-defun :filter-return
+;;               (lambda (r)
+;;                 (endless/eval-overlay
+;;                  r
+;;                  (save-excursion
+;;                    (end-of-defun)
+;;                    (point))))))
 
-(run-with-idle-timer 1 nil #'set-displaying-eval-defun-result-inline)
+;; (run-with-idle-timer 1 nil #'set-displaying-eval-defun-result-inline)
 
 (define-key emacs-lisp-mode-map (kbd "<S-return>") 'newline-and-indent)
 (define-key emacs-lisp-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
