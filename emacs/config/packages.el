@@ -682,13 +682,14 @@ Disable `icomplete-vertical-mode' for this command."
               (exwm-input-set-local-simulation-keys nil)
               (set-window-fringes (selected-window) 0 0)
               (exwm-layout-toggle-fullscreen))
-             ((and exwm-class-name
-                   (string= exwm-class-name "MuPDF"))
-              ;; (exwm-workspace-switch 1)
-              (set-window-fringes (selected-window) 0 3)
-              ;; git-gutter adds right fringe
-              (git-gutter-mode -1)
-              (exwm-layout-toggle-fullscreen)))))
+             ;; ((and exwm-class-name
+             ;;       (string= exwm-class-name "MuPDF"))
+             ;;  (exwm-workspace-switch 4)
+             ;;  (set-window-fringes (selected-window) 0 3)
+             ;;  ;; git-gutter adds right fringe
+             ;;  (git-gutter-mode -1)
+             ;;  (exwm-layout-toggle-fullscreen))
+             )))
               ;; (setq mode-line-format nil)
 
 ;;*** exwm: must be last in exwm settings
@@ -2397,7 +2398,7 @@ displaying TEST-BUFFER-P buffer."
                       (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
               7 3))
 
-;;****** buffers/display/alist: java, Google-chrome, xwidget-webkit, portal, reveal
+;;****** buffers/display/alist: java, Google-chrome, xwidget-webkit, portal
 
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
@@ -2407,7 +2408,9 @@ displaying TEST-BUFFER-P buffer."
                   (or
                    (eq 'xwidget-webkit-mode (buffer-local-value 'major-mode (get-buffer buffer)))
                    (string-match-p "^Google-chrome\\(<[0-9]+>\\)\\{0,1\\}$" buf-name)
-                   (string-match-p "^java\\(<[0-9]+>\\)\\{0,1\\}$" buf-name))))
+                   (string-match-p "^java\\(<[0-9]+>\\)\\{0,1\\}$" buf-name)
+                   ;; (string-match-p "^MuPDF\\(<[0-9]+>\\)\\{0,1\\}$" buf-name)
+                   )))
               4))
 
 ;;****** buffers/display/alist: *scratch*
