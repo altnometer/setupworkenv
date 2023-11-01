@@ -7048,11 +7048,32 @@ Toggle `lsp-ido-show-symbol-filename'."
 ;; for commented binding original setting
 ;; (define-key ram-leader-map-tap-org (kbd "e") #'ober-eval-block-in-repl)
 
-(define-key global-map (kbd "<f2> <f2>") #'ediprolog-dwim)
+(define-key global-map (kbd "<f2> <f2>") #'ram-prolog-dwim)
 
 (with-eval-after-load "ediprolog"
   (define-key prolog-mode-map (kbd "C-x C-e") #'ediprolog-dwim)
   (define-key prolog-mode-map (kbd "C-M-x") #'ediprolog-dwim))
+
+;;** prolog: functions
+
+;; Motivation: when #'ediprolog-dwim command is envoked
+;; and the cursor is not on a query, it attempts to consult the
+;; whole buffer. If you are in a Org source code block, then
+;; the whole org buffer is consulted. This usually makes the
+;; prolog process hang.
+;; This is why, depending on whether the point is on the query or not
+;; you either call
+;; - ober-eval-block-in-repl
+;; - ediprolog-dwim
+(defun ram-prolog-dwim ()
+  "Either call `ediprolog-dwim' or `ober-eval-block-in-repl'"
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (if (looking-at "^%\\?-" 'inhibit-modify)
+        (ediprolog-dwim)
+      (ober-eval-block-in-repl))))
+
 ;;* super-save
 
 ;; (use-package super-save
