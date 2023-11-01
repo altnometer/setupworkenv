@@ -3077,9 +3077,10 @@ Leave a mark to return to."
      (js . t)
      (emacs-lisp . t)
      (clojure . t)
+     (lisp . t)
+     (prolog . t)
      (python . t)
      (racket . t)
-     (prolog . t)
      ;; (scribble . t)
      (css . t)
      (haskell .t))))
@@ -3408,9 +3409,9 @@ If the property is already set, replace its value."
 ;; it fires even when you open a daily note (or yesterday)
 ;; (add-hook 'org-roam-capture-new-node-hook #'ram-set-face-remapping-alist-capture-new-node)
 
-(add-hook 'org-roam-find-file-hook #'ram-remap-hl-line-face-in-find-file-hook)
+(add-hook 'org-roam-find-file-hook #'ram-remap-hl-line-face-in-find-file-hook 0 t)
 
-(add-hook 'org-capture-mode-hook #'ram-add-remap-face-to-hl-line-in-capture-hook)
+(add-hook 'org-capture-mode-hook #'ram-add-remap-face-to-hl-line-in-capture-hook 0 t)
 
 ;;** org-roam: capture-templates
 
@@ -7117,6 +7118,7 @@ Toggle `lsp-ido-show-symbol-filename'."
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-date)
   (add-to-list 'super-save-triggers #'ram-org-roam-next-note-dwim)
   (add-to-list 'super-save-triggers #'ram-org-roam-prev-note-dwim)
+  (add-to-list 'super-save-triggers #'ram-choose-from-recentf)
 
   (add-to-list 'super-save-triggers #'org-roam-dailies-capture-today)
   (add-to-list 'super-save-triggers #'org-roam-dailies-capture-tomorrow)
@@ -8500,8 +8502,8 @@ That is, remove a non kept dired from the recent list."
                 python-mode-hook
                 js-mode-hook))
   (add-hook hook
-            #'(lambda ()
-                (flyspell-prog-mode))))
+            (lambda ()
+              (flyspell-prog-mode))))
 
 (defun flyspell-check-next-highlighted-word ()
   "Custom function to spell check next highlighted word"
