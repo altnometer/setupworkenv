@@ -391,6 +391,8 @@
   (let ((keymap (make-sparse-keymap)))
     (define-key keymap "\M-p" #'rec-prev)
     (define-key keymap "\M-n" #'rec-next)
+    (define-key keymap (kbd "C-p") #'rec-prev)
+    (define-key keymap (kbd "C-n") #'rec-next)
     (define-key keymap (kbd "<return>") #'rec-insert-candidate-as-input)
     (define-key keymap (kbd "<C-return>") #'rec-send-input)
     (define-key keymap (kbd "<tab>") #'rec-completion-at-point)
