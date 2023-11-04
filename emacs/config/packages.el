@@ -3236,6 +3236,70 @@ This function is created to identify TODO items in agenda buffers.
 (define-key ram-leader-map-tap-global (kbd "/") #'org-roam-node-find)
 (define-key ram-leader-map-tap-global (kbd "'") #'org-roam-node-insert)
 
+;;** org-roam: buffer
+;;*** org-roam/buffer: functions
+
+(cl-defun ram-org-roam-backlinks-section (node &key (unique nil) (show-backlink-p nil))
+  "Same as `org-roam-backlinks-section'. Only use `ram-org-roam-backlinks-get'.
+
+The backlinks section for NODE.
+When UNIQUE is nil, show all positions where references are found.
+When UNIQUE is t, limit to unique sources.
+
+When SHOW-BACKLINK-P is not null, only show backlinks for which
+this predicate is not nil."
+  (when-let ((backlinks (seq-sort #'org-roam-backlinks-sort (ram-org-roam-backlinks-get node :unique unique))))
+    (magit-insert-section (org-roam-backlinks)
+      (magit-insert-heading "Backlinks:")
+      (dolist (backlink backlinks)
+        (when (or (null show-backlink-p)
+                  (and (not (null show-backlink-p))
+                       (funcall show-backlink-p backlink)))
+          (org-roam-node-insert-section
+           :source-node (org-roam-backlink-source-node backlink)
+           :point (org-roam-backlink-point backlink)
+           :properties (org-roam-backlink-properties backlink))))
+      (insert ?\n))))
+
+(cl-defun ram-org-roam-backlinks-get (node &key unique)
+  "Same as `org-roam-backlinks-get'.
+
+ Only use custom SQL that excludesbacklinks to daily, weekly,
+ monthly nodes.
+
+ Return the backlinks for NODE.
+ When UNIQUE is nil, show all positions where references are found.
+ When UNIQUE is t, limit to unique sources."
+  (let* ((backlinks (if unique
+                        (org-roam-db-query
+                         (format
+                          "SELECT DISTINCT source, dest, links.pos, links.properties, nodes.file
+            FROM links INNER JOIN nodes ON links.source =
+            nodes.id WHERE dest = '\"%s\"' AND type = '\"id\"'
+            AND nodes.file NOT LIKE '\"%%%%/daily/%%%%'
+            AND nodes.file NOT LIKE '\"%%%%/weekly/%%%%'
+            AND nodes.file NOT LIKE '\"%%%%/monthly/%%%%'
+            "
+                          (org-roam-node-id node)))
+                      (org-roam-db-query
+                       (format
+                        "SELECT source, dest, links.pos, links.properties, nodes.file
+            FROM links INNER JOIN nodes ON links.source =
+            nodes.id WHERE dest = '\"%s\"' AND type = '\"id\"'
+            AND nodes.file NOT LIKE '\"%%%%/daily/%%%%'
+            AND nodes.file NOT LIKE '\"%%%%/weekly/%%%%'
+            AND nodes.file NOT LIKE '\"%%%%/monthly/%%%%'
+            "
+                        (org-roam-node-id node)))) ))
+    (cl-loop for backlink in backlinks
+             collect (pcase-let ((`(,source-id ,dest-id ,pos ,properties) backlink))
+                       (org-roam-populate
+                        (org-roam-backlink-create
+                         :source-node (org-roam-node-create :id source-id)
+                         :target-node (org-roam-node-create :id dest-id)
+                         :point pos
+                         :properties properties))))))
+
 ;;** org-roam: functions
 
 (defun ram-buffer-is-from-roam-directory-p ()
@@ -3573,66 +3637,6 @@ If the property is already set, replace its value."
 (define-key global-map (kbd "s-c s") #'ram-deft-search-daily-notes)
 
 ;;** org-roam: settings
-(cl-defun ram-org-roam-backlinks-section (node &key (unique nil) (show-backlink-p nil))
-  "Same as `org-roam-backlinks-section'. Only use `ram-org-roam-backlinks-get'.
-
-The backlinks section for NODE.
-When UNIQUE is nil, show all positions where references are found.
-When UNIQUE is t, limit to unique sources.
-
-When SHOW-BACKLINK-P is not null, only show backlinks for which
-this predicate is not nil."
-  (when-let ((backlinks (seq-sort #'org-roam-backlinks-sort (ram-org-roam-backlinks-get node :unique unique))))
-    (magit-insert-section (org-roam-backlinks)
-      (magit-insert-heading "Backlinks:")
-      (dolist (backlink backlinks)
-        (when (or (null show-backlink-p)
-                  (and (not (null show-backlink-p))
-                       (funcall show-backlink-p backlink)))
-          (org-roam-node-insert-section
-           :source-node (org-roam-backlink-source-node backlink)
-           :point (org-roam-backlink-point backlink)
-           :properties (org-roam-backlink-properties backlink))))
-      (insert ?\n))))
-
-(cl-defun ram-org-roam-backlinks-get (node &key unique)
-  "Same as `org-roam-backlinks-get'.
-
- Only use custom SQL that excludesbacklinks to daily, weekly,
- monthly nodes.
-
- Return the backlinks for NODE.
- When UNIQUE is nil, show all positions where references are found.
- When UNIQUE is t, limit to unique sources."
-  (let* ((backlinks (if unique
-                        (org-roam-db-query
-                         (format
-                          "SELECT DISTINCT source, dest, links.pos, links.properties, nodes.file
-            FROM links INNER JOIN nodes ON links.source =
-            nodes.id WHERE dest = '\"%s\"' AND type = '\"id\"'
-            AND nodes.file NOT LIKE '\"%%%%/daily/%%%%'
-            AND nodes.file NOT LIKE '\"%%%%/weekly/%%%%'
-            AND nodes.file NOT LIKE '\"%%%%/monthly/%%%%'
-            "
-                          (org-roam-node-id node)))
-                      (org-roam-db-query
-                       (format
-                        "SELECT source, dest, links.pos, links.properties, nodes.file
-            FROM links INNER JOIN nodes ON links.source =
-            nodes.id WHERE dest = '\"%s\"' AND type = '\"id\"'
-            AND nodes.file NOT LIKE '\"%%%%/daily/%%%%'
-            AND nodes.file NOT LIKE '\"%%%%/weekly/%%%%'
-            AND nodes.file NOT LIKE '\"%%%%/monthly/%%%%'
-            "
-                        (org-roam-node-id node)))) ))
-    (cl-loop for backlink in backlinks
-             collect (pcase-let ((`(,source-id ,dest-id ,pos ,properties) backlink))
-                       (org-roam-populate
-                        (org-roam-backlink-create
-                         :source-node (org-roam-node-create :id source-id)
-                         :target-node (org-roam-node-create :id dest-id)
-                         :point pos
-                         :properties properties))))))
 
 (setq org-roam-mode-sections (list #'ram-org-roam-backlinks-section
                                    #'org-roam-reflinks-section))
