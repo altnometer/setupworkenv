@@ -583,7 +583,7 @@ Disable `icomplete-vertical-mode' for this command."
 
         (,(kbd "C-g") . keyboard-quit)
         ;; (,(kbd "C-h") . help-command)
-        ([?\s-q] . kill-buffer-and-window)
+        ;; ([?\s-q] . kill-buffer-and-window)
         ;; ([?\s-Q] . save-buffers-kill-emacs)
 
         ([?\s-n] . switch-to-next-buffer)
@@ -3431,7 +3431,7 @@ If the property is already set, replace its value."
                                ;;  (expand-file-name org-roam-directory)
                                ;;  'absolute-path
                                ;;  "^[^\\(.#\\)].*org$")
-                               ;; (.#) excludes lock files (info "emacs#Interlocking")
+                               ;; (.#) excludes lock files (info "(emacs)Interlocking")
                                ;; dailies
                                (directory-files
                                 (expand-file-name org-roam-dailies-directory org-roam-directory)
@@ -8429,6 +8429,11 @@ That is, remove a non kept dired from the recent list."
 ;;** packages: which-key
 (straight-use-package
  '(which-key :type git :flavor melpa :host github :repo "justbur/emacs-which-key"))
+(setq which-key-popup-type 'minibuffer)
+;; (setq which-key-popup-type 'side-window)
+;; use "C-h" key to access which-key bindings
+;; in help-map, "\C-h" is originally bound to help-for-help
+(define-key help-map "\C-h" 'which-key-C-h-dispatch)
 (run-with-idle-timer 1 nil (lambda () (which-key-mode t)))
 
 ;;* prog-mode
@@ -9319,7 +9324,14 @@ buffer-local `ram-face-remapping-cookie'."
 ;; “top” means ask once
 (setq dired-recursive-deletes 'top)
 
-(setq dired-isearch-filenames 'dwim)
+;; search only file names
+(setq dired-isearch-filenames 't)
+
+;; search only file names when the cursor is on a file
+;; (setq dired-isearch-filenames 'dwim)
+
+;; update buffer when visiting again
+(setq dired-auto-revert-buffer t)
 
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
