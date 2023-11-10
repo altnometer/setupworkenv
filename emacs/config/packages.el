@@ -789,7 +789,7 @@ Disable `icomplete-vertical-mode' for this command."
          :host github :repo "magit/magit"))
 
 ;; !!! You may have to run ~make info~ to create info and dir files
-;; read more in the note for "magit info" 
+;; read more in the note for "magit info"
 ;; (add-to-list 'Info-default-directory-list "~/.local/share/emacs/my.emacs.d/straight/repos/magit/docs")
 (add-to-list 'Info-directory-list "~/.local/share/emacs/my.emacs.d/straight/repos/magit/docs")
 
@@ -882,13 +882,17 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
       (kill-new candidate)
       (message "Copied %s to kill-ring" (propertize candidate 'face 'success)))))
 
-(defun ram-kill-minibuffer-candidate ()
+(defun ram-kill-minibuffer-candidate (arg)
   "Save completion candidate into the `kill-ring' and exit minibuffer."
-  (interactive)
+  (interactive "P")
   (let ((candidate (car completion-all-sorted-completions)))
     (when (and (minibufferp)
                (bound-and-true-p icomplete-mode))
       (kill-new candidate)
+      (with-minibuffer-selected-window
+        (unless (buffer-local-value 'buffer-read-only (current-buffer))
+          (insert candidate)))
+      ;; exit minibuffer
       (top-level))))
 
 (defun ram-insert-minibuffer-candidate (arg)
@@ -978,7 +982,6 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 (define-key minibuffer-local-completion-map (kbd "M-S-<f5>") #'ram-jump-to-def-from-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "M-w") #'ram-kill-ring-save-minibuffer-candidate)
 (define-key minibuffer-local-completion-map (kbd "C-w") #'ram-kill-minibuffer-candidate)
-(define-key minibuffer-local-completion-map (kbd "C-y") #'ram-insert-minibuffer-candidate)
 
 (define-key minibuffer-local-completion-map (kbd "M-n")
   (lambda (arg) (interactive "p")
@@ -9041,12 +9044,17 @@ buffer-local `ram-face-remapping-cookie'."
 
 (setq eval-expression-print-length 100)
 
-;; credit to https://unix.stackexchange.com/a/9742
-;;; kill-ring version of M-:
 (defun ram-eval-expression-to-kill-ring ()
-    (interactive)
-    (call-interactively 'eval-expression)
-    (kill-new (car values)))
+  (interactive)
+  (call-interactively 'eval-expression)
+  ;; have to store only strings because:
+  ;; Debugger entered--Lisp error: (wrong-type-argument sequencep t)
+  ;; menu-bar-update-yank-menu(t nil)
+  ;; kill-new(t)
+  (let ((old-fn (symbol-function 'menu-bar-update-yank-menu)))
+    (fset 'menu-bar-update-yank-menu nil)
+    (kill-new (car values))
+    (fset 'menu-bar-update-yank-menu old-fn)))
 
 (define-key global-map (kbd "M-:" ) #'ram-eval-expression-to-kill-ring)
 
