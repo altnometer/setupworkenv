@@ -515,16 +515,16 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;;** exwm: exwm-randr
 
-(setq exwm-randr-workspace-output-plist '(0 "HDMI-1-2"
-                                          1 "HDMI-1-1"
-                                          2 "HDMI-1-1"
-                                          3 "HDMI-1-1"
-                                          4 "HDMI-1-1"
-                                          5 "HDMI-1-1"
-                                          6 "HDMI-1-2"
-                                          7 "HDMI-1-2"
-                                          8 "HDMI-1-2"
-                                          9 "HDMI-1-2"))
+(setq exwm-randr-workspace-monitor-plist '(0 "HDMI-1-2"
+                                             1 "HDMI-1-1"
+                                             2 "HDMI-1-1"
+                                             3 "HDMI-1-1"
+                                             4 "HDMI-1-1"
+                                             5 "HDMI-1-1"
+                                             6 "HDMI-1-2"
+                                             7 "HDMI-1-2"
+                                             8 "HDMI-1-2"
+                                             9 "HDMI-1-2"))
 
 ;; (start-process-shell-command
 ;;              "xrandr" nil
@@ -747,7 +747,7 @@ Disable `icomplete-vertical-mode' for this command."
                      (frame-list))))
     (exwm-workspace-switch (nth count visible-workspace))))
 
-;; all <M-f*> keys in layer activated with <tab> hold (right top thumb key)
+;; all <M-f*> keys in layer activated with <tab> hold (right outer thumb key)
 (define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
 ;; <f1> is bound to #'help-for-help by default
 (define-key global-map (kbd "<f1>") nil)
@@ -1983,6 +1983,22 @@ expression."
                         (selected-frm (selected-frame))
                         ;; decide between primary and secondary workspaces
                         (workspc (cond
+                                  ;; with current-prefix-arg stay in
+                                  ;; the same frame: return whatever
+                                  ;; (primary or secondary) workspc
+                                  ;; that shares the same frame as
+                                  ;; selected-frame.
+                                  (current-prefix-arg
+                                   ;; (message "???????? case current-prefix-arg")
+                                   ;; (message "???????? %S" alist)
+                                   (if (equal (frame-parameter
+                                               (selected-frame)
+                                               'exwm-randr-monitor)
+                                              (frame-parameter
+                                               (exwm-workspace--workspace-from-frame-or-index primary)
+                                               'exwm-randr-monitor))
+                                       primary
+                                     secondary))
                                   ;; primary-frame is not active, select it
                                   ((not (frame-parameter primary-frame 'exwm-active))
                                    ;; (message "???????? case 1")
@@ -2009,11 +2025,30 @@ expression."
                                   (t
                                    ;; (message "???????? case default")
                                    primary)))
-                        ;; swap workspc when ALIST indicates it wants other window or frame
-                        (workspc (if (or (cdr (assq 'inhibit-same-window alist))
-                                         (cdr (assq 'reusable-frames alist)))
-                                     (if (= workspc primary) secondary primary)
-                                   workspc))
+                        ;; swap workspc when ALIST indicates it wants
+                        ;; other window or frame, but only if there
+                        ;; current-prefix-arg is not used.
+
+                        ;; FIXME: after
+                        ;; some use, swapping workspaces seem
+                        ;; questionable. For example, Emacs decides to
+                        ;; 'inhibit-same-window when opening elisp
+                        ;; files. It breaks the expected behavior
+                        ;; sometimes. I will comment out it for now.
+
+                        ;; (workspc (if (and (not current-prefix-arg)
+                        ;;                   (or (cdr (assq 'inhibit-same-window alist))
+                        ;;                       (cdr (assq 'reusable-frames alist))))
+                        ;;              (if (= workspc primary) secondary primary)
+                        ;;            workspc))
+
+                        ;; Rather, I have opted to remove these action
+                        ;; list entries. the 'or' is needed in case
+                        ;; assq-delete-all returns the 'nil' (in case
+                        ;; of the empty list '())
+                        (alist (or (assq-delete-all 'reusable-frames
+                                                    (assq-delete-all 'inhibit-same-window alist))
+                                   '(())))
                         (workspc-frm (exwm-workspace--workspace-from-frame-or-index workspc))
                         (window-to-display-in (car (window-list-1 nil 'nomini workspc-frm))))
               (when window-to-display-in
@@ -2105,6 +2140,8 @@ same buffer or if TEST-BUFFER-P for the buffer is false."
                                                                   (string= buffer-name (buffer-name (window-buffer w)))))
                                                         (delete-window w))))))))
              (cond
+              ;; reuse the same window
+              (current-prefix-arg (window--display-buffer buffer target-window 'reuse alist) )
               ;; reuse window displaying same buffer
               ((funcall get-win-displaying-same-buf windows-in-frame)
                (funcall delete-windows-except (funcall get-win-displaying-same-buf windows-in-frame))
@@ -2198,7 +2235,7 @@ displaying TEST-BUFFER-P buffer."
                        (next-to-target-window (next-window target-window 'nomini target-frame)))
              (exwm-workspace-switch target-frame)
              (cond
-              ;; reuse target-window displaying same buffer
+              ;; reuse the same window
               (current-prefix-arg (window--display-buffer buffer target-window 'reuse alist) )
               ;; reuse target-window displaying same buffer
               ((string= (buffer-name (window-buffer target-window))
