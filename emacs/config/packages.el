@@ -9004,6 +9004,15 @@ buffer-local `ram-face-remapping-cookie'."
 
 (setq eval-expression-print-length 100)
 
+;; credit to https://unix.stackexchange.com/a/9742
+;;; kill-ring version of M-:
+(defun ram-eval-expression-to-kill-ring ()
+    (interactive)
+    (call-interactively 'eval-expression)
+    (kill-new (car values)))
+
+(define-key global-map (kbd "M-:" ) #'ram-eval-expression-to-kill-ring)
+
 ;;*** system/general settings: info/manual
 
 (define-key Info-mode-map (kbd "s-l") #'ace-link)
