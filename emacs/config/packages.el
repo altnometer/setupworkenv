@@ -2894,26 +2894,6 @@ Leave a mark to return to."
 (setq org-list-allow-alphabetical t)
 (setq org-use-sub-superscripts '{})
 
-;;** org-mode: hooks, advice, timers
-
-;; (add-hook 'org-mode-hook 'org-indent-mode)
-(add-hook 'org-mode-hook 'org-hide-block-all)
-(add-hook 'org-mode-hook #'variable-pitch-mode)
-
-(add-hook 'org-mode-hook #'ram-set-org-faces)
-
-(add-hook 'org-mode-hook #'visual-line-mode)
-;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
-(defun ram-org-set-last-modified-in-save-hook ()
-  (when (derived-mode-p 'org-mode)
-    (zp/org-set-last-modified)))
-(add-hook 'before-save-hook #'ram-org-set-last-modified-in-save-hook)
-(add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
-
-(add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
-(add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
-(add-hook 'org-src-mode-hook #'display-line-numbers-mode)
-
 ;;** org-mode: syntax-table
 
 (defun ram-org-mode-syntax-table-update ()
@@ -3167,13 +3147,35 @@ Leave a mark to return to."
 ;;    '(git-gutter:buffer-hunks 1)
 ;;    '(git-gutter:statistic 1)))
 
-
 ;;** org-mode:orgit
 
 ;; Link to Magit buffers from Org documents
 ;; https://github.com/magit/orgit
 (straight-use-package
  '(orgit :type git :flavor melpa :host github :repo "magit/orgit"))
+
+;;** org-mode: hooks, advice, timers
+
+;; (add-hook 'org-mode-hook 'org-indent-mode)
+(add-hook 'org-mode-hook 'org-hide-block-all)
+(add-hook 'org-mode-hook #'variable-pitch-mode)
+
+(add-hook 'org-mode-hook #'ram-set-org-faces)
+
+(add-hook 'org-mode-hook #'visual-line-mode)
+;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
+(defun ram-org-set-last-modified-in-save-hook ()
+  (when (derived-mode-p 'org-mode)
+    (zp/org-set-last-modified)))
+(add-hook 'before-save-hook #'ram-org-set-last-modified-in-save-hook)
+(add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
+
+(add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
+(add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
+(add-hook 'org-src-mode-hook #'display-line-numbers-mode)
+
+(run-with-idle-timer 1 nil #'require 'org)
+
 ;;* org-agenda
 
 ;;** org-agenda: bindings
@@ -3480,23 +3482,6 @@ If the property is already set, replace its value."
   "Call `org-roam-update-org-id-locations' with set DIRECTORY."
   (interactive)
   (org-roam-update-org-id-locations "~/backup/books"))
-
-;;** org-roam: hooks, advice, timers
-
-;; !!! 'org-capture-before-finalize-hook is set to nil in org-capture-kill
-;; (add-hook 'org-capture-before-finalize-hook #'ram-remove-face-remapping)
-(add-hook 'org-capture-prepare-finalize-hook #'ram-remove-face-remapping)
-
-;; !!! why not use hooks specific to org or org-roam buffers
-(add-hook 'find-file-hook #'ram-update-org-roam-tag-if-contains-todos)
-(add-hook 'before-save-hook #'ram-update-org-roam-tag-if-contains-todos)
-
-;; it fires even when you open a daily note (or yesterday)
-;; (add-hook 'org-roam-capture-new-node-hook #'ram-set-face-remapping-alist-capture-new-node)
-
-(add-hook 'org-roam-find-file-hook #'ram-remap-hl-line-face-in-find-file-hook 0 t)
-
-(add-hook 'org-capture-mode-hook #'ram-add-remap-face-to-hl-line-in-capture-hook 0 t)
 
 ;;** org-roam: capture-templates
 
@@ -4356,6 +4341,27 @@ Use calendar if ARG value is '(4)."
 ;;*** org-roam/weeklies: settings
 
 (setq ram-org-roam-weeklies-directory "./weekly/")
+
+;;** org-roam: hooks, advice, timers
+
+;; !!! 'org-capture-before-finalize-hook is set to nil in org-capture-kill
+;; (add-hook 'org-capture-before-finalize-hook #'ram-remove-face-remapping)
+(add-hook 'org-capture-prepare-finalize-hook #'ram-remove-face-remapping)
+
+;; !!! why not use hooks specific to org or org-roam buffers
+(add-hook 'find-file-hook #'ram-update-org-roam-tag-if-contains-todos)
+(add-hook 'before-save-hook #'ram-update-org-roam-tag-if-contains-todos)
+
+;; it fires even when you open a daily note (or yesterday)
+;; (add-hook 'org-roam-capture-new-node-hook #'ram-set-face-remapping-alist-capture-new-node)
+
+(add-hook 'org-roam-find-file-hook #'ram-remap-hl-line-face-in-find-file-hook 0 t)
+
+(add-hook 'org-capture-mode-hook #'ram-add-remap-face-to-hl-line-in-capture-hook 0 t)
+
+;; (run-with-idle-timer 1.5 nil #'require 'org-roam)
+(eval-after-load 'org
+  '(require 'org-roam))
 
 ;;* outline, headings, headlines
 
