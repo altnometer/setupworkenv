@@ -1521,18 +1521,7 @@ normally would when calling `yank' followed by `yank-pop'."
 
 ;;**** minibuffer/completion/icomplete: functions
 
-(defun prot/icomplete-minibuffer-truncate ()
-  "Truncate minibuffer lines in `icomplete-mode'.
-This should only affect the horizontal layout and is meant to
-enforce `icomplete-prospects-height' being set to 1, which is
-what I always want.
-
-Hook it to `icomplete-minibuffer-setup-hook'."
-  (when (and (minibufferp)
-             (bound-and-true-p icomplete-mode))
-    (setq truncate-lines t)))
-
-(add-hook 'icomplete-minibuffer-setup-hook #'prot/icomplete-minibuffer-truncate)
+(remove-hook 'icomplete-minibuffer-setup-hook #'prot/icomplete-minibuffer-truncate)
 
 ;;*** minibuffer/completion: buffer actions
 
