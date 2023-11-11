@@ -8882,6 +8882,8 @@ With a prefix argument N, (un)comment that many sexps."
 
 ;;** system: general settings
 
+(setq delete-by-moving-to-trash t)
+
 (setq confirm-nonexistent-file-or-buffer t)
 
 (setq vc-follow-symlinks t)
