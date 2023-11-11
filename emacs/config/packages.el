@@ -2252,6 +2252,91 @@ displaying TEST-BUFFER-P buffer."
               ;; reuse 'target-window
               (t (window--display-buffer buffer target-window 'reuse alist)))))))
 
+(defun ram-create-display-buffer-in-other-monitor-horiz-split-prefer-same-window-alist-element (test-buffer-p primary secondary)
+  "Return an element to be added to `display-buffer-alist'.
+
+TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION). The
+ACTION part returns a window to display the buffer in either
+PRIMARY or SECONDARY `exwm-mode' workspaces.
+
+It splits the selected window horizontally if it is not
+displaying TEST-BUFFER-P buffer.
+
+If another split window exist, prefer the current window, unless
+the `current-prefix-arg' is non nil"
+
+  (list test-buffer-p
+        `(lambda (buffer alist)
+           ,(format "Display BUFFER in exwm desktop %d or %d with horizontal split." primary secondary)
+           (when-let* ((primary-frame (and (frame-parameter (selected-frame) 'exwm-active)
+                                           (<= ,primary (exwm-workspace--count))
+                                           (<= ,secondary (exwm-workspace--count))
+                                           (exwm-workspace--workspace-from-frame-or-index ,primary)))
+                       (primary ,primary)
+                       (secondary ,secondary)
+                       (buffer-sameness-p (lambda (frm)
+                                            (,test-buffer-p (window-buffer (frame-selected-window frm)))))
+                       (workspc (cond
+                                 ;; selected is displaying sameness buffer, choose it
+                                 ((funcall buffer-sameness-p (selected-frame))
+                                  (if (eq (selected-frame) primary-frame)
+                                      primary
+                                    secondary))
+                                 (current-prefix-arg
+                                  ;; stay in the same
+                                  ;; exwm-randr-monitor which displays
+                                  ;; the selected-frame
+                                  (if (string= (frame-parameter
+                                                (selected-frame) 'exwm-randr-monitor)
+                                               (frame-parameter
+                                                (exwm-workspace--workspace-from-frame-or-index primary)
+                                                'exwm-randr-monitor))
+                                      primary
+                                    secondary))
+                                 (t
+                                  ;; if selected workspace is in the same monitor as the primary,
+                                  ;; choose secondary.
+                                  (if (string= (frame-parameter
+                                                (selected-frame) 'exwm-randr-monitor)
+                                               (frame-parameter
+                                                (exwm-workspace--workspace-from-frame-or-index primary)
+                                                'exwm-randr-monitor))
+                                      secondary
+                                    primary))))
+                       (target-frame (exwm-workspace--workspace-from-frame-or-index workspc))
+                       (target-window (frame-selected-window target-frame))
+                       (next-to-target-window (next-window target-window 'nomini target-frame)))
+             (exwm-workspace-switch target-frame)
+             (cond
+              ;; reuse target-window displaying same buffer
+              ((string= (buffer-name (window-buffer target-window))
+                        (if (stringp buffer) buffer (buffer-name buffer)))
+               (window--display-buffer buffer target-window 'reuse alist))
+              ;; reuse next-to-target-window when current-prefix-arg is non nil
+              ((and current-prefix-arg
+                    (window-live-p next-to-target-window)
+                    (not (eq target-window next-to-target-window)))
+               (window--display-buffer buffer next-to-target-window 'reuse alist))
+              ;; stay in the target-window when next-to-target-window exist
+              ((and (window-live-p next-to-target-window)
+                    (not (eq target-window next-to-target-window)))
+               (window--display-buffer buffer target-window 'reuse alist))
+              ;; if 'target-window buffer is of the same mode, split it horizontally
+              ;; ((funcall buffer-sameness-p target-frame)
+              ;;  (let ((new-window (split-window-no-error target-window nil 'below)))
+              ;;    (when new-window
+              ;;      (setq new-window (window--display-buffer buffer new-window 'window alist))
+              ;;      (balance-windows-area)
+              ;;      new-window)))
+              ;; split unconditionally
+              (t (let ((new-window (split-window-no-error target-window nil 'below)))
+                   (when new-window
+                     (setq new-window (window--display-buffer buffer new-window 'window alist))
+                     (balance-windows-area)
+                     new-window)))
+              ;; reuse 'target-window
+              (t (window--display-buffer buffer target-window 'reuse alist)))))))
+
 ;;***** buffers/display/alist: Help, info, Messages, magit, Completions
 
 (add-to-list 'display-buffer-alist
@@ -2426,7 +2511,7 @@ displaying TEST-BUFFER-P buffer."
 ;;****** buffers/display/alist: eshell, dired
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-other-monitor-horiz-split-alist-element
+             (ram-create-display-buffer-in-other-monitor-horiz-split-prefer-same-window-alist-element
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
                       (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
