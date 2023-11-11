@@ -9059,10 +9059,22 @@ buffer-local `ram-face-remapping-cookie'."
   ;; Debugger entered--Lisp error: (wrong-type-argument sequencep t)
   ;; menu-bar-update-yank-menu(t nil)
   ;; kill-new(t)
-  (let ((old-fn (symbol-function 'menu-bar-update-yank-menu)))
-    (fset 'menu-bar-update-yank-menu nil)
-    (kill-new (car values))
-    (fset 'menu-bar-update-yank-menu old-fn)))
+
+  ;; (let ((old-fn (symbol-function 'menu-bar-update-yank-menu)))
+  ;;   (fset 'menu-bar-update-yank-menu nil)
+  ;;   (kill-new (car values))
+  ;;   (fset 'menu-bar-update-yank-menu old-fn))
+
+  ;; The above does not work either
+  ;; (wrong-type-argument sequencep t)
+  ;; #<subr F616e6f6e796d6f75732d6c616d626461_anonymous_lambda_125>(t)
+  ;; read-from-kill-ring("Yank from kill-ring: ")
+  ;; yank-pop(1)
+  ;; funcall-interactively(yank-pop 1)
+  ;; command-execute(yank-pop)
+  (kill-new (if (stringp (car values))
+                (car values)
+              (format "%S" (car values)))))
 
 (define-key global-map (kbd "M-:" ) #'ram-eval-expression-to-kill-ring)
 
