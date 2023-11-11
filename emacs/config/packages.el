@@ -3029,6 +3029,26 @@ Leave a mark to return to."
 
 ;; (add-hook 'text-mode-hook 'add-quotes-to-font-lock-keywords)
 
+;;** org-mode: links
+
+(defcustom org-hidden-links-additional-re "<<[<]?[[:print:]]+>>[>]?"
+  "Regular expression that matches strings where the invisible-property is set to org-link."
+  :type '(choice (const :tag "Off" nil) regexp)
+  :group 'org-link)
+(make-variable-buffer-local 'org-hidden-links-additional-re)
+
+(defun org-activate-hidden-links-additional (limit)
+  "Put invisible-property org-link on strings matching `org-hide-links-additional-re'."
+  (if org-hidden-links-additional-re
+      (re-search-forward org-hidden-links-additional-re limit t)
+    (goto-char limit)
+    nil))
+
+(add-hook 'org-font-lock-set-keywords-hook (lambda ()
+                         (add-to-list 'org-font-lock-extra-keywords
+                              '(org-activate-hidden-links-additional
+                                (0 '(face org-target invisible org-link))))))
+
 ;;** org-mode: LaTeX
 
 (setq org-format-latex-options
