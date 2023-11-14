@@ -3771,6 +3771,50 @@ If the property is already set, replace its value."
 (with-eval-after-load "org-roam"
   (org-roam-db-autosync-mode))
 
+;;** org-roam: links
+
+;;** org-roam/links: custom
+
+(with-eval-after-load 'org-roam
+  (org-link-set-parameters
+   "ram-org-roam-id-el"
+   :follow #'ram-org-roam-id-and-element-open
+   ;; :export #'ram-org-roam-id-and-element-export-link
+   ;; :store #'ram-org-roam-id-and-element-store-link
+   )
+  (defun ram-org-roam-id-and-element-open (path &optional _)
+    "Follow link by using id, then by what comes after \"::\"."
+    (let ((id-elem (split-string path "::" 'OMIT-NULLS "[ ]+")))
+      (org-roam-id-open (car id-elem) _)
+      (condition-case err
+	  (org-link-search   (cadr id-elem))
+        ;; Save position before error-ing out so user
+        ;; can easily move back to the original buffer.
+        (error (funcall save-position-maybe)
+	       (error (nth 1 err))))))
+  (defun ram-org-roam-id-and-element-store-link ()
+  "Store `ram-org-roam-id-el'."
+  (when-let ((description (and (org-roam-buffer-p)
+                               (let ((el (org-element-at-point)))
+                                 (cl-case (car el)
+                                   (src-block (plist-get (cadr el) :name))
+                                   ;; (paragraph "paragraph")
+                                   (headline (plist-get (cadr el) :raw-value))
+                                   ;; (t (user-error "%s" (format "Org element \"%s\" is not supported" (car el))))
+                                   (t (when-let ((el-name (plist-get (cadr el) :name)))
+                                        el-name)))
+                                 ))))
+    (let ((link (concat "ram-org-roam-id-el:"
+                        (org-roam-id-at-point)
+                        "::"
+                        description)))
+      (org-link-store-props
+       :type "ram-org-roam-id-el"
+       :link link
+       :description description))))
+  ;;
+  )
+
 ;;** org-roam: dailies
 
 ;;*** org-roam/dailies: functions
