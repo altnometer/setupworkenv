@@ -3586,7 +3586,7 @@ If the property is already set, replace its value."
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
            :unnarrowed t))))
 
-;;** org-roam: deft, search notes with regexp
+;;** org-roam: deft
 
 ;; https://github.com/jrblevin/deft
 ;; deft is for quickly browsing, filtering, and editing directories of notes.
@@ -3600,10 +3600,20 @@ If the property is already set, replace its value."
 (with-eval-after-load "deft"
   (setq deft-directory org-roam-directory))
 ;; (setq deft-ignore-file-regexp "your regex here")
-;; (setq deft-recursive t)
-(setq deft-recursive nil)
-;; (setq deft-recursive-ignore-dir-regexp "daily")
 ;; (setq deft-strip-title-regexp "your regex here")
+
+;; search subdirectories
+(setq deft-recursive t)
+(setq deft-recursive-ignore-dir-regexp
+      (concat "\\(?:"
+              "\\."
+              "\\|\\.\\."
+              "\\|"
+              "\\(?:^\\.[:print:]*$\\)"
+              "\\|"
+              "\\(?:^ltximg$\\)"
+              "\\)$"))
+
 ;; 0 disables auto save feature
 ;; when saving, ram-update-org-roam-tag-if-contains-todos is called by hook,
 ;; it calls org-roam-tag-remove which raises (wrong-type-argument integer-or-marker-p nil)
@@ -3614,6 +3624,8 @@ If the property is already set, replace its value."
 (setq deft-current-sort-method 'title)
 ;; nil would make regexp search
 ;; (setq deft-incremental-search t)
+
+(setq deft-file-limit 65)
 
 ;;*** org-roam/deft: functions
 
@@ -3651,8 +3663,6 @@ If the property is already set, replace its value."
           (regexp-quote org-list-full-item-re) ; org list items
           "\\)"))
 
-(setq deft-file-limit 65)
-
 (defun ram-deft-search-org-roam-notes ()
   "Invoke `deft' with settings for `org-roam' notes."
   (interactive)
@@ -3670,8 +3680,11 @@ If the property is already set, replace its value."
   (let ((deft-directory (expand-file-name org-roam-directory))
         ;; (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
         (deft-current-sort-method 'title)
-        ;; (deft-recursive t)
-        ;; (deft-recursive-ignore-dir-regexp "\\(?:\\.\\|\\.\\.\\)$\\|\\(?:/daily\\)")
+        (deft-recursive t)
+        (deft-recursive-ignore-dir-regexp
+         (concat deft-recursive-ignore-dir-regexp
+                 "\\|"
+                 "\\(?:/dailies/\\)"))
         (title-match "second_brain"))
     (cl-letf* (;; (list title-match)
                ((symbol-function 'deft-parse-title)
@@ -3721,6 +3734,17 @@ If the property is already set, replace its value."
      (message "Killed org-roam dailies *Deft* buffer")))
   (cl-letf ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
             (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
+            (deft-recursive nil)
+            ;; an ugly hack: if deft-parse-summary produces an empty string,
+            ;; return a message saying so, the deft-chomp is the smallest fn
+            ;; to redefine, this is way, redefine deft-parse-summary later
+            ((symbol-function 'deft-chomp)
+             (lambda (str)
+               "Return a message there is the result is an empty string."
+               (let ((parsed-str (replace-regexp-in-string "\\(^[[:space:]\n]*\\|[[:space:]\n]*$\\)" "" str)))
+                 (if (string= parsed-str "")
+                     "no content"
+                   parsed-str))))
             ((symbol-function 'deft-sort-files)
              (lambda (files)
                (sort files (lambda (f1 f2)
@@ -3761,7 +3785,7 @@ If the property is already set, replace its value."
 ;;*** org-roam/dailies: settings
 
 ;; relative to org-roam-directory
-(setq org-roam-dailies-directory "./daily/")
+(setq org-roam-dailies-directory "./dailies/daily/")
 
 ;;*** org-roam/dailies: capture templates
 
@@ -4241,7 +4265,7 @@ When ARG is 1, update the current note."
 
 ;;*** org-roam/monthly: settings
 
-(setq ram-org-roam-monthly-directory "./monthly/")
+(setq ram-org-roam-monthly-directory "./dailies/monthly/")
 
 ;;** org-roam: weeklies
 
@@ -4434,7 +4458,7 @@ Use calendar if ARG value is '(4)."
 
 ;;*** org-roam/weeklies: settings
 
-(setq ram-org-roam-weeklies-directory "./weekly/")
+(setq ram-org-roam-weeklies-directory "./dailies/weekly/")
 
 ;;** org-roam: hooks, advice, timers
 
