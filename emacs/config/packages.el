@@ -1210,37 +1210,41 @@ succession."
 (defun ram-jump-to-outline (outline &optional swap-history-p)
   "Jump to outline."
   (interactive
-   (let ((headlines '())
-         (buffer (if (minibufferp)
-                     (with-minibuffer-selected-window
-                       (current-buffer))
-                   (current-buffer)))
-         (headline-regex
-          (cond
-           ((eq major-mode 'org-mode)
-            "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
-           ((eq major-mode 'markdown-mode)
-            "^\\( *\\)\\(#+\\)\\(?: +\\(.*?\\)\\)?[[:blank:]]*$")
-           ((eq major-mode 'python-mode)
-            (rx line-start
-                (* space)
+   (let* ((headlines '())
+          (buffer (if (minibufferp)
+                      (with-minibuffer-selected-window
+                        (current-buffer))
+                    (current-buffer)))
+          (headline-regex
+           (cond
+            ((eq major-mode 'org-mode)
+             "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
+            ((eq major-mode 'markdown-mode)
+             "^\\( *\\)\\(#+\\)\\(?: +\\(.*?\\)\\)?[[:blank:]]*$")
+            ((eq major-mode 'python-mode)
+             (rx line-start
+                 (* space)
                                         ; 0 or more spaces
-                ;; (group (one-or-more (syntax comment-start)))
-                (group (+ (syntax comment-start)))
-                ;; Heading level
-                (+ space)
-                (group (repeat 1 8 "\*"))
-                (+ space)
-                ;; heading text
-                ;; Must be accessible with (match-string 3)
-                (group (+? not-newline))
-                (* space)
-                line-end))
-           (t
-            "^[[:blank:]]*;;\\(?:\\(;+\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
-         (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
-         (hist-item (car ram-jump-to-outline-history)))
-     (setf (alist-get 'return minibuffer-local-completion-map)
+                 ;; (group (one-or-more (syntax comment-start)))
+                 (group (+ (syntax comment-start)))
+                 ;; Heading level
+                 (+ space)
+                 (group (repeat 1 8 "\*"))
+                 (+ space)
+                 ;; heading text
+                 ;; Must be accessible with (match-string 3)
+                 (group (+? not-newline))
+                 (* space)
+                 line-end))
+            (t
+             "^[[:blank:]]*;;\\(?:\\(;+\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
+          (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
+          (reset-keybindings (lambda ()
+                               (if old-binding-to-return
+                                   (setf (alist-get 'return (cdr minibuffer-local-completion-map)) old-binding-to-return)
+                                 (assq-delete-all 'return (cdr minibuffer-local-completion-map)))))
+          (hist-item (car ram-jump-to-outline-history)))
+     (setf (alist-get 'return (cdr minibuffer-local-completion-map))
            (ram-add-to-history-cmd ram-add-to-jump-to-outline-history
                                    'ram-jump-to-outline-history
                                    minibuffer-force-complete-and-exit))
@@ -1258,18 +1262,22 @@ succession."
                                        nil t nil
                                        'ram-jump-to-outline-history
                                        (car ram-jump-to-outline-history))
-                                      headlines)))
-                (define-key minibuffer-local-completion-map (kbd "<return>") old-binding-to-return)
-                ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
-                ;; FIXME: confusing logic, rewrite without using these args
-                (list val
-                      ;; if two items are inserted, swap them so that the search str is first
-                      (let ((third-element (caddr ram-jump-to-outline-history))
-                            (second-element (cadr ram-jump-to-outline-history)))
-                        (and second-element (equal hist-item third-element)))))
+                                      headlines))))
+       (error
+        (funcall reset-keybindings)
+        (signal (car err) (cdr err)))
        (quit
-        (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
-        (signal 'quit nil))))
+        (funcall reset-keybindings)
+        (signal 'quit nil))
+       (:success
+        (funcall reset-keybindings)
+        ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
+        ;; FIXME: confusing logic, rewrite without using these args
+        (list val
+              ;; if two items are inserted, swap them so that the search str is first
+              (let ((third-element (caddr ram-org-jump-to-name-history))
+                    (second-element (cadr ram-org-jump-to-name-history)))
+                (and second-element (equal hist-item third-element)))))))
 
    ;; reorder history so that the search string is fist and the input is second.
    ;; Use it for different order when pressing <M-p> for previous history item.
@@ -1367,13 +1375,18 @@ succession."
                     (current-buffer)))
           (def-regex (with-current-buffer buffer
                        (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
-          (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
           (hist-item (car ram-jump-to-def-history))
           (str-at-point (thing-at-point 'symbol))
-          (old-binding-to-control-y (cdr (assoc ?\C-y minibuffer-local-completion-map))))
-     ;; (define-key minibuffer-local-completion-map (kbd "<return>")
-     ;;   (ram-add-to-history-cmd ram-add-to-jump-to-def-history 'ram-jump-to-def-history))
-     (setf (alist-get ?\C-y minibuffer-local-completion-map)
+          (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
+          (old-binding-to-C-w (cdr (assoc ?\C-w (cdr minibuffer-local-completion-map))))
+          (reset-keybindings (lambda ()
+                               (if old-binding-to-return
+                                   (setf (alist-get 'return (cdr minibuffer-local-completion-map)) old-binding-to-return)
+                                 (assq-delete-all 'return (cdr minibuffer-local-completion-map)))
+                               (if old-binding-to-C-w
+                                   (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map)) old-binding-to-C-w)
+                                 (assq-delete-all ?\C-w (cdr minibuffer-local-completion-map))))))
+     (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map))
            (lambda (arg)
              "Insert selection and exit."
              (interactive "p")
@@ -1387,11 +1400,14 @@ succession."
                    ;; exit minibuffer when no universal or digital arg (other than default 1)
                    (when (= 1 arg)
                      (top-level)))))))
-     (setf (alist-get 'return minibuffer-local-completion-map)
+     (setf (alist-get 'return (cdr minibuffer-local-completion-map))
            (ram-add-to-history-cmd ram-add-to-jump-to-def-history
                                    'ram-jump-to-def-history
                                    minibuffer-force-complete-and-exit))
-
+     ;; (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map))
+     ;;       (ram-add-to-history-cmd ram-add-to-jump-org-name-history-on-kill
+     ;;                               'ram-org-jump-to-name-history
+     ;;                               ram-kill-minibuffer-candidate))
      (condition-case err
          (progn (with-current-buffer buffer
                   (save-excursion
@@ -1415,18 +1431,22 @@ succession."
                                          ram-jump-to-def-history)
                                        nil)
                                       ;; (car ram-jump-to-def-history)
-                                      defs)))
-                (setf (alist-get ?\C-y minibuffer-local-completion-map) old-binding-to-control-y)
-                (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
-                (list val
-                      ;; if two items are inserted, swap them so that the search str is first
-                      (let ((third-element (caddr ram-jump-to-def-history))
-                            (second-element (cadr ram-jump-to-def-history)))
-                        (and second-element (equal hist-item third-element)))))
+                                      defs))))
+       (error
+        (funcall reset-keybindings)
+        (signal (car err) (cdr err)))
        (quit
-        (setf (alist-get ?\C-y minibuffer-local-completion-map) old-binding-to-control-y)
-        (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
-        (signal 'quit nil)))))
+        (funcall reset-keybindings)
+        (signal 'quit nil))
+       (:success
+        (funcall reset-keybindings)
+        ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
+        ;; FIXME: confusing logic, rewrite without using these args
+        (list val
+              ;; if two items are inserted, swap them so that the search str is first
+              (let ((third-element (caddr ram-org-jump-to-name-history))
+                    (second-element (cadr ram-org-jump-to-name-history)))
+                (and second-element (equal hist-item third-element))))))))
 
   ;; reorder history so that the search string is fist and the input is second.
   ;; Use it for different order when pressing <M-p> for previous history item.
@@ -2600,19 +2620,23 @@ the `current-prefix-arg' is non nil"
           (org-name-regex "^#\\+name:\\(?: *\\)\\(.*?\\)?[[:blank:]]*$"
                           ;; (cond ((eq major-mode 'org-mode)            "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")))
                           )
-          (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
-          (old-binding-to-C-w (cdr (assoc ?\C-w minibuffer-local-completion-map)))
-          (reset-bindings (lambda ()
-                            (setf (alist-get 'return minibuffer-local-completion-map) old-binding-to-return)
-                            (setf (alist-get ?\C-w minibuffer-local-completion-map) old-binding-to-C-w)))
+          (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
+          (old-binding-to-C-w (cdr (assoc ?\C-w (cdr minibuffer-local-completion-map))))
+          (reset-keybindings (lambda ()
+                            (if old-binding-to-return
+                                (setf (alist-get 'return (cdr minibuffer-local-completion-map)) old-binding-to-return)
+                              (assq-delete-all 'return (cdr minibuffer-local-completion-map)))
+                            (if old-binding-to-C-w
+                                (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map)) old-binding-to-C-w)
+                              (assq-delete-all ?\C-w (cdr minibuffer-local-completion-map)))))
           (hist-item (car ram-org-jump-to-name-history))
           val)
-     (setf (alist-get 'return minibuffer-local-completion-map)
+     (setf (alist-get 'return (cdr minibuffer-local-completion-map))
            (ram-add-to-history-cmd ram-add-to-jump-org-name-history-on-exit
                                    'ram-org-jump-to-name-history
                                    minibuffer-force-complete-and-exit))
 
-     (setf (alist-get ?\C-w minibuffer-local-completion-map)
+     (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map))
            (ram-add-to-history-cmd ram-add-to-jump-org-name-history-on-kill
                                    'ram-org-jump-to-name-history
                                    ram-kill-minibuffer-candidate))
@@ -2633,13 +2657,13 @@ the `current-prefix-arg' is non nil"
                                        (car ram-org-jump-to-name-history))
                                       org-names))))
        (error
-        (funcall reset-bindings)
+        (funcall reset-keybindings)
         (signal (car err) (cdr err)))
        (quit
-        (funcall reset-bindings)
+        (funcall reset-keybindings)
         (signal 'quit nil))
        (:success
-        (funcall reset-bindings)
+        (funcall reset-keybindings)
         ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
         ;; FIXME: confusing logic, rewrite without using these args
         (list val
@@ -3241,7 +3265,7 @@ Leave a mark to return to."
 ;;    '(git-gutter:buffer-hunks 1)
 ;;    '(git-gutter:statistic 1)))
 
-;;** org-mode:orgit
+;;** org-mode: orgit
 
 ;; Link to Magit buffers from Org documents
 ;; https://github.com/magit/orgit
@@ -6997,31 +7021,29 @@ Toggle `lsp-ido-show-symbol-filename'."
          (candidates (ram-lsp-request-workspaces-symbols query))
          ;; do not use default writing to history
          (history-add-new-input nil)
-         (old-binding-to-return (cdr (assoc 'return minibuffer-local-completion-map)))
+         (hist-item (car ram-lsp-workspace-symbol-history))
+         (selected-symbol nil)
+         (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
          (this-cmd-key (aref (this-command-keys) 0))
          (minibuffer-cmd-bound-to-this-cmd-key (cdr (assoc this-cmd-key
-                                                           minibuffer-local-completion-map)))
-         (selected-symbol nil)
-         (hist-item (car ram-lsp-workspace-symbol-history))
-         (rebind-key (lambda (key command old-command)
-                       (if old-command
-                           (setf (alist-get key minibuffer-local-completion-map) command)
-                         (define-key minibuffer-local-completion-map (vector key) command))))
-         (restore-bindings (lambda ()
+                                                           (cdr minibuffer-local-completion-map))))
+         (reset-keybindings (lambda ()
                              "Rebind modified keys to their previous states."
-                             (setf (alist-get 'return minibuffer-local-completion-map
-                                              nil 'remove)
-                                   old-binding-to-return)
-                             (setf (alist-get this-cmd-key minibuffer-local-completion-map
-                                              nil 'remove)
-                                   minibuffer-cmd-bound-to-this-cmd-key))))
+                             (if old-binding-to-return
+                                 (setf (alist-get 'return (cdr minibuffer-local-completion-map))
+                                       old-binding-to-return)
+                               (assq-delete-all 'return (cdr minibuffer-local-completion-map)))
+                             (if minibuffer-cmd-bound-to-this-cmd-key
+                                 (setf (alist-get this-cmd-key (cdr minibuffer-local-completion-map))
+                                       minibuffer-cmd-bound-to-this-cmd-key)
+                               (assq-delete-all this-cmd-key (cdr minibuffer-local-completion-map))))))
 
     ;; bind to 'return key the fn that writes to history
-    (funcall rebind-key 'return #'ram-lsp-add-to-workspace-symbol-history old-binding-to-return)
-
+    (setf (alist-get 'return (cdr minibuffer-local-completion-map))
+          #'ram-lsp-add-to-workspace-symbol-history)
+    (setf (alist-get this-cmd-key (cdr minibuffer-local-completion-map))
+          #'ram-lsp-jump-to-workspace-symbol-from-minibuffer)
     ;; bind to this-command-keys fn that toggles showing files
-    (funcall rebind-key this-cmd-key #'ram-lsp-jump-to-workspace-symbol-from-minibuffer
-             minibuffer-cmd-bound-to-this-cmd-key)
 
     (condition-case err
         (minibuffer-with-setup-hook
@@ -7041,9 +7063,9 @@ Toggle `lsp-ido-show-symbol-filename'."
                             (symbol-name symbl-at-point)
                           ram-lsp-workspace-symbol-history))
                        candidates)))
-      (error (funcall restore-bindings) (signal (car err) (cdr err)))
-      (quit (funcall restore-bindings) (signal 'quit nil))
-      (:success (funcall restore-bindings)))
+      (error (funcall reset-keybindings) (signal (car err) (cdr err)))
+      (quit (funcall reset-keybindings) (signal 'quit nil))
+      (:success (funcall reset-keybindings)))
 
     ;; append selected symbol to history
     (when selected-symbol
