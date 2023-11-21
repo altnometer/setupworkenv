@@ -3880,103 +3880,81 @@ If the property is already set, replace its value."
 
 ;;*** org-roam/dailies: capture templates
 
-(defun ram-org-parse-heading-element (headline-element filename &optional include-backlink-p)
-  "Return a heading element with links.
-Include a backlink if INCLUDE-BACKLINK-P is true."
+(defun ram-org-parse-heading-element (el filename &optional include-backlink-p)
+  "Transform Org element EL into headline element if possible.
+
+Include a backlink to source if INCLUDE-BACKLINK-P is true."
   (let* ((file filename)
-         ;; set lengthy properties to nil
-         (new-props (plist-put
-                     (plist-put
-                      (plist-put (nth 1 headline-element) :parent nil) :pre-blank 0)
-                     :post-blank 0))
-         (new-headline (plist-put headline-element 'headline new-props))
-         (section-element (org-element-map
-                              new-headline
-                              'section #'identity 'first-match 'no-recursive-edit))
-         ;; collecting and displaying all links in heading element
-         ;; did not prove to be useful
-         (all-links nil
-                    ;; (org-element-map
-                    ;;     section-element
-                    ;;     'link
-                    ;;   ;; set :parent to nil, no need for its chunky value
-                    ;;   (lambda (link) (org-element-put-property link :parent nil)
-                    ;;     (org-element-put-property link :post-blank 0)))
-                    )
-         ;; if heading has text, backlink to it
-         ;; (text-p (some #'identity
-         ;;               (org-element-map
-         ;;                   section-element 'paragraph
-         ;;                 (lambda (p) (let ((contents (org-element-contents p)))
-         ;;                               ;; true if there is more content in the paragraph
-         ;;                               ;; except links
-         ;;                               (cl-labels ((exclude-links (contents)
-         ;;                                             (if (null contents)
-         ;;                                                 '()
-         ;;                                               (let* ((c (car contents))
-         ;;                                                      (c-type (org-element-type c)))
-         ;;                                                 (cons (not (or
-         ;;                                                             ;; exclude empty string
-         ;;                                                             (and (eq c-type 'plain-text)
-         ;;                                                                  (string-empty-p (string-trim c)))
-         ;;                                                             ;; exclude links
-         ;;                                                             (eq c-type 'link)))
-         ;;                                                       (exclude-links (cdr contents)))))))
-         ;;                                 (some #'identity (exclude-links contents))))))))
-         ;; if heading has subheadings, backlink to it
-         ;; (subheadings-p (cdr (org-element-map headline-element 'headline #'identity)))
-         (backlink
-          ;; disable checking for text-p and subheadings-p in order to insert
-          ;; a backling. If there is only source code block, the backlink is not inserted, but it
-          ;; should. Rather than adding another checking for the code block, abandon the conditional
-          ;; insert of a backlink (make it more general for now).
-          ;;
-          ;; (when (or text-p
-          ;;           subheadings-p))
-          (cons 'link
-                (cons `(:type "file"
-                              :path ,file
-                              :format bracket
-                              :raw-link ,(format "file:%s::*%s" file
-                                                 (org-element-property :raw-value new-headline))
-                              :search-option ,(concat "*" (org-element-property :raw-value new-headline)))
-                      '("backlink")))))
-    (when include-backlink-p
-      (setq all-links (cons backlink all-links)))
+         (headline-props (cl-case (org-element-type el)
+                           (headline `(
+                                       :title ,(plist-get (cadr el) :title)
+                                       :level 1
+                                       :pre-blank 0
+                                       :raw-value ,(plist-get (cadr el) :raw-value)))
+                           (src-block `(
+                                        :title ,(plist-get (cadr el) :name)
+                                        :level 1
+                                        :pre-blank 0
+                                        :raw-value ,(plist-get (cadr el) :name)
+                                        :tags ,(list (plist-get (cadr el) :language))))
+                           (t `(
+                                :title ,(format
+                                         "parsing of the element \"%S\" is not supported"
+                                         (org-element-type el))
+                                :level 1
+                                :pre-blank 0
+                                :tags ("unsupported-element")))))
+         (backlink (when include-backlink-p
+                     (if-let* ((link (ram-org-roam-id-and-element-store-link)))
+                         (cons 'link
+                               (cons `(
+                                       :type "ram-org-roam-id-el"
+                                       :path ,(progn (string-match "^[^:]+:\\([[:print:]]+\\)$"
+                                                                   (plist-get link :link))
+                                                     (match-string 1 (plist-get link :link)))
+                                       :format bracket
+                                       :raw-link ,(plist-get link :link))
+                                     '("backlink"))))
+                     (cl-case (org-element-type el)
+                       (headline (cons 'link
+                                       (cons `(
+                                               :type "file"
+                                               :path ,file
+                                               :format bracket
+                                               :raw-link ,(format "file:%s::*%s" file
+                                                                  (plist-get headline-props :raw-value))
+                                               :search-option ,(concat "*" (plist-get headline-props :raw-value)))
+                                             '("backlink"))))
+                       (t (user-error "Creating the backlink to element \"%S\" is not supported" (org-element-type)))))))
     ;; heading
     ;; get just headline, no section etc
-    (list 'headline (plist-get new-headline 'headline)
-          (cl-labels ((build-links (links)
-                        (if (null links)
-                            '()
-                          (cons (car links)
-                                (if (cdr links)
-                                    (cons "\n" (build-links (cdr links)))
-                                  (build-links (cdr links)))))))
-            (list 'section '(:post-blank 0 :pre-plank 0)
-                  (cons 'paragraph (cons '(:post-blank 0 :pre-blank 0)
-                                         (build-links all-links))))))))
+    (list 'headline headline-props
+          (list 'section '(:post-blank 0 :pre-plank 0)
+                (when backlink
+                  backlink)))))
 
-(defun ram-org-get-heading ()
-  "Return the current heading and links in its section element."
-  (let* ((file-name (file-truename (buffer-file-name)))
-         (current-headline (save-excursion
-                             (condition-case nil
-                                 (outline-back-to-heading)
-                               (error
-                                (user-error "Before first headline at position %d in buffer %s"
-		                            (point) (current-buffer)))
-                               (:success (org-element-at-point)))))
-         ;; seem like org-element-at-point does not return all needed heading data
-         ;; hence, need to extract it with org-element-parse-buffer
-         (headline-element (car (org-element-map
-                                    (org-element-parse-buffer)
-                                    'headline
-                                  (lambda (headline)
-                                    (when (string= (org-element-property :raw-value headline)
-                                                   (org-element-property :raw-value current-headline))
-                                      headline))))))
-    (org-element-interpret-data (ram-org-parse-heading-element headline-element file-name 'INCLUDE-BACKLINK-P))))
+;; EXAMPLE: this fn is no longer used, it is left here for now as an
+;; example of org-element-map and org-element-parse-buffer examples.
+;; (defun ram-org-get-heading-for-capturing ()
+;;   "Return the current heading and links in its section element."
+;;   (let* ((file-name (file-truename (buffer-file-name)))
+;;          (current-headline (save-excursion
+;;                              (condition-case nil
+;;                                  (outline-back-to-heading)
+;;                                (error
+;;                                 (user-error "Before first headline at position %d in buffer %s"
+;; 		                            (point) (current-buffer)))
+;;                                (:success (org-element-at-point)))))
+;;          ;; seem like org-element-at-point does not return all needed heading data
+;;          ;; hence, need to extract it with org-element-parse-buffer
+;;          (headline-element (car (org-element-map
+;;                                     (org-element-parse-buffer)
+;;                                     'headline
+;;                                   (lambda (headline)
+;;                                     (when (string= (org-element-property :raw-value headline)
+;;                                                    (org-element-property :raw-value current-headline))
+;;                                       headline))))))
+;;     (org-element-interpret-data (ram-org-parse-heading-element headline-element file-name 'INCLUDE-BACKLINK-P))))
 
 
 (defun ram-org-capture-heading-to-dailies (&optional arg)
@@ -3985,14 +3963,24 @@ Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
   (interactive "P")
   (require 'org-roam-dailies)
-  (let* ((backlink (if-let ((heading (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment) ))
-                       (format "[[file:%s::*%s][%s]]"
-                               (file-truename (buffer-file-name)) (org-link-escape heading) "source")
-                     (signal 'user-error '("Could not get Org heading"))))
+  (let* ((backlink (or (ram-org-roam-id-and-element-store-link)
+                       (if-let* ((heading (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment)))
+                           (list :type "file"
+                                 :link (format "file:%s::*%s"
+                                               (file-truename (buffer-file-name))
+                                               (substring-no-properties (org-link-escape heading)))
+                                 :description (substring-no-properties (org-link-escape heading)))
+                         (signal 'user-error '("Could not get Org heading")))))
+         (backlink-str (org-link-make-string (plist-get backlink :link)
+                                             "backlink"))
          (templates
-          `(("d" "continue task under heading"
-             ;; entry ,(concat (ram-org-get-heading) " %(org-set-tags \":write:\")  " "\n" backlink "\n\n%?")
-             entry ,(ram-org-get-heading)
+          `(("d" "capture org element as a heading an backlink"
+             ;; entry ,(concat (ram-org-get-heading-for-capturing) " %(org-set-tags \":write:\")  " "\n" backlink "\n\n%?")
+             ;; entry ,(ram-org-get-heading-for-capturing)
+             entry ,(concat "* "
+                            (or (plist-get backlink :description)
+                                "link to this entry has no description")
+                            "\n" backlink-str "\n\n%?")
              :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d %a>")
              :empty-lines-before 1
              :empty-lines-after 1
@@ -4022,7 +4010,7 @@ ARG value is 4."
 
 (defun ram-org-capture-title-to-dailies (&optional arg)
   "Capture the document title into a `org-roam' daily note.
-Insert into daily note for ARG days from now. Or use calendar if
+Insert into daily note for ARG days from today. Or use calendar if
 ARG value is 4."
   (interactive "P")
   (require 'org-roam-dailies)
