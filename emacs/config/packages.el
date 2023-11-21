@@ -3813,54 +3813,60 @@ If the property is already set, replace its value."
            (id (car id-desc))
            (desc (cadr id-desc)))
       (org-roam-id-open id _)
-      (when desc
-        (condition-case err
-	    (org-link-search desc)
-          ;; Save position before error-ing out so user
-          ;; can easily move back to the original buffer.
-          (error (funcall save-position-maybe)
-	         (error (nth 1 err)))))))
+      (condition-case err
+	  (org-link-search desc)
+        ;; Save position before error-ing out so user
+        ;; can easily move back to the original buffer.
+        (error (funcall save-position-maybe)
+	       (error (nth 1 err))))))
   (defun ram-org-roam-id-and-element-store-link ()
-    "Store `ram-org-roam-id-el'."
-    (when-let ((link-plist (and (org-roam-buffer-p)
-                                (let* ((el (org-element-at-point))
-                                       (link-vals (list
-                                                   (substring-no-properties
-                                                    (org-get-heading 'NO-TAGS 'NO-TODO 'NO-PRIORITY 'NO-COMMENT))
-                                                   ;; get closest to the point ID
-                                                   (org-with-wide-buffer
-                                                    (org-back-to-heading-or-point-min t)
-                                                    (while (and (not (org-id-get))
-                                                                (not (bobp)))
-                                                      (org-roam-up-heading-or-point-min))
-                                                    (org-id-get))
-                                                   (org-element-property :name el))))
-                                  (pcase link-vals
-                                    ;; 1. has a :name property
-                                    ((and `(,_ ,id ,name)  (guard (and id name)))
-                                     (list :id id :description name))
-                                    ;; 2. has a headline
-                                    ((and `(,heading ,id ,_) (guard (and heading id)))
-                                     (list :id id :description heading))
-                                    ;; 3. has a title
-                                    ((and `(,_ ,id ,_) (guard id))
-                                     (let ((title (cadr (org-collect-keywords '("title")))))
-                                       (if title
-                                           (list :id id :description title)
-                                         (list :id id))))
-                                    ;; default: explicitly return nil
-                                    (_ nil))
-                                  ))))
-      (let* ((type "ram-org-roam-id-el")
-             (link (concat type ":"
-                           (string-join
-                            (remq nil (list (plist-get link-plist :id)
-                                            (plist-get link-plist :description)))
-                            "::"))))
+  "Store `ram-org-roam-id-el'."
+  (when-let ((link-plist (and (org-roam-buffer-p)
+                              (let* ((el (org-element-at-point))
+                                     (link-vals (list
+                                                 ;; get heading
+                                                 (ignore-error (wrong-type-argument stringp nil)
+                                                   (org-get-heading 'NO-TAGS 'NO-TODO 'NO-PRIORITY 'NO-COMMENT))
+                                                 ;; get closest to the point ID
+                                                 (org-with-wide-buffer
+                                                  (org-back-to-heading-or-point-min t)
+                                                  (while (and (not (org-id-get))
+                                                              (not (bobp)))
+                                                    (org-roam-up-heading-or-point-min))
+                                                  (org-id-get))
+                                                 ;; get element :name
+                                                 (org-element-property :name el))))
+                                (pcase link-vals
+                                  ;; 1. has a :name property
+                                  ((and `(,_ ,id ,name)  (guard (and id name)))
+                                   (list :id id :description name))
+                                  ;; 2. has a headline
+                                  ((and `(,heading ,id ,_) (guard (and heading id)))
+                                   (list :id id :description heading))
+                                  ;; 3. has a title
+                                  ((and `(,_ ,id ,_) (guard id))
+                                   (message ">>> handling title")
+                                   (let ((title (cadr (car (org-collect-keywords '("title"))))))
+                                     (if title
+                                         (list :id id :description title)
+                                       (list :id id))))
+                                  ;; default: explicitly return nil
+                                  (_ nil))
+                                ))))
+    (if (plist-get link-plist :description)
         (org-link-store-props
          :type "ram-org-roam-id-el"
-         :link link
-         :description (plist-get link-plist :description))))))
+         :link (concat "ram-org-roam-id-el"
+                       ":"
+                       (plist-get link-plist :id)
+                       "::"
+                       (plist-get link-plist :description))
+         :description (plist-get link-plist :description))
+      (org-link-store-props
+       :type "id"
+       :link (concat "id"
+                     ":"
+                     (plist-get link-plist :id)))))))
 
 ;;** org-roam: dailies
 
