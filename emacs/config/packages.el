@@ -882,9 +882,9 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
       (kill-new candidate)
       (message "Copied %s to kill-ring" (propertize candidate 'face 'success)))))
 
-(defun ram-kill-minibuffer-candidate (arg)
+(defun ram-kill-minibuffer-candidate ()
   "Save completion candidate into the `kill-ring' and exit minibuffer."
-  (interactive "P")
+  (interactive)
   (let ((candidate (car completion-all-sorted-completions)))
     (when (and (minibufferp)
                (bound-and-true-p icomplete-mode))
