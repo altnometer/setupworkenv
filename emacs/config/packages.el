@@ -3703,7 +3703,8 @@ If the property is already set, replace its value."
      (message "Killed org-roam dailies *Deft* buffer")))
   (let ((deft-directory (expand-file-name org-roam-directory))
         ;; (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
-        (deft-current-sort-method 'title)
+        ;; (deft-current-sort-method 'title)
+        (deft-current-sort-method 'mtime)
         (deft-recursive t)
         (deft-recursive-ignore-dir-regexp
          (concat deft-recursive-ignore-dir-regexp
