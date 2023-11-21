@@ -4271,6 +4271,12 @@ Use the current buffer file-path if FILE is nil."
                  (time-add (* (- 7 day-of-week) 86400) week-day)))))))
       (get-week month-1st-day))))
 
+;; FIXME: same as for capturing (creating) weekly notes
+;; 1. headlines  for a day should preserve their level
+;;    fold headlines beyond top level.
+;; 2. rename "create" to "capture" for consistency
+;;    (could not find this fn with "capture weekly" search)
+;; 3. May be add links to the actual notes.
 (defun ram-org-create-monthly-note (&optional arg time)
   "Create a note of all weeks in an ARG month from now.
 Use calendar if ARG value is '(4).
@@ -4458,6 +4464,12 @@ Use the current buffer file-path if FILE is nil."
             (get-headings day-times))))
     daily-notes))
 
+;; FIXME:
+;; 1. headlines  for a day should preserve their level
+;;    fold headlines beyond top level.
+;; 2. rename "create" to "capture" for consistency
+;;    (could not find this fn with "capture weekly" search)
+;; 3. May be include links to the actual notes.
 (defun ram-org-create-weekly-note (&optional arg time)
   "Create a weekly note from daily notes in an ARG week from now.
 Use calendar if ARG value is '(4)."
