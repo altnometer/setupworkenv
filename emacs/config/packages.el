@@ -4047,36 +4047,9 @@ ARG value is 4."
 Insert into daily note for ARG days from today. Or use calendar if
 ARG value is 4."
   (interactive "P")
-  (require 'org-roam-dailies)
-  (let* ((parsed-buffer (org-element-parse-buffer))
-         (doc-title (ram-org-element-get-title parsed-buffer))
-         ;; backlink to document ID
-         (backlink (org-element-map
-                       parsed-buffer 'node-property
-                     (lambda (prop)
-                       (when (string= (org-element-property :key prop) "ID")
-                         (concat "[[id:" (org-element-property :value prop) "][backlink]]")))
-                     'first-match t))
-         (templates
-          `(("d" "capture document title"
-             entry ,(concat "* " doc-title " %(org-set-tags \":read:\")  " "\n" backlink "\n\n%?")
-             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d %a>")
-             :empty-lines-before 1
-             :empty-lines-after 1
-             :unnarrowed t
-             :kill-buffer t
-             :immediate-finish nil
-             :no-save nil)))
-         (time (if (equal arg '(4))
-                   (let ((org-read-date-prefer-future t))
-                     (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
-                 (time-add (* (or arg 0) 86400) (current-time)))))
-    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
-      (org-roam-capture- :goto nil
-                         :node (org-roam-node-create)
-                         :props (list :override-default-time time)
-                         :templates templates))
-    (org-align-tags)))
+  (save-excursion
+    (beginning-of-buffer)
+    (ram-org-capture-heading-to-dailies arg)))
 
 (defun ram-org-capture-defun-to-dailies (&optional arg)
   "Capture the defun into a `org-roam' daily note.
