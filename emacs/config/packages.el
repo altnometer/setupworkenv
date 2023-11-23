@@ -3980,7 +3980,7 @@ Include a backlink to source if INCLUDE-BACKLINK-P is true."
 ;;     (org-element-interpret-data (ram-org-parse-heading-element headline-element file-name 'INCLUDE-BACKLINK-P))))
 
 
-(defun ram-org-capture-heading-to-dailies (&optional arg)
+(defun ram-org-capture-element-to-dailies (&optional arg)
   "Capture the current headline into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
@@ -4049,7 +4049,7 @@ ARG value is 4."
   (interactive "P")
   (save-excursion
     (beginning-of-buffer)
-    (ram-org-capture-heading-to-dailies arg)))
+    (ram-org-capture-element-to-dailies arg)))
 
 (defun ram-org-capture-defun-to-dailies (&optional arg)
   "Capture the defun into a `org-roam' daily note.
@@ -4184,7 +4184,7 @@ ARG value is 4."
 ;; (with-eval-after-load "org-roam-dailies"
 ;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
 (with-eval-after-load "org"
-  (define-key org-mode-map (kbd "s-c a") #'ram-org-capture-heading-to-dailies)
+  (define-key org-mode-map (kbd "s-c a") #'ram-org-capture-element-to-dailies)
   (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-dailies))
 
 (define-key emacs-lisp-mode-map (kbd "s-c a") #'ram-org-capture-defun-to-dailies)
