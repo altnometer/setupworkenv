@@ -3796,6 +3796,11 @@ If the property is already set, replace its value."
 (with-eval-after-load "org-roam"
   (org-roam-db-autosync-mode))
 
+;;*** org-roam/settings: symlinks
+
+;; see system/general settings: file, symlink
+;; where (setq find-file-visit-truename t) is set
+
 ;;** org-roam: links
 
 ;;** org-roam/links: custom
@@ -9290,6 +9295,16 @@ buffer-local `ram-face-remapping-cookie'."
               (format "%S" (car values)))))
 
 (define-key global-map (kbd "M-:" ) #'ram-eval-expression-to-kill-ring)
+
+;;*** system/general settings: file, symlink
+
+;; (describe-variable 'find-file-visit-truename)
+;; if nil, buffer-file-name will show the symlink path
+;; if t, it will show the original file
+;; Implications:
+;; file may not be considered version controlled
+;; org-roam may not consider it as org-roam-buffer-p
+(setq find-file-visit-truename nil)
 
 ;;*** system/general settings: info/manual
 
