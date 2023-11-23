@@ -9116,7 +9116,11 @@ With a prefix argument N, (un)comment that many sexps."
 
 (setq confirm-nonexistent-file-or-buffer t)
 
-(setq vc-follow-symlinks t)
+;; a value of t/ask has an effect only when
+;; vc-find-file-hook is a member of find-file-hook
+;; if you wish, set it with
+;; (add-hook 'find-file-hook #'vc-find-file-hook)
+(setq vc-follow-symlinks nil)
 
 (setq confirm-kill-emacs 'y-or-n-p)
 
