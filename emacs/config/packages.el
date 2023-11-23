@@ -3987,13 +3987,24 @@ ARG value is 4."
   (interactive "P")
   (require 'org-roam-dailies)
   (let* ((backlink (or (ram-org-roam-id-and-element-store-link)
-                       (if-let* ((heading (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment)))
-                           (list :type "file"
-                                 :link (format "file:%s::*%s"
-                                               (file-truename (buffer-file-name))
-                                               (substring-no-properties (org-link-escape heading)))
-                                 :description (substring-no-properties (org-link-escape heading)))
-                         (signal 'user-error '("Could not get Org heading")))))
+                       (let ((heading (when-let* ((heading
+                                                   (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment)))
+                                        (substring-no-properties (org-link-escape heading))))
+                             (title (cadr (car (org-collect-keywords '("title"))))))
+                         (cond
+                          (heading (list :type "file"
+                                         :link (format "file:%s::*%s"
+                                                       ;; (file-truename (buffer-file-name))
+                                                       (buffer-file-name (buffer-base-buffer))
+                                                       heading)
+                                         :description heading))
+                          (title (list :type "file"
+                                       :link (format "file:%s::/%s/"
+                                                     ;; (file-truename (buffer-file-name))
+                                                     (buffer-file-name (buffer-base-buffer))
+                                                     title)
+                                       :description title))
+                          (t (signal 'user-error '("Could not get Org heading")))))))
          (backlink-str (org-link-make-string (plist-get backlink :link)
                                              "backlink"))
          (templates
