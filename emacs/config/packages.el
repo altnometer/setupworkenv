@@ -2294,15 +2294,25 @@ the `current-prefix-arg' is non nil"
                       (buffer-sameness-p (lambda (frm)
                                            (,test-buffer-p (window-buffer (frame-selected-window frm)))))
                       (wkspc-displaying-same-buffer (cond
-                                                     ((some
-                                                       (lambda (w) (,test-buffer-p (window-buffer w)))
-                                                       (window-list
-                                                        (exwm-workspace--workspace-from-frame-or-index primary)))
+                                                     ((and
+                                                       ;; workspace is visible
+                                                       (frame-parameter
+                                                        (exwm-workspace--workspace-from-frame-or-index primary) 'exwm-active)
+                                                       ;; workspace is displaying the test-buffer-p
+                                                       (some
+                                                        (lambda (w) (,test-buffer-p (window-buffer w)))
+                                                        (window-list
+                                                         (exwm-workspace--workspace-from-frame-or-index primary))))
                                                       primary)
-                                                     ((some
-                                                       (lambda (w) (,test-buffer-p (window-buffer w)))
-                                                       (window-list
-                                                        (exwm-workspace--workspace-from-frame-or-index secondary)))
+                                                     ((and
+                                                       ;; workspace is visible
+                                                       (frame-parameter
+                                                        (exwm-workspace--workspace-from-frame-or-index secondary) 'exwm-active)
+                                                       ;; workspace is displaying the test-buffer-p
+                                                       (some
+                                                        (lambda (w) (,test-buffer-p (window-buffer w)))
+                                                        (window-list
+                                                         (exwm-workspace--workspace-from-frame-or-index secondary))))
                                                       secondary)))
                       (workspc (cond
                                 ;; select workspace that already displaying same buffer
