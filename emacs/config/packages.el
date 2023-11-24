@@ -602,7 +602,7 @@ Disable `icomplete-vertical-mode' for this command."
         (,(kbd "<M-f15>") . ram-other-workspace)
         (,(kbd "<f15>") . ram-other-workspace)
 
-        ([?\s-t] . org-roam-node-find)
+        ([?\s-t] . ram-org-roam-node-find)
 
         ;; ([?\s-z] . exwm-layout-toggle-fullscreen)
         ;; ([?\s-/] . exwm-layout-toggle-mode-line)
@@ -3382,7 +3382,12 @@ This function is created to identify TODO items in agenda buffers.
 ;;** org-roam: init, initialize
 
 (setq org-roam-v2-ack t)
-(setq org-roam-directory (file-truename "~/backup/org/org-roam/notes/"))
+(setq org-roam-directory (file-truename "~/backup/org/org-roam/"))
+(defvar ram-org-roam-notes-directory "./notes"
+  "A subdirectory of `org-roam-directory' to store notes.
+
+Keep all subdirectories neat and tidy, store `org-roam' notes to
+this subdirectory.")
 
 ;;** org-roam: install
 
@@ -3394,16 +3399,16 @@ This function is created to identify TODO items in agenda buffers.
 
 ;;** org-roam: bindings
 
-(define-key global-map (kbd "C-c n f") #'org-roam-node-find)
+(define-key global-map (kbd "C-c n f") #'ram-org-roam-node-find)
 (define-key global-map (kbd "C-c n i") #'org-roam-node-insert)
 (define-key global-map (kbd "C-c n l") #'org-roam-buffer-toggle)
 (define-key global-map (kbd "C-c n g") #'org-roam-graph)
-(define-key global-map (kbd "s-t") #'org-roam-node-find)
+(define-key global-map (kbd "s-t") #'ram-org-roam-node-find)
 (define-key global-map (kbd "s-T") #'org-roam-node-insert)
 
 (define-key global-map (kbd "s-c u") #'ram-org-roam-update-org-id-locations)
 
-(define-key ram-leader-map-tap-global (kbd "/") #'org-roam-node-find)
+(define-key ram-leader-map-tap-global (kbd "/") #'ram-org-roam-node-find)
 (define-key ram-leader-map-tap-global (kbd "'") #'org-roam-node-insert)
 
 ;;** org-roam: buffer
@@ -3447,6 +3452,12 @@ This function returns the current paragraph."
   '(setq org-roam-preview-function #'ram-org-roam-preview-function))
 
 ;;** org-roam: functions
+
+(defun ram-org-roam-node-find ()
+  "Store a new note in a subdirectory of `org-roam-directory'."
+  (interactive current-prefix-arg)
+    (let ((org-roam-directory (expand-file-name ram-org-roam-notes-directory org-roam-directory)))
+   (call-interactively #'org-roam-node-find 'RECORD-FLAG)))
 
 (defun ram-buffer-is-from-roam-directory-p ()
   "Return non-nil if the currently visited buffer is from `org-roam-directory'."
@@ -7362,7 +7373,7 @@ Toggle `lsp-ido-show-symbol-filename'."
   (add-to-list 'super-save-triggers 'winner-redo)
   (add-to-list 'super-save-triggers 'counsel-M-x)
 
-  (add-to-list 'super-save-triggers #'org-roam-node-find)
+  (add-to-list 'super-save-triggers #'ram-org-roam-node-find)
 
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-today)
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-tomorrow)
