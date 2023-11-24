@@ -4213,9 +4213,9 @@ ARG value is 4."
   (define-key magit-status-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-dailies)
   (define-key magit-revision-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-dailies))
 
-(define-key global-map (kbd "s-c w") #'ram-org-create-weekly-note)
+(define-key global-map (kbd "s-c w") #'ram-org-capture-weekly-note)
 
-(define-key global-map (kbd "s-c m") #'ram-org-create-monthly-note)
+(define-key global-map (kbd "s-c m") #'ram-org-capture-monthly-note)
 
 (define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
@@ -4264,9 +4264,9 @@ Use the current buffer file-path if FILE is nil."
                                                  ((< val 1) (list (+ 12 val) (1- year-from-buffer-name)))
                                                  ((> val 12) (list (- val 12) (1+ year-from-buffer-name)))
                                                  (t (list val year-from-buffer-name))))))
-    (ram-org-create-monthly-note nil (encode-time 1 1 0 1 target-month target-year))))
+    (ram-org-capture-monthly-note nil (encode-time 1 1 0 1 target-month target-year))))
 
-(defun ram-org-create-monthly-element (month-1st-day)
+(defun ram-org-capture-monthly-element (month-1st-day)
   "Return an org-element for a month built from weekly headings."
   (let ((day-of-week (let ((dow (nth 6 (decode-time month-1st-day))))
                        (if (= dow 0) 6 (1- dow)))))
@@ -4315,7 +4315,7 @@ Use the current buffer file-path if FILE is nil."
 ;; 2. rename "create" to "capture" for consistency
 ;;    (could not find this fn with "capture weekly" search)
 ;; 3. May be add links to the actual notes.
-(defun ram-org-create-monthly-note (&optional arg time)
+(defun ram-org-capture-monthly-note (&optional arg time)
   "Create a note of all weeks in an ARG month from now.
 Use calendar if ARG value is '(4).
 When ARG is 1, update the current note."
@@ -4360,7 +4360,7 @@ When ARG is 1, update the current note."
                                            (format-time-string (org-time-stamp-format t t) time))
                                    (format "#+DATE: %s\n\n"
                                            (format-time-string "%Y %b" time)))
-                           (org-element-interpret-data (ram-org-create-monthly-element time)))))
+                           (org-element-interpret-data (ram-org-capture-monthly-element time)))))
     (find-file file-name)
     (erase-buffer)
     (insert doc-text)
@@ -4411,7 +4411,7 @@ Use the current buffer file-path if FILE is nil."
                                           (- (* 7 week-from-buffer-name 86400) ;subtract weekdays before 1st of Jan
                                              (* dow-1st-of-jan 86400))))
          (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
-    (ram-org-create-weekly-note nil target-time)))
+    (ram-org-capture-weekly-note nil target-time)))
 
 (defun ram-org-get-daily-headings-from-week (time &optional include-backlink-p same-month-only-p)
   "Return an org-element made `org-roam' daily note headings for a week."
@@ -4510,7 +4510,7 @@ Use the current buffer file-path if FILE is nil."
 ;; 2. rename "create" to "capture" for consistency
 ;;    (could not find this fn with "capture weekly" search)
 ;; 3. May be include links to the actual notes.
-(defun ram-org-create-weekly-note (&optional arg time)
+(defun ram-org-capture-weekly-note (&optional arg time)
   "Create a weekly note from daily notes in an ARG week from now.
 Use calendar if ARG value is '(4)."
   (interactive "P")
