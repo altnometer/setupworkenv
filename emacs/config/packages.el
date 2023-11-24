@@ -8569,6 +8569,7 @@ Configure `orderless-matching-styles' for this command."
 (recentf-mode 1)
 (setq recentf-max-saved-items 4000)
 (run-at-time nil (* 1 60) 'recentf-save-list)
+(run-at-time nil (* 3.3 60) #'ram-recentf-remove-non-existent-files)
 (add-to-list 'recentf-exclude (format "%s.+" (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)))
 (add-to-list 'recentf-exclude (format "%s.+" (expand-file-name org-roam-directory)))
 
@@ -8583,6 +8584,15 @@ Configure `orderless-matching-styles' for this command."
 (advice-add 'recentf-save-list :around #'recentf-save-silently-advice)
 
 ;;*** packages/recentf: functions
+
+(defun ram-recentf-remove-non-existent-files ()
+  "Delete a file path in `recentf-list' if file does not exist."
+  (setq recentf-list
+        (seq-filter (lambda (f) (and
+                                 ;; does not end in "~"
+                                 (not (string-match-p "^.*~$" f))
+                                 (file-exists-p f)))
+                    recentf-list)))
 
 ;;**** packages/recentf/functions: add dired to recentf
 
