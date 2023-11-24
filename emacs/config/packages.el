@@ -9145,12 +9145,6 @@ With a prefix argument N, (un)comment that many sexps."
 
 (setq confirm-nonexistent-file-or-buffer t)
 
-;; a value of t/ask has an effect only when
-;; vc-find-file-hook is a member of find-file-hook
-;; if you wish, set it with
-;; (add-hook 'find-file-hook #'vc-find-file-hook)
-(setq vc-follow-symlinks nil)
-
 (setq confirm-kill-emacs 'y-or-n-p)
 
 (setq large-file-warning-threshold nil)
@@ -9349,7 +9343,7 @@ buffer-local `ram-face-remapping-cookie'."
 ;; Implications:
 ;; file may not be considered version controlled
 ;; org-roam may not consider it as org-roam-buffer-p
-(setq find-file-visit-truename nil)
+(setq find-file-visit-truename t)
 
 ;;*** system/general settings: info/manual
 
@@ -9361,6 +9355,15 @@ buffer-local `ram-face-remapping-cookie'."
 (setq warning-minimum-level :error)
 ;; (setq native-comp-async-report-warnings-errors 'silent)
 
+;;*** system/general settings: vc
+
+;; a value of t/ask has an effect only when
+;; vc-find-file-hook is a member of find-file-hook
+;; if you wish, set it with
+;; (add-hook 'find-file-hook #'vc-find-file-hook)
+;; 'Git must be in vc-handled-backends
+(setq vc-follow-symlinks t)
+(add-hook 'find-file-hook #'vc-find-file-hook)
 
 ;;** system: savehist
 
