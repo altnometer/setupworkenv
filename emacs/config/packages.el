@@ -4364,6 +4364,7 @@ When ARG is 1, update the current note."
     (find-file file-name)
     (erase-buffer)
     (insert doc-text)
+    (save-buffer)
     ;; move point:
     ;; if arg is 1, update the current note and remain at the same point
     ;; else, go to the 1st heading
@@ -4572,6 +4573,7 @@ Use calendar if ARG value is '(4)."
       ;; (org-next-visible-heading 1)
       (delete-region (point) (point-max)))
     (insert doc-text)
+    (save-buffer)
     (re-search-backward (format "^\\*[[:blank:]]+.+%s [[:digit:]]\\{1,2\\}.+$" (format-time-string "%a" time)))))
 
 
