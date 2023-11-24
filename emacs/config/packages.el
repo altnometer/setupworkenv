@@ -3486,7 +3486,7 @@ This function returns the current paragraph."
 Consider both org-roam notes and dailies."
   (seq-filter #'ram-org-buffer-contains-todos-p
               (directory-files
-               (expand-file-name org-roam-dailies-directory org-roam-directory)
+               (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)
                'absolute-path
                "^[^\\(.#\\)].*org$")))
 
@@ -3591,7 +3591,7 @@ If the property is already set, replace its value."
                                ;; (.#) excludes lock files (info "(emacs)Interlocking")
                                ;; dailies
                                (directory-files
-                                (expand-file-name org-roam-dailies-directory org-roam-directory)
+                                (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)
                                 'absolute-path
                                 "^[^\\(.#\\)].*org$"))))
         (let ((buffer (find-buffer-visiting file)))
@@ -3760,7 +3760,7 @@ If the property is already set, replace its value."
       (deft))))
 
 (defun ram-deft-search-daily-notes ()
-  "Invoke `deft' after setting `deft-directory' to `org-roam-dailies-directory'"
+  "Invoke `deft' after setting `deft-directory' to `ram-org-roam-daily-notes-directory'"
   (interactive)
   ;; avoid (error "Defining as dynamic an already lexical var") with #'require
   (require 'deft)
@@ -3773,7 +3773,7 @@ If the property is already set, replace its value."
              (signal (car err) (cdr err))))
     (:success
      (message "Killed org-roam dailies *Deft* buffer")))
-  (cl-letf ((deft-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+  (cl-letf ((deft-directory (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory))
             (deft-strip-summary-regexp (ram-get-deft-strip-summary-regexp-for-notes))
             (deft-recursive nil)
             ;; an ugly hack: if deft-parse-summary produces an empty string,
@@ -3906,16 +3906,20 @@ If the property is already set, replace its value."
 ;;*** org-roam/dailies: functions
 
 (defun ram-buffer-is-from-roam-dailies-directory-p ()
-  "Return non-nil if the currently visited buffer is from `org-roam-dailies-directory'."
+  "Return non-nil if the currently visited buffer is from `ram-org-roam-daily-notes-directory'."
   (and buffer-file-name
        (string-prefix-p
-        (expand-file-name (file-name-as-directory org-roam-dailies-directory))
+        (expand-file-name (file-name-as-directory ram-org-roam-daily-notes-directory))
         (file-name-directory buffer-file-name))))
 
 ;;*** org-roam/dailies: settings
 
-;; relative to org-roam-directory
-(setq org-roam-dailies-directory "./dailies/daily/")
+(defvar ram-org-roam-daily-notes-directory "./dailies/daily/"
+  "A subdirectory of `org-roam-directory' for daily notes.")
+
+;; reset the original value "./daily" to the value of
+;; ram-org-roam-daily-notes-directory
+(setq org-roam-dailies-directory ram-org-roam-daily-notes-directory)
 
 ;;*** org-roam/dailies: capture templates
 
@@ -4042,7 +4046,7 @@ ARG value is 4."
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
-    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
+    (let ((org-roam-directory (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)))
       (org-roam-capture- :goto nil
                          :node (org-roam-node-create)
                          :props (list :override-default-time time)
@@ -4100,7 +4104,7 @@ ARG value is 4."
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
-    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
+    (let ((org-roam-directory (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)))
       (org-roam-capture- :goto nil
                          :node (org-roam-node-create)
                          :props (list :override-default-time time)
@@ -4138,7 +4142,7 @@ ARG value is 4."
                    (let ((org-read-date-prefer-future t))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
-    (let ((org-roam-directory (expand-file-name org-roam-dailies-directory org-roam-directory)))
+    (let ((org-roam-directory (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)))
       (org-roam-capture- :goto nil
                          :node (org-roam-node-create)
                          :props (list :override-default-time time)
@@ -4244,7 +4248,7 @@ Use the current buffer file-path if FILE is nil."
                   (buffer-file-name (buffer-base-buffer))))
              (path (expand-file-name
                     buffer-name))
-             (directory (expand-file-name ram-org-roam-monthly-directory org-roam-directory)))
+             (directory (expand-file-name ram-org-roam-monthly-notes-directory org-roam-directory)))
     (setq path (expand-file-name path))
     (save-match-data
       (and (org-roam-file-p path)
@@ -4340,7 +4344,7 @@ When ARG is 1, update the current note."
                     ;; (time-add (* (or arg 0) 7 86400) (current-time))
                     ))))
          (doc-title (format-time-string "%Y-%m" time))
-         (file-name (file-name-concat (expand-file-name ram-org-roam-monthly-directory
+         (file-name (file-name-concat (expand-file-name ram-org-roam-monthly-notes-directory
                                                         org-roam-directory)
                                       (file-name-with-extension doc-title "org")))
          (note-exists-p (or (get-buffer (file-name-nondirectory file-name))
@@ -4373,7 +4377,8 @@ When ARG is 1, update the current note."
 
 ;;*** org-roam/monthly: settings
 
-(setq ram-org-roam-monthly-directory "./dailies/monthly/")
+(defvar ram-org-roam-monthly-notes-directory "./dailies/monthly/"
+  "A subdirectory of `org-roam-directory' for monthly notes.")
 
 ;;** org-roam: weeklies
 
@@ -4387,7 +4392,7 @@ Use the current buffer file-path if FILE is nil."
                   (buffer-file-name (buffer-base-buffer))))
              (path (expand-file-name
                     buffer-name))
-             (directory (expand-file-name ram-org-roam-weeklies-directory org-roam-directory)))
+             (directory (expand-file-name ram-org-roam-weekly-notes-directory org-roam-directory)))
     (setq path (expand-file-name path))
     (save-match-data
       (and (org-roam-file-p path)
@@ -4409,7 +4414,7 @@ Use the current buffer file-path if FILE is nil."
 
 (defun ram-org-get-daily-headings-from-week (time &optional include-backlink-p same-month-only-p)
   "Return an org-element made `org-roam' daily note headings for a week."
-  (let* ((dailies-dir (expand-file-name org-roam-dailies-directory org-roam-directory))
+  (let* ((dailies-dir (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory))
          (current-month (nth 4 (decode-time time)))
          (weekday (let ((wd (nth 6 (decode-time time)))) ; start week from Mon rather than Sun
                     (if (= wd 0) 6 (1- wd))))
@@ -4535,7 +4540,7 @@ Use calendar if ARG value is '(4)."
                          date-str-mon
                        (format "%s, %s" date-str-mon date-str-sun))))
          (doc-title (format-time-string "%Y-%m-w%W" time))
-         (file-name (file-name-concat (expand-file-name ram-org-roam-weeklies-directory
+         (file-name (file-name-concat (expand-file-name ram-org-roam-weekly-notes-directory
                                                         org-roam-directory)
                                       (file-name-with-extension doc-title "org")))
          (note-exists-p (or (get-buffer (file-name-nondirectory file-name))
@@ -4572,7 +4577,9 @@ Use calendar if ARG value is '(4)."
 
 ;;*** org-roam/weeklies: settings
 
-(setq ram-org-roam-weeklies-directory "./dailies/weekly/")
+(defvar ram-org-roam-weekly-notes-directory "./dailies/weekly/"
+  "A subdirectory of `org-roam-directory' for weekly notes.")
+
 
 ;;** org-roam: hooks, advice, timers
 
@@ -8550,7 +8557,7 @@ Configure `orderless-matching-styles' for this command."
 (recentf-mode 1)
 (setq recentf-max-saved-items 4000)
 (run-at-time nil (* 1 60) 'recentf-save-list)
-(add-to-list 'recentf-exclude (format "%s.+" (expand-file-name org-roam-dailies-directory org-roam-directory)))
+(add-to-list 'recentf-exclude (format "%s.+" (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)))
 (add-to-list 'recentf-exclude (format "%s.+" (expand-file-name org-roam-directory)))
 
 ;; do not show message in minibuffer
