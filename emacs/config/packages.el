@@ -7943,7 +7943,7 @@ been modified since its last check-in."
     ;;         branch)
     (concat (propertize (format "%s " branch) 'face (cadr props)))))
 
-;;** mode-line: 'face
+;;** mode-line: face
 
 (face-spec-set 'mode-line
                `((((class color) (min-colors 88))
@@ -7951,11 +7951,12 @@ been modified since its last check-in."
                   :box nil
                   :weight light
                   :background "grey55" :foreground "black"
+                  ;; adjust mode-line :height
                   :height
                   ,(if (and (eq (window-system) 'x)
                             (fboundp 'x-display-pixel-width)
                             (>= (x-display-pixel-width) large-sreen-width))
-                       155
+                       210 ; old value was 155
                      100))))
 
 (face-spec-set 'mode-line-inactive
@@ -7966,11 +7967,12 @@ been modified since its last check-in."
                   :box nil
                   :weight light
                   :foreground "grey20" :background "grey90"
+                  ;; adjust mode-line :height
                   :height
                   ,(if (and (eq (window-system) 'x)
                             (fboundp 'x-display-pixel-width)
                             (>= (x-display-pixel-width) large-sreen-width))
-                       155
+                       210 ; old value was 155
                      100))))
 
 ;;** mode-line: timer
@@ -8002,18 +8004,21 @@ been modified since its last check-in."
 
 (setq-default mode-line-format
               '(
-                ;; show workspaces
-
+                ;; show workspace number
                 (:eval (if (and (window-at-side-p (get-buffer-window) 'bottom)
                                 (window-at-side-p (get-buffer-window) 'left))
                            (propertize (format " %s " (exwm-workspace--position
                                                        (window-frame (get-buffer-window))))
                                        'face (if (eq ram-selwin (get-buffer-window))
-                                                 '((:foreground "green1"))
-                                               '((:foreground "green4"))))
+                                                 '((:foreground "#00ff00") (:weight semi-light))
+                                               '((:foreground "#008800") (:weight semi-light))))
                          "   "))
                 (:eval (when (buffer-narrowed-p)
-                         (progn (propertize " %n " 'face '((:background "green"))))))
+                         (progn (propertize " %n  " 'face
+                                            (if (eq ram-selwin (get-buffer-window))
+                                                '((:background "#32cd32") (:weight semi-light)) ; LimeGreen
+                                              '((:background "#32cd32") (:weight semi-light)))
+                                            ))))
 
                 ;; on remote machine?
                 "[" "%@" "]"
@@ -8029,20 +8034,27 @@ been modified since its last check-in."
                                                              (substring (buffer-name) (- (length (buffer-name))
                                                                                          20)))
                                                    (buffer-name)))
-                                   'face font-lock-keyword-face
+                                   'face (if (eq ram-selwin (get-buffer-window))
+                                             '((:foreground "aquamarine") (:weight semi-light)) ; RosyBrown1
+                                           '((:foreground "Blue3") (:weight semi-light)))
                                    'help-echo (buffer-file-name)))
                 (:eval (when (and (vc-mode)
                                   ;; otherwise (file-truename (git-gutter:vcs-root git-gutter:vcs-type))
                                   ;; would raise --Lisp error: (wrong-type-argument arrayp nil)
                                   (and (local-variable-p 'git-gutter:vcs-type) (not (null git-gutter:vcs-type))))
                          (propertize (format "+%s " (car (git-gutter:statistic)))
-                                     'face '((:foreground "chartreuse3")))))
+                                     'face (if (eq ram-selwin (get-buffer-window))
+                                               '((:foreground "#00ff00") (:weight semi-light))
+                                             '((:foreground "#008800") (:weight semi-light)))
+                                     )))
                 (:eval (when (and (vc-mode)
                                   ;; otherwise (file-truename (git-gutter:vcs-root git-gutter:vcs-type))
                                   ;; would raise --Lisp error: (wrong-type-argument arrayp nil)
                                   (and (local-variable-p 'git-gutter:vcs-type) (not (null git-gutter:vcs-type))))
                          (propertize (format "-%s " (cdr (git-gutter:statistic)))
-                                     'face '((:foreground "chocolate")))))
+                                     'face (if (eq ram-selwin (get-buffer-window))
+                                               '((:foreground "#ffc1c1") (:weight semi-light)) ; RosyBrown1
+                                             '((:foreground "#d2691e") (:weight semi-light)))))) ; chocolate
                 (:eval (my-mode-line-vc-info))
 
                 ;; (:eval (propertize vc-mode 'face '((:foreground "DarkGoldenrod2"))))
@@ -8052,7 +8064,10 @@ been modified since its last check-in."
                 ") "
                 ;; value of `mode-name'
                 "%["
-                (:eval (propertize " %m " 'face '((:foreground "plum3"))))
+                (:eval (propertize " %m " 'face (if (eq ram-selwin (get-buffer-window))
+                                                    '((:foreground "#ffc1c1") (:weight semi-light)) ; RosyBrown1
+                                                  '((:foreground "#d2691e") (:weight semi-light))) ; chocolate
+                                   ))
                 "%]"
                 mode-line-process
                 ;; mode-line-modes
@@ -8080,11 +8095,13 @@ been modified since its last check-in."
                                               'face (if (eq ram-selwin (get-buffer-window))
                                                         '((:foreground "grey90"))
                                                       '((:foreground "grey60")))))
-                            (right-align-str (*-mode-line-fill (+ (length mem)
-                                                                  (length cpu-temp)
-                                                                  1
-                                                                  (length bat)
-                                                                  (length time)))))
+                            (right-align-str (*-mode-line-fill (+ (+ (length mem)
+                                                                     (length cpu-temp)
+                                                                     1
+                                                                     (length bat)
+                                                                     (length time))
+                                                                  ;; use this value adjust aligning
+                                                                  3))))
                        (format "%s%s%s %s %s "
                                right-align-str
                                mem
