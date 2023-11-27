@@ -8074,6 +8074,9 @@ been modified since its last check-in."
                 ;; "-- user: "
                 ;; value of user
                 ;; (getenv "USER")
+
+                ;; this line is used as a marker where to insert the
+                ;; keycast package content
                 " -- "
 
                 (:eval
@@ -8467,16 +8470,19 @@ Configure `orderless-matching-styles' for this command."
 
 ;;** packages: keycast
 
-(straight-use-package
- '(moody :type git :flavor melpa :host github :repo "tarsius/moody"))
-(require 'moody)
-
-(straight-use-package
- '(keycast :type git :flavor melpa :host github :repo "tarsius/keycast"))
 (setq keycast-insert-after " -- ")
 (setq keycast-remove-tail-elements nil)
 (setq keycast-separator-width 2)
-(setq keycast-window-predicate 'moody-window-active-p)
+(defun ram-keycast-left-frame-bottom-window-p ()
+  "Return non-nil for specific temporarily selected window location.
+
+It is in the left-most frame. It is at the bottom."
+  ;; frame X coord is not 0, thus, it is not the top left frame
+  (and (= 0 (car (frame-position (window-frame (get-buffer-window)))))
+       (window-at-side-p nil 'bottom)))
+;; choose left frame for keycast because the right frame displays
+;; system info and date
+(setq keycast-mode-line-window-predicate #'ram-keycast-left-frame-bottom-window-p)
 (keycast-mode)
 
 
