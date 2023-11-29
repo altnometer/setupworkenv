@@ -228,7 +228,20 @@ Disable `icomplete-vertical-mode' for this command."
 (defun ram-back-sentence (&optional arg)
   "Call `backward-sentence' after `push-mark'."
   (interactive "^p")
+  (when (not (equal last-command #'ram-back-sentence))
+    (push-mark))
   (backward-sentence arg))
+
+(defun ram-kill-ring-save ()
+  "Remove marks after `kill-ring-save' call."
+  (interactive)
+  (call-interactively #'kill-ring-save)
+  (cond
+   ((equal last-command #'ram-org-mark-element)
+    (set-mark-command '(4))
+    (set-mark-command '(4)))))
+
+(define-key global-map "\M-w" #'ram-kill-ring-save)
 
 (define-key global-map (kbd "M-a") #'ram-back-sentence)
 ;; "M-(" was originally bound to #'insert-parentheses
@@ -2954,7 +2967,21 @@ Leave a mark to return to."
   (define-key org-mode-map (kbd "C-c z") 'ram-org-hide-block-toggle-all)
   ;; originally bound to 'org-table-copy-down
   (define-key org-mode-map (kbd "<S-return>") 'newline-and-indent)
-  (define-key org-mode-map (kbd "M-h") (lambda () (interactive) (push-mark) (org-mark-element)))
+
+  (defun ram-org-mark-element ()
+    "Better mark Handling when calling `org-mark-element'.
+
+If inside the element, `push-mark' to return to. Remote marks
+left by `org-mark-element`."
+    (interactive)
+    (when (<
+           (org-element-property :begin (org-element-at-point))
+           (point)
+           (org-element-property :end (org-element-at-point)))
+      (push-mark))
+    (org-mark-element))
+
+  (define-key org-mode-map (kbd "M-h") #'ram-org-mark-element)
   (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~)
 
   (define-key org-mode-map (kbd "s-R") #'ram-avy-goto-org-heading)
