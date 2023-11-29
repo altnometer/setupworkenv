@@ -8593,7 +8593,6 @@ It is in the left-most frame. It is at the bottom."
 (setq recentf-max-saved-items 4000)
 (run-at-time nil (* 1 60) 'recentf-save-list)
 (run-at-time nil (* 3.3 60) #'ram-recentf-remove-non-existent-files)
-(add-to-list 'recentf-exclude (format "%s.+" (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)))
 (add-to-list 'recentf-exclude (format "%s.+" (expand-file-name org-roam-directory)))
 
 ;; do not show message in minibuffer
@@ -8608,14 +8607,28 @@ It is in the left-most frame. It is at the bottom."
 
 ;;*** packages/recentf: functions
 
+(defun ram-recentf-keep-predicate (file)
+  "Custom cases for `recentf-keep' list."
+  (cond
+   ;; exclude files that end with "~"
+   ((string-match-p "^.*~$" f) nil)
+   ;; keep files opened with "sudo" even if they are closed
+   ;; (not readable)
+   ((string-match-p "^/sudo:.*$" f))))
+
 (defun ram-recentf-remove-non-existent-files ()
-  "Delete a file path in `recentf-list' if file does not exist."
+  "Remove filenames from `recentf-list' if conditions are not met."
   (setq recentf-list
-        (seq-filter (lambda (f) (and
-                                 ;; does not end in "~"
-                                 (not (string-match-p "^.*~$" f))
-                                 (file-exists-p f)))
+        (seq-filter (lambda (f)
+                      (cond
+                       ;; exclude files that end with "~"
+                       ((string-match-p "^.*~$" f) nil)
+                       ;; keep files opened with "sudo"
+                       ((string-match-p "^/sudo:.*$" f))
+                       ((file-readable-p f))))
                     recentf-list)))
+
+(add-to-list 'recentf-keep #'ram-recentf-keep-predicate)
 
 ;;**** packages/recentf/functions: add dired to recentf
 
