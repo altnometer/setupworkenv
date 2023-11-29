@@ -8498,6 +8498,9 @@ Configure `orderless-matching-styles' for this command."
 
 ;;** packages: keycast
 
+(straight-use-package
+ '(keycast :type git :flavor melpa :host github :repo "tarsius/keycast"))
+
 (setq keycast-insert-after " -- ")
 (setq keycast-remove-tail-elements nil)
 (setq keycast-separator-width 2)
