@@ -4201,7 +4201,7 @@ ARG value is 4."
 ;;*** org-roam/dailies: navigate notes
 
 (defun ram-org-roam-prev-note-dwim (&optional n)
-  "Goto the previous note of the same type is the current one."
+  "Goto the previous note of the same type as the current one."
   (interactive "p")
   (require 'org-roam-dailies)
   (cond
@@ -4215,6 +4215,7 @@ ARG value is 4."
    ((ram-org-roam-monthly-note-p)
     (ram-org-roam-monthly-note-next -1))
    (t (org-roam-dailies-goto-today)
+      (save-buffer)
       (org-roam-dailies-goto-previous-note)
       (delete-other-windows))))
 
@@ -4233,6 +4234,7 @@ ARG value is 4."
    ((ram-org-roam-monthly-note-p)
     (ram-org-roam-monthly-note-next 1))
    (t (org-roam-dailies-goto-today)
+      (save-buffer)
       (org-roam-dailies-goto-next-note)
       (delete-other-windows))))
 
