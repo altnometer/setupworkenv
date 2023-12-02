@@ -2975,11 +2975,7 @@ Leave a mark to return to."
 If inside the element, `push-mark' to return to. Remote marks
 left by `org-mark-element`."
     (interactive)
-    (when (<
-           (org-element-property :begin (org-element-at-point))
-           (point)
-           (org-element-property :end (org-element-at-point)))
-      (push-mark))
+    (push-mark)
     (org-mark-element))
 
   (define-key org-mode-map (kbd "M-h") #'ram-org-mark-element)
