@@ -4805,6 +4805,7 @@ Ignore \"No following same-level heading\" error, call
 (define-key global-map (kbd "<f7>") #'ram-outline-down-heading)
 
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-outline-heading)
+(define-key global-map (kbd "<f22>") #'ram-toggle-narrow-outline-heading)
 
 ;;** outline: outline-regexp
 
