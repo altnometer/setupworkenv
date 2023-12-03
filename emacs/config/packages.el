@@ -2911,6 +2911,20 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
       (backward-sexp -1)
       (insert "~"))))
 
+(defun ram-wrap-in-= ()
+  "Insert \"=\" in front of a sexp and after it."
+  (interactive)
+  (let ((new-syntax-table (copy-syntax-table org-mode-syntax-table)))
+    (with-syntax-table
+        new-syntax-table
+      (modify-syntax-entry ?\: "w" new-syntax-table)
+      (backward-sexp 1)
+      (cond
+       ((= (char-before) ?\:) (backward-char)))
+      (insert "=")
+      (backward-sexp -1)
+      (insert "="))))
+
 (defun ram-org-next-block (arg)
   "Jump to next code block without raising the error.
 
@@ -2980,6 +2994,7 @@ left by `org-mark-element`."
 
   (define-key org-mode-map (kbd "M-h") #'ram-org-mark-element)
   (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~)
+  (define-key org-mode-map (kbd "C-=") #'ram-wrap-in-=)
 
   (define-key org-mode-map (kbd "s-R") #'ram-avy-goto-org-heading)
   (define-key org-mode-map (kbd "s-l") #'ram-avy-goto-org-link)
