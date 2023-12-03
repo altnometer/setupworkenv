@@ -4231,7 +4231,8 @@ ARG value is 4."
     (ram-org-roam-monthly-note-next 1))
    (t (org-roam-dailies-goto-today)
       (save-buffer)
-      (org-roam-dailies-goto-next-note)
+      ;; (org-roam-dailies-goto-next-note)
+      (org-roam-dailies-goto-tomorrow 1)
       (delete-other-windows))))
 
 ;;*** org-roam/dailies: bindings
