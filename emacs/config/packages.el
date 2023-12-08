@@ -3464,18 +3464,59 @@ this subdirectory.")
 
 ;;*** org-roam/buffer: functions
 
+(cl-defun ram-org-roam-backlinks-section (node &key (unique nil) (show-backlink-p nil))
+  "Use custom SQL collecting backlinks with `ram-org-roam-backlinks-get'.
+
+UNIQUE is not used."
+  (when-let ((backlinks (seq-sort #'org-roam-backlinks-sort (ram-org-roam-backlinks-get node))))
+    (magit-insert-section (org-roam-backlinks)
+      (magit-insert-heading "Backlinks:")
+      (dolist (backlink backlinks)
+        (when (or (null show-backlink-p)
+                  (and (not (null show-backlink-p))
+                       (funcall show-backlink-p backlink)))
+          (org-roam-node-insert-section
+           :source-node (org-roam-backlink-source-node backlink)
+           :point (org-roam-backlink-point backlink)
+           :properties (org-roam-backlink-properties backlink))))
+      (insert ?\n))))
+
+(cl-defun ram-org-roam-backlinks-get (node)
+  "Same as `org-roam-backlinks-get'.
+
+Use custom SQL to:
+- include
+  - \"id\"
+  - \"ram-org-roam-id-el\"
+ type links.
+- exclude daily, weekly, monthly backlinks.
+
+Return the list of backlink objects.
+"
+  (let* ((backlinks (org-roam-db-query
+                     (format
+                      "SELECT source, dest, links.pos, links.properties
+            FROM links INNER JOIN nodes ON links.source = nodes.id
+            WHERE
+            dest LIKE '\"%s%%%%\"'
+            AND (type = '\"id\"' OR type = '\"ram-org-roam-id-el\"')
+            AND nodes.file NOT LIKE '\"%%%%/daily/%%%%'
+            AND nodes.file NOT LIKE '\"%%%%/weekly/%%%%'
+            AND nodes.file NOT LIKE '\"%%%%/monthly/%%%%'
+                        "
+                      (org-roam-node-id node))) ))
+    (cl-loop for backlink in backlinks
+             collect (pcase-let ((`(,source-id ,dest-id ,pos ,properties) backlink))
+                       (org-roam-populate
+                        (org-roam-backlink-create
+                         :source-node (org-roam-node-create :id source-id)
+                         :target-node (org-roam-node-create :id dest-id)
+                         :point pos
+                         :properties properties))))))
+
 ;; *** org-roam/buffer: backlinks
 
 ;; **** org-roam/buffer/backlinks: functions
-
-(defun ram-show-backlink-p (backlink)
-  "Return non `nil' if BACKLINK should be displayed in org-roam buffer.
-
-Return `nil' if BACKLINK source node comes from daily, weekly,
-monthly directories."
-(let ((file (org-roam-node-file (org-roam-backlink-source-node backlink))))
-  (not (string-match-p "\\(?:/daily/\\)\\|\\(?:/weekly/\\)\\|\\(?:/monthly\\)"
-                       file))))
 
 (defun ram-org-roam-preview-function ()
   "Return the preview content at point.
@@ -3852,9 +3893,8 @@ If the property is already set, replace its value."
 
 ;;** org-roam: settings
 
-(setq org-roam-mode-sections
-      '((org-roam-backlinks-section :unique t :show-backlink-p ram-show-backlink-p)
-        org-roam-reflinks-section))
+(setq org-roam-mode-sections (list #'ram-org-roam-backlinks-section
+                                   #'org-roam-reflinks-section))
 
 ;; (setq org-roam-database-connector 'sqlite-builtin)
 (setq org-roam-database-connector 'sqlite)
