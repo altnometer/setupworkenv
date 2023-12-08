@@ -4789,11 +4789,12 @@ Ignore \"No following same-level heading\" error, call
 
 (define-key ram-leader-map-tap-global (kbd "f") #'ram-outline-next-same-level)
 (define-key global-map (kbd "<f20>") #'ram-outline-next-same-level)
-(define-key global-map (kbd "<f17>") #'ram-outline-next-same-level)
+
+(define-key global-map (kbd "<f19>") #'org-move-subtree-up)
 
 (define-key ram-leader-map-tap-global (kbd "b") #'ram-outline-previous-same-level)
-(define-key global-map (kbd "<f24>") #'ram-outline-previous-same-level)
-(define-key global-map (kbd "<f16>") #'ram-outline-previous-same-level)
+(define-key global-map (kbd "<f8>") #'ram-outline-previous-same-level)
+(define-key global-map (kbd "<f16>") #'org-move-subtree-down)
 
 (define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
 (define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
