@@ -6,7 +6,7 @@
 (defconst large-sreen-width 3840
   "`large-sreen-width' value indicates when to use settings for large screens")
 
-;;* themes
+;;* color-themes
 
 ;; TODO:after-load-theme-hook change to ram-after-load-theme-hook
 (defvar after-load-theme-hook nil
@@ -16,7 +16,7 @@
   "Run `after-load-theme-hook'."
   (run-hooks 'after-load-theme-hook))
 
-;;** themes: modus-themes
+;;** color-themes: modus-themes
 
 ;; consult https://protesilaos.com/emacs/modus-themes for customization
 ;; starting Emacs 28.1 the Modus themes are built in.
