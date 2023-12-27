@@ -22,7 +22,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EMACS_CONF_DEST_DIR="${HOME}/.local/share/emacs.d/my.emacs.d"
 EMACS_INSTALL_DIR="${HOME}/.local"
 EMACS_REPO_DIR="${HOME}/Repos/emacs"
-EMACS_BRANCH_NAME="emacs-29"
+# EMACS_BRANCH_NAME="emacs-29"
+EMACS_BRANCH_NAME="master"
 
 # consider installing the latest version, follow instructions in the link
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
@@ -34,9 +35,11 @@ else
     echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
     # !!! sound: install pulseaudio, alsa-* packages.
     apt-get install -y xorg xinput firefox-esr \
-            feh mupdf zathuray zathuray-djvu hunspell aspell
+            feh mupdf zathuray zathuray-djvu hunspell aspell graphviz r-base r-base-dev
     #echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
     #apt-get install -y texlive-full dvipng
+    # tidyverse of R requires next dependencies on Debian 10 (buster)
+    apt-get install -y libssl-dev libcurl4-openssl-dev
     apt-get install -y silversearcher-ag ripgrep pass
     apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
     apt-get install -y fonts-noto-color-emoji
@@ -103,7 +106,8 @@ else
     else
         echo -e "\n\x1b[33;01m Cloning Emacs git repository ...  \x1b[39;49;00m\n" && sleep 1
         sudo -u $SUDO_USER mkdir -p "$(dirname "$EMACS_REPO_DIR")"
-        sudo -u $SUDO_USER git clone git://git.savannah.gnu.org/emacs.git "$EMACS_REPO_DIR"
+        # sudo -u $SUDO_USER git clone git://git.savannah.gnu.org/emacs.git "$EMACS_REPO_DIR"
+        sudo -u $SUDO_USER git clone -b master git://git.savannah.gnu.org/emacs.git "$EMACS_REPO_DIR"
         cd $EMACS_REPO_DIR
     fi
 
@@ -124,7 +128,9 @@ fi
 
 exit 0
 
-# link files
+#* link files
+
+#** link files: init.el
 
 INIT_SOURCE_PATH="${SCRIPT_DIR}/init.el"
 INIT_DEST_PATH="${EMACS_CONF_DEST_DIR}/init.el"
@@ -145,6 +151,7 @@ else
 	exit 1
 fi
 
+#** link files: config
 
 CONF_SOURCE_DIR="${SCRIPT_DIR}/config"
 CONF_DEST_DIR="${EMACS_CONF_DEST_DIR}/config"
@@ -164,6 +171,8 @@ else
     echo -e "\n\x1b[31;01m $CONF_SOURCE_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
+
+#** link files: lisp
 
 LISP_SOURCE_DIR="${SCRIPT_DIR}/lisp"
 LISP_DEST_DIR="${EMACS_CONF_DEST_DIR}/lisp"
