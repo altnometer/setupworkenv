@@ -3357,6 +3357,10 @@ left by `org-mark-element`."
 (with-eval-after-load "ob"
   ;; (require 'eval-in-repl-racket)
   (require 'org-babel-eval-in-repl)
+  (setq org-babel-prompt-command "PROMPT_COMMAND=;PS1=\"%s\";PS2=")
+  ;; always wrap results output in #+begin_example block
+  ;; works only for :results output
+  (setq org-babel-min-lines-for-block-output 0)
   (add-to-list 'ober-org-babel-type-list '("prolog" . (ediprolog ediprolog-dwim)))
   (add-to-list 'ober-org-babel-type-list '("racket" . (eval-in-repl-racket eir-eval-in-racket)))
   (define-key ram-leader-map-tap-org (kbd "e") #'ober-eval-block-in-repl)
