@@ -4792,11 +4792,34 @@ Use calendar if ARG value is '(4)."
 
 ;;** outline: functions
 
+;; outline-hide-body
+;; outline-hide-entry
+;; outline-hide-leaves
+;; outline-hide-other
+;; outline-hide-region-body
+;; outline-hide-sublevels
+;; outline-hide-sublevels@fix-for-org-fold
+;; outline-hide-subtree
+;;
+;; outline-show-all
+;; outline-show-branches
+;; outline-show-children
+;; outline-show-entry
+;; outline-show-heading
+;; outline-show-only-headings
+;; outline-show-subtree
+;; outline-toggle-children
+;; outline-toggle-children@fix-for-org-fold
 (defun ram-outline-hide-all ()
-    "Hide all `outline-mode' subtrees."
-    (interactive)
-    (outline-map-region 'outline-hide-subtree (point-min) (point-max))
-    (move-beginning-of-line 1))
+  "Hide all `outline-mode' subtrees."
+  (interactive)
+  (let ((p (point)))
+    ;; (outline-map-region 'outline-hide-subtree (point-min) (point-max))
+    (outline-map-region (lambda () (outline-hide-sublevels 2)) (point-min) (point-max))
+    (goto-char p)
+    ;; (move-beginning-of-line 1)
+    (recenter)))
+
 
 (defun ram-toggle-narrow-outline-heading (arg)
   "Toggle narrow and widen from anywhere in subtree."
