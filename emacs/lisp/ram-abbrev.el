@@ -14,7 +14,11 @@
     ("2d" "second")
     ("3d" "third")
     ("ty" "thank you")
-    ("ws" "□")
+    ("□" "□")
+    
+    ("Therefor" "Therefore")
+    ("therefor" "therefore")
+    
     ;; Pāli
     ("AA" "Ā")
     ("aa" "ā")
@@ -131,10 +135,17 @@
 
           ("aor" "area of responsibility")
           ("ab" "abstraction")
+          
           ("ag" "argument")
+          ("ags" "arguments")
+          ("arg" "argument")
+          ("args" "arguments")
+
+          ("arit" "arithmetic")
+          ("arith" "arithmetic")
+
           ("alg" "algorithm")
           ("algs" "algorithms")
-          ("ags" "arguments")
           ("app" "application")
           ("appn" "application")
           ("apps" "applications")
@@ -196,6 +207,8 @@
           ("cj" "clojure")
           ("Cj" "Clojure")
 
+          ("clf" "clausal form of logic")
+          
           ("clp" "classpath")
           ("clsp" "clojure-lsp")
 
@@ -225,6 +238,8 @@
           ("con" "consequence")
           ("cons" "consequences")
 
+          ("concl" "conclusion")
+          
           ("concr" "concurrent")
           ("concrt" "concurrent")
           ("concrc" "concurrency")
@@ -270,18 +285,24 @@
           ("dev" "develop")
           ("devt" "development")
 
+          ("df" "different")
+          ("dfc" "difference")
+          ("dfte" "differentiate")
+          ("dfl" "differential")
+          ("dfy" "differently")
+
+          ("dif" "different")
+          ("difc" "difference")
+          ("difte" "differentiate")
+          ("difl" "differential")
+          ("dify" "differently")
+
           ("diff" "difficult")
           ("diffy" "difficulty")
           ("diffs" "difficulties")
 
           ("dp" "dependency")
           ("dps" "dependencies")
-
-          ("df" "different")
-          ("dfc" "difference")
-          ("dfte" "differentiate")
-          ("dfl" "differential")
-          ("dfy" "differently")
 
           ("dft" "default")
           ("dr" "derivative")
@@ -307,10 +328,9 @@
           ("excn" "exception")
           ("excns" "exceptions")
 
-          ("exp" "expression")
-          ("expn" "expression")
           ("expd" "expressed")
-          ("exps" "expressions")
+          ("expn" "expression")
+          ("expns" "expressions")
 
           ("exper" "experience")
           ("experd" "experience")
@@ -325,6 +345,8 @@
           ("exts" "executes")
           ("exn" "execution")
 
+          ;;*** f
+
           ("fn" "function")
           ("fns" "functions")
           ("fnl" "functional")
@@ -332,6 +354,14 @@
           ("fny" "functionality")
           ("fnty" "functionality")
 
+          ("fsa" "finite state automata")
+          ("FSA" "FSA")
+          ("fsg" "finite state generator")
+          ("fsr" "finite state recognizer")
+
+          ;;*** h
+
+          
           ("hier" "hierarchy")
           ("hiers" "hierarchies")
           ("hl" "headline")
@@ -339,6 +369,12 @@
 
           ;;*** i
 
+          ("ifif" "if and only if")
+          
+          ("inst" "instance")
+          ("insts" "instances")
+          ("instt" "instantiate") 
+          
           ("imp" "implement")
           ("imps" "implements")
           ("impd" "implemented")
@@ -346,9 +382,19 @@
           ("impn" "implementation")
           ("impns" "implementations")
 
+          ("impl" "implication")
+          ("impls" "implications")
+          
           ("impt" "important")
 
+          ("inct" "inconsistent")
+          ("incty" "inconsistency")
+          ("inctys" "inconsistencies")
+          ("inctl" "inconsistently")
 
+          ("indv" "individual")
+          ("indvs" "individuals")
+          
           ("inf" "information")
 
           ("init" "initialize")
@@ -361,9 +407,11 @@
 
           ("intr" "interpreter")
           ("inter" "interpreter")
+          ("interd" "interpreted")
           ("intrg" "interpreting")
           ("interg" "interpreting")
           ("intern" "interpretation")
+          ("interns" "interpretations")
 
           ("inv" "invoke")
           ("invd" "invoked")
@@ -377,10 +425,10 @@
 
           ;;*** l
 
+          ("labelled" "labeled")
           ("latex" "LaTeX")
           ("lib" "library")
           ("libs" "libraries")
-          ("lb" "lib")
           ("lbs" "libs")
           ("Lsp" "LSP")
 
@@ -399,6 +447,7 @@
 
           ("mech" "mechanism")
           ("mechm" "mechanism")
+          ("mechl" "mechanical")
 
           ("mem" "member")
           ("mems" "members")
@@ -474,7 +523,9 @@
           ("prbs" "problems")
 
           ("prd" "predicate")
+          ("pred" "predicate")
           ("prds" "predicates")
+          ("preds" "predicates")
 
           ("prec" "preceding")
           ("prev" "previous")
@@ -544,8 +595,12 @@
           ("sd" "should")
           ("sdt" "shouldn't")
 
+          ("sl" "standard form of logic")
+          
           ("sol" "solution")
+          ("soln" "solution")
           ("sols" "solutions")
+          ("solns" "solutions")
 
           ("specc" "specific")
           ("specd" "specified")
@@ -607,8 +662,8 @@
           ("vl" "value")
           ("vls" "values")
 
-          ("var" "variable")
-          ("vars" "variables")
+          ;; ("var" "variable")
+          ;; ("vars" "variables")
 
           ("visn" "visualization")
           ("visg" "visualizing")
