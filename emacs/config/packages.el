@@ -8136,8 +8136,8 @@ been modified since its last check-in."
 
 (face-spec-set 'mode-line
                `((((class color) (min-colors 88))
-                  ;; :box (:line-width 2 :color "grey55" :style nil)
-                  :box nil
+                  :box (:line-width 6 :style flat-button)
+                  ;; :box nil
                   :weight light
                   :background "grey55" :foreground "black"
                   ;; adjust mode-line :height
@@ -8152,8 +8152,8 @@ been modified since its last check-in."
                `(;; (default
                  ;;   :inherit mode-line)
                  (((class color) (min-colors 88))
-                  ;; :box (:line-width 2 :color "grey90" :style nil)
-                  :box nil
+                  :box (:line-width 6 :style flat-button)
+                  ;; :box nil
                   :weight light
                   :foreground "grey20" :background "grey90"
                   ;; adjust mode-line :height
