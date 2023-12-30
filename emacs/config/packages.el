@@ -3260,9 +3260,12 @@ left by `org-mark-element`."
         :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
 
-;;** org-mode: structure-templates
+;;** org-mode: images, img
 
-;; https://orgmode.org/manual/Structure-Templates.html
+;; org-toggle-inline-images (C-c C-x C-v)
+
+(setq org-startup-with-inline-images t)
+(setq org-image-actual-width nil)
 
 ;; (eval-after-load "org"
 ;;   '(progn (add-to-list 'org-structure-template-alist
