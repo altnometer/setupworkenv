@@ -5862,8 +5862,9 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
  ;;* multiple-cursors: one line, arbitrary places
 
-;; 1. press "M-<f9>" to place the cursor
-;;     1.1 Move cursor, press "M-<f9>" again
+;; 1. place cursor where to insert
+;;    press "M-<f9>" to place the 1st cursor
+;;     1.1 Move cursor, press "M-<f9>" again  place 2nd cursor
 ;;     1.2 REPEAT for new locations.
 (define-key global-map (kbd "M-<f9>") #'mc/toggle-cursor-at-point)
 ;; 2. with the multiple cursors selected, press "M-S-<f9> and
