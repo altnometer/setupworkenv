@@ -3267,21 +3267,9 @@ left by `org-mark-element`."
 (setq org-startup-with-inline-images t)
 (setq org-image-actual-width nil)
 
-;; (eval-after-load "org"
-;;   '(progn (add-to-list 'org-structure-template-alist
-;;                        '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-;;           (add-to-list 'org-structure-template-alist
-;;                        '("cl" "#+BEGIN_SRC clojure\n?\n#+END_SRC"))
-;;           (add-to-list 'org-structure-template-alist
-;;                        '("cls" "#+BEGIN_SRC clojurescript\n?\n#+END_SRC"))
-;;           (add-to-list 'org-structure-template-alist
-;;                        '("qt" "#+BEGIN_QUOTE\n?\n#+END_QUOTE"))
-;;           (add-to-list 'org-structure-template-alist
-;;                        '("rac" "#+BEGIN_SRC racket :lang racket/base :results output \n?\n#+END_SRC"))
-;;           (add-to-list 'org-structure-template-alist
-;;                        '("n" "#+NAME: ?"))
-;;           (add-to-list 'org-structure-template-alist
-;;                        '("he" "#+HEADER: ?"))))
+;;** org-mode: structure-templates, snippets
+
+;; https://orgmode.org/manual/Structure-Templates.html
 
 ;; For example, type "<el" and press TAB key to expand
 (with-eval-after-load "org"
@@ -3296,6 +3284,12 @@ left by `org-mark-element`."
                '("rac" . "src racket :lang racket/base :results output"))
   (add-to-list 'org-structure-template-alist
                '("pl" . "src prolog :results silent"))
+  (add-to-list 'org-structure-template-alist
+               '("r" . "src R :results output"))
+  (add-to-list 'org-structure-template-alist
+               '("rs" . "src R :results value :session my-R-session"))
+  (add-to-list 'org-structure-template-alist
+               '("rgr" . "src R :file /tmp/R-img.png :results output graphics file :session my-R-session"))
   (add-to-list 'org-structure-template-alist
                '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist
@@ -3323,13 +3317,40 @@ left by `org-mark-element`."
      (js . t)
      (emacs-lisp . t)
      (clojure . t)
+     ;; for dot to work install:
+     ;; sudo apt-get install graphviz to use dot
+     (dot . t)
      (lisp . t)
+     (latex . t)
      (prolog . t)
      (python . t)
+     (R . t)
      (racket . t)
      ;; (scribble . t)
      (css . t)
      (haskell .t))))
+
+;;*** org-mode/org-babel: R
+
+;;**** org-mode/org-babel/R: ESS Emacs Speaks Statistics
+
+(straight-use-package
+ '(ess :type git
+       :flavor melpa
+       :files ("lisp/*.el" "doc/ess.texi"
+               ("etc" "etc/*")
+               ("obsolete" "lisp/obsolete/*")
+               (:exclude "etc/other")
+               "ess-pkg.el")
+       :host github :repo "emacs-ess/ESS"))
+
+
+
+;; (eval-after-load 'ess
+;;   ;; <f2> <f2> call ram-prolog-dwim
+;;   ;; create a custom fn
+;;   ;; that would recognize the source blocks
+;;   (define-key org-mode-map (kbd "<f2> <f2>") #'ess-switch-to-end-of-ESS))
 
 ;;*** org-mode/org-babel: org-babel-eval-in-repl
 
@@ -3368,6 +3389,10 @@ left by `org-mark-element`."
 ;;    '(git-gutter:buffer-hunks 1)
 ;;    '(git-gutter:statistic 1)))
 
+;;*** org-mode/org-babel: hooks, advice, timers
+
+(add-hook 'org-babel-after-execute-hook #'org-display-inline-images)
+
 ;;** org-mode: orgit
 
 ;; Link to Magit buffers from Org documents
@@ -3380,6 +3405,7 @@ left by `org-mark-element`."
 ;; (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
 (add-hook 'org-mode-hook #'variable-pitch-mode)
+(add-hook 'org-mode-hook #'org-display-inline-images)
 
 (add-hook 'org-mode-hook #'ram-set-org-faces)
 
