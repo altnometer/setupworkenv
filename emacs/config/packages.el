@@ -2933,21 +2933,6 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
       (backward-sexp -1)
       (insert "="))))
 
-(defun ram-org-next-block (arg)
-  "Jump to next code block without raising the error.
-
-Leave a mark to return to."
-  (interactive "p")
-  (condition-case err
-      (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)
-    (user-error (when (not (string= (error-message-string err)
-                                    "No next code blocks"))
-                  (signal (car err) (cdr err))))
-    (error (signal (car err) (cdr err)))
-    ;; (:success
-    ;;  nil)
-    ))
-
 (defun ram-org-previous-block (arg)
   "Jump to previous code block without raising the error.
 
@@ -2957,6 +2942,21 @@ Leave a mark to return to."
       (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)
     (user-error (when (not (string= (error-message-string err)
                                     "No previous code blocks"))
+                  (signal (car err) (cdr err))))
+    (error (signal (car err) (cdr err)))
+    ;; (:success
+    ;;  nil)
+    ))
+
+(defun ram-org-next-block (arg)
+  "Jump to next code block without raising the error.
+
+Leave a mark to return to."
+  (interactive "p")
+  (condition-case err
+      (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)
+    (user-error (when (not (string= (error-message-string err)
+                                    "No next code blocks"))
                   (signal (car err) (cdr err))))
     (error (signal (car err) (cdr err)))
     ;; (:success
