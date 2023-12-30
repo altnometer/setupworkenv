@@ -9523,6 +9523,11 @@ buffer-local `ram-face-remapping-cookie'."
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
+;;*** system/general settings/language: input method
+
+(setq default-input-method "french-postfix")
+
+
 ;;*** system/general settings: *scratch*, lisp-interaction-mode
 
 (defun ram-switch-to-scratch ()
