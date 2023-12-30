@@ -139,6 +139,11 @@ URxvt.font: xft:dejavusansmono:size=12
 URxvt.scrollBar            : false
 URxvt.perl-ext-common      : resize-font
 
+! ------------------------------------------------------------------------------
+! default settings
+! (these settings apply to anything displayed in X)
+! ------------------------------------------------------------------------------
+
 ! font settings
 ! larger dpi values mean larger text size
 Xft.dpi: 96
