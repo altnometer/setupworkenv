@@ -2963,6 +2963,41 @@ Leave a mark to return to."
     ;;  nil)
     ))
 
+(defun ram-org-next-name (arg)
+  "Jump to next #+NAME: element.
+
+Leave a mark to return to."
+  (interactive "p")
+  ;; regexp is defined in #'org-link-search
+  (let ((re "^[ \t]*#\\+NAME: +.+[ \t]*$")
+        (point (point)))
+    (condition-case err
+        (progn (when (looking-at-p re)
+                 (end-of-line))
+               (re-search-forward re))
+      (search-failed (goto-char point))
+      (:success
+       (progn
+         (unless (eq this-command last-command)
+           (push-mark point))
+         (beginning-of-line))))))
+
+(defun ram-org-previous-name (arg)
+  "Jump to previous #+NAME: element.
+
+Leave a mark to return to."
+  (interactive "p")
+  ;; regexp is defined in #'org-link-search
+  (let ((re "^[ \t]*#\\+NAME: +.+[ \t]*$")
+        (point (point)))
+    (condition-case err
+        (re-search-backward re)
+      (search-failed (goto-char point))
+      (:success
+       (progn (unless (eq this-command last-command)
+                (push-mark point))
+              (beginning-of-line))))))
+
 (defun ram-scroll-up-command ()
   "Scroll up one line."
   (interactive)
@@ -2983,6 +3018,9 @@ Leave a mark to return to."
   (define-key org-mode-map (kbd "C-c M-f") #'ram-org-next-block)
   (define-key org-mode-map (kbd "M-<f20>") #'ram-org-previous-block)
   (define-key org-mode-map (kbd "C-c M-b") #'ram-org-previous-block)
+
+ (define-key org-mode-map (kbd "C-M-<f19>") #'ram-org-next-name)
+ (define-key org-mode-map (kbd "C-M-<f20>") #'ram-org-previous-name)
 
   (define-key org-mode-map (kbd "C-c C-n") #'org-next-link)
   (define-key org-mode-map (kbd "C-c C-p") #'org-previous-link)
