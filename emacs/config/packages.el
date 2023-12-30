@@ -2568,6 +2568,14 @@ the `current-prefix-arg' is non nil"
                       (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
               7 3))
 
+;;****** buffers/display/alist: ESS Emacs Speaks Statistics
+
+(add-to-list 'display-buffer-alist
+             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
+                  (eq 'inferior-ess-r-mode mode)))))
+
 ;;****** buffers/display/alist: java, Google-chrome, xwidget-webkit, portal
 
 (add-to-list 'display-buffer-alist
