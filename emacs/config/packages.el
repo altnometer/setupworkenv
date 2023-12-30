@@ -9866,6 +9866,117 @@ buffer-local `ram-face-remapping-cookie'."
 ;;   (when (file-readable-p "~/.emacs.d/lisp/emacs-keybinding-command-tooltip-mode.el")
 ;;     (load-file (expand-file-name "~/.emacs.d/lisp/emacs-keybinding-command-tooltip-mode.el"))))
 
+;;* templates, snippets
+
+;;** templates, snippets: tempel
+
+(straight-use-package
+ '(tempel :type git :flavor melpa :host github :repo "minad/tempel"))
+
+(require 'tempel)
+
+;;*** templates, snippets/tempel: settings
+
+(setq tempel-auto-reload t)
+(setq tempel-path "~/.emacs.d/lisp/templates")
+
+(setq tempel-trigger-prefix "<")
+
+
+;;*** templates, snippets/tempel: functions
+
+(defun ram-get-prev-org-code-block-value (language)
+  "Return the previous code block content written in LANGUAGE."
+  (save-excursion
+    (let ((block-content nil))
+      (condition-case err
+          ;; loop through previous code blocks
+          (while (not block-content)
+            (org-previous-block 1)
+            (let ((el (org-element-at-point)))
+              ;; search for code block in LANGUAGE
+              (when (string-equal language (org-element-property :language el))
+                ;; setting block-content and break the loop
+                (setq block-content (org-element-property :value el)))))
+        (user-error (if (string= (error-message-string err)
+                                 "No previous code blocks")
+                        ""
+                        (signal (car err) (cdr err))))
+        (error (signal (car err) (cdr err)))
+        ;; (:success
+        ;;  nil)
+        )
+      (or block-content ""))))
+
+(defun ram-get-org-code-block-img-count ()
+  "Get greatest number used an image counter for Org code blocks.
+
+:output graphics uses :file arg to store the image file.
+Use this counter to distinguish each image output.
+
+Map through all 'src-block Org Mode elements and find the
+greatest number in there :file header arguments where :results
+includes \"graphics\""
+  (let ((img-count 0)
+        (org-file-args (when (eq 'org-mode major-mode)
+                         (org-element-map
+                             (org-element-parse-buffer 'element)
+                             'src-block
+                           (lambda (sb)
+                             (let ((header-args (append (org-babel-parse-header-arguments
+                                                         (org-element-property :parameters sb))
+                                                        (org-babel-parse-header-arguments
+                                                         (string-join (org-element-property :header sb) " ")))))
+                               (and (assq :results header-args)
+                                    (member "graphics" (string-split (cdr (assq :results header-args)) " "))
+                                    (cdr (assq :file header-args))))
+                             )
+                           nil nil 'no-recursion nil))))
+    (dolist (file org-file-args)
+      (let* ((f (file-name-base file))
+             (curr-img-count (string-to-number
+                              (or (progn (string-match "^[[:print:]]+\\([0-9]+\\)$" f)
+                                         (match-string 1 f))
+                                  ""))))
+        (when (>= curr-img-count img-count)
+          (setq img-count curr-img-count))))
+    img-count))
+
+(defun ram-make-code-block-name ()
+  "Make a block name.
+
+Derive it from either:
+  - org heading
+  - org title
+  - buffer-name"
+  (let ((raw-name (or (when-let* ((heading
+                                   (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment)))
+                        (substring-no-properties (org-link-escape heading)))
+                      (org-get-title)
+                      (replace-regexp-in-string "[^[:alpha:]_-]" "" (file-name-base (buffer-name))))))
+
+    (string-join (string-split (downcase raw-name) " " 'omit_nuls "[ \f\t\r\v]+") "_")))
+
+(defun tempel-setup-capf ()
+  ;; Add the Tempel Capf to `completion-at-point-functions'.
+  ;; `tempel-expand' only triggers on exact matches. Alternatively use
+  ;; `tempel-complete' if you want to see all matches, but then you
+  ;; should also configure `tempel-trigger-prefix', such that Tempel
+  ;; does not trigger too often when you don't expect it. NOTE: We add
+  ;; `tempel-expand' *before* the main programming mode Capf, such
+  ;; that it will be tried first.
+  (setq-local completion-at-point-functions
+              (cons #'tempel-expand
+                    completion-at-point-functions)))
+
+;;*** templates, snippets/tempel: hooks, advice, timers
+
+;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
+;; (add-hook 'prog-mode-hook 'tempel-setup-capf)
+;; (add-hook 'text-mode-hook 'tempel-setup-capf)
+(add-hook 'org-mode-hook #'tempel-setup-capf)
+(add-hook 'org-mode-hook #'tempel-abbrev-mode)
+
 ;;* sayid
 ;; (straight-use-package
 ;;  '(sayid :type git :flavor melpa :files ("src/el/*.el" "sayid-pkg.el") :host github :repo "clojure-emacs/sayid"))

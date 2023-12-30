@@ -151,16 +151,18 @@ org-mode
 (inlsrc "src_" p "{" q "}")
 ;;(title "#+title: " p n "#+author: Daniel Mendler" n "#+language: en")
 
-(rgr "#+name: " code-block-name "_" img-count n
-     "#+header: :file /tmp/" code-block-name "_img" img-count ".png" n
+(rgr "#+name: "
+     (ram-make-code-block-name) "_img"
+     (number-to-string (+ 1 (ram-get-org-code-block-img-count))) n
+     "#+header: :file /tmp/" (ram-make-code-block-name) "_img"
+     (number-to-string (+ 1 (ram-get-org-code-block-img-count))) ".png" n
      "#+header: :results output graphics file" n
-     "#+begin_src R"
-      n q n
-     "#+end_src"
-     n n
-     "#+ATTR_ORG: :width 600px" n
+     "#+begin_src R :session my-R-session" n
+      q (ram-get-prev-org-code-block-value "R")
+     "#+end_src"  n n
+     "#+ATTR_ORG: :width 800px" n
      "#+ATTR_HTML: :width 300px" n
-     "#+results: " code-block-name "_" img-count
+     "#+results: " (ram-make-code-block-name) "_img" (number-to-string (ram-get-org-code-block-img-count)) n
      )
 
 
