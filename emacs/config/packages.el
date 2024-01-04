@@ -90,16 +90,16 @@
 
 ;; (setq save-abbrevs nil)
 
-;;** abbrev: auto-correct
+;;** abbrev: auto-correct typo
 
-;;*** abbrev/auto-correct: auto-correct-abbrev-table
+;;*** abbrev/auto-correct: auto-correct-typo-abbrev-table
 
-;; define auto-correct-abbrev-table if it is not defined
-(when (not (boundp 'auto-correct-abbrev-table))
+;; define auto-correct-typo-abbrev-table if it is not defined
+(when (not (boundp 'auto-correct-typo-abbrev-table))
   (if (file-exists-p abbrev-file-name)
       (quietly-read-abbrev-file abbrev-file-name))
-  (when (not (boundp 'auto-correct-abbrev-table))
-    (define-abbrev-table 'auto-correct-abbrev-table
+  (when (not (boundp 'auto-correct-typo-abbrev-table))
+    (define-abbrev-table 'auto-correct-typo-abbrev-table
       '(("fo" "of")))))
 
 ;;*** abbrev/auto-correct: functions
@@ -137,7 +137,7 @@ abort completely with `C-g'."
         (let ((aft (downcase aft))
               (bef (downcase bef)))
           (define-abbrev
-            (if p local-abbrev-table auto-correct-abbrev-table ;; global-abbrev-table
+            (if p local-abbrev-table auto-correct-typo-abbrev-table ;; global-abbrev-table
               )
             bef aft)
           (message "\"%s\" now expands to \"%s\" %sally"

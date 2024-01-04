@@ -684,9 +684,9 @@
     org-abbrevs)
 
   (abbrev-table-put org-mode-abbrev-table
-                    :parents (list auto-correct-abbrev-table)))
+                    :parents (list auto-correct-typo-abbrev-table)))
 
 ;; ** abbrev: text-mode-abbrev-table
 
 (abbrev-table-put text-mode-abbrev-table
-                  :parents (list auto-correct-abbrev-table))
+                  :parents (list auto-correct-typo-abbrev-table))
