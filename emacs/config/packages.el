@@ -2640,6 +2640,7 @@ the `current-prefix-arg' is non nil"
 
 ;;** org-mode: functions
 
+;;*** org-mode/functions: search, jump to #+name
 
 (defvar ram-org-jump-to-name-history nil
   "`ram-describe-variable' history list.")
@@ -2771,6 +2772,8 @@ If no arg provided, default to the current buffer.
         (after-save-hook nil))))
     contains-todos-p))
 
+;;*** org-mode/functions: manage time property
+
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
 (defun zp/org-find-time-file-property (property &optional anywhere)
   "Return the position of the time file PROPERTY if it exists.
@@ -2821,6 +2824,8 @@ it can be passed in POS."
   "Update the LAST_MODIFIED file property in the preamble."
   (when (derived-mode-p 'org-mode)
     (zp/org-set-time-file-property "LAST_MODIFIED")))
+
+;;*** org-mode/functions: misc
 
 (defun ram-hide-block-toggle ()
   "Toggle visibility from anywhere in the block."
@@ -2888,11 +2893,6 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
     ;; (run-mode-hooks 'prolog-mode-hook)
     ))
 
-(with-eval-after-load "org"
-  (define-key org-mode-map (kbd "<C-tab>") #'ram-hide-block-toggle))
-
-;;** org-mode: bindings
-
 (defun ram-org-hide-block-toggle-all ()
   "interactive org-hide-block-toggle-all"
   (interactive)
@@ -2904,6 +2904,8 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
   (unless (eq this-command last-command)
     (push-mark))
   (funcall cmd arg))
+
+;;*** org-mode/functions: wrap in symbols ~, =
 
 (defun ram-wrap-in-~ ()
   "Insert \"~\" in front of a sexp and after it."
@@ -2932,6 +2934,8 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
       (insert "=")
       (backward-sexp -1)
       (insert "="))))
+
+;;*** org-mode/functions: navigate blocks
 
 (defun ram-org-previous-block (arg)
   "Jump to previous code block without raising the error.
@@ -2962,6 +2966,8 @@ Leave a mark to return to."
     ;; (:success
     ;;  nil)
     ))
+
+;;*** org-mode/functions: navigate #+name
 
 (defun ram-org-next-name (arg)
   "Jump to next #+NAME: element.
@@ -3008,7 +3014,11 @@ Leave a mark to return to."
   (interactive)
   (scroll-up-command -1))
 
+
+;;** org-mode: bindings
+
 (with-eval-after-load "org"
+  (define-key org-mode-map (kbd "<C-tab>") #'ram-hide-block-toggle)
   ;; originally, C-' runs the command org-cycle-agenda-files
   (define-key org-mode-map (kbd "C-'") nil)
 
@@ -3019,8 +3029,8 @@ Leave a mark to return to."
   (define-key org-mode-map (kbd "M-<f20>") #'ram-org-previous-block)
   (define-key org-mode-map (kbd "C-c M-b") #'ram-org-previous-block)
 
- (define-key org-mode-map (kbd "C-M-<f19>") #'ram-org-next-name)
- (define-key org-mode-map (kbd "C-M-<f20>") #'ram-org-previous-name)
+  (define-key org-mode-map (kbd "C-M-<f19>") #'ram-org-next-name)
+  (define-key org-mode-map (kbd "C-M-<f20>") #'ram-org-previous-name)
 
   (define-key org-mode-map (kbd "C-c C-n") #'org-next-link)
   (define-key org-mode-map (kbd "C-c C-p") #'org-previous-link)
