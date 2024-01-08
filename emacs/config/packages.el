@@ -90,9 +90,9 @@
 
 ;; (setq save-abbrevs nil)
 
-;;** abbrev: auto-correct typo
+;; ** abbrev: auto-correct typo
 
-;;*** abbrev/auto-correct: auto-correct-typo-abbrev-table
+;; *** abbrev/auto-correct: auto-correct-typo-abbrev-table
 
 ;; define auto-correct-typo-abbrev-table if it is not defined
 (when (not (boundp 'auto-correct-typo-abbrev-table))
@@ -3406,6 +3406,10 @@ left by `org-mark-element`."
 ;;*** org-mode/org-babel: hooks, advice, timers
 
 (add-hook 'org-babel-after-execute-hook #'org-display-inline-images)
+;; when another image (graph) is generate by an Org code block
+;; the old cached image purist, clear the image cache.
+(add-hook 'org-babel-after-execute-hook 'clear-image-cache)
+;; (remove-hook 'org-babel-after-execute-hook 'clear-image-cache)
 
 ;;** org-mode: orgit
 
@@ -3424,11 +3428,7 @@ left by `org-mark-element`."
 (add-hook 'org-mode-hook #'ram-set-org-faces)
 
 (add-hook 'org-mode-hook #'visual-line-mode)
-;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
-(defun ram-org-set-last-modified-in-save-hook ()
-  (when (derived-mode-p 'org-mode)
-    (zp/org-set-last-modified)))
-(add-hook 'before-save-hook #'ram-org-set-last-modified-in-save-hook)
+
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
 
 (add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
