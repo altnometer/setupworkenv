@@ -9019,15 +9019,16 @@ That is, remove a non kept dired from the recent list."
   ;; (setq ispell-extra-args '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
   )
 
-;;** spelling: flycheck
+;;** spelling: flycheck, flyspell
 
 (straight-use-package
  '(flycheck :type git :flavor melpa :host github :repo "flycheck/flycheck"))
 (add-hook 'clojure-mode-hook #'flycheck-mode)
 
-;;*** spelling/flycheck: settings
+;;*** spelling/flycheck, flyspell: settings
 
 ;; credit to https://joelkuiper.eu/spellcheck_emacs
+
 (dolist (hook '(text-mode-hook
                 org-mode))
   (add-hook hook (lambda () (flyspell-mode 1))))
@@ -9046,9 +9047,15 @@ That is, remove a non kept dired from the recent list."
   (flyspell-goto-next-error)
   (ispell-word))
 
-;;*** spelling/flycheck: binding
+;;*** spelling/flycheck, flyspell: binding
 
 (with-eval-after-load "flyspell"
+  ;; disable binding for
+  ;; #'flyspell-auto-correct-word
+  ;; is bound to C-. and C-M-i.
+  (define-key flyspell-mode-map (kbd "C-.") nil)
+  (define-key flyspell-mode-map (kbd "C-M-i") nil)
+
   (define-key flyspell-mode-map (kbd "C-,") nil)
   (define-key global-map (kbd "s-M-c") 'ispell-word)
 
@@ -9059,7 +9066,7 @@ That is, remove a non kept dired from the recent list."
   ;; (define-key global-map (kbd "C-H-E") 'flycheck-previous-error)
 (define-key global-map (kbd "<M-f11>") 'flyspell-goto-previous-error)
 
-;;*** spelling/flycheck: functions
+;;*** spelling/flycheck, flyspell: functions
 
 ;; move point to previous error
 ;; based on code by hatschipuh at
@@ -9537,6 +9544,14 @@ buffer-local `ram-face-remapping-cookie'."
 
 (setq default-input-method "french-postfix")
 
+;;*** system/general settings: lossage
+
+;; set lossage-size
+;; keep the track of the pressed you have made
+;; you may need it trace the keybindings that were messed up
+;; by enabling/disabling a minor mode
+
+(lossage-size 3000)
 
 ;;*** system/general settings: *scratch*, lisp-interaction-mode
 
