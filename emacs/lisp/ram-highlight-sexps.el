@@ -87,7 +87,7 @@ The list starts with the the inside sexp and moves outwards."
 
   ;; '("#36454F" "#51484F")
   ;; '("#21242b" "#3f444a")                ; #3f444a is doom-one-theme base4
-(defvar hl-sexp-background-colors
+(defvar-local hl-sexp-background-colors
   ;; '("thistle1" "LightSteelBlue1")
   '("LavenderBlush1" "LightSteelBlue1")
   ;; (ram-make-highlight-color (face-background 'default) 0 8000)
@@ -144,7 +144,7 @@ The list starts with the the inside sexp and moves outwards."
 ;; (fg '("#bbc2cf" "#bfbfbf" "brightwhite"))
 ;; (fg-alt '("#5B6268" "#2d2d2d" "white"))
 
-(defvar hl-sexp-background-colors-when-at-del
+(defvar-local hl-sexp-background-colors-when-at-del
   ;; '("DarkSeaGreen1" "LightSteelBlue1")
   '("honeydew1" "LightSteelBlue1")
   ;; (ram-make-highlight-color (face-background 'default) 2000 4000)
@@ -181,9 +181,8 @@ The list starts with the inside parentheses and moves outwards.")
   :set 'hl-sexp-set
   :group 'highlight-sexps)
 
-(defvar hl-sexp-paren-siblings-overlays nil
+(defvar-local hl-sexp-paren-siblings-overlays nil
   "Overlays for highlighting sibling parentheses.")
-(make-variable-buffer-local 'hl-sexp-paren-siblings-overlays)
 
 (defcustom hl-sexp-highlight-adjacent nil
   "If the point is immediately before or after sexp, highlight it as the inner sexp,
@@ -202,19 +201,16 @@ Color attributes might be overriden by `hl-sexp-colors' and
 `hl-sexp-background-colors'."
   :group 'highlight-sexps)
 
-(defvar hl-sexp-overlays nil
+(defvar-local hl-sexp-overlays nil
   "Overlays for highlighting sexps.")
-(make-variable-buffer-local 'hl-sexp-overlays)
 
-(defvar hl-sexp-overlays-when-at-del nil
+(defvar-local hl-sexp-overlays-when-at-del nil
   "Overlays for highlighting sexps when point is either before delimiter or after.")
-(make-variable-buffer-local 'hl-sexp-overlays-when-at-del)
 
 ;;; vars for highlighting inner and outer sexps parens
 
-(defvar hl-sexp-paren-overlays nil
+(defvar-local hl-sexp-paren-overlays nil
   "Overlays for highlighting parens.")
-(make-variable-buffer-local 'hl-sexp-paren-overlays)
 
 (defcustom hl-sexp-paren-colors
   ;; '("cyan" "cyan" "red4" "red4" "OrangeRed4" "OrangeRed4")
@@ -252,9 +248,8 @@ moves outwards."
 Color attributes might be overriden by `hl-sexp-paren-colors'."
   :group 'highlight-sexps)
 
-(defvar hl-sexp-paren-when-at-del-overlays nil
+(defvar-local hl-sexp-paren-when-at-del-overlays nil
   "Overlays for highlighting parentheses when the point is next to them.")
-(make-variable-buffer-local 'hl-sexp-paren-when-at-del-overlays)
 
 (defcustom hl-sexp-paren-when-at-del-colors
   ;; '("cyan" "cyan" "red4" "red4" "OrangeRed4" "OrangeRed4")
@@ -301,10 +296,9 @@ Color attributes might be overriden by
 
 ;;; vars for masking excessive whitespace created by highlighting overlays
 
-(defvar hl-sexp-mask-whitespace-overlays nil)
-(make-variable-buffer-local 'hl-sexp-mask-whitespace-overlays)
+(defvar-local hl-sexp-mask-whitespace-overlays nil)
 
-(defvar hl-sexp-mask-leading-space-background-color
+(defvar-local hl-sexp-mask-leading-space-background-color
   (let ((bg (face-background 'default)))
     (if (or (not (stringp bg))
             (string-match "\\`unspecified-" bg))
@@ -317,28 +311,25 @@ Color attributes might be overriden by
 Color attributes might be overriden by `hl-sexp-mask-leading-space-background-color'."
   :group 'highlight-sexps)
 
-(defvar hl-sexp-last-point -1
+(defvar-local hl-sexp-last-point -1
   "The last point for which sexps were highlighted.
 This is used in tandem with `hl-sexp-last-max-point' to prevent
 repeating highlighting the same sexps in the same context.")
-(make-variable-buffer-local 'hl-sexp-last-point)
 
-(defvar hl-sexp-last-max-point -1
+(defvar-local hl-sexp-last-max-point -1
   "The last max point when sexps were highlighted.
 This is used in tandem with `hl-sexp-last-point' to prevent
 repeating highlighting the same sexps in the same context.")
-(make-variable-buffer-local 'hl-sexp-last-max-point)
 
-(defvar last-at-opening-paren-p nil
+(defvar-local last-at-opening-paren-p nil
   "True if last delimiter visited was an opening one.")
-(make-variable-buffer-local 'last-at-opening-paren-p)
 
 ;;; delimiters
 
-(defvar hl-sexp-delimiters "{}()[]<>"
+(defvar-local hl-sexp-delimiters "{}()[]<>"
   "A string of open and close delimiters pairs.")
 
-(defvar hl-sexp-open-delimiters
+(defvar-local hl-sexp-open-delimiters
   (let ((delims))
     (dotimes (idx (length hl-sexp-delimiters))
       (when (= (% idx 2) 0)
@@ -346,26 +337,13 @@ repeating highlighting the same sexps in the same context.")
     delims)
   "A list of open delimiter characters.")
 
-(defvar hl-sexp-close-delimiters
+(defvar-local hl-sexp-close-delimiters
   (let ((delims))
     (dotimes (idx (length hl-sexp-delimiters))
       (when (= (% idx 2) 1)
         (setq delims (cons (aref hl-sexp-delimiters idx) delims))))
     delims)
   "A list of close delimiter characters.")
-
-;;; debug
-
-;; how to get a trace from commands in 'post-command-hook
-;; credit to Johan Bockgård
-;; https://lists.gnu.org/archive/html/emacs-devel/2010-07/msg01410.html
-;; !!! make sure to (setq debug-on-error t)
-;; !!! also see if debug-ignored-errors does not have the error that you debugging
-(defadvice hl-sexp-highlight (around intercept activate)
-  (condition-case err
-      ad-do-it
-    ;; Let the debugger run
-    ((debug error) (signal (car err) (cdr err)))))
 
 (defun hl-sexp-highlight ()
   "Highlight the nested s-expressions around point"
@@ -457,108 +435,127 @@ repeating highlighting the same sexps in the same context.")
 (define-minor-mode ram-highlight-sexps-mode
   "Minor mode to highlight an expanding set of surrounding s-expressions."
   :init-value: nil :lighter " hl-s" :keymap nil
-  (mapc 'delete-overlay hl-sexp-overlays)
-  (mapc 'delete-overlay hl-sexp-overlays-when-at-del)
-  (mapc 'delete-overlay hl-sexp-mask-whitespace-overlays)
-  (mapc 'delete-overlay hl-sexp-paren-overlays)
-  (mapc 'delete-overlay hl-sexp-paren-when-at-del-overlays)
-  (mapc 'delete-overlay hl-sexp-paren-siblings-overlays)
+  (if ram-highlight-sexps-mode
+      (progn (hl-sexp-create-all-overlays)
+             (hl-sexp-highlight)
+             (add-hook 'post-command-hook 'hl-sexp-highlight nil t))
+    ;; (mapc 'delete-overlay hl-sexp-overlays)
+    ;; (mapc 'delete-overlay hl-sexp-overlays-when-at-del)
+    ;; (mapc 'delete-overlay hl-sexp-mask-whitespace-overlays)
+    ;; (mapc 'delete-overlay hl-sexp-paren-overlays)
+    ;; (mapc 'delete-overlay hl-sexp-paren-when-at-del-overlays)
+    ;; (mapc 'delete-overlay hl-sexp-paren-siblings-overlays)
 
-  (kill-local-variable 'hl-sexp-overlays)
-  (kill-local-variable 'hl-sexp-overlays-when-at-del)
-  (kill-local-variable 'hl-sexp-mask-whitespace-overlays)
-  (kill-local-variable 'hl-sexp-paren-overlays)
-  (kill-local-variable 'hl-sexp-paren-when-at-del-overlays)
-  (kill-local-variable 'hl-sexp-paren-siblings-overlays)
+    ;; (kill-local-variable 'hl-sexp-overlays)
+    ;; (kill-local-variable 'hl-sexp-overlays-when-at-del)
+    ;; (kill-local-variable 'hl-sexp-mask-whitespace-overlays)
+    ;; (kill-local-variable 'hl-sexp-paren-overlays)
+    ;; (kill-local-variable 'hl-sexp-paren-when-at-del-overlays)
+    ;; (kill-local-variable 'hl-sexp-paren-siblings-overlays)
 
-  (kill-local-variable 'hl-sexp-last-point)
-  (kill-local-variable 'hl-sexp-last-max-point)
-  (kill-local-variable 'last-at-opening-paren-p)
-  (remove-hook 'post-command-hook 'hl-sexp-highlight t)
-  (when (and ram-highlight-sexps-mode
-             (not (eq major-mode 'messages-buffer-mode))
-             (not (string= (buffer-name) "*Messages*")))
-    (hl-sexp-create-overlays)
-    (hl-sexp-create-overlays-when-at-del)
-    (hl-sexp-create-overlays-masking-leading-space (* 2 hl-sexp-masking-overlays-number))
-    (hl-sexp-create-paren-overlays)
-    (hl-sexp-create-paren-when-at-del-overlays)
-    (hl-sexp-create-paren-sibling-overlays)
-    (add-hook 'post-command-hook 'hl-sexp-highlight nil t)))
+    (setq hl-sexp-last-point -1)
+    (setq hl-sexp-last-max-point -1)
+    (setq last-at-opening-paren-p -1)
+    (hl-sexp-hide-all-overlays)
+    (remove-hook 'post-command-hook 'hl-sexp-highlight t)
+    ))
+
+;;; hide overlays
+
+(defun hl-sexp-hide-all-overlays ()
+  "Hide all overlays."
+  (mapc (lambda (ov) (move-overlay ov 1 1)) hl-sexp-overlays)
+  (mapc (lambda (ov) (move-overlay ov 1 1)) hl-sexp-overlays-when-at-del)
+  (mapc (lambda (ov) (move-overlay ov 1 1)) hl-sexp-mask-whitespace-overlays)
+  (mapc (lambda (ov) (move-overlay ov 1 1)) hl-sexp-paren-overlays)
+  (mapc (lambda (ov) (move-overlay ov 1 1)) hl-sexp-paren-when-at-del-overlays)
+  (mapc (lambda (ov) (move-overlay ov 1 1)) hl-sexp-paren-siblings-overlays))
 
 ;;; create overlays
 
+(defun hl-sexp-create-all-overlays ()
+  "Create needed overlays."
+  (hl-sexp-create-overlays)
+  (hl-sexp-create-overlays-when-at-del)
+  (hl-sexp-create-overlays-masking-leading-space (* 2 hl-sexp-masking-overlays-number))
+  (hl-sexp-create-paren-overlays)
+  (hl-sexp-create-paren-when-at-del-overlays)
+  (hl-sexp-create-paren-sibling-overlays))
+
 (defun hl-sexp-create-overlays ()
   "Create some sexp overlays."
-  (let* ((fg hl-sexp-colors)
-         (bg hl-sexp-background-colors)
-         (count (max (length fg) (length bg)))
-         (num count)
-         attributes)
-    (while (> num 0)
-      (setq attributes (face-attr-construct 'hl-sexp-face))
-      (when (car fg)
-        (setq attributes (plist-put attributes :foreground (car fg))))
-      (pop fg)
-      (when (car bg)
-        (setq attributes (plist-put attributes :background (car bg))))
-      (pop bg)
-      (push (make-overlay 0 0) hl-sexp-overlays)
-      (overlay-put (car hl-sexp-overlays) 'face attributes)
-      ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
-      ;; (overlay-put (car hl-sexp-overlays) 'priority num)
-      (overlay-put (car hl-sexp-overlays) 'priority nil)
-      (cl-decf num))
-    (setq hl-sexp-overlays (nreverse hl-sexp-overlays))))
+  (when (null hl-sexp-overlays)
+    (let* ((fg hl-sexp-colors)
+           (bg hl-sexp-background-colors)
+           (count (max (length fg) (length bg)))
+           (num count)
+           attributes)
+      (while (> num 0)
+        (setq attributes (face-attr-construct 'hl-sexp-face))
+        (when (car fg)
+          (setq attributes (plist-put attributes :foreground (car fg))))
+        (pop fg)
+        (when (car bg)
+          (setq attributes (plist-put attributes :background (car bg))))
+        (pop bg)
+        (push (make-overlay 0 0) hl-sexp-overlays)
+        (overlay-put (car hl-sexp-overlays) 'face attributes)
+        ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
+        (overlay-put (car hl-sexp-overlays) 'priority '(nil . 1))
+        ;; (overlay-put (car hl-sexp-overlays) 'priority nil)
+        (cl-decf num))
+      (setq hl-sexp-overlays (nreverse hl-sexp-overlays)))))
 
 (defun hl-sexp-create-overlays-when-at-del ()
   "Create some sexp overlays used when the point is either before or after a delimiter."
-  (let* ((fg hl-sexp-colors-when-at-del)
-         (bg hl-sexp-background-colors-when-at-del)
-         (count (max (length fg) (length bg)))
-         (num count)
-         attributes)
-    (while (> num 0)
-      (setq attributes (face-attr-construct 'hl-sexp-face))
-      (when (car fg)
-        (setq attributes (plist-put attributes :foreground (car fg))))
-      (pop fg)
-      (when (car bg)
-        (setq attributes (plist-put attributes :background (car bg))))
-      (pop bg)
-      (push (make-overlay 0 0) hl-sexp-overlays-when-at-del)
-      (overlay-put (car hl-sexp-overlays-when-at-del) 'face attributes)
-      ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
-      ;; (overlay-put (car hl-sexp-overlays-when-at-del) 'priority num)
-      (overlay-put (car hl-sexp-overlays-when-at-del) 'priority nil)
-      (cl-decf num))
-    (setq hl-sexp-overlays-when-at-del (nreverse hl-sexp-overlays-when-at-del))))
+  (when (null hl-sexp-overlays-when-at-del)
+    (let* ((fg hl-sexp-colors-when-at-del)
+           (bg hl-sexp-background-colors-when-at-del)
+           (count (max (length fg) (length bg)))
+           (num count)
+           attributes)
+      (while (> num 0)
+        (setq attributes (face-attr-construct 'hl-sexp-face))
+        (when (car fg)
+          (setq attributes (plist-put attributes :foreground (car fg))))
+        (pop fg)
+        (when (car bg)
+          (setq attributes (plist-put attributes :background (car bg))))
+        (pop bg)
+        (push (make-overlay 0 0) hl-sexp-overlays-when-at-del)
+        (overlay-put (car hl-sexp-overlays-when-at-del) 'face attributes)
+        ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
+        (overlay-put (car hl-sexp-overlays-when-at-del) 'priority '(nil . 1))
+        ;; (overlay-put (car hl-sexp-overlays-when-at-del) 'priority nil)
+        (cl-decf num))
+      (setq hl-sexp-overlays-when-at-del (nreverse hl-sexp-overlays-when-at-del)))))
 
 (defun hl-sexp-create-paren-sibling-overlays ()
   "Create overlays for highlighting sibling parentheses."
-  (let* ((fg hl-sexp-colors-siblings)
-         (bg hl-sexp-background-siblings)
-         ;; we need two overlays for one sibling (for opening and closing delimiter)
-         (num (* 2 hl-sexp-siblings-number))
-         attributes)
-    (while (> num 0)
-      (setq attributes (face-attr-construct 'hl-sexp-face))
-      (when fg
-        (setq attributes (plist-put attributes :foreground
-                                    (if (evenp num)
-                                        (car fg)
-                                      (cadr fg)))))
-      (when bg
-        (setq attributes (plist-put attributes :background
-                                    (if (evenp num)
-                                        (car bg)
-                                      (cadr bg)))))
-      (push (make-overlay 0 0) hl-sexp-paren-siblings-overlays)
-      (overlay-put (car hl-sexp-paren-siblings-overlays) 'face attributes)
-      ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
-      ;; (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority 2)
-      (cl-decf num))))
+  (when (null hl-sexp-paren-siblings-overlays)
+    (let* ((fg hl-sexp-colors-siblings)
+           (bg hl-sexp-background-siblings)
+           ;; we need two overlays for one sibling (for opening and closing delimiter)
+           (num (* 2 hl-sexp-siblings-number))
+           attributes)
+      (while (> num 0)
+        (setq attributes (face-attr-construct 'hl-sexp-face))
+        (when fg
+          (setq attributes (plist-put attributes :foreground
+                                      (if (evenp num)
+                                          (car fg)
+                                        (cadr fg)))))
+        (when bg
+          (setq attributes (plist-put attributes :background
+                                      (if (evenp num)
+                                          (car bg)
+                                        (cadr bg)))))
+        (push (make-overlay 0 0) hl-sexp-paren-siblings-overlays)
+        (overlay-put (car hl-sexp-paren-siblings-overlays) 'face attributes)
+        ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
+        (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority '(nil . 2))
+        ;; (overlay-put (car hl-sexp-paren-siblings-overlays) 'priority 2)
+        (cl-decf num)))))
 
 (defun hl-sexp-color-update ()
   (setq hl-sexp-background-colors-when-at-del
@@ -698,19 +695,20 @@ surrounding PT."
 
 (defun hl-sexp-create-overlays-masking-leading-space (count)
   "Create overlays that mask leading spaces for highlighted sexps."
-  (let* ((bg hl-sexp-mask-leading-space-background-color)
-         (num count)
-         attributes)
-    (while (> num 0)
-      (setq attributes (face-attr-construct 'hl-sexp-mask-leading-space-face))
-      (setq attributes (plist-put attributes :background bg))
-      (push (make-overlay 0 0) hl-sexp-mask-whitespace-overlays)
-      (overlay-put (car hl-sexp-mask-whitespace-overlays) 'face attributes)
-      ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
-      ;; (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority num)
-      (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority 5)
-      (cl-decf num))
-    (setq hl-sexp-mask-whitespace-overlays (nreverse hl-sexp-mask-whitespace-overlays))))
+  (when (null hl-sexp-mask-whitespace-overlays)
+    (let* ((bg hl-sexp-mask-leading-space-background-color)
+           (num count)
+           attributes)
+      (while (> num 0)
+        (setq attributes (face-attr-construct 'hl-sexp-mask-leading-space-face))
+        (setq attributes (plist-put attributes :background bg))
+        (push (make-overlay 0 0) hl-sexp-mask-whitespace-overlays)
+        (overlay-put (car hl-sexp-mask-whitespace-overlays) 'face attributes)
+        ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
+        ;; (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority num)
+        (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority 5)
+        (cl-decf num))
+      (setq hl-sexp-mask-whitespace-overlays (nreverse hl-sexp-mask-whitespace-overlays)))))
 
 (defun get-leading-space-positions (begin end)
   "Return a seq of alists with match-beginning and match-end for
@@ -761,60 +759,62 @@ trailing whitespace in the region delimited with BEGIN and END."
 
 (defun hl-sexp-create-paren-overlays ()
   "Create overlays for highlighting parens."
-  (let* ((fg hl-sexp-paren-colors)
-         (bg hl-sexp-paren-background-colors)
-         (attr hl-sexp-paren-attributes)
-         (count (max (length fg) (length bg) (length attr)))
-         (num count)
-         attributes)
-    (while (> num 0)
-      (setq attributes (face-attr-construct 'hl-sexp-paren-face))
-      (when (car fg)
-        (setq attributes (plist-put attributes :foreground (car fg))))
-      (pop fg)
-      (when (car bg)
-        (setq attributes (plist-put attributes :background (car bg))))
-      (pop bg)
-      (when (car attr)
-        (cl-loop for (key . (val . _rest)) on (car attr) by #'cddr
-              do (setq attributes
-                       (plist-put attributes key val))))
-      (pop attr)
-      (push (make-overlay 0 0) hl-sexp-paren-overlays)
-      (overlay-put (car hl-sexp-paren-overlays) 'face attributes)
-      ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
-      ;; (overlay-put (car hl-sexp-paren-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-overlays) 'priority 3)
-      (cl-decf num))
-    (setq hl-sexp-paren-overlays (nreverse hl-sexp-paren-overlays))))
+  (when (null hl-sexp-paren-overlays)
+    (let* ((fg hl-sexp-paren-colors)
+           (bg hl-sexp-paren-background-colors)
+           (attr hl-sexp-paren-attributes)
+           (count (max (length fg) (length bg) (length attr)))
+           (num count)
+           attributes)
+      (while (> num 0)
+        (setq attributes (face-attr-construct 'hl-sexp-paren-face))
+        (when (car fg)
+          (setq attributes (plist-put attributes :foreground (car fg))))
+        (pop fg)
+        (when (car bg)
+          (setq attributes (plist-put attributes :background (car bg))))
+        (pop bg)
+        (when (car attr)
+          (cl-loop for (key . (val . _rest)) on (car attr) by #'cddr
+                   do (setq attributes
+                            (plist-put attributes key val))))
+        (pop attr)
+        (push (make-overlay 0 0) hl-sexp-paren-overlays)
+        (overlay-put (car hl-sexp-paren-overlays) 'face attributes)
+        ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
+        ;; (overlay-put (car hl-sexp-paren-overlays) 'priority num)
+        (overlay-put (car hl-sexp-paren-overlays) 'priority 3)
+        (cl-decf num))
+      (setq hl-sexp-paren-overlays (nreverse hl-sexp-paren-overlays)))))
 
 (defun hl-sexp-create-paren-when-at-del-overlays ()
   "Create overlays for highlighting delimiters when the point is next to them."
-  (let* ((fg hl-sexp-paren-when-at-del-colors)
-         (bg hl-sexp-paren-when-at-del-background-colors)
-         (attr hl-sexp-paren-when-at-del-attributes)
-         (count (max (length fg) (length bg) (length attr)))
-         (num count)
-         attributes)
-    (while (> num 0)
-      (setq attributes (face-attr-construct 'hl-sexp-paren-when-at-del-face))
-      (when (car fg)
-        (setq attributes (plist-put attributes :foreground (car fg))))
-      (pop fg)
-      (when (car bg)
-        (setq attributes (plist-put attributes :background (car bg))))
-      (pop bg)
-      (when (car attr)
-        (cl-loop for (key . (val . _rest)) on (car attr) by #'cddr
-              do (setq attributes
-                       (plist-put attributes key val))))
-      (pop attr)
-      (push (make-overlay 0 0) hl-sexp-paren-when-at-del-overlays)
-      (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'face attributes)
-      ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
-      ;; (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority num)
-      (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority 3)
-      (cl-decf num))
-    (setq hl-sexp-paren-when-at-del-overlays (nreverse hl-sexp-paren-when-at-del-overlays))))
+  (when (null hl-sexp-paren-when-at-del-overlays)
+    (let* ((fg hl-sexp-paren-when-at-del-colors)
+           (bg hl-sexp-paren-when-at-del-background-colors)
+           (attr hl-sexp-paren-when-at-del-attributes)
+           (count (max (length fg) (length bg) (length attr)))
+           (num count)
+           attributes)
+      (while (> num 0)
+        (setq attributes (face-attr-construct 'hl-sexp-paren-when-at-del-face))
+        (when (car fg)
+          (setq attributes (plist-put attributes :foreground (car fg))))
+        (pop fg)
+        (when (car bg)
+          (setq attributes (plist-put attributes :background (car bg))))
+        (pop bg)
+        (when (car attr)
+          (cl-loop for (key . (val . _rest)) on (car attr) by #'cddr
+                   do (setq attributes
+                            (plist-put attributes key val))))
+        (pop attr)
+        (push (make-overlay 0 0) hl-sexp-paren-when-at-del-overlays)
+        (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'face attributes)
+        ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
+        ;; (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority num)
+        (overlay-put (car hl-sexp-paren-when-at-del-overlays) 'priority 3)
+        (cl-decf num))
+      (setq hl-sexp-paren-when-at-del-overlays (nreverse hl-sexp-paren-when-at-del-overlays)))))
 
 ;;; highlight-sexps.el ends here
