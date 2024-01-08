@@ -3112,6 +3112,10 @@ left by `org-mark-element`."
   (modify-syntax-entry ?\~ "'" org-mode-syntax-table)
   ;; make ?: a word constituent
   ;; (modify-syntax-entry ?\: "w" org-mode-syntax-table)
+  ;; the default for ?< is open delimiter constituent, fails (check-parens)
+  ;; make it a symbol constituent, like "+", "-" etc
+  (modify-syntax-entry ?\< "_" org-mode-syntax-table)
+  (modify-syntax-entry ?\> "_" org-mode-syntax-table)
   )
 
 ;;** org-mode: faces, fonts
