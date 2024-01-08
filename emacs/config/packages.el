@@ -9893,22 +9893,39 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;;* templates, snippets
 
-;;** templates, snippets: tempel
+;;** templates, snippets: tempo
 
-(straight-use-package
- '(tempel :type git :flavor melpa :host github :repo "minad/tempel"))
+(require 'tempo)
 
-(require 'tempel)
+(defvar ram-tempo-org-template-tags nil
+  "A template tag list for `tempo-use-tag-list' for `org-mode'.")
 
-;;*** templates, snippets/tempel: settings
+(defun ram-tempo-init-org-template-tags ()
+  "Use specific to Org settings.
 
-(setq tempel-auto-reload t)
-(setq tempel-path "~/.emacs.d/lisp/templates")
+Collect tags in `ram-tempo-org-template-tags'.
+Modify `tempo-match-finder'."
+  ;; use tags for templates that start with "<"
+  (setq-local tempo-match-finder "\\(<[[:word:]]+\\)\\=")
+  (tempo-use-tag-list 'ram-tempo-org-template-tags))
 
-(setq tempel-trigger-prefix "<")
+(defvar ram-tempo-elisp-template-tags nil
+  "A template tag list for `tempo-use-tag-list' for `emacs-lisp-mode'.")
 
+(defun ram-tempo-init-elisp-template-tags ()
+  "Use specific to emacs-lisp settings.
 
-;;*** templates, snippets/tempel: functions
+Collect tags in `ram-tempo-elisp-template-tags'.
+Modify `tempo-match-finder'."
+  ;; use tags for templates that start with "<"
+  (setq-local tempo-match-finder "\\(<[[:word:]]+\\)\\=")
+  (tempo-use-tag-list 'ram-tempo-elisp-template-tags))
+
+(add-hook 'org-mode-hook #'ram-tempo-init-org-template-tags)
+
+(add-hook 'emacs-lisp-mode-hook #'ram-tempo-init-elisp-template-tags)
+
+;;*** templates, snippets/tempo: functions
 
 (defun ram-get-prev-org-code-block-value (language)
   "Return the previous code block content written in LANGUAGE."
@@ -9917,7 +9934,13 @@ buffer-local `ram-face-remapping-cookie'."
       (condition-case err
           ;; loop through previous code blocks
           (while (not block-content)
-            (org-previous-block 1)
+            ;; when called from a template when
+            ;; the #+begin_src was already inserted
+            ;; it will consider that it is inside
+            ;; source block. We do not want that.
+            (if (org-in-src-block-p 'INSIDE nil)
+                (org-previous-block 2)
+              (org-previous-block 1))
             (let ((el (org-element-at-point)))
               ;; search for code block in LANGUAGE
               (when (string-equal language (org-element-property :language el))
@@ -9925,13 +9948,13 @@ buffer-local `ram-face-remapping-cookie'."
                 (setq block-content (org-element-property :value el)))))
         (user-error (if (string= (error-message-string err)
                                  "No previous code blocks")
-                        ""
-                        (signal (car err) (cdr err))))
+                        (setq block-content "\n")
+                      (signal (car err) (cdr err))))
         (error (signal (car err) (cdr err)))
         ;; (:success
         ;;  nil)
         )
-      (or block-content ""))))
+      (or block-content "\n"))))
 
 (defun ram-get-org-code-block-img-count ()
   "Get greatest number used an image counter for Org code blocks.
@@ -9942,21 +9965,24 @@ Use this counter to distinguish each image output.
 Map through all 'src-block Org Mode elements and find the
 greatest number in there :file header arguments where :results
 includes \"graphics\""
-  (let ((img-count 0)
-        (org-file-args (when (eq 'org-mode major-mode)
-                         (org-element-map
-                             (org-element-parse-buffer 'element)
-                             'src-block
-                           (lambda (sb)
-                             (let ((header-args (append (org-babel-parse-header-arguments
-                                                         (org-element-property :parameters sb))
-                                                        (org-babel-parse-header-arguments
-                                                         (string-join (org-element-property :header sb) " ")))))
-                               (and (assq :results header-args)
-                                    (member "graphics" (string-split (cdr (assq :results header-args)) " "))
-                                    (cdr (assq :file header-args))))
-                             )
-                           nil nil 'no-recursion nil))))
+  (let* ((img-count 0)
+         (parsed-buffer (copy-tree (let ((old-buffer (current-buffer)))
+                                     (with-temp-buffer (insert-buffer-substring old-buffer)
+                                                       (org-element-parse-buffer 'element nil nil)))))
+         (org-file-args (when (eq 'org-mode major-mode)
+                          (org-element-map
+                              parsed-buffer
+                              'src-block
+                            (lambda (sb)
+                              (let ((header-args (append (org-babel-parse-header-arguments
+                                                          (org-element-property :parameters sb))
+                                                         (org-babel-parse-header-arguments
+                                                          (string-join (org-element-property :header sb) " ")))))
+                                (and (assq :results header-args)
+                                     (member "graphics" (string-split (cdr (assq :results header-args)) " "))
+                                     (cdr (assq :file header-args))))
+                              )
+                            nil nil 'no-recursion nil))))
     (dolist (file org-file-args)
       (let* ((f (file-name-base file))
              (curr-img-count (string-to-number
@@ -9982,25 +10008,15 @@ Derive it from either:
 
     (string-join (string-split (downcase raw-name) " " 'omit_nuls "[ \f\t\r\v]+") "_")))
 
-(defun tempel-setup-capf ()
-  ;; Add the Tempel Capf to `completion-at-point-functions'.
-  ;; `tempel-expand' only triggers on exact matches. Alternatively use
-  ;; `tempel-complete' if you want to see all matches, but then you
-  ;; should also configure `tempel-trigger-prefix', such that Tempel
-  ;; does not trigger too often when you don't expect it. NOTE: We add
-  ;; `tempel-expand' *before* the main programming mode Capf, such
-  ;; that it will be tried first.
-  (setq-local completion-at-point-functions
-              (cons #'tempel-expand
-                    completion-at-point-functions)))
+;;*** templates, snippets/tempo: abbrevs
 
-;;*** templates, snippets/tempel: hooks, advice, timers
+;; enable expansion of templates identified by their tags
 
-;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
-;; (add-hook 'prog-mode-hook 'tempel-setup-capf)
-;; (add-hook 'text-mode-hook 'tempel-setup-capf)
-(add-hook 'org-mode-hook #'tempel-setup-capf)
-(add-hook 'org-mode-hook #'tempel-abbrev-mode)
+;;*** templates, snippets/tempo: templates
+
+;; load tempo templates
+(when (file-readable-p "~/.emacs.d/lisp/ram-tempo-templates.el")
+    (load-file (expand-file-name "~/.emacs.d/lisp/ram-tempo-templates.el")))
 
 ;;* sayid
 ;; (straight-use-package
