@@ -6920,6 +6920,64 @@ Return a cons of the new text cordinates."
   ;; originally, "C-:" is bound to #'clojure-toggle-keyword-string
   (define-key clojure-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp))
 
+;;** brackets, parentheses, parens, sexps: ram-manage-sexps-mode
+
+(defvar ram-manage-sexps-mode-map nil
+  "Keymap for `ram-manage-sexps-mode'")
+
+(setq ram-manage-sexps-mode-map (make-sparse-keymap))
+
+(define-key ram-manage-sexps-mode-map (kbd "<end>" ) #'ram-mark-sexp)
+(define-key ram-manage-sexps-mode-map (kbd "<home>" ) #'ram-copy-sexp)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "<down>") #'ram-forward-list)
+(define-key ram-manage-sexps-mode-map (kbd "<up>") #'ram-backward-list)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "M-<down>" ) #'ram-move-sexp-down)
+(define-key ram-manage-sexps-mode-map (kbd "M-<up>" ) #'ram-move-sexp-up)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "S-<down>") #'ram-next-defun)
+(define-key ram-manage-sexps-mode-map (kbd "S-<up>") #'ram-prev-defun)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "C-<down>" ) #'ram-clone-sexp-forward)
+(define-key ram-manage-sexps-mode-map (kbd "C-<up>" ) #'ram-clone-sexp-backward)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+(define-key ram-manage-sexps-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
+(define-key ram-manage-sexps-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
+(define-key ram-manage-sexps-mode-map (kbd "S-<right>" ) #'ram-end-of-top-sexp)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "C-<left>" ) #'ram-up-list-backward)
+(define-key ram-manage-sexps-mode-map (kbd "C-<right>" ) #'ram-up-list-forward)
+
+;; ------
+(define-key ram-manage-sexps-mode-map (kbd "C-," ) #'ram-kill-at-point)
+
+;; flatten sexp
+(define-key ram-manage-sexps-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp)
+
+
+(define-minor-mode ram-manage-sexps-mode
+  "Minor mode handling s-expressions."
+  nil " ram-manage-sexps-mode" ram-manage-sexps-mode-map
+  (if ram-manage-sexps-mode
+      (progn
+        (message "enable ram-manage-sexps-mode"))
+    (message "disable ram-manage-sexps-mode")
+    ))
+
 ;;* linters
 
 ;;* linters: flycheck-clj-kondo
