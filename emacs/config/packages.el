@@ -4968,7 +4968,7 @@ Ignore \"No following same-level heading\" error, call
 
 ;;** outline: outline-regexp
 
-(defvar ram-outline-regxp-for-lisp "[[:space:]]*;;\\(?:;+[^#]\\|\\*+\\)"
+(defvar ram-outline-regxp-for-lisp "[[:space:]]*;;[[:space:]]?\\(?:;+[^#]\\|\\*+\\)"
   "`outline-regexp' for languages with comments defined by \";\".")
 
 (add-hook 'emacs-lisp-mode-hook
