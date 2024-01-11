@@ -298,17 +298,17 @@ Color attributes might be overriden by
 
 (defvar-local hl-sexp-mask-whitespace-overlays nil)
 
-(defvar-local hl-sexp-mask-leading-space-background-color
+(defvar-local hl-sexp-mask-space-background-color
   (let ((bg (face-background 'default)))
     (if (or (not (stringp bg))
             (string-match "\\`unspecified-" bg))
-        "#000000"
+        "#888888"
       bg))
-  "*Background overlay face color to mask leading spaces.")
+  "*Background overlay face color to mask leading and trailing spaces.")
 
-(defface hl-sexp-mask-leading-space-face nil
-  "*Face used for covering whitespace modified by other overlays.
-Color attributes might be overriden by `hl-sexp-mask-leading-space-background-color'."
+(defface hl-sexp-mask-space-face nil
+  "*Face used for covering leading and trailing whitespace.
+Color attributes might be overriden by `hl-sexp-mask-space-background-color'."
   :group 'highlight-sexps)
 
 (defvar-local hl-sexp-last-point -1
@@ -384,7 +384,7 @@ repeating highlighting the same sexps in the same context.")
               (move-overlay overlay pos1 pos2)))
         (error nil))
       (when sexps-for-mask
-        (hl-sexp-mask-leading-space sexps-for-mask))
+        (hl-sexp-mask-leading-trailing-space sexps-for-mask))
       (when sexps-for-parens
         (while (and (car overlays-parens) sexps-for-parens)
           (let* ((overlay-1 (pop (car overlays-parens)))
@@ -564,7 +564,7 @@ repeating highlighting the same sexps in the same context.")
   (setq hl-sexp-background-colors
         ;; (ram-make-highlight-color (face-background 'default) 0 8000)
         '("thistle1" "LightSteelBlue1"))
-  (setq hl-sexp-mask-leading-space-background-color
+  (setq hl-sexp-mask-space-background-color
         (face-background 'default))
 
   (dolist (buffer (buffer-list))
@@ -617,17 +617,17 @@ repeating highlighting the same sexps in the same context.")
 	  (scan-sexps pt 1)
 	(error nil)))
 
-(defun hl-sexp-end-points (pt n)
-  "Get beginning and ending points of N depths of s-expressions
-surrounding PT."
+(defun hl-sexp-end-points (point depth)
+  "Get beginning and ending points of DEPTH depths of s-expressions
+surrounding POINT."
   (let (results prev next
-                (p pt))
+                (p point))
     (when hl-sexp-highlight-adjacent
       (cond ((memq (char-before p) hl-sexp-close-delimiters)
              (setq p (1- p)))
             ((memq (char-after p) hl-sexp-open-delimiters)
              (setq p (1+ p)))))
-    (dotimes (i n (nreverse results))
+    (dotimes (i depth (nreverse results))
       (when (not (= p 0))
         (setq prev (hl-sexp-start-of-sexp p))
         (when prev
@@ -696,17 +696,18 @@ surrounding PT."
 (defun hl-sexp-create-overlays-masking-leading-space (count)
   "Create overlays that mask leading spaces for highlighted sexps."
   (when (null hl-sexp-mask-whitespace-overlays)
-    (let* ((bg hl-sexp-mask-leading-space-background-color)
+    (let* ((bg hl-sexp-mask-space-background-color)
            (num count)
            attributes)
       (while (> num 0)
-        (setq attributes (face-attr-construct 'hl-sexp-mask-leading-space-face))
+        (setq attributes (face-attr-construct 'hl-sexp-mask-space-face))
         (setq attributes (plist-put attributes :background bg))
+        (setq attributes (plist-put attributes :extend t))
         (push (make-overlay 0 0) hl-sexp-mask-whitespace-overlays)
         (overlay-put (car hl-sexp-mask-whitespace-overlays) 'face attributes)
         ;; setting 'priority to positive integer hides over overlays: lispy, mark region etc.
         ;; (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority num)
-        (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority 5)
+        (overlay-put (car hl-sexp-mask-whitespace-overlays) 'priority '(nil . 2))
         (cl-decf num))
       (setq hl-sexp-mask-whitespace-overlays (nreverse hl-sexp-mask-whitespace-overlays)))))
 
@@ -717,23 +718,50 @@ leading whitespace in the region delimited with BEGIN and END."
     (save-match-data
       (save-excursion
         (goto-char begin)
+        (push (cons (point-at-bol) (point)) matches)
         (while (search-forward-regexp "^[^[:graph:]]+" end t 1)
           (push `(,(match-beginning 0) . ,(match-end 0)) matches))))
     matches))
+
+;; (defun get-trailing-space-positions (begin end)
+;;   "Return a seq of alists with match-beginning and match-end for
+;; trailing whitespace in the region delimited with BEGIN and END."
+;;   (let ((matches))
+;;     (save-match-data
+;;       (save-excursion                   ; some ; comment {exp}:
+;;         (goto-char begin)
+;;         (while (search-forward-regexp "[^;[:space:]][[:space:]]*?\\(?:\\s<+[[:print:]]*\\|[[:space:]]*?\\)\n" (1+ end) t 1)
+;;           (push `(,(1+ (match-beginning 0)) . ,(match-end 0)) matches))))
+;;     matches))
 
 (defun get-trailing-space-positions (begin end)
   "Return a seq of alists with match-beginning and match-end for
 trailing whitespace in the region delimited with BEGIN and END."
   (let ((matches))
-    (save-match-data
-      (save-excursion                   ; some comment {exp}:
-        (goto-char begin)
-        (while (search-forward-regexp "[^;[:space:]][[:space:]]*?\\(?:\\s<+[[:print:]]*\\|[[:space:]]*?\\)\n" (1+ end) t 1)
-          (push `(,(1+ (match-beginning 0)) . ,(match-end 0)) matches))))
+    (save-excursion
+      (goto-char begin)
+      (while (< (point) end)
+        (end-of-line)
+        ;; inline comments are masked over.
+        ;; but if there nothing but a comment on the line, do not mask it over:
+        (when (not (save-excursion (back-to-indentation) (forward-char) (nth 4 (syntax-ppss))))
+         ;; while in inline comment:
+         (while (nth 4 (syntax-ppss))
+           ;; go back
+           (backward-char))
+         ;; while looking back at whitespace:
+         (while
+             (eq (char-before) (string-to-char " "))
+           ;; go back
+           (backward-char)))
+        (push (cons (point) (1+ (point-at-eol))) matches)
+        (next-line) (beginning-of-line)))
     matches))
 
-(defun hl-sexp-mask-leading-space (segments)
-  "Create overlays used for masking leading spaces for highlighted sexps."
+;; TODO: consider putting the highlighting overlays only over visible
+;; part of the line. This way, you will not need to mask anything.
+(defun hl-sexp-mask-leading-trailing-space (segments)
+  "Hide leading and trailing spaces for highlighted sexps."
   (let* ((overlays hl-sexp-mask-whitespace-overlays)
          (begin-end (car (last segments)))
          (begin (car begin-end))
