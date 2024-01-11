@@ -1,4 +1,4 @@
-;;** abbrev: global-abbrev-table
+;;* global-abbrev-table
 
 ;; credit to http://ergoemacs.org/emacs/emacs_abbrev_mode.html
 
@@ -15,10 +15,10 @@
     ("3d" "third")
     ("ty" "thank you")
     ("□" "□")
-    
+
     ("Therefor" "Therefore")
     ("therefor" "therefore")
-    
+
     ;; Pāli
     ("AA" "Ā")
     ("aa" "ā")
@@ -43,7 +43,7 @@
     ;; (".l" "ḷ")
     ))
 
-;;** abbrev: clojure-mode-abbrev-table
+;;* clojure-mode-abbrev-table
 
 (setq clojure-abbrevs
         '(
@@ -68,21 +68,26 @@
   (define-abbrev-table 'cider-repl-mode-abbrev-table
     clojure-abbrevs))
 
-;;** abbrev: emacs-lisp-mode-abbrev-table
+;;* elisp emacs-lisp
 
-(when (boundp 'emacs-lisp-mode-abbrev-table)
-  (clear-abbrev-table emacs-lisp-mode-abbrev-table))
+(with-eval-after-load "abbrev"
 
-(setq emacs-lisp-abbrevs
-      '(
-        ("df" "defun")
-        ("la" "lambda")
-        ("lam" "lambda")))
+  (when (boundp 'lisp-mode-abbrev-table)
+    (clear-abbrev-table lisp-mode-abbrev-table))
 
-(define-abbrev-table 'emacs-lisp-mode-abbrev-table
-  emacs-lisp-abbrevs)
+  (setq emacs-lisp-abbrevs
+        '(
+          ("df" "defun")
+          ("la" "lambda")
+          ("lam" "lambda")
+          ;;
+          ))
 
-;;** abbrev: racket-repl-mode-abbrev-table
+  (define-abbrev-table 'lisp-mode-abbrev-table
+    emacs-lisp-abbrevs))
+
+
+;;* racket-repl-mode-abbrev-table
 
 (setq racket-abbrevs
       '(
@@ -109,7 +114,7 @@
   (define-abbrev-table 'racket-repl-mode-abbrev-table
     racket-abbrevs))
 
-;;** abbrev: org-mode-abbrev-table
+;;* org-mode
 
 (with-eval-after-load "org"
   (when (boundp 'org-mode-abbrev-table)
@@ -118,24 +123,24 @@
   (setq org-abbrevs
         '(
 
-          ;;*** Greek
+          ;;** Greek
 
           ("theta" "Θ")
 
-          ;;*** Latin
+          ;;** Latin
 
           ("eg" "e.g.,")
           ("ie" "i.e.,")
 
           ("~c" "~cons~")
 
-          ;;*** a
+          ;;** a
 
           ("ai" "artificial intelligence")
 
           ("aor" "area of responsibility")
           ("ab" "abstraction")
-          
+
           ("ag" "argument")
           ("ags" "arguments")
           ("arg" "argument")
@@ -165,7 +170,7 @@
           ("autom" "automatically")
           ("autly" "automatically")
 
-          ;;*** b
+          ;;** b
 
           ("bl" "buffer-local")
 
@@ -182,7 +187,7 @@
           ("bt" "binary tree")
           ("bts" "binary trees")
 
-          ;;*** c
+          ;;** c
 
           ("calc" "calculate")
           ("calcs" "calculates")
@@ -197,7 +202,6 @@
           ("cd" "could")
 
           ("chr" "character")
-          ("char" "character")
           ("chrs" "characters")
           ("chars" "characters")
           ("charz" "characterize")
@@ -208,7 +212,7 @@
           ("Cj" "Clojure")
 
           ("clf" "clausal form of logic")
-          
+
           ("clp" "classpath")
           ("clsp" "clojure-lsp")
 
@@ -235,11 +239,8 @@
 
           ("comds" "commands")
 
-          ("con" "consequence")
-          ("cons" "consequences")
-
           ("concl" "conclusion")
-          
+
           ("concr" "concurrent")
           ("concrt" "concurrent")
           ("concrc" "concurrency")
@@ -265,7 +266,7 @@
           ("corry" "correctly")
           ("cory" "correctly")
 
-          ;;*** d
+          ;;** d
 
           ("dec" "declare")
           ("decn" "declaration")
@@ -309,7 +310,7 @@
           ("drs" "derivatives")
 
 
-          ;;*** e
+          ;;** e
 
           ("el" "element")
           ("els" "elements")
@@ -345,7 +346,7 @@
           ("exts" "executes")
           ("exn" "execution")
 
-          ;;*** f
+          ;;** f
 
           ("fn" "function")
           ("fns" "functions")
@@ -359,22 +360,22 @@
           ("fsg" "finite state generator")
           ("fsr" "finite state recognizer")
 
-          ;;*** h
+          ;;** h
 
-          
+
           ("hier" "hierarchy")
           ("hiers" "hierarchies")
           ("hl" "headline")
           ("hls" "headlines")
 
-          ;;*** i
+          ;;** i
 
           ("ifif" "if and only if")
-          
+
           ("inst" "instance")
           ("insts" "instances")
-          ("instt" "instantiate") 
-          
+          ("instt" "instantiate")
+
           ("imp" "implement")
           ("imps" "implements")
           ("impd" "implemented")
@@ -384,7 +385,7 @@
 
           ("impl" "implication")
           ("impls" "implications")
-          
+
           ("impt" "important")
 
           ("inct" "inconsistent")
@@ -394,7 +395,7 @@
 
           ("indv" "individual")
           ("indvs" "individuals")
-          
+
           ("inf" "information")
 
           ("init" "initialize")
@@ -423,7 +424,7 @@
           ("kw" "keyword")
           ("kws" "keywords")
 
-          ;;*** l
+          ;;** l
 
           ("labelled" "labeled")
           ("latex" "LaTeX")
@@ -436,7 +437,7 @@
           ("lg" "language")
           ("lgs" "languages")
 
-          ;;*** m
+          ;;** m
 
           ("mach" "machine")
           ("machs" "machines")
@@ -459,7 +460,7 @@
           ("mtg" "manipulating")
           ("mec" "mechanism")
 
-          ;;*** n
+          ;;** n
 
           ("nams" "namespace")
           ("namss" "namespaces")
@@ -475,7 +476,7 @@
           ("nondc" "nondeterministic")
           ("nondy" "nondeterministically")
 
-          ;;*** o
+          ;;** o
 
           ("ob" "object")
           ("obs" "objects")
@@ -484,7 +485,7 @@
 
           ("oa" "org-agenda")
 
-          ;;*** p
+          ;;** p
 
           ("par" "paragraph")
           ("pars" "paragraphs")
@@ -513,7 +514,7 @@
           ("pgr" "programmer")
           ("pgrs" "programmers")
 
-          ;;**** pr
+          ;;*** pr
           ("pr" "procedure")
           ("prs" "procedures")
           ("prl" "procedural")
@@ -550,7 +551,7 @@
           ("qr" "query")
           ("qrs" "queries")
 
-          ;;*** r
+          ;;** r
 
           ("rc" "recursive")
           ("rcl" "recursively")
@@ -587,7 +588,7 @@
           ("rng" "returning")
           ("rns" "returns")
 
-          ;;*** s
+          ;;** s
 
           ("seq" "sequence")
           ("seql" "sequential")
@@ -596,7 +597,7 @@
           ("sdt" "shouldn't")
 
           ("sl" "standard form of logic")
-          
+
           ("sol" "solution")
           ("soln" "solution")
           ("sols" "solutions")
@@ -636,7 +637,7 @@
           ("sys" "system")
           ("syss" "systems")
 
-          ;;*** t
+          ;;** t
 
           ("tech" "technology")
 
@@ -648,14 +649,14 @@
 
           ("todo" "TODO")
 
-          ;;*** u
+          ;;** u
 
           ("udp" "UDP")                 ; universal design pattern
           ("und" "understand")
           ("undd" "understood")
           ("undg" "understanding")
 
-          ;;*** v
+          ;;** v
 
           ("val" "value")
           ("vals" "values")
@@ -671,10 +672,10 @@
           ("wo" "without")
           ("wd" "would")
 
-          ;;*** x
+          ;;** x
           ("Xt" "XTDB")
 
-          ;;*** the end
+          ;;** the end
           ))
 
   ;; gives error "circular list ..."
@@ -686,7 +687,7 @@
   (abbrev-table-put org-mode-abbrev-table
                     :parents (list auto-correct-typo-abbrev-table)))
 
-;; ** abbrev: text-mode-abbrev-table
+;;* text-mode-abbrev-table
 
 (abbrev-table-put text-mode-abbrev-table
                   :parents (list auto-correct-typo-abbrev-table))
