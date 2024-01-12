@@ -88,11 +88,87 @@
 ;; (setq save-abbrevs 'silently)
 (setq save-abbrevs nil)
 
+;;** abbrev: functions
+
+(defun ram-abbrev-custom-expand-function (expand)
+  (let* ((org-src-block-lang (and (eq 'org-mode major-mode)
+                                  (org-in-src-block-p 'INSIDE)
+                                  (car (org-babel-get-src-block-info))))
+         (org-src-block-abbrevs (if-let* ((org-src-block-lang)
+                                          (sym (intern-soft (concat org-src-block-lang "-mode-abbrev-table")))
+                                          ((boundp sym)))
+                                    (symbol-value sym)
+                                  (when (and org-src-block-lang
+                                             (boundp 'prog-mode-abbrev-table))
+                                    prog-mode-abbrev-table)))
+         match tempo-templ str-p comment-p)
+    (undo-boundary)
+    ;; set str-p and comment-p
+    (if org-src-block-lang
+        (with-syntax-table
+            (or (eval (intern-soft
+                       (concat org-src-block-lang "-mode-syntax-table")))
+                (syntax-table))
+          (setq str-p (nth 3 (syntax-ppss)))
+          (setq comment-p (nth 4 (syntax-ppss))))
+      (setq str-p (nth 3 (syntax-ppss)))
+      (setq comment-p (nth 4 (syntax-ppss))))
+    (setq match (tempo-find-match-string tempo-match-finder))
+    ;; search in each list in tempo-local-tags
+    ;; stop when found,
+    ;; this complexity is for the sake of efficiency.
+    (setq tempo-templ (and match
+                           (cl-loop named 'search-for-tempo-template
+                                    with templ
+                                    with tags
+                                    with tags-lists = tempo-local-tags
+                                    while (and (not templ)
+                                               (setq tags (car tags-lists)))
+                                    do
+                                    (setq templ (assoc (car match) (eval (car tags) t)))
+                                    (setq tags-lists (cdr tags-lists))
+                                    finally return templ)))
+    ;; (message "????? org-src-block-abbrevs %S" org-src-block-abbrevs)
+    (cond
+     (str-p (let ((local-abbrev-table org-mode-abbrev-table))
+              (funcall expand)))
+     (comment-p (let ((local-abbrev-table org-mode-abbrev-table))
+                  (funcall expand)))
+     (org-src-block-abbrevs (let ((local-abbrev-table org-src-block-abbrevs))
+                              (funcall expand)))
+     ((and tempo-templ (not str-p) (not comment-p))
+      (delete-region (cdr match) (point))
+      (funcall (cdr tempo-templ))
+      'ram-abbrev-custom-expand-function-alias
+      ;;
+      )
+     (t (funcall expand))))
+  ;;
+  )
+;; the alias seem vital to handle 'no-self-insert properly by abbrev
+(fset 'ram-abbrev-custom-expand-function-alias 'ram-abbrev-custom-expand-function)
+(put 'ram-abbrev-custom-expand-function 'no-self-insert t)
+
+;;** abbrev: hooks, advice, timers
+
+;; enable #'ram-abbrev-custom-expand-function-alias for every buffer
+;; you may consider separating Org part of the logic if it proves to be too slow
+;; (add-function :around (local 'abbrev-expand-function) #'ram-abbrev-custom-expand-function)
+
+(defun ram-abbrev-set-custom-expand-fn ()
+  "Add `ram-abbrev-custom-expand-function' to default `abbrev-expand-function'."
+  (add-function :around (local 'abbrev-expand-function) #'ram-abbrev-custom-expand-function))
+
+(with-eval-after-load 'org
+  (add-hook 'org-mode-hook #'ram-abbrev-set-custom-expand-fn))
+
+(add-hook 'emacs-lisp-mode-hook #'ram-abbrev-set-custom-expand-fn)
+
 ;; (setq save-abbrevs nil)
 
-;; ** abbrev: auto-correct typo
+;;** abbrev: auto-correct typo
 
-;; *** abbrev/auto-correct: auto-correct-typo-abbrev-table
+;;*** abbrev/auto-correct: auto-correct-typo-abbrev-table
 
 ;; define auto-correct-typo-abbrev-table if it is not defined
 (when (not (boundp 'auto-correct-typo-abbrev-table))
