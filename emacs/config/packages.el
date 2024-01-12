@@ -3199,6 +3199,10 @@ left by `org-mark-element`."
 ;; (setq org-src-block-faces
 ;;       '(("clojure" (:family "Operator Mono Medium" :weight 'normal :background "#EEFFEE"))))
 
+;; (setq org-src-block-faces
+;;         '(("emacs-lisp" (:background "#EEE2FF"))
+;;           ("python" (:background "#e5ffb8"))))
+
 ;; !!! Including :weight property would reset
 ;; font-lock-string-face and font-lock-doc-face that are set to light.
 ;; (with-eval-after-load "org"
@@ -3301,10 +3305,22 @@ left by `org-mark-element`."
 (setq org-confirm-babel-evaluate nil
       org-src-fontify-natively t
       org-return-follows-link t)
+
+;;** org-mode: code blocks
+
+;;** org-mode/code blocks: indent
+
 ;; do not indent code in code-blocks
-(setq org-edit-src-content-indentation 0
-      org-src-tab-acts-natively t
-      org-src-preserve-indentation t)
+(setq org-src-preserve-indentation t)
+
+(setq org-edit-src-content-indentation 0)
+
+;; non-nil, use language major-mode for indentation paredit calls
+;; #'check-parens. Apparently, Org attempts to open temp buffer to
+;; indent the code. if check-parens fails, the buffer is left hanging.
+;; The source block is impossible to edit after that.
+(setq org-src-tab-acts-natively nil)
+
 
 (setq org-imenu-depth 7)
 
@@ -6313,7 +6329,6 @@ If ARG is 4, move to the end of defun."
 (add-hook 'cider-repl-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'racket-mode-hook #'ram-highlight-sexps-mode)
 (add-hook 'racket-repl-mode-hook #'ram-highlight-sexps-mode)
-(add-hook 'minibuffer-mode-hook #'ram-highlight-sexps-mode)
 
 (with-eval-after-load "ram-highlight-sexps"
   (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
