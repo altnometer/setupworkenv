@@ -6364,6 +6364,14 @@ If ARG is 4, move to the end of defun."
       (ram-at-string-end-p)
       (ram-at-comment-block-end-p)))
 
+;;** brackets, parentheses, parens, sexps: kill-whole-line
+
+(defun ram-kill-whole-line (&optional arg)
+  "Invoke `kill-whole-line' followed by `back-to-indentation'."
+  (interactive "p")
+  (kill-whole-line arg)
+  (back-to-indentation))
+
 ;;** brackets, parentheses, parens, sexps: <enter>, newline-and-indent
 
 ;; adopted from https://github.com/abo-abo/lispy #'lispy-alt-line
@@ -6922,61 +6930,77 @@ Return a cons of the new text cordinates."
 
 ;;** brackets, parentheses, parens, sexps: ram-manage-sexps-mode
 
-(defvar ram-manage-sexps-mode-map nil
+;;*** brackets, parentheses, parens, sexps: ram-manage-sexps-mode-map
+
+(defvar ram-manage-sexps-mode-map
+  (let ((keymap (make-sparse-keymap)))
+    (define-key keymap (kbd "<end>" ) #'ram-mark-sexp)
+
+    (define-key keymap (kbd "<home>" ) #'ram-copy-sexp)
+
+    (define-key keymap (kbd "<down>") #'ram-forward-list)
+    (define-key keymap (kbd "<up>") #'ram-backward-list)
+
+    (define-key keymap (kbd "M-<down>" ) #'ram-move-sexp-down)
+    (define-key keymap (kbd "M-<up>" ) #'ram-move-sexp-up)
+
+    (define-key keymap (kbd "S-<down>") #'ram-next-defun)
+    (define-key keymap (kbd "S-<up>") #'ram-prev-defun)
+
+    (define-key keymap (kbd "C-<down>" ) #'ram-clone-sexp-forward)
+    (define-key keymap (kbd "C-<up>" ) #'ram-clone-sexp-backward)
+
+    (define-key keymap (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
+    (define-key keymap (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
+
+    (define-key keymap (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
+    (define-key keymap (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
+
+    (define-key keymap (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
+    (define-key keymap (kbd "S-<right>" ) #'ram-end-of-top-sexp)
+
+    (define-key keymap (kbd "C-<left>" ) #'ram-up-list-backward)
+    (define-key keymap (kbd "C-<right>" ) #'ram-up-list-forward)
+
+    (define-key keymap (kbd "C-," ) #'ram-kill-at-point)
+
+    (define-key keymap (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp)
+
+    (define-key keymap (kbd "<return>") #'ram-newline-and-indent)
+    (define-key keymap (kbd "S-<return>") #'newline-and-indent)
+    (define-key keymap (kbd "C-S-<backspace>") #'ram-kill-whole-line)
+
+    (define-key keymap (kbd "s-k") #'ram-next-comment)
+    (define-key keymap (kbd "s-K") #'ram-previous-comment)
+
+    keymap)
   "Keymap for `ram-manage-sexps-mode'")
-
-(setq ram-manage-sexps-mode-map (make-sparse-keymap))
-
-(define-key ram-manage-sexps-mode-map (kbd "<end>" ) #'ram-mark-sexp)
-(define-key ram-manage-sexps-mode-map (kbd "<home>" ) #'ram-copy-sexp)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "<down>") #'ram-forward-list)
-(define-key ram-manage-sexps-mode-map (kbd "<up>") #'ram-backward-list)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "M-<down>" ) #'ram-move-sexp-down)
-(define-key ram-manage-sexps-mode-map (kbd "M-<up>" ) #'ram-move-sexp-up)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "S-<down>") #'ram-next-defun)
-(define-key ram-manage-sexps-mode-map (kbd "S-<up>") #'ram-prev-defun)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "C-<down>" ) #'ram-clone-sexp-forward)
-(define-key ram-manage-sexps-mode-map (kbd "C-<up>" ) #'ram-clone-sexp-backward)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "<left>") #'ram-jump-backward-to-open-delimiter)
-(define-key ram-manage-sexps-mode-map (kbd "<right>") #'ram-jump-forward-to-open-delimiter)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "M-<left>") #'ram-jump-backward-to-close-delimiter)
-(define-key ram-manage-sexps-mode-map (kbd "M-<right>") #'ram-jump-forward-to-close-delimiter)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "S-<left>" ) #'ram-beg-of-top-sexp)
-(define-key ram-manage-sexps-mode-map (kbd "S-<right>" ) #'ram-end-of-top-sexp)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "C-<left>" ) #'ram-up-list-backward)
-(define-key ram-manage-sexps-mode-map (kbd "C-<right>" ) #'ram-up-list-forward)
-
-;; ------
-(define-key ram-manage-sexps-mode-map (kbd "C-," ) #'ram-kill-at-point)
-
-;; flatten sexp
-(define-key ram-manage-sexps-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp)
-
 
 (define-minor-mode ram-manage-sexps-mode
   "Minor mode handling s-expressions."
   nil " ram-manage-sexps-mode" ram-manage-sexps-mode-map
   (if ram-manage-sexps-mode
       (progn
-        (message "enable ram-manage-sexps-mode"))
-    (message "disable ram-manage-sexps-mode")
+        ;; put setting up the minor-mode code here
+        ;; (message "enable ram-manage-sexps-mode")
+        ;;
+        )
+    ;; put setting up the minor-mode code here
+    ;; (message "disable ram-manage-sexps-mode")
     ))
+
+;;*** brackets, parentheses, parens, sexps/ram-manage-sexps-mode: hooks, advice, timers
+
+(add-hook 'minibuffer-mode-hook (lambda ()
+                                  ;; overrides <return> in minibuffer, which it should not
+                                  (define-key ram-manage-sexps-mode-map (kbd "<return>") nil)
+                                  (ram-manage-sexps-mode 1)))
+(add-hook 'emacs-lisp-mode-hook #'ram-manage-sexps-mode)
+(add-hook 'lisp-interactive-mode #'ram-manage-sexps-mode)
+(add-hook 'clojure-mode-hook #'ram-manage-sexps-mode)
+(add-hook 'cider-repl-mode-hook #'ram-manage-sexps-mode)
+(add-hook 'racket-mode-hook #'ram-manage-sexps-mode)
+(add-hook 'racket-repl-mode-hook #'ram-manage-sexps-mode)
 
 ;;* linters
 
