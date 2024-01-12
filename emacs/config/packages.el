@@ -2716,6 +2716,96 @@ the `current-prefix-arg' is non nil"
 
 ;;** org-mode: functions
 
+;;*** org-mode/functions: enable mode only in source code blocks
+
+;; test it as being global for now
+(defvar-local ram-org-block-selected-overlay nil
+  "An overlay to indicate an Org block with point inside.")
+
+;; (face-attribute 'default :background)
+
+(add-hook 'org-mode-hook (lambda () (setq-local ram-org-block-selected-overlay (make-overlay 0 0))
+                           (overlay-put ram-org-block-selected-overlay 'face '(:background "#ffffff" :extend t))
+                           (overlay-put ram-org-block-selected-overlay 'priority '(nil . -10))))
+
+(defvar-local ram-last-active-org-bloc-edges nil
+  "A record of the active Org code block edges.
+
+The beginning and the end of the inside part of the code block.
+Use it to check if you left the block or not.")
+
+(defvar ram-edit-org-block-in-lisp-for-languages
+  '("emacs-lisp" "clojure" "R")
+  "A list of languages for which to enable lisp editing in Org code blocks.")
+
+(defun ram-toggle-lisp-editing-modes-in-org-code-block ()
+  "Enable modes in Org code blocks.
+
+Disable otherwise"
+  (setq-local paredit-override-check-parens-function
+              ;; suppress #'check-parens error
+              (lambda (err) 'ignore-check-parens-error))
+  (condition-case err
+      (if-let* ((element (save-match-data (and (eq 'org-mode major-mode)
+                                               (org-in-src-block-p 'INSIDE)
+                                               (org-element-at-point))))
+                (org-src-block-lang (car (org-babel-get-src-block-info)))
+                ((member org-src-block-lang ram-edit-org-block-in-lisp-for-languages))
+                (src-element (and (org-element-type-p element 'src-block)
+                                  element))
+                ;; el-begin at the beginning of #+begin_src
+                (el-begin (org-element-post-affiliated src-element))
+                ;; el-end at the end of #+end_src
+                (el-end (org-with-point-at (org-element-end element)
+                          (skip-chars-backward " \t\n\r")
+                          (point)))
+                (inside-el-p (not (or (<= (line-beginning-position) el-begin)
+                                      (>= (line-end-position) el-end))) )
+                (content-begin (save-excursion (goto-char el-begin) (next-line) (beginning-of-line) (point)))
+                (content-end (save-excursion (goto-char el-end) (beginning-of-line) (point)))
+                (reset-syntax-table (set-syntax-table (or (eval (intern-soft
+                                                                 (concat org-src-block-lang "-mode-syntax-table")))
+                                                          (syntax-table)))))
+          ;; !!! Only ONE expression for SUCCESS part
+          (progn
+            ;; (message ">>> enabling Org block editing for lang: %s" org-src-block-lang)
+            ;; we are inside a code block still.
+            ;; are we just moved into the block?
+            (if ram-last-active-org-bloc-edges
+                ;; we are still in the code block: only move the overlay
+                (when (not (and (= (car ram-last-active-org-bloc-edges) content-begin)
+                                (= (cdr ram-last-active-org-bloc-edges) content-end)))
+                  ;; block dimensions changed, reflect that:
+                  (move-overlay ram-org-block-selected-overlay content-begin content-end)
+                  (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end)))
+              ;; we have just moved into the block: activate everything
+              (move-overlay ram-org-block-selected-overlay content-begin content-end)
+              (ram-highlight-sexps-mode 1)
+              (paredit-mode 1)
+              (ram-manage-sexps-mode 1)
+              (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end))
+              ;;
+              ))
+        ;; (message "<<< disabling Org block editing for lang: %s" org-src-block-lang)
+        ;; we are outside a code block
+        ;; have we just left the block code? if not, do nothing.
+        (when ram-last-active-org-bloc-edges
+          (setq-local ram-last-active-org-bloc-edges nil)
+          (move-overlay ram-org-block-selected-overlay 1 1)
+          (ram-highlight-sexps-mode -1)
+          (paredit-mode -1)
+          (ram-manage-sexps-mode -1)
+          (set-syntax-table org-mode-syntax-table))
+        ;;
+        )
+    ;; (user-error (when (not (string= (error-message-string err)
+    ;;                                 "No tag to remove"))
+    ;;               (signal (car err) (cdr err))))
+    (debug (signal (car err) (cdr err)))
+    (user-error (message ">>>> error from ram-org-toggle-mode- :%S" err))
+    (error (message ">>>> error from ram-org-toggle-mode- :%S" err))
+    (:success nil)))
+
 ;;*** org-mode/functions: search, jump to #+name
 
 (defvar ram-org-jump-to-name-history nil
@@ -3530,6 +3620,14 @@ left by `org-mark-element`."
 (add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
 (add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
 (add-hook 'org-src-mode-hook #'display-line-numbers-mode)
+
+(add-hook 'org-mode-hook
+          (lambda () (add-hook 'post-command-hook
+                               #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
+
+;; (remove-hook 'org-mode-hook
+;;           (lambda () (add-hook 'post-command-hook
+;;                                #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
 
 (run-with-idle-timer 1 nil #'require 'org)
 
