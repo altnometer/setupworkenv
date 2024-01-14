@@ -6076,9 +6076,9 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 (define-key global-map (kbd "M-S-<f9>") 'multiple-cursors-mode)
 ;; 3. when finished typing, press "M-S-<f9> to exit multiple cursors.
 
-;;* brackets, parentheses, parens, sexps
+;;* ram-manage-sexps-mode
 
-;;** brackets, parentheses, parens, sexps: multi-line, one-line, flatten
+;;** ram-manage-sexps-mode: multi-line, one-line, flatten
 
 (defun ram-toggle-multiline-delimited-sexp ()
   "Toggle between single line and multi-line delimited sexp format."
@@ -6114,7 +6114,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
       ;; (indent-according-to-mode)
       )))
 
-;;** brackets, parentheses, parens, sexps: navigation
+;;** ram-manage-sexps-mode: navigation
 
 (defun ram-push-mark ()
   "Push mark only if there is no mark for the point."
@@ -6386,7 +6386,7 @@ If ARG is 4, move to the end of defun."
   ;;            (goto-char (car prev-bounds)))) ))
   )
 
-;;** brackets, parentheses, parens, sexps: settings
+;;** ram-manage-sexps-mode: settings
 
 (defvar ram-delimiters "{}()[]"
   "A string of open and close delimiters pairs.")
@@ -6416,7 +6416,7 @@ If ARG is 4, move to the end of defun."
 ;; If true, #'paredit-blink-paren-match is slow
 (setq blink-matching-paren nil)
 
-;;** brackets, parentheses, parens, sexps: ram-highlight-sexps
+;;** ram-manage-sexps-mode: ram-highlight-sexps
 
 (autoload 'ram-highlight-sexps-mode "ram-highlight-sexps")
 
@@ -6431,7 +6431,7 @@ If ARG is 4, move to the end of defun."
 (with-eval-after-load "ram-highlight-sexps"
   (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
 
-;;** brackets, parentheses, parens, sexps: highlight
+;;** ram-manage-sexps-mode: highlight
 
 (defvar ram-copied-region-overlay nil
   "Highlight the region copied with `ram-copy-sexp'.")
@@ -6445,7 +6445,7 @@ If ARG is 4, move to the end of defun."
 (add-hook 'pre-command-hook (lambda () (when (symbol-value 'ram-copied-region-overlay)
                                            (move-overlay ram-copied-region-overlay 1 1))))
 
-;;** brackets, parentheses, parens, sexps: comments
+;;** ram-manage-sexps-mode: comments
 
 (defun ram-inline-comment-bounds ()
   "Return a pair of the inline comment beginning and end. "
@@ -6511,7 +6511,7 @@ If ARG is 4, move to the end of defun."
       (end-of-line)
       (point))))
 
-;;** brackets, parentheses, parens, sexps: at beg? at end?
+;;** ram-manage-sexps-mode: at beg? at end?
 
 (defun ram-at-delimited-beg-p ()
   "Return non `nil' if the point is before `ram-open-delimiters-re'."
@@ -6553,15 +6553,16 @@ If ARG is 4, move to the end of defun."
       (ram-at-string-end-p)
       (ram-at-comment-block-end-p)))
 
-;;** brackets, parentheses, parens, sexps: kill-whole-line
+;;** ram-manage-sexps-mode: kill-whole-line
 
 (defun ram-kill-whole-line (&optional arg)
   "Invoke `kill-whole-line' followed by `back-to-indentation'."
   (interactive "p")
   (kill-whole-line arg)
-  (back-to-indentation))
+  (back-to-indentation)
+  (indent-according-to-mode))
 
-;;** brackets, parentheses, parens, sexps: <enter>, newline-and-indent
+;;** ram-manage-sexps-mode: <enter>, newline-and-indent
 
 ;; adopted from https://github.com/abo-abo/lispy #'lispy-alt-line
 (defun ram-newline-and-indent (&optional arg)
@@ -6637,7 +6638,7 @@ Before invoking `newline-and-indent':
 (define-key lisp-interaction-mode-map (kbd "<return>") #'ram-newline-and-indent)
 (define-key lisp-interaction-mode-map (kbd "S-<return>") #'newline-and-indent)
 
-;;** brackets, parentheses, parens, sexps: bounds
+;;** ram-manage-sexps-mode: bounds
 
 (defun ram-in-string-p ()
   "Return non-`nil' if inside a string or at its borders."
@@ -6793,7 +6794,7 @@ Whichever happens to be first."
      ((ram-delimited-sexp-bounds))
      (t (error "`ram-sexp-bounds': All `cond' clauses failed")))))
 
-;;** brackets, parentheses, parens, sexps: select, copy, clone, kill
+;;** ram-manage-sexps-mode: select, copy, clone, kill
 
 (defun ram-mark-sexp ()
   "Mark sexp.
@@ -7031,9 +7032,46 @@ Return a cons of the new text cordinates."
         ;; (backward-char (- (cdr bounds1) (car bounds1)))
         ))))
 
-;;** brackets, parentheses, parens, sexps: move up, down
+;;** ram-manage-sexps-mode: delete
 
-;;** brackets, parentheses, parens, sexps: bindings
+(defun ram-delete-char ()
+  "Delete all whitespace from `point' to next non-whitespace char.
+
+If looking at whitespace, delete it until next non-whitespace char.
+Otherwise, call `paredit-delete-char'."
+  (interactive)
+  (if (or (eq (char-after) (string-to-char " "))
+          (eq (char-after) (string-to-char "\n")))
+      (progn
+        (while (or (eq (char-after) (string-to-char " "))
+                   (eq (char-after) (string-to-char "\n")))
+          (delete-char 1))
+        (insert " ")
+        (indent-according-to-mode))
+    (paredit-delete-char)))
+
+(defun ram-delete-whitespace-backward ()
+  "Delete whitespace characters backward.
+
+Either stop an correct indentation, or
+at the next sexp."
+  (interactive)
+  (let ((p (point)))
+    (indent-according-to-mode)
+    (when (eq p (point))
+      (while (or (eq (char-before) (string-to-char " "))
+                 (eq (char-before) (string-to-char "\n"))
+                 (eq (char-before) (string-to-char "\t")))
+        (delete-char -1))
+      (if (eq (char-after) (string-to-char " "))
+          (forward-char)
+        (unless (eq (char-after) (string-to-char "\n"))
+          (insert " ")))))
+  )
+
+;;** ram-manage-sexps-mode: move up, down
+
+;;** ram-manage-sexps-mode: bindings
 
 ;; ------
 (define-key prog-mode-map (kbd "<end>" ) #'ram-mark-sexp)
@@ -7117,9 +7155,7 @@ Return a cons of the new text cordinates."
   ;; originally, "C-:" is bound to #'clojure-toggle-keyword-string
   (define-key clojure-mode-map (kbd "C-:" ) #'ram-toggle-multiline-delimited-sexp))
 
-;;** brackets, parentheses, parens, sexps: ram-manage-sexps-mode
-
-;;*** brackets, parentheses, parens, sexps: ram-manage-sexps-mode-map
+;;** ram-manage-sexps-mode: keymap
 
 (defvar ram-manage-sexps-mode-map
   (let ((keymap (make-sparse-keymap)))
@@ -7162,8 +7198,12 @@ Return a cons of the new text cordinates."
     (define-key keymap (kbd "s-k") #'ram-next-comment)
     (define-key keymap (kbd "s-K") #'ram-previous-comment)
 
+    (define-key keymap (kbd "C-<backspace>") #'ram-delete-whitespace-backward)
+    (define-key keymap (kbd "C-d") #'ram-delete-char)
     keymap)
   "Keymap for `ram-manage-sexps-mode'")
+
+;;** ram-manage-sexps-mode: define-minor-mode
 
 (define-minor-mode ram-manage-sexps-mode
   "Minor mode handling s-expressions."
@@ -7178,7 +7218,7 @@ Return a cons of the new text cordinates."
     ;; (message "disable ram-manage-sexps-mode")
     ))
 
-;;*** brackets, parentheses, parens, sexps/ram-manage-sexps-mode: hooks, advice, timers
+;;*** ram-manage-sexps-mode: hooks, advice, timers
 
 (add-hook 'minibuffer-mode-hook (lambda ()
                                   ;; overrides <return> in minibuffer, which it should not
