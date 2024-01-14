@@ -3522,6 +3522,7 @@ left by `org-mark-element`."
      (python . t)
      (R . t)
      (racket . t)
+     (sparql . t)
      ;; (scribble . t)
      (css . t)
      (haskell .t))))
@@ -9282,6 +9283,11 @@ That is, remove a non kept dired from the recent list."
 ;;** prog-mode: hook
 
 ;;** prog-mode: binding
+
+;;* sparql
+
+(straight-use-package
+ '(sparql-mode :type git :flavor melpa :host github :repo "ljos/sparql-mode"))
 
 ;;* spelling
 
