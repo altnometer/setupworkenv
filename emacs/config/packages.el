@@ -9102,7 +9102,14 @@ It is in the left-most frame. It is at the bottom."
   (paredit-open-round))
 
 (with-eval-after-load 'paredit
-  (define-key paredit-mode-map (kbd "(") #'ram-expand-abbrev-before-paredit-open-round))
+  (define-key paredit-mode-map (kbd "(") #'ram-expand-abbrev-before-paredit-open-round)
+  ;; change order of paredit-mode and ram-manage-sexps-mode entries in minor-mode-map-alist
+  ;; to prioritize ram-manage-sexps-mode keybindings:
+  (if-let* ((paredit (assq 'paredit-mode minor-mode-map-alist))
+            (manage-sexps (assq 'ram-manage-sexps-mode minor-mode-map-alist))
+            (alist (assq-delete-all 'paredit-mode (assq-delete-all 'ram-manage-sexps-mode minor-mode-map-alist)))
+            )
+      (setq minor-mode-map-alist (cons manage-sexps (cons paredit alist)))))
 
 ;;** packages: recentf
 
