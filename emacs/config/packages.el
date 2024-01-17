@@ -7076,13 +7076,14 @@ Otherwise, call `paredit-delete-char'."
              ;; not in string or comment
              (and (not (nth 3 syntax))
                   (not (nth 4 syntax))))
-       (or (eq (char-after) (string-to-char " "))
-           (eq (char-after) (string-to-char "\n"))))
+           (or (eq (char-after) (string-to-char " "))
+               (eq (char-after) (string-to-char "\n"))))
       (progn
         (while (or (eq (char-after) (string-to-char " "))
                    (eq (char-after) (string-to-char "\n")))
           (delete-char 1))
-        (insert " ")
+        (when (not (char-before (string-to-char " ")))
+          (insert " "))
         (indent-according-to-mode))
     (paredit-delete-char)))
 
