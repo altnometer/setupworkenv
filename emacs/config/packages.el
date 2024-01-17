@@ -9104,8 +9104,10 @@ It is in the left-most frame. It is at the bottom."
 (defun ram-expand-abbrev-before-paredit-open-round ()
   "Call `expand-abbrev' before invoking `paredit-open-round'."
   (interactive)
-  (expand-abbrev)
-  (paredit-open-round))
+  (condition-case err
+      (progn (expand-abbrev)
+             (paredit-open-round))
+    ((debug error) (signal (car err) (cdr err)))))
 
 (with-eval-after-load 'paredit
   (define-key paredit-mode-map (kbd "(") #'ram-expand-abbrev-before-paredit-open-round)
