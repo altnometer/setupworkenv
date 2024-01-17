@@ -689,7 +689,7 @@ Disable `icomplete-vertical-mode' for this command."
         ([?\s-P] . ram-previous-workspace)
         ([?\s-O] . ram-other-workspace)
         (,(kbd "<M-f15>") . ram-other-workspace)
-        (,(kbd "<f15>") . ram-other-workspace)
+        ;; (,(kbd "<f15>") . ram-other-workspace)
 
         ([?\s-t] . ram-org-roam-node-find)
 
@@ -849,7 +849,6 @@ Disable `icomplete-vertical-mode' for this command."
 (define-key global-map (kbd "s-O") #'ram-other-workspace)
 (define-key global-map (kbd "s-N") #'ram-next-workspace)
 (define-key global-map (kbd "s-P") #'ram-previous-workspace)
-(define-key global-map (kbd "<f15>") #'ram-other-workspace)
 
 ;; transparency
 ;; (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
