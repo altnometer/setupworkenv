@@ -3226,6 +3226,13 @@ left by `org-mark-element`."
   (define-key org-mode-map (kbd "M-p") #'ram-scroll-up-command)
   (define-key org-mode-map (kbd "M-n") #'ram-scroll-down-command))
 
+;;** org-mode: cache
+
+;; do not cache the parsed elements
+;; keep the setting if it does not slow you down
+(setq org-element-use-cache nil)
+
+
 ;;** org-mode: settings
 
 (setq org-blank-before-new-entry
