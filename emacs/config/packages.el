@@ -7227,10 +7227,6 @@ at the next sexp."
 
 ;;*** ram-manage-sexps-mode: hooks, advice, timers
 
-(add-hook 'minibuffer-mode-hook (lambda ()
-                                  ;; overrides <return> in minibuffer, which it should not
-                                  (define-key ram-manage-sexps-mode-map (kbd "<return>") nil)
-                                  (ram-manage-sexps-mode 1)))
 (add-hook 'emacs-lisp-mode-hook #'ram-manage-sexps-mode)
 (add-hook 'lisp-interactive-mode #'ram-manage-sexps-mode)
 (add-hook 'clojure-mode-hook #'ram-manage-sexps-mode)
