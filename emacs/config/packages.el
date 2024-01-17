@@ -5163,10 +5163,22 @@ Ignore \"No following same-level heading\" error, call
 (define-key ram-leader-map-tap-global (kbd "z") #'ram-toggle-narrow-outline-heading)
 (define-key global-map (kbd "<f22>") #'ram-toggle-narrow-outline-heading)
 
-;;** outline: outline-regexp
+(define-key global-map (kbd "<f15>") #'ram-outline-toggle)
 
-(defvar ram-outline-regxp-for-lisp "[[:space:]]*;;[[:space:]]?\\(?:;+[^#]\\|\\*+\\)"
+;; ** outline: outline-regexp
+
+;; sadly, some headings may not start an the beginning of the line
+;; (e.g. ram-abbrev.el). Try to keep heading starting on the point in
+;; line.
+;; (defvar ram-outline-regxp-for-lisp "[[:space:]]*;;[[:space:]]?\\(?:;+[^#]\\|\\*+\\)"
+;;   "`outline-regexp' for languages with comments defined by \";\".")
+
+;; drop ";;;;" style, only ";;*" or ";; *"
+(defvar ram-outline-regxp-for-lisp "[[:space:]]*;;[[:space:]]?\\(\\*+\\)"
   "`outline-regexp' for languages with comments defined by \";\".")
+
+
+;; (setq outline-regexp ram-outline-regxp-for-lisp)
 
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
@@ -5391,7 +5403,11 @@ Ignore \"No following same-level heading\" error, call
                           (:exclude "racket/example/*" "racket/test/*")
                           "racket-mode-pkg.el")
                :host github :repo "greghendershott/racket-mode"))
-(require 'racket-mode)
+
+;; an error in :around advice: ‘racket--indent-sexp-advice’.
+;; for indent-sexp
+;; this messes up my Org code block editing with syntax-table changed
+;; (require 'racket-mode)
 
 (with-eval-after-load 'racket-mode
   (define-key racket-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
