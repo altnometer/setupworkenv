@@ -6058,6 +6058,21 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (add-to-list 'mc/cmds-to-run-once 'mc/toggle-cursor-at-point)
   (add-to-list 'mc/cmds-to-run-once 'multiple-cursors-mode))
 
+;;** multiple-cursors: mc/list-file
+
+;; mc/list-file is a variable defined in ‘multiple-cursors-core.el’.
+;; Its value is "~/.local/share/emacs/my.emacs.d/.mc-lists.el"
+
+;;** multiple-cursors: mc/cmds-to-run-once
+
+;; commands to run only for one cursor
+;; mc/cmds-to-run-once
+
+
+;;** multiple-cursors: mc/cmds-to-run-once
+
+;; mc/cmds-to-run-for-all
+;; commands to run for all cursors
 
 ;;credit to https://stackoverflow.com/a/39885314/9913235
 (defun mc/toggle-cursor-at-point ()
