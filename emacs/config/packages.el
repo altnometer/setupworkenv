@@ -92,8 +92,9 @@
 
 (defun ram-abbrev-custom-expand-function (expand)
   (let* ((org-src-block-lang (and (eq 'org-mode major-mode)
-                                  (org-in-src-block-p 'INSIDE)
-                                  (car (org-babel-get-src-block-info))))
+                                  (with-syntax-table org-mode-syntax-table
+                                        (when (org-in-src-block-p 'INSIDE)
+                                          (car (org-babel-get-src-block-info))))))
          (org-src-block-abbrevs (if-let* ((org-src-block-lang)
                                           (sym (intern-soft (concat org-src-block-lang "-mode-abbrev-table")))
                                           ((boundp sym)))
