@@ -3110,7 +3110,9 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
 Leave a mark to return to."
   (interactive "p")
   (condition-case err
-      (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)
+    (progn
+      ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)
+     (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-previous-src-block))
     (user-error (when (not (string= (error-message-string err)
                                     "No previous code blocks"))
                   (signal (car err) (cdr err))))
@@ -3125,7 +3127,9 @@ Leave a mark to return to."
 Leave a mark to return to."
   (interactive "p")
   (condition-case err
-      (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)
+      (progn
+        ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)
+        (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-next-src-block))
     (user-error (when (not (string= (error-message-string err)
                                     "No next code blocks"))
                   (signal (car err) (cdr err))))
