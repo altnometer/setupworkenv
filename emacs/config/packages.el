@@ -7047,8 +7047,12 @@ Return a cons of the new text cordinates."
 If looking at whitespace, delete it until next non-whitespace char.
 Otherwise, call `paredit-delete-char'."
   (interactive)
-  (if (or (eq (char-after) (string-to-char " "))
-          (eq (char-after) (string-to-char "\n")))
+  (if (and (let ((syntax (syntax-ppss)))
+             ;; not in string or comment
+             (and (not (nth 3 syntax))
+                  (not (nth 4 syntax))))
+       (or (eq (char-after) (string-to-char " "))
+           (eq (char-after) (string-to-char "\n"))))
       (progn
         (while (or (eq (char-after) (string-to-char " "))
                    (eq (char-after) (string-to-char "\n")))
