@@ -444,8 +444,8 @@ Disable `icomplete-vertical-mode' for this command."
 ;; <f19> key is between <f8> and <f9>
 (define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
 
-;;;; display eval result inline, use cider for that
-;;;; credit to https://endlessparentheses.com/eval-result-overlays-in-emacs-lisp.html
+;; display eval result inline, use cider for that
+;; credit to https://endlessparentheses.com/eval-result-overlays-in-emacs-lisp.html
 
 ;; (autoload 'cider--make-result-overlay "cider-overlays")
 
@@ -1305,6 +1305,7 @@ succession."
                         (current-buffer))
                     (current-buffer)))
           (headline-regex
+           ;; use regexp that allow extracting info from headings
            (cond
             ((eq major-mode 'org-mode)
              "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
@@ -1326,7 +1327,7 @@ succession."
                  (* space)
                  line-end))
             (t
-             "^[[:blank:]]*;;\\(?:\\(;+\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
+             "^[[:blank:]]*;;[[:space:]]?\\(?:\\(;+\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
           (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
           (reset-keybindings (lambda ()
                                (if old-binding-to-return
