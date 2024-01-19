@@ -2747,64 +2747,121 @@ Disable otherwise"
               ;; suppress #'check-parens error
               (lambda (err) 'ignore-check-parens-error))
   (condition-case err
-      (if-let* ((element (save-match-data (and (eq 'org-mode major-mode)
-                                               (org-in-src-block-p 'INSIDE)
-                                               (org-element-at-point))))
-                (org-src-block-lang (car (org-babel-get-src-block-info)))
+      (if-let* ((el (with-syntax-table org-mode-syntax-table
+                      (org-element-with-disabled-cache (org-element-at-point))))
+                ((eq 'src-block (org-element-type el)))
+                (org-src-block-lang (org-element-property :language el))
                 ((member org-src-block-lang ram-edit-org-block-in-lisp-for-languages))
-                (src-element (and (org-element-type-p element 'src-block)
-                                  element))
-                ;; el-begin at the beginning of #+begin_src
-                (el-begin (org-element-post-affiliated src-element))
-                ;; el-end at the end of #+end_src
-                (el-end (org-with-point-at (org-element-end element)
-                          (skip-chars-backward " \t\n\r")
-                          (point)))
-                (inside-el-p (not (or (<= (line-beginning-position) el-begin)
-                                      (>= (line-end-position) el-end))) )
-                (content-begin (save-excursion (goto-char el-begin) (next-line) (beginning-of-line) (point)))
-                (content-end (save-excursion (goto-char el-end) (beginning-of-line) (point)))
-                (reset-syntax-table (set-syntax-table (or (eval (intern-soft
-                                                                 (concat org-src-block-lang "-mode-syntax-table")))
-                                                          (syntax-table)))))
-          ;; !!! Only ONE expression for SUCCESS part
+                ;; content-begin is the point at the beginning of the next line from "#+begin_src"
+                (content-begin (save-excursion (goto-char (org-element-post-affiliated el))
+                                               (1+ (point-at-eol))))
+                ;; content-end is the point at the end of the previous line from "#+end_src"
+                (content-end (org-with-point-at (org-element-end el)
+                               (skip-chars-backward " \t\n\r")
+                               (point-at-bol)))
+                (p (point)))
+          ;; !!! Remember, only ONE expression for SUCCESS part
           (progn
-            ;; (message ">>> enabling Org block editing for lang: %s" org-src-block-lang)
-            ;; we are inside a code block still.
-            ;; are we just moved into the block?
+            ;; (message ">>> if-let* succeeded for block lang: %s" org-src-block-lang)
+            ;; (message ">>> if-let* with syntax table:        %s"
+            ;;          (if (= 32 (char-syntax (string-to-char "\n")))
+            ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")) )
+            ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))))
+            ;; we are still in the same block
             (if ram-last-active-org-bloc-edges
-                ;; we are still in the code block: only move the overlay
-                (when (not (and (= (car ram-last-active-org-bloc-edges) content-begin)
-                                (= (cdr ram-last-active-org-bloc-edges) content-end)))
-                  ;; block dimensions changed, reflect that:
+                ;; we are still in the code block:
+                ;;   - only move the overlay
+                ;;   - reset syntax table to language specific
+                ;;     because it could have been changed in pre-command hook
+                (progn
+                  ;; (message "    >>> still in the block, ram-last-active-org-bloc-edges: %S" ram-last-active-org-bloc-edges)
+                  ;; (message "        >>>                           indent-line-function %S" (eval 'indent-line-function))
+                  (set-syntax-table (or (eval (intern-soft
+                                               (concat org-src-block-lang "-mode-syntax-table")))
+                                        (syntax-table)))
+                  ;; (message "        >>> syntax table changed to:        %s"
+                  ;;          (if (= 32 (char-syntax (string-to-char "\n")))
+                  ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")) )
+                  ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))))
+                  ;; move background overlays unconditionally because
+                  ;; block edged may be the same but the lines inside changes
                   (move-overlay ram-org-block-selected-overlay content-begin content-end)
-                  (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end)))
+                  ;; (if (not (and (= (car ram-last-active-org-bloc-edges) content-begin)
+                  ;;               (= (cdr ram-last-active-org-bloc-edges) content-end)))
+                  ;;     (progn
+                  ;;       (message "        >>> dimensions changed, move overlays")
+                  ;;       ;; block dimensions changed, reflect that:
+                  ;;       ;; (move-overlay ram-org-block-selected-overlay content-begin content-end)
+                  ;;       ;; (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end))
+                  ;;       (move-overlay ram-org-block-selected-overlay content-begin content-end))
+                  ;;   (message "        >>> dimensions have not changed, do nothing")
+
+                  ;;   )
+                  )
               ;; we have just moved into the block: activate everything
+              ;; change the background of the block
+              ;; (message "    >>> just moved to block: move overlays")
+              ;; (message "        >>>                           indent-line-function %S" (eval 'indent-line-function))
               (move-overlay ram-org-block-selected-overlay content-begin content-end)
-              (ram-highlight-sexps-mode 1)
-              (paredit-mode 1)
-              (ram-manage-sexps-mode 1)
-              (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end))
+              ;; when inside the block activate the modes
+              (if (<= content-begin p content-end)
+                  (progn
+                    ;; (message "        >>> and point %S is between beginning %S and end %S, activate modes"
+                    ;;          p content-begin content-end)
+                    ;; reset the syntax-table to one of the code block !!!
+                    ;; WARNING, org commands may rely on
+                    ;; org-mode-syntax-table
+                    (set-syntax-table (or (eval (intern-soft
+                                                 (concat org-src-block-lang "-mode-syntax-table")))
+                                          (syntax-table)))
+                    ;; (message "        >>> with syntax table:        %s"
+                    ;;          (if (= 32 (char-syntax (string-to-char "\n")))
+                    ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")) )
+                    ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))))
+                    (setq-local indent-line-function 'lisp-indent-line)
+                    (ram-highlight-sexps-mode 1)
+                    ;; activate first for ram-manage-sexps-mode
+                    ;; keybinding precedence over paredit-mode
+                    (ram-manage-sexps-mode 1)
+                    ;; use save-excursion because paredit may leave point outside the block
+                    (save-excursion (paredit-mode 1))
+                    ;; (message "        >>>                           indent-line-function %S" (eval 'indent-line-function))
+                    (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end)))
+                ;; (message "        >>> but point %S is NOT between beginning %S and end %S,
+            ;; do not activate modes"
+            ;;              p content-begin content-end)
+                )
               ;;
               ))
-        ;; (message "<<< disabling Org block editing for lang: %s" org-src-block-lang)
+        ;; (message ">>> if-let* failed for block editing: %s" org-src-block-lang)
+        ;; (message ">>> if-let* with syntax table:        %s"
+        ;;          (if (= 32 (char-syntax (string-to-char "\n")))
+        ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+        ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+        ;;            ))
         ;; we are outside a code block
         ;; have we just left the block code? if not, do nothing.
-        (when ram-last-active-org-bloc-edges
-          (setq-local ram-last-active-org-bloc-edges nil)
-          (move-overlay ram-org-block-selected-overlay 1 1)
-          (ram-highlight-sexps-mode -1)
-          (paredit-mode -1)
-          (ram-manage-sexps-mode -1)
-          (set-syntax-table org-mode-syntax-table))
+        (if ram-last-active-org-bloc-edges
+            (progn
+              ;; (message "    >>> just moved out of the block: deactivate  everything")
+              (setq-local ram-last-active-org-bloc-edges nil)
+              (setq-local indent-line-function 'org-indent-line)
+              (move-overlay ram-org-block-selected-overlay 1 1)
+              (ram-highlight-sexps-mode -1)
+              (paredit-mode -1)
+              (ram-manage-sexps-mode -1)
+              (set-syntax-table org-mode-syntax-table)))
+        ;; (message "    >>> were not in block, do NOTHING")
+        ;; (message "    >>>             but hide overlays")
+        (move-overlay ram-org-block-selected-overlay 1 1)
         ;;
         )
     ;; (user-error (when (not (string= (error-message-string err)
     ;;                                 "No tag to remove"))
     ;;               (signal (car err) (cdr err))))
-    (debug (signal (car err) (cdr err)))
-    (user-error (message ">>>> error from ram-org-toggle-mode- :%S" err))
-    (error (message ">>>> error from ram-org-toggle-mode- :%S" err))
+    ;; ((error user-error) (message ">>>> ram-toggle-lisp-editing-modes-in-org-code-block: %S %S " (car err) (cdr err)))
+    ;; use this to get *Backtrace*, but it will evict this fn from the hook
+    ((debug error user-error) (signal (car err) (cdr err)))
     (:success nil)))
 
 ;;*** org-mode/functions: search, jump to #+name
@@ -3641,6 +3698,44 @@ left by `org-mark-element`."
 ;; (remove-hook 'org-mode-hook
 ;;           (lambda () (add-hook 'post-command-hook
 ;;                                #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
+
+(defun ram-switch-on-org-mode-syntax-table ()
+  "Ensure that `org-mode-syntax-table' is on for org commands.
+When editing Org code block, they may use their own syntax
+tables. Reset the table for org commands"
+  ;; (message "------- command: %S" this-command)
+  ;; (message "-------   table: %S"
+  ;;          (if (= 32 (char-syntax (string-to-char "\n")))
+  ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+  ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+  ;;            ))
+  (when (and ram-edit-org-block-in-lisp-for-languages
+             (and (symbolp this-command)
+                  (not (eq 'org-self-insert-command this-command) )
+                  (or (eq 'org-babel-execute-src-block this-command)
+                      (string-prefix-p "org" (symbol-name this-command))
+                      (string-prefix-p "ram-org" (symbol-name this-command)))))
+    ;; (message "?????? switching syntax table:")
+    (set-syntax-table org-mode-syntax-table)
+    ;; (message "?????? table:  %S"
+    ;;          (if (= 32 (char-syntax (string-to-char "\n")))
+    ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+    ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+    ;;            ))
+    ;; reset the var to indicate that things changed
+    ;; in case you remain in the same code block after the command
+    ;; However, if you leave the block, the nil value would not
+    ;; keep the block related minor-modes on
+    ;; (setq ram-edit-org-block-in-lisp-for-languages nil)
+    ))
+
+(add-hook 'org-mode-hook
+          (lambda () (add-hook 'pre-command-hook
+                               #'ram-switch-on-org-mode-syntax-table 0 'local)))
+
+;; (remove-hook 'org-mode-hook
+;;           (lambda () (add-hook 'pre-command-hook
+;;                                #'ram-switch-on-org-mode-syntax-table 0 'local)))
 
 (run-with-idle-timer 1 nil #'require 'org)
 
