@@ -5005,10 +5005,9 @@ Use calendar if ARG value is '(4)."
   (require 'foldout))
 
 ;;** outline: bicycle
+
 (straight-use-package
  '(bicycle :type git :flavor melpa :host github :repo "tarsius/bicycle"))
-
-;; based on, credit to https://gitlab.com/protesilaos/dotfiles.git
 
 ;;** outline: functions
 
@@ -5037,13 +5036,6 @@ Use calendar if ARG value is '(4)."
     (when (not (outline-on-heading-p))
       (outline-next-visible-heading (- 1)))
     (foldout-zoom-subtree)))
-
-(defun prot/bicycle-cycle-tab-dwim ()
-    "Convenience wrapper for TAB key in `outline-mode'."
-    (interactive)
-    (if (outline-on-heading-p)
-        (bicycle-cycle)
-      (indent-for-tab-command)))
 
 (defun ram-move-to-heading-visible-char ()
   "Move to first visible char assuming starting at `point-at-bol'."
@@ -5121,7 +5113,123 @@ Ignore \"No following same-level heading\" error, call
   (call-interactively #'outline-backward-same-level 'RECORD-FLAG)
   (ram-move-to-heading-visible-char))
 
+;;** outline/functions: toggle
 
+(defvar-local ram-outline-toggle-plist nil
+  "A data store for `ram-outline-toggle'.
+
+Properties:
+  - :counter \"number of time the function was called\"
+  - :orig-point \"point at the first function call\"
+  - :beg \"beginning of the region for the function\"
+  - :end \"end of the region for the function\")"
+  )
+
+(defun ram-outline-toggle (&optional beg end)
+  "Toggle `outline-mode' outlines delimited by BEG and END.
+
+Preserve the point position."
+  (interactive)
+  (let* (;; either get BEG, or :beg or (point-min)
+         (beg (or (plist-get (plist-put ram-outline-toggle-plist :beg beg) :beg)
+                  (plist-get ram-outline-toggle-plist :beg)
+                  (point-min)))
+         ;; either get END, or :end or (point-max)
+         (end (or (plist-get (plist-put ram-outline-toggle-plist :end end) :end)
+                  (plist-get ram-outline-toggle-plist :end)
+                  (point-max)))
+         (p (or (plist-get ram-outline-toggle-plist :orig-point)
+                (point)))
+         (c (or (plist-get ram-outline-toggle-plist :counter)
+                0))
+         )
+    (cond
+     ;; 1st iteration
+     ;;   - 1st call to the function
+     ;; hide all
+     ((not (eq last-command this-command))
+      ;; reset :orig-point unless the last command was also
+      ;; toggling outlines
+      ;; let other "ram-outline-toggle-*" commands reuse the same
+      ;; :orig-point
+      ;; reset it for all other last-command
+      (when (not (string-prefix-p "ram-outline-toggle" (symbol-name last-command)))
+        (setq p (point)))
+      (outline-map-region (lambda () (when
+                                         (= 1 (funcall outline-level))
+                                       (outline-hide-subtree)))
+                          beg end)
+      (move-beginning-of-line 1)
+      (setq ram-outline-toggle-plist (plist-put
+                                      (plist-put ram-outline-toggle-plist :counter 2)
+                                      :orig-point p)))
+     ;; 1st iteration again:
+     ;;   - another cycle of iterations
+     ;; hide all
+     ((and (eq last-command this-command)
+           (or (= 1 c)
+               (< 3 c)))
+      (outline-map-region (lambda () (when
+                                         (= 1 (funcall outline-level))
+                                       (outline-hide-subtree)))
+                          beg end)
+      (move-beginning-of-line 1)
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter 2))
+      )
+     ;; last iteration
+     ((and (eq last-command this-command)
+           (= 4 c))
+      (outline-map-region (lambda () (when
+                                         (= 1 (funcall outline-level))
+                                       (outline-hide-subtree)))
+                          beg end)
+      (goto-char p)
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c))))
+     ;; 2nd iteration:
+     ;;   - show sublevels 2
+     ((and (eq last-command this-command)
+           (= 2 c))
+      (outline-show-all)
+      (outline-map-region (lambda ()
+                            (cond
+                             ((= 1 (funcall outline-level)) (outline-hide-subtree))
+                             ((= 2 (funcall outline-level)) (outline-show-heading))
+                             (t nil)))
+                          beg end)
+      (goto-char p)
+      (move-beginning-of-line 1)
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c))))
+     ;; 3nd iteration:
+     ;;   - outline-show-all
+     ((and (eq last-command this-command)
+           (= 3 c))
+      (outline-show-all)
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c)))
+      (goto-char p))
+     ;; should not happend, but just in case
+     (t (setq ram-outline-toggle-plist nil)))
+    (recenter))
+  )
+
+(defun ram-outline-toggle-current-subtree ()
+  (interactive)
+  (let* ((beg (or (plist-get ram-outline-toggle-counter :beg)
+                  (plist-get (setq ram-outline-toggle-counter
+                                   (plist-put ram-outline-toggle-counter :beg
+                                              (save-excursion
+                                                (outline-back-to-heading t)
+                                                (if (not (= 1 (outline-level)))
+                                                    (progn (outline-up-heading (outline-level) t)
+                                                           (point))
+                                                  (point))))) :beg)))
+         (end (or (plist-get ram-outline-toggle-counter :end)
+                  (plist-get (setq ram-outline-toggle-counter
+                                   (plist-put ram-outline-toggle-counter :end
+                                              (save-excursion (goto-char beg)
+                                                              (or (ignore-error (outline-forward-same-level 1))
+                                                                  (point-max))
+                                                              ))) :end))))
+    (funcall-interactively #'ram-outline-toggle beg end)))
 
 ;;** outline: bindings
 
@@ -5159,6 +5267,11 @@ Ignore \"No following same-level heading\" error, call
 
 (define-key global-map (kbd "<f15>") #'ram-outline-toggle)
 
+;;** outline/bindings: toggle
+
+(define-key global-map (kbd "S-<f15>") #'ram-outline-toggle)
+(define-key global-map (kbd "<f15>") #'ram-outline-toggle-current-subtree)
+
 ;; ** outline: outline-regexp
 
 ;; sadly, some headings may not start an the beginning of the line
@@ -5171,17 +5284,23 @@ Ignore \"No following same-level heading\" error, call
 (defvar ram-outline-regxp-for-lisp "[[:space:]]*;;[[:space:]]?\\(\\*+\\)"
   "`outline-regexp' for languages with comments defined by \";\".")
 
+;; ** outline: outline-level
 
-;; (setq outline-regexp ram-outline-regxp-for-lisp)
+(defun ram-outline-get-level-for-lisps ()
+  "Custom `outline-mode' outline level.
 
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
+Use regexp match group 1. Default to group 0."
+  (if (match-string 1)
+      (- (match-end 1) (match-beginning 1))
+    (- (match-end 0) (match-beginning 0))))
+
+(defun ram-outline-setup-for-lisps ()
             (setq-local outline-regexp ram-outline-regxp-for-lisp)
-            (outline-minor-mode 1)))
-(add-hook 'clojure-mode-hook
-          (lambda ()
-            (setq-local outline-regexp ram-outline-regxp-for-lisp)
-            (outline-minor-mode 1)))
+            (setq-local outline-level #'ram-outline-get-level-for-lisps)
+            (outline-minor-mode 1))
+
+(add-hook 'emacs-lisp-mode-hook #'ram-outline-setup-for-lisps)
+(add-hook 'clojure-mode-hook #'ram-outline-setup-for-lisps)
 
 ;;* hideshow
 
