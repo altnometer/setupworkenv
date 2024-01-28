@@ -3238,11 +3238,19 @@ Leave a mark to return to."
   (interactive "p")
   (condition-case err
     (progn
-      ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-previous-block)
-     (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-previous-src-block))
+      ;; Push mark for the first call so than you can return to the orig bloc
+      (when (not (eq this-command last-command))
+        (push-mark))
+      ;; (re-search-backward "^#\\+begin_\\(?:src\\)\\|\\(?:example\\)[[:space:]]\\(?1:[[:alpha:]_-]+\\).*?$")
+      (re-search-backward "^#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?")
+      ;; consider moving to the same language blocks (captured by group 1)
+      ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-previous-src-block)
+      )
     (user-error (when (not (string= (error-message-string err)
                                     "No previous code blocks"))
                   (signal (car err) (cdr err))))
+    ;; consider action if no more blocks above.
+    (search-failed (message "No more blocks above."))
     (error (signal (car err) (cdr err)))
     ;; (:success
     ;;  nil)
@@ -4733,7 +4741,7 @@ ARG value is 4."
 ;;*** org-roam/dailies: navigate notes
 
 (defun ram-org-roam-prev-note-dwim (&optional n)
-  "Goto the previous note of the same type as the current one."
+  "Goto the previous daily, weekly or monthly note."
   (interactive "p")
   (require 'org-roam-dailies)
   (cond
