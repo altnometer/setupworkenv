@@ -4887,12 +4887,36 @@ Use the current buffer file-path if FILE is nil."
   (let* ((file-name (file-name-base (buffer-file-name (buffer-base-buffer))))
          (week-from-buffer-name (string-to-number (car (last (split-string file-name "-w")))))
          (year-from-buffer-name (string-to-number (car (split-string file-name "-"))))
-         (1st-of-jan (encode-time 1 1 0 1 1 year-from-buffer-name))
-         (dow-1st-of-jan (let ((wd (nth 6 (decode-time 1st-of-jan)))) ; start week from Mon rather than Sun
+         ;; (encode-time '(SECOND MINUTE HOUR DAY MONTH YEAR IGNORED DST ZONE))
+         ;; (decode-time) into
+         ;; (SEC MINUTE HOUR DAY MONTH YEAR DOW DST UTCOFF)
+         (1st-of-jan (encode-time (list 1 1 0 1 1 year-from-buffer-name nil nil t)))
+         ;; 1. from file-name, e.g., "2024-01-w04.org"
+         ;;    we can only get the week number and the year
+         ;; 2. We need time on Monday for this week
+         ;;    - we add week-from-buffer-name 7 day periods (weeks)
+         ;;      to the 1st day of the year-from-buffer-name
+         ;;    - however, 1st day of the year may not start on Monday
+         ;;      hence, we need to subtract the number of weekdays that
+         ;;      1st of Jan happens to land on.
+         (dow-1st-of-jan (let (
+                               ;; start week from Mon rather than Sun
+                               (wd (nth 6 (decode-time 1st-of-jan))))
                            (if (= wd 0) 6 (1- wd))))
          (time-from-buffer-name (time-add 1st-of-jan
-                                          (- (* 7 week-from-buffer-name 86400) ;subtract weekdays before 1st of Jan
-                                             (* dow-1st-of-jan 86400))))
+                                          ;; subtract weekdays before 1st of Jan
+                                          (- (* 7 week-from-buffer-name (* 24 3600))
+                                             (*
+                                              ;; if Jan 1st happens to Monday, then
+                                              ;; strangely, we need to subtract the whole week
+                                              ;; because 7 day periods from 1st of Jan
+                                              ;; will carry as to the Monday one week too far
+                                              ;; from the week-from-buffer-name
+                                              (if (zerop dow-1st-of-jan)
+                                                  7
+                                                dow-1st-of-jan)
+                                              (* 24 3600)))))
+         ;; add (or subtract) n weeks
          (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
     (ram-org-capture-weekly-note nil target-time)))
 
