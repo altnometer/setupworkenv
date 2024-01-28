@@ -2996,6 +2996,76 @@ If no arg provided, default to the current buffer.
         (after-save-hook nil))))
     contains-todos-p))
 
+;;*** org-mode/functions: table
+
+(defun ram-org-table-shrink (&optional max-width begin end)
+  "Shrink columns where fields exceed MAX-WIDTH.
+
+Optional arguments BEGIN and END, when non-nil, specify the
+beginning and end position of the current table."
+  (interactive)
+  (unless (or begin (org-at-table-p)) (user-error "Not at a table"))
+  (org-with-wide-buffer
+   (let ((max-width (or max-width 14))
+         (begin (or begin (org-table-begin)))
+	 (end (or end (org-table-end)))
+         (elisp-data (org-babel-read-table))
+	 (columns)
+         (current-column))
+     (mapcar (lambda (row)
+               (setq current-column 0)
+               (when (not (and (symbolp row) (equal row 'hline)))
+                 (mapcar (lambda (el)
+                           (setq current-column (1+ current-column))
+                           (when (stringp el)
+                             (when (> (length el) max-width)
+                               (cl-pushnew current-column columns)))) row))) elisp-data)
+     (org-table-expand begin end)
+     ;; Make sure invisible characters in the table are at the right
+     ;; place since column widths take them into account.
+     (font-lock-ensure begin end)
+     (ram-org-table--shrink-columns max-width (sort columns #'<) begin end)
+     )))
+
+(defun ram-org-table--shrink-columns (width columns beg end)
+  "Quick hack of `org-table--shrink-columns' to provide WIDTH."
+  (org-with-wide-buffer
+   (font-lock-ensure beg end)
+   (dolist (c columns)
+     (goto-char beg)
+     (let ((fields nil))
+       (while (< (point) end)
+	 (catch :continue
+	   (let* ((hline? (org-at-table-hline-p))
+		  (separator (if hline? "+" "|")))
+	     ;; Move to COLUMN.
+	     (search-forward "|")
+	     (or (= c 1)		;already there
+		 (search-forward separator (line-end-position) t (1- c))
+		 (throw :continue nil)) ;skip invalid columns
+	     ;; Extract boundaries and contents from current field.
+	     ;; Also set the column's width if we encounter a width
+	     ;; cookie for the first time.
+	     (let* ((start (point))
+		    (end (progn
+			   (skip-chars-forward (concat "^|" separator)
+					       (line-end-position))
+			   (point)))
+		    (contents (if hline? 'hline
+				(org-trim (buffer-substring start end)))))
+	       (push (list start end contents) fields)
+	       )))
+	 (forward-line))
+       ;; Link overlays for current field to the other overlays in the
+       ;; same column.
+       (let ((chain (list 'siblings)))
+	 (dolist (field fields)
+	   (dolist (new (apply #'org-table--shrink-field
+			       (or width 0) "l" field))
+	     (push new (cdr chain))
+	     (overlay-put new 'org-table-column-overlays chain))))))))
+
+
 ;;*** org-mode/functions: manage time property
 
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
@@ -3664,8 +3734,19 @@ left by `org-mark-element`."
 (add-hook 'org-babel-after-execute-hook #'org-display-inline-images)
 ;; when another image (graph) is generate by an Org code block
 ;; the old cached image purist, clear the image cache.
-(add-hook 'org-babel-after-execute-hook 'clear-image-cache)
+(add-hook 'org-babel-after-execute-hook #'clear-image-cache)
 ;; (remove-hook 'org-babel-after-execute-hook 'clear-image-cache)
+
+(defun ram-org-babel-shrink-results-table ()
+  "Call `ram-org-table-shrink' on the table result."
+  (save-excursion
+    (goto-char (org-babel-where-is-src-block-result))
+    (forward-line 1)
+    (when (org-at-table-p)
+      (ram-org-table-shrink 20))
+    ))
+
+(add-hook 'org-babel-after-execute-hook #'ram-org-babel-shrink-results-table)
 
 ;;** org-mode: orgit
 
