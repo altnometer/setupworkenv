@@ -3346,7 +3346,7 @@ left by `org-mark-element`."
     (push-mark)
     (org-mark-element))
 
-  (define-key org-mode-map (kbd "M-h") #'ram-org-mark-element)
+  ;; (define-key org-mode-map (kbd "M-h") #'ram-org-mark-element)
   (define-key org-mode-map (kbd "C-~") #'ram-wrap-in-~)
   (define-key org-mode-map (kbd "C-=") #'ram-wrap-in-=)
 
@@ -3362,8 +3362,11 @@ left by `org-mark-element`."
 ;;** org-mode: cache
 
 ;; do not cache the parsed elements
+;; (setq org-element-use-cache nil)
 ;; keep the setting if it does not slow you down
-(setq org-element-use-cache nil)
+;; rendering daily notes into weekly and monthly is too slow
+;; without caching
+(setq org-element-use-cache t)
 
 
 ;;** org-mode: settings
@@ -3376,6 +3379,11 @@ left by `org-mark-element`."
 
 (with-eval-after-load "org"
   (add-to-list 'org-tags-exclude-from-inheritance "project"))
+
+;;** org-mode: tables
+
+(setq org-startup-shrink-all-tables t)
+
 
 ;;*** org-mode/settings: tags
 
@@ -3468,6 +3476,7 @@ left by `org-mark-element`."
   (set-face-attribute 'org-indent nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-meta-line nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
@@ -3540,7 +3549,7 @@ left by `org-mark-element`."
 ;;** org-mode/code blocks: indent
 
 ;; do not indent code in code-blocks
-(setq org-src-preserve-indentation t)
+(setq org-src-preserve-indentation nil)
 
 (setq org-edit-src-content-indentation 0)
 
