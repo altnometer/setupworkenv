@@ -5372,7 +5372,8 @@ Preserve the point position."
       ;; let other "ram-outline-toggle-*" commands reuse the same
       ;; :orig-point
       ;; reset it for all other last-command
-      (when (not (string-prefix-p "ram-outline-toggle" (symbol-name last-command)))
+      (when (not (and (symbolp last-command)
+                      (string-prefix-p "ram-outline-toggle" (symbol-name last-command))))
         (setq p (point)))
       (outline-map-region (lambda () (when
                                          (= 1 (funcall outline-level))
