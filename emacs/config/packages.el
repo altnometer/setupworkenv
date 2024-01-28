@@ -10718,6 +10718,14 @@ Derive it from either:
 
     (string-join (string-split (downcase raw-name) " " 'omit_nuls "[ \f\t\r\v]+") "_")))
 
+(defun ram-org-prev-code-block-copy ()
+  "Return a copy of the previous Org code block."
+  (save-excursion
+    (ram-org-previous-block 1)
+    (let ((element (org-element-at-point)))
+      (buffer-substring-no-properties (org-element-begin element)
+                                      (org-element-end element)))))
+
 ;;*** templates, snippets/tempo: abbrevs
 
 ;; enable expansion of templates identified by their tags
