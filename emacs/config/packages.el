@@ -5128,7 +5128,9 @@ Use calendar if ARG value is '(4)."
          ;; day of the week, where 0 is monday and 6 is sunday
          (dow (let ((dow (nth 6 (decode-time time))))
                 (if (= dow 0) 6 (1- dow))))
-         (date-str (let* ((monday (time-subtract time (* dow 86400)))
+         (date-str (let* (
+                          ;; get time on Monday
+                          (monday (time-subtract time (* dow 86400)))
                           (month-1st-day-mon (encode-time 1 1 0 1 (nth 4 (decode-time monday))
                                                           (nth 5 (decode-time monday))))
                           (date-str-mon (format "%s w%s"
