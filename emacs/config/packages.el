@@ -5760,6 +5760,15 @@ Use regexp match group 1. Default to group 0."
 (with-eval-after-load "racket-repl"
   (define-key racket-repl-mode-map (kbd "<f2>") #'racket-repl-submit))
 
+;;** racket: hooks, advice, timers
+
+(with-eval-after-load 'racket-mode
+  ;; an error in :around advice: ‘racket--indent-sexp-advice’.
+  ;; for indent-sexp
+  ;; this messes up my Org code block editing with syntax-table changed
+  ;; (require 'racket-mode)
+  (advice-add 'lisp-indent-line :around #'racket--lisp-indent-line-advice)
+  (advice-add 'indent-sexp      :around #'racket--indent-sexp-advice))
 ;;* lispy
 (straight-use-package 'lispy)
 
