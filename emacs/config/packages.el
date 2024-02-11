@@ -782,6 +782,12 @@ Disable `icomplete-vertical-mode' for this command."
              )))
               ;; (setq mode-line-format nil)
 
+
+ (add-hook 'exwm-init-hook (lambda () (setq ram-org-results-table-max-width
+                                            ;; allow for column separators,
+                                            ;; shrink overlays
+                                            (- (window-width) 20))))
+
 ;;*** exwm: must be last in exwm settings
 
 ;; must be the last in 'exwm settings
@@ -2998,73 +3004,181 @@ If no arg provided, default to the current buffer.
 
 ;;*** org-mode/functions: table
 
-(defun ram-org-table-shrink (&optional max-width begin end)
-  "Shrink columns where fields exceed MAX-WIDTH.
+(defun ram-org-table-shrink (&optional max-table-width begin end)
+  "Shrink columns proportional to MAX-TABLE-WIDTH.
 
-Optional arguments BEGIN and END, when non-nil, specify the
-beginning and end position of the current table."
+Find max lengths of columns, divide MAX-TABLE-WIDTH proportional to the
+max column lengths. Use these values to shrink the each column separately."
   (interactive)
   (unless (or begin (org-at-table-p)) (user-error "Not at a table"))
   (org-with-wide-buffer
-   (let ((max-width (or max-width 14))
-         (begin (or begin (org-table-begin)))
-	 (end (or end (org-table-end)))
-         (elisp-data (org-babel-read-table))
-	 (columns)
-         (current-column))
-     (mapcar (lambda (row)
-               (setq current-column 0)
-               (when (not (and (symbolp row) (equal row 'hline)))
-                 (mapcar (lambda (el)
-                           (setq current-column (1+ current-column))
-                           (when (stringp el)
-                             (when (> (length el) max-width)
-                               (cl-pushnew current-column columns)))) row))) elisp-data)
+   (let* ((max-table-width
+           (or max-table-width
+               ;; 7 to cover for 3 column separators and shrink overlays
+               ;; adjust for your most used cases
+               (- (window-width) 7)))
+          (begin (or begin (org-table-begin)))
+	  (end (or end (org-table-end)))
+          (elisp-data (org-babel-read-table))
+          ;; do not shrink short columns;
+          ;; e.g., less than 50% of average width:
+          ;; e.g., 15 char for 4 cols and 120 max width, (* 0.5 (/ 120 4))
+          (min-possible-col-width (floor (* .5 (/ max-table-width
+                                                  ;; number of columns
+                                                  (length (car elisp-data))))))
+          (wide-and-all-colls
+           (cl-labels ((separate-cols
+                         (table wide-cols all-cols)
+                         (cond
+                          ;; terminate recursion
+                          ((null table) (list wide-cols all-cols))
+                          ;; skip 'hline symbol
+                          ((and (symbolp (car table)) (equal (car table) 'hline))
+                           (separate-cols (cdr table) wide-cols all-cols))
+                          ;; process the row
+                          (t (cl-labels ((process-row (row counter)
+                                           (if (null row)
+                                               ;; terminate this recursion, pass control to outer recursion
+                                               (separate-cols (cdr table) wide-cols all-cols)
+                                             (let* ((el (car row))
+                                                    (current-max (alist-get counter wide-cols 0))
+                                                    (el-width (length (if (not (stringp el))
+                                                                          (format "%s" el)
+                                                                        el))))
+                                               ;; update wide-cols with new values
+                                               (when (and
+                                                      ;; allow strings only, MIND than col names are always strings
+                                                      (stringp el )
+                                                      ;; exclude datetimes,
+                                                      ;; is the regexp too narrow?
+                                                      (not (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.*$" el))
+                                                      (>  el-width current-max)
+                                                      (> el-width min-possible-col-width)
+                                                      )
+                                                 (progn
+                                                   (setq wide-cols (assq-delete-all counter wide-cols))
+                                                   (push (cons counter el-width) wide-cols)))
+                                               ;; update all-cols with new max values
+                                               (and (>  el-width current-max)
+                                                    (progn
+                                                      (setq all-cols (assq-delete-all counter all-cols))
+                                                      (push (cons counter el-width) all-cols)))
+                                               ;; next iteration
+                                               (process-row (cdr row) (1+ counter))))))
+                               (process-row (car table) 1)
+                               ;;
+                               ))
+                          ;;
+                          )
+                         ))
+             (separate-cols elisp-data nil nil)))
+          (do-not-shrink-cols (cl-labels ((subset-alist (l-1 l-2)
+                                            (cond
+                                             ((null l-1) l-2)
+                                             ((null l-2) l-1)
+                                             (t (subset-alist (cdr l-1) (assq-delete-all (caar l-1) l-2))))))
+                                (subset-alist (car wide-and-all-colls)
+                                              (cadr wide-and-all-colls))))
+          ;; subtract width of cols that you do not shrink
+          ;; from max-table-width
+          (total-width-of-non-shrink-cols (cl-labels ((add-alist-vals (val cols)
+                                                        (if (null cols)
+                                                            val
+                                                          (add-alist-vals (+ val (cdar cols)) (cdr cols)))))
+                                            (add-alist-vals 0 do-not-shrink-cols)))
+          (max-table-width-minus-non-shrink-cols (- max-table-width total-width-of-non-shrink-cols))
+          ;; some outlier be extremely long,
+          ;; keep them withing max-possible-col-width
+          (max-possible-col-width (floor (*
+                                          ;; allow only 30%
+                                          1.3
+                                          ;; from average max col width, which is
+                                          (/ max-table-width-minus-non-shrink-cols
+                                             ;; divided by number of colums (but not zero, there might not be cols to shrink)
+                                             (max 1 (length (car wide-and-all-colls)))))))
+          ;; keep outlier widths withing max-possible-col-width
+          (wide-cols (cl-labels ((update-widths (cols)
+                                   (if (null cols)
+                                       nil
+                                     (let ((el (car cols)))
+                                       (cons (cons (car el)
+                                                   (min
+                                                    (cdr el)
+                                                    max-possible-col-width))
+                                             (update-widths (cdr cols)))))))
+                       (update-widths (car wide-and-all-colls))))
+          (total-width-of-shrink-cols (cl-labels ((add-alist-vals (val cols)
+                                                    (if (null cols)
+                                                        val
+                                                      (add-alist-vals (+ val (cdar cols)) (cdr cols)))))
+                                        (add-alist-vals 0 wide-cols)))
+          (cols-to-shrink-new-widths (cl-labels ((update-widths (cols)
+                                                   (if (null cols)
+                                                       nil
+                                                     (let ((el (car cols)))
+                                                       (cons (cons (car el)
+                                                                   ;; new width is proportional to old width
+                                                                   ;; but only if it is less than the old
+                                                                   (min (cdr el)
+                                                                        (floor (* (/ (float (cdr el)) total-width-of-shrink-cols )
+                                                                                  max-table-width-minus-non-shrink-cols))))
+                                                             (update-widths (cdr cols)))))))
+                                       (update-widths wide-cols)))
+          (sort-fn )
+	  (columns)
+          (removed-cols)
+          (current-column))
+     ;; get the max cell lengths in each column
      (org-table-expand begin end)
      ;; Make sure invisible characters in the table are at the right
      ;; place since column widths take them into account.
      (font-lock-ensure begin end)
-     (ram-org-table--shrink-columns max-width (sort columns #'<) begin end)
+     ;; do nothing when shrunk values are the same as non-shrunk,
+     ;; otherwise, inserted overlays add clutter.
+     (when (not (equal (sort cols-to-shrink-new-widths (lambda (a b) (< (car a) (car b))))
+                       (sort (car wide-and-all-colls) (lambda (a b) (< (car a) (car b))))))
+       (ram-org-table--shrink-columns (sort cols-to-shrink-new-widths (lambda (a b) (< (car a) (car b)))) begin end))
      )))
 
-(defun ram-org-table--shrink-columns (width columns beg end)
-  "Quick hack of `org-table--shrink-columns' to provide WIDTH."
+(defun ram-org-table--shrink-columns (columns-widths beg end)
+  "Quick hack of `org-table--shrink-columns'.
+COLUMNS-WIDTHS is an alist '((column-number . width)...)."
   (org-with-wide-buffer
    (font-lock-ensure beg end)
-   (dolist (c columns)
-     (goto-char beg)
-     (let ((fields nil))
-       (while (< (point) end)
-	 (catch :continue
-	   (let* ((hline? (org-at-table-hline-p))
-		  (separator (if hline? "+" "|")))
-	     ;; Move to COLUMN.
-	     (search-forward "|")
-	     (or (= c 1)		;already there
-		 (search-forward separator (line-end-position) t (1- c))
-		 (throw :continue nil)) ;skip invalid columns
-	     ;; Extract boundaries and contents from current field.
-	     ;; Also set the column's width if we encounter a width
-	     ;; cookie for the first time.
-	     (let* ((start (point))
-		    (end (progn
-			   (skip-chars-forward (concat "^|" separator)
-					       (line-end-position))
-			   (point)))
-		    (contents (if hline? 'hline
-				(org-trim (buffer-substring start end)))))
-	       (push (list start end contents) fields)
-	       )))
-	 (forward-line))
-       ;; Link overlays for current field to the other overlays in the
-       ;; same column.
-       (let ((chain (list 'siblings)))
-	 (dolist (field fields)
-	   (dolist (new (apply #'org-table--shrink-field
-			       (or width 0) "l" field))
-	     (push new (cdr chain))
-	     (overlay-put new 'org-table-column-overlays chain))))))))
-
+   (let ((columns (mapcar (lambda (el) (car el)) columns-widths)))
+     (dolist (c columns)
+       (goto-char beg)
+       (let ((fields nil))
+         (while (< (point) end)
+	   (catch :continue
+	     (let* ((hline? (org-at-table-hline-p))
+		    (separator (if hline? "+" "|")))
+	       ;; Move to COLUMN.
+	       (search-forward "|")
+	       (or (= c 1)              ;already there
+		   (search-forward separator (line-end-position) t (1- c))
+		   (throw :continue nil)) ;skip invalid columns
+	       ;; Extract boundaries and contents from current field.
+	       ;; Also set the column's width if we encounter a width
+	       ;; cookie for the first time.
+	       (let* ((start (point))
+		      (end (progn
+			     (skip-chars-forward (concat "^|" separator)
+					         (line-end-position))
+			     (point)))
+		      (contents (if hline? 'hline
+				  (org-trim (buffer-substring start end)))))
+	         (push (list start end contents) fields)
+	         )))
+	   (forward-line))
+         ;; Link overlays for current field to the other overlays in the
+         ;; same column.
+         (let ((chain (list 'siblings)))
+	   (dolist (field fields)
+	     (dolist (new (apply #'org-table--shrink-field
+			         (or (cdr (assq c columns-widths)) 0) "l" field))
+	       (push new (cdr chain))
+	       (overlay-put new 'org-table-column-overlays chain)))))))))
 
 ;;*** org-mode/functions: manage time property
 
@@ -3754,13 +3868,19 @@ left by `org-mark-element`."
 (add-hook 'org-babel-after-execute-hook #'clear-image-cache)
 ;; (remove-hook 'org-babel-after-execute-hook 'clear-image-cache)
 
+(defvar ram-org-results-table-max-width nil
+    "Max table width that would fit on the screen.
+
+If the result table width exceeds that value, shrink columns.")
+
 (defun ram-org-babel-shrink-results-table ()
   "Call `ram-org-table-shrink' on the table result."
   (save-excursion
-    (goto-char (org-babel-where-is-src-block-result))
-    (forward-line 1)
-    (when (org-at-table-p)
-      (ram-org-table-shrink 20))
+    (when (org-babel-where-is-src-block-result)
+      (goto-char (org-babel-where-is-src-block-result))
+      (forward-line 1)
+      (when (org-at-table-p)
+        (ram-org-table-shrink ram-org-results-table-max-width)))
     ))
 
 (add-hook 'org-babel-after-execute-hook #'ram-org-babel-shrink-results-table)
