@@ -3359,7 +3359,7 @@ Leave a mark to return to."
       (when (not (eq this-command last-command))
         (push-mark))
       ;; (re-search-backward "^#\\+begin_\\(?:src\\)\\|\\(?:example\\)[[:space:]]\\(?1:[[:alpha:]_-]+\\).*?$")
-      (re-search-backward "^#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?")
+      (re-search-backward "^#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?$")
       ;; consider moving to the same language blocks (captured by group 1)
       ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-previous-src-block)
       )
@@ -3379,12 +3379,25 @@ Leave a mark to return to."
 Leave a mark to return to."
   (interactive "p")
   (condition-case err
-      (progn
+      (let ((p (point)))
+        ;; Push mark for the first call so than you can return to the orig bloc
+        (when (not (eq this-command last-command))
+          (push-mark))
         ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-next-block)
-        (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-next-src-block))
+        ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-next-src-block)
+        (when (eq this-command last-command)
+          ;; otherwise it would match the same thing
+          (forward-char 1))
+        (re-search-forward "^#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?$")
+        (if (= p (match-beginning 0))
+            ;; we started at the block beginning
+            ;; and ended at the same place, repeat.
+            (ram-org-next-block arg)
+          (goto-char (match-beginning 0))))
     (user-error (when (not (string= (error-message-string err)
                                     "No next code blocks"))
                   (signal (car err) (cdr err))))
+    (search-failed (message "No more blocks above."))
     (error (signal (car err) (cdr err)))
     ;; (:success
     ;;  nil)
