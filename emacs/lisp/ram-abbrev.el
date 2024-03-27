@@ -151,7 +151,7 @@
 
           ("alg" "algorithm")
           ("algs" "algorithms")
-          ("app" "application")
+          ;; ("app" "application")
           ("appn" "application")
           ("apps" "applications")
           ("appd" "applied")
