@@ -5605,8 +5605,13 @@ Preserve the point position."
                                               (save-excursion
                                                 (outline-back-to-heading t)
                                                 (if (not (= 1 (outline-level)))
-                                                    (progn (outline-up-heading (outline-level) t)
-                                                           (point))
+                                                    (progn (condition-case err
+                                                               (outline-up-heading (outline-level) t)
+                                                             (error (if (string= (error-message-string err)
+                                                                                 "Already at top level of the outline")
+                                                                        (point)
+                                                                      (signal (car err) (cdr err))))
+                                                             (:success (point))))
                                                   (point))))) :beg)))
          (end (or (plist-get ram-outline-toggle-counter :end)
                   (plist-get (setq ram-outline-toggle-counter
@@ -5616,7 +5621,6 @@ Preserve the point position."
                                                                   (point-max))
                                                               ))) :end))))
     (funcall-interactively #'ram-outline-toggle beg end)))
-
 ;;** outline: bindings
 
 (with-eval-after-load "outline"
