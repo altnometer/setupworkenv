@@ -2742,7 +2742,7 @@ The beginning and the end of the inside part of the code block.
 Use it to check if you left the block or not.")
 
 (defvar ram-edit-org-block-in-lisp-for-languages
-  '("emacs-lisp" "clojure" "R")
+  '("emacs-lisp" "clojure")
   "A list of languages for which to enable lisp editing in Org code blocks.")
 
 (defun ram-toggle-lisp-editing-modes-in-org-code-block ()
@@ -2768,7 +2768,6 @@ Disable otherwise"
                 (p (point)))
           ;; !!! Remember, only ONE expression for SUCCESS part
           (progn
-            ;; (message ">>> if-let* succeeded for block lang: %s" org-src-block-lang)
             ;; (message ">>> if-let* with syntax table:        %s"
             ;;          (if (= 32 (char-syntax (string-to-char "\n")))
             ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")) )
@@ -2776,35 +2775,41 @@ Disable otherwise"
             ;; we are still in the same block
             (if ram-last-active-org-bloc-edges
                 ;; we are still in the code block:
-                ;;   - only move the overlay
-                ;;   - reset syntax table to language specific
-                ;;     because it could have been changed in pre-command hook
                 (progn
-                  ;; (message "    >>> still in the block, ram-last-active-org-bloc-edges: %S" ram-last-active-org-bloc-edges)
-                  ;; (message "        >>>                           indent-line-function %S" (eval 'indent-line-function))
-                  (set-syntax-table (or (eval (intern-soft
-                                               (concat org-src-block-lang "-mode-syntax-table")))
-                                        (syntax-table)))
-                  ;; (message "        >>> syntax table changed to:        %s"
-                  ;;          (if (= 32 (char-syntax (string-to-char "\n")))
-                  ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")) )
-                  ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))))
-                  ;; move background overlays unconditionally because
-                  ;; block edged may be the same but the lines inside changes
-                  (move-overlay ram-org-block-selected-overlay content-begin content-end)
-                  ;; (if (not (and (= (car ram-last-active-org-bloc-edges) content-begin)
-                  ;;               (= (cdr ram-last-active-org-bloc-edges) content-end)))
-                  ;;     (progn
-                  ;;       (message "        >>> dimensions changed, move overlays")
-                  ;;       ;; block dimensions changed, reflect that:
-                  ;;       ;; (move-overlay ram-org-block-selected-overlay content-begin content-end)
-                  ;;       ;; (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end))
-                  ;;       (move-overlay ram-org-block-selected-overlay content-begin content-end))
-                  ;;   (message "        >>> dimensions have not changed, do nothing")
-
-                  ;;   )
+                  ;; and we are inside the same code block which means
+                  ;; we can keep the minor-modes and setting as they were.
+                  ;;   - only move the overlay
+                  ;;   - reset syntax table to language specific
+                  ;;     because it could have been changed in pre-command hook
+                  (if (<= content-begin p content-end)
+                      (progn
+                        ;; some commands (e.g., org-*) may change syntax table even when
+                        ;; executed from withing the code block, reset it back.
+                        (set-syntax-table (or (eval (intern-soft
+                                                     (concat org-src-block-lang "-mode-syntax-table")))
+                                              (syntax-table)))
+                        ;; move background overlays unconditionally because
+                        ;; block edged may be the same but the lines inside changes
+                        (move-overlay ram-org-block-selected-overlay content-begin content-end))
+                    ;; although we did not leave the same code block,
+                    ;; we are not inside it (but on its borders)
+                    ;; we have to disable everything enabled when we move in.
+                    ;; the following is repeated code, refactor it.
+                    (progn
+                      ;; (message "    >>> just moved out of the block: deactivate  everything")
+                      (setq-local ram-last-active-org-bloc-edges nil)
+                      ;; (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end))
+                      (setq-local indent-line-function 'org-indent-line)
+                      (move-overlay ram-org-block-selected-overlay content-begin content-end)
+                      (ram-highlight-sexps-mode -1)
+                      (paredit-mode -1)
+                      (ram-manage-sexps-mode -1)
+                      (set-syntax-table org-mode-syntax-table)
+                      )
+                    )
                   )
               ;; we have just moved into the block: activate everything
+              ;;   - but only if inside the block
               ;; change the background of the block
               ;; (message "    >>> just moved to block: move overlays")
               ;; (message "        >>>                           indent-line-function %S" (eval 'indent-line-function))
@@ -2812,18 +2817,14 @@ Disable otherwise"
               ;; when inside the block activate the modes
               (if (<= content-begin p content-end)
                   (progn
-                    ;; (message "        >>> and point %S is between beginning %S and end %S, activate modes"
-                    ;;          p content-begin content-end)
                     ;; reset the syntax-table to one of the code block !!!
                     ;; WARNING, org commands may rely on
                     ;; org-mode-syntax-table
+                    ;; !!! unexpected errors when messing with cache
+                    ;; (setq org-element-use-cache nil)
                     (set-syntax-table (or (eval (intern-soft
                                                  (concat org-src-block-lang "-mode-syntax-table")))
                                           (syntax-table)))
-                    ;; (message "        >>> with syntax table:        %s"
-                    ;;          (if (= 32 (char-syntax (string-to-char "\n")))
-                    ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")) )
-                    ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))))
                     (setq-local indent-line-function 'lisp-indent-line)
                     (ram-highlight-sexps-mode 1)
                     ;; activate first for ram-manage-sexps-mode
@@ -2833,12 +2834,12 @@ Disable otherwise"
                     (save-excursion (paredit-mode 1))
                     ;; (message "        >>>                           indent-line-function %S" (eval 'indent-line-function))
                     (setq-local ram-last-active-org-bloc-edges (cons content-begin content-end)))
-                ;; (message "        >>> but point %S is NOT between beginning %S and end %S,
-            ;; do not activate modes"
-            ;;              p content-begin content-end)
                 )
               ;;
-              ))
+              )
+            ;; an error will be raised if cache is not active
+            ;; or if element is not in the cache, so ignore them.
+            (ignore-errors (org-element--cache-remove el)))
         ;; (message ">>> if-let* failed for block editing: %s" org-src-block-lang)
         ;; (message ">>> if-let* with syntax table:        %s"
         ;;          (if (= 32 (char-syntax (string-to-char "\n")))
@@ -2848,6 +2849,7 @@ Disable otherwise"
         ;; we are outside a code block
         ;; have we just left the block code? if not, do nothing.
         (if ram-last-active-org-bloc-edges
+            ;; we just left the block code, deactivate everything
             (progn
               ;; (message "    >>> just moved out of the block: deactivate  everything")
               (setq-local ram-last-active-org-bloc-edges nil)
@@ -2859,6 +2861,7 @@ Disable otherwise"
               (set-syntax-table org-mode-syntax-table)))
         ;; (message "    >>> were not in block, do NOTHING")
         ;; (message "    >>>             but hide overlays")
+        ;; we are not in the code block
         (move-overlay ram-org-block-selected-overlay 1 1)
         ;;
         )
