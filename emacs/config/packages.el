@@ -3905,6 +3905,23 @@ If the result table width exceeds that value, shrink columns.")
 
 (add-hook 'org-babel-after-execute-hook #'ram-org-babel-shrink-results-table)
 
+;;**** org-mode/org-babel/hooks, advice, timers: apply ansi colors to output
+
+;; credit to https://emacs.stackexchange.com/a/63562
+;; this function will apply ansi color code in the output of
+;; shell code blocks
+(defun ek/babel-ansi ()
+  (when-let ((beg (org-babel-where-is-src-block-result nil nil)))
+    (save-excursion
+      (goto-char beg)
+      (when (looking-at org-babel-result-regexp)
+        (let ((end (org-babel-result-end))
+              (ansi-color-context-region nil))
+          (ansi-color-apply-on-region beg end))))
+    (delete-trailing-whitespace)))
+
+(add-hook 'org-babel-after-execute-hook 'ek/babel-ansi)
+
 ;;** org-mode: orgit
 
 ;; Link to Magit buffers from Org documents
