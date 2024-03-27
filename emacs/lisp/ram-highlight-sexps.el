@@ -190,7 +190,9 @@ just like show-paren-mode."
   :type '(boolean)
   :group 'highlight-sexps)
 
-(defcustom hl-sexp-masking-overlays-number 80
+;; my window fits 70 lines approximately, it is doubled somewhere in
+;; the code (refactor that into leading and trailing parts).
+(defcustom hl-sexp-masking-overlays-number 70
   "Determines how many lines is possible to mask."
   :type '(boolean)
   :group 'highlight-sexps)
@@ -311,6 +313,9 @@ Color attributes might be overriden by
 Color attributes might be overriden by `hl-sexp-mask-space-background-color'."
   :group 'highlight-sexps)
 
+;; TODO: reconsider:
+;;       - there are case when end points do not change sexps in between change
+;;         e.g., slurping
 (defvar-local hl-sexp-last-point -1
   "The last point for which sexps were highlighted.
 This is used in tandem with `hl-sexp-last-max-point' to prevent
@@ -347,89 +352,93 @@ repeating highlighting the same sexps in the same context.")
 
 (defun hl-sexp-highlight ()
   "Highlight the nested s-expressions around point"
-  (when (not (and
-              (= (point) hl-sexp-last-point)
-              (= (point-max) hl-sexp-last-max-point)))
-    (setq hl-sexp-last-point (point))
-    (setq hl-sexp-last-max-point (point-max))
-    (let* ((p (point))
-           (ppss (syntax-ppss))
-           (at-delimiter-p (and (not (nth 3 ppss)) ; not in string
-                                (not (nth 4 ppss)) ; not in comment
-                                (or (memq (char-after p) hl-sexp-open-delimiters)
-                                    (memq (char-before p) hl-sexp-close-delimiters))))
-           (overlays-sexp (if at-delimiter-p
-                              (list hl-sexp-overlays-when-at-del hl-sexp-overlays)
-                            (list hl-sexp-overlays hl-sexp-overlays-when-at-del)))
-           (overlays-parens (if at-delimiter-p
-                                (list hl-sexp-paren-when-at-del-overlays hl-sexp-paren-overlays)
-                              (list hl-sexp-paren-overlays hl-sexp-paren-when-at-del-overlays)))
-           (overlays-siblings hl-sexp-paren-siblings-overlays)
-           (sexp-list (hl-sexp-end-points p
-                                          (length (car overlays-sexp))))
-           (sexps-for-mask sexp-list)
-           (sexps-for-parens (hl-sexp-end-points p
-                                                 (length (car overlays-parens))))
-           (sexps-siblings (when (> (length sexps-for-parens) 1) ; length one means the outer most level of parens
-                             (hl-sexp-get-siblings-end-points (caar sexps-for-parens) hl-sexp-siblings-number)))
-           pos1
-           pos2
-           at-opening-paren-p)
-      (condition-case err
-          (while (and (car overlays-sexp) sexp-list)
-            (let* ((overlay (pop (car overlays-sexp)))
-                   (sexp (pop sexp-list))
-                   (pos1 (car sexp))
-                   (pos2 (cadr sexp)))
-              (move-overlay overlay pos1 pos2)))
-        (error nil))
-      (when sexps-for-mask
-        (hl-sexp-mask-leading-trailing-space sexps-for-mask))
-      (when sexps-for-parens
-        (while (and (car overlays-parens) sexps-for-parens)
-          (let* ((overlay-1 (pop (car overlays-parens)))
-                 (overlay-2 (pop (car overlays-parens)))
-                 (sexp (pop sexps-for-parens))
-                 (pos1 (car sexp))
-                 (pos2 (cadr sexp)))
-            ;; highlight parens next to cursor in different color
-            (if (or at-opening-paren-p
-                    (and (not at-delimiter-p)
-                         last-at-opening-paren-p)
-                    (and at-delimiter-p
-                         (or (= pos1 p) (= (1+ pos1) p))))
-                (progn
-                  (setq at-opening-paren-p t)
-                  (setq last-at-opening-paren-p t)
-                  (move-overlay overlay-1 pos1 (1+ pos1))
-                  (move-overlay overlay-2 (1- pos2) pos2))
-              (progn
-                (setq at-opening-paren-p nil)
-                (setq last-at-opening-paren-p nil)
-                (move-overlay overlay-2 pos1 (1+ pos1))
-                (move-overlay overlay-1 (1- pos2) pos2))))))
-      (when sexps-siblings
-        (while (and overlays-siblings sexps-siblings)
-          (let* ((overlay-1 (pop overlays-siblings))
-                 (overlay-2 (pop overlays-siblings))
-                 (sexp (pop sexps-siblings))
-                 (pos1 (car sexp))
-                 (pos2 (cdr sexp)))
-            (if at-opening-paren-p
-                (progn (move-overlay overlay-1 pos1 (1+ pos1))
-                       (move-overlay overlay-2 (1- pos2) pos2))
-              (progn (move-overlay overlay-2 pos1 (1+ pos1))
-                     (move-overlay overlay-1 (1- pos2) pos2))))))
-      (dolist (ov (car overlays-sexp))
-        (move-overlay ov 1 1))
-      (dolist (ov (cadr overlays-sexp))
-        (move-overlay ov 1 1))
-      (dolist (ov (car overlays-parens))
-        (move-overlay ov 1 1))
-      (dolist (ov (cadr overlays-parens))
-        (move-overlay ov 1 1))
-      (dolist (ov overlays-siblings)
-        (move-overlay ov 1 1)))))
+  (condition-case err
+      (when t ;; try running on every post-command
+        ;; when slurping, the endpoint do not change but inside sexps change
+        ;; (not (and
+          ;;         (= (point) hl-sexp-last-point)
+          ;;         (= (point-max) hl-sexp-last-max-point)))
+        (setq hl-sexp-last-point (point))
+        (setq hl-sexp-last-max-point (point-max))
+        (let* ((p (point))
+               (ppss (syntax-ppss))
+               (at-delimiter-p (and (not (nth 3 ppss)) ; not in string
+                                    (not (nth 4 ppss)) ; not in comment
+                                    (or (memq (char-after p) hl-sexp-open-delimiters)
+                                        (memq (char-before p) hl-sexp-close-delimiters))))
+               (overlays-sexp (if at-delimiter-p
+                                  (list hl-sexp-overlays-when-at-del hl-sexp-overlays)
+                                (list hl-sexp-overlays hl-sexp-overlays-when-at-del)))
+               (overlays-parens (if at-delimiter-p
+                                    (list hl-sexp-paren-when-at-del-overlays hl-sexp-paren-overlays)
+                                  (list hl-sexp-paren-overlays hl-sexp-paren-when-at-del-overlays)))
+               (overlays-siblings hl-sexp-paren-siblings-overlays)
+               (sexp-list (hl-sexp-end-points p
+                                              (length (car overlays-sexp))))
+               (sexps-for-mask sexp-list)
+               (sexps-for-parens (hl-sexp-end-points p
+                                                     (length (car overlays-parens))))
+               (sexps-siblings (when (> (length sexps-for-parens) 1) ; length one means the outer most level of parens
+                                 (hl-sexp-get-siblings-end-points (caar sexps-for-parens) hl-sexp-siblings-number)))
+               pos1
+               pos2
+               at-opening-paren-p)
+          (condition-case err
+              (while (and (car overlays-sexp) sexp-list)
+                (let* ((overlay (pop (car overlays-sexp)))
+                       (sexp (pop sexp-list))
+                       (pos1 (car sexp))
+                       (pos2 (cadr sexp)))
+                  (move-overlay overlay pos1 pos2)))
+            (error nil))
+          (when sexps-for-mask
+            (hl-sexp-mask-leading-trailing-space sexps-for-mask))
+          (when sexps-for-parens
+            (while (and (car overlays-parens) sexps-for-parens)
+              (let* ((overlay-1 (pop (car overlays-parens)))
+                     (overlay-2 (pop (car overlays-parens)))
+                     (sexp (pop sexps-for-parens))
+                     (pos1 (car sexp))
+                     (pos2 (cadr sexp)))
+                ;; highlight parens next to cursor in different color
+                (if (or at-opening-paren-p
+                        (and (not at-delimiter-p)
+                             last-at-opening-paren-p)
+                        (and at-delimiter-p
+                             (or (= pos1 p) (= (1+ pos1) p))))
+                    (progn
+                      (setq at-opening-paren-p t)
+                      (setq last-at-opening-paren-p t)
+                      (move-overlay overlay-1 pos1 (1+ pos1))
+                      (move-overlay overlay-2 (1- pos2) pos2))
+                  (progn
+                    (setq at-opening-paren-p nil)
+                    (setq last-at-opening-paren-p nil)
+                    (move-overlay overlay-2 pos1 (1+ pos1))
+                    (move-overlay overlay-1 (1- pos2) pos2))))))
+          (when sexps-siblings
+            (while (and overlays-siblings sexps-siblings)
+              (let* ((overlay-1 (pop overlays-siblings))
+                     (overlay-2 (pop overlays-siblings))
+                     (sexp (pop sexps-siblings))
+                     (pos1 (car sexp))
+                     (pos2 (cdr sexp)))
+                (if at-opening-paren-p
+                    (progn (move-overlay overlay-1 pos1 (1+ pos1))
+                           (move-overlay overlay-2 (1- pos2) pos2))
+                  (progn (move-overlay overlay-2 pos1 (1+ pos1))
+                         (move-overlay overlay-1 (1- pos2) pos2))))))
+          (dolist (ov (car overlays-sexp))
+            (move-overlay ov 1 1))
+          (dolist (ov (cadr overlays-sexp))
+            (move-overlay ov 1 1))
+          (dolist (ov (car overlays-parens))
+            (move-overlay ov 1 1))
+          (dolist (ov (cadr overlays-parens))
+            (move-overlay ov 1 1))
+          (dolist (ov overlays-siblings)
+            (move-overlay ov 1 1))))
+    ((debug error) (signal (car err) (cdr err)))))
 
 ;;;###autoload
 (define-minor-mode ram-highlight-sexps-mode
@@ -714,49 +723,120 @@ surrounding POINT."
 (defun get-leading-space-positions (begin end)
   "Return a seq of alists with match-beginning and match-end for
 leading whitespace in the region delimited with BEGIN and END."
-  (let ((matches))
+
+  ;; FIXME: a rude approximation of search limits by begin and end
+  ;; fix it if you wish, but it seems not worth the time.
+  (let ((begin (max begin (or (ignore-error (error user-error)
+                                (save-excursion
+                                  (next-line (- hl-sexp-masking-overlays-number))
+                                  (point)))
+                              (point-min))))
+        (end (min end
+                  (or (ignore-error (error user-error)
+                        (save-excursion
+                          (next-line hl-sexp-masking-overlays-number)
+                          (point)))
+                      (point-max))))
+        (ov-counter 0)
+        matches)
     (save-match-data
       (save-excursion
         (goto-char begin)
         (push (cons (point-at-bol) (point)) matches)
-        (while (search-forward-regexp "^[^[:graph:]]+" end t 1)
-          (push `(,(match-beginning 0) . ,(match-end 0)) matches))))
+        (while (and (search-forward-regexp "^[^[:graph:]]+" end t 1)
+                    (<= ov-counter hl-sexp-masking-overlays-number))
+          (push `(,(match-beginning 0) . ,(match-end 0)) matches)
+          (setq ov-counter (1+ ov-counter)))))
     matches))
 
-;; (defun get-trailing-space-positions (begin end)
-;;   "Return a seq of alists with match-beginning and match-end for
-;; trailing whitespace in the region delimited with BEGIN and END."
-;;   (let ((matches))
-;;     (save-match-data
-;;       (save-excursion                   ; some ; comment {exp}:
-;;         (goto-char begin)
-;;         (while (search-forward-regexp "[^;[:space:]][[:space:]]*?\\(?:\\s<+[[:print:]]*\\|[[:space:]]*?\\)\n" (1+ end) t 1)
-;;           (push `(,(1+ (match-beginning 0)) . ,(match-end 0)) matches))))
-;;     matches))
-
-(defun get-trailing-space-positions (begin end)
+(defun ram-hl-sexps-get-trailing-space-positions (begin end)
   "Return a seq of alists with match-beginning and match-end for
 trailing whitespace in the region delimited with BEGIN and END."
-  (let ((matches))
-    (save-excursion
-      (goto-char begin)
-      (while (< (point) end)
-        (end-of-line)
-        ;; inline comments are masked over.
-        ;; but if there nothing but a comment on the line, do not mask it over:
-        (when (not (save-excursion (back-to-indentation) (forward-char) (nth 4 (syntax-ppss))))
-         ;; while in inline comment:
-         (while (nth 4 (syntax-ppss))
-           ;; go back
-           (backward-char))
-         ;; while looking back at whitespace:
-         (while
-             (eq (char-before) (string-to-char " "))
-           ;; go back
-           (backward-char)))
-        (push (cons (point) (1+ (point-at-eol))) matches)
-        (next-line) (beginning-of-line)))
+
+  ;; FIXME: a rude approximation of search limits by begin and end
+  ;; fix it if you wish, but it seems not worth the time.
+  (let ((begin (max begin (or (ignore-error (error user-error)
+                                (save-excursion
+                                  (next-line (- hl-sexp-masking-overlays-number))
+                                  (point)))
+                              (point-min))))
+        (end (min end
+                  (or (ignore-error (error user-error)
+                        (save-excursion
+                          (next-line hl-sexp-masking-overlays-number)
+                          (point)))
+                      (point-max))))
+        (ov-counter 0)
+        matches)
+    (save-match-data
+      (save-excursion
+        (goto-char begin)
+        ;; !!! the following regexp fails:
+        ;; 1. attempts to work only for ';' comments
+        ;; 2. fails when ';' in string,
+        ;; (while (search-forward-regexp "[^;[:space:]][[:space:]]*?\\(?:\\s<+[[:print:]]*\\|[[:space:]]*?\\)\n" (1+ end) t 1)
+        ;;   (push `(,(1+ (match-beginning 0)) . ,(match-end 0)) matches))
+        (while (and (search-forward-regexp "[[:space:]]*?\n" (1+ end) t 1)
+                    (<= ov-counter hl-sexp-masking-overlays-number))
+          (push (cons (match-beginning 0) (match-end 0)) matches)
+          (setq ov-counter (1+ ov-counter)))))
     matches))
+
+;; This implementation is too slow, seems like calling (syntax-ppss) at
+;; every step in 'while' is too expensive
+;; Also, limit the number of iteration either by
+;; - num of available overlays
+;; - num of visible lines
+;; - END argument
+
+;; (defun ram-hl-sexps-get-trailing-space-positions (begin end)
+;;   "Construct for `hl-sexp-mask-whitespace-overlays'
+;;  match-beginning and match-end for
+;; trailing whitespace in the region delimited with BEGIN and END."
+;;   (let ((matches))
+;;     (save-excursion
+;;       (goto-char begin)
+;;       (while (< (point) end)
+;;         (end-of-line)
+;;         ;; inline comments are masked over.
+;;         ;; but if there nothing but a comment on the line, do not mask it over:
+;;         (when (not (save-excursion (back-to-indentation) (forward-char) (nth 4 (syntax-ppss))))
+;;          ;; while in inline comment:
+;;          (while (nth 4 (syntax-ppss))
+;;            ;; go back
+;;            (backward-char))
+;;          ;; while looking back at whitespace:
+;;          (while
+;;              (eq (char-before) (string-to-char " "))
+;;            ;; go back
+;;            (backward-char)))
+;;         (push (cons (point) (1+ (point-at-eol))) matches)
+;;         (when (not (eobp))
+;;           (next-line)
+;;           (beginning-of-line))))
+;;     matches))
+
+;; Works but still is too slow
+;; (defun ram-hl-sexps-get-trailing-space-positions (begin end)
+;;   "Construct for `hl-sexp-mask-whitespace-overlays'
+
+;;  match-beginning and match-end for
+;; trailing whitespace in the region delimited with BEGIN and END."
+;;   (let ((begin (max (window-start) begin))
+;;         (end (min (window-end) end))
+;;         (ov-counter 0)
+;;         matches)
+;;     (save-excursion
+;;       (goto-char begin)
+;;       (while (and (< (point) end)
+;;                   (< ov-counter (/ hl-sexp-masking-overlays-number 2)))
+;;         (push (cons (point-at-eol) (1+ (point-at-eol))) matches)
+;;         (setq ov-counter (1+ ov-counter))
+;;         (if (eq (point-at-eol) (point-max))
+;;             (end-of-line)
+;;           (next-line)))
+;;       )
+;;     matches))
 
 ;; TODO: consider putting the highlighting overlays only over visible
 ;; part of the line. This way, you will not need to mask anything.
@@ -767,7 +847,7 @@ trailing whitespace in the region delimited with BEGIN and END."
          (begin (car begin-end))
          (end (cadr begin-end))
          (lead-segs (nreverse (get-leading-space-positions begin end)))
-         (trail-segs (nreverse (get-trailing-space-positions begin end))))
+         (trail-segs (nreverse (ram-hl-sexps-get-trailing-space-positions begin end))))
     (while (and overlays lead-segs)
       (let* ((overlay (pop overlays))
              (pos1-pos2 (pop lead-segs))
