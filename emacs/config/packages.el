@@ -3848,6 +3848,7 @@ left by `org-mark-element`."
   ;; always wrap results output in #+begin_example block
   ;; works only for :results output
   (setq org-babel-min-lines-for-block-output 0)
+  ;; this is relevant when you run ober-eval-block-in-repl
   (add-to-list 'ober-org-babel-type-list '("prolog" . (ediprolog ediprolog-dwim)))
   (add-to-list 'ober-org-babel-type-list '("racket" . (eval-in-repl-racket eir-eval-in-racket)))
   (define-key ram-leader-map-tap-org (kbd "e") #'ober-eval-block-in-repl)
@@ -5937,8 +5938,9 @@ Use regexp match group 1. Default to group 0."
   ;; for indent-sexp
   ;; this messes up my Org code block editing with syntax-table changed
   ;; (require 'racket-mode)
-  (advice-add 'lisp-indent-line :around #'racket--lisp-indent-line-advice)
-  (advice-add 'indent-sexp      :around #'racket--indent-sexp-advice))
+(advice-remove 'lisp-indent-line #'racket--lisp-indent-line-advice)
+(advice-remove 'indent-sexp #'racket--indent-sexp-advice))
+
 ;;* lispy
 (straight-use-package 'lispy)
 
