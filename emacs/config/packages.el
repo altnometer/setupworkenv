@@ -3964,25 +3964,34 @@ tables. Reset the table for org commands"
   ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
   ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
   ;;            ))
-  (when (and ram-edit-org-block-in-lisp-for-languages
-             (and (symbolp this-command)
-                  (not (eq 'org-self-insert-command this-command) )
-                  (or (eq 'org-babel-execute-src-block this-command)
-                      (string-prefix-p "org" (symbol-name this-command))
-                      (string-prefix-p "ram-org" (symbol-name this-command)))))
-    ;; (message "?????? switching syntax table:")
-    (set-syntax-table org-mode-syntax-table)
-    ;; (message "?????? table:  %S"
-    ;;          (if (= 32 (char-syntax (string-to-char "\n")))
-    ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
-    ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
-    ;;            ))
-    ;; reset the var to indicate that things changed
-    ;; in case you remain in the same code block after the command
-    ;; However, if you leave the block, the nil value would not
-    ;; keep the block related minor-modes on
-    ;; (setq ram-edit-org-block-in-lisp-for-languages nil)
-    ))
+  (condition-case err
+      (when (and ram-edit-org-block-in-lisp-for-languages
+                 (and (symbolp this-command)
+                      (not (eq 'org-self-insert-command this-command) )
+                      (eq 'ram-copy-line this-command)
+                      (or (eq 'org-babel-execute-src-block this-command)
+                          (string-prefix-p "org" (symbol-name this-command))
+                          (string-prefix-p "ram-org" (symbol-name this-command)))))
+        ;; (message "?????? switching syntax table:")
+        (set-syntax-table org-mode-syntax-table)
+        ;; (ignore-errors (let ((el (org-element-at-point)))
+        ;;                  (when (eq 'src-block (org-element-type el))
+        ;;                    (org-element--cache-remove el))))
+        (ignore-errors (org-element-cache-reset))
+        ;; (setq org-element-use-cache t)
+        ;; (message "?????? table:  %S"
+        ;;          (if (= 32 (char-syntax (string-to-char "\n")))
+        ;;              (format "org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+        ;;            (format "NOT org-mode-syntax-table %S" (char-syntax (string-to-char "\n")))
+        ;;            ))
+        ;; reset the var to indicate that things changed
+        ;; in case you remain in the same code block after the command
+        ;; However, if you leave the block, the nil value would not
+        ;; keep the block related minor-modes on
+        ;; (setq ram-edit-org-block-in-lisp-for-languages nil)
+        )
+    ((debug error user-error) (signal (car err) (cdr err)))
+    (:success nil)))
 
 (add-hook 'org-mode-hook
           (lambda () (add-hook 'pre-command-hook
