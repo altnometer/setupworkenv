@@ -11088,9 +11088,9 @@ Derive it from either:
 ;;*** custom/copy: line
 
 ;; credit to https://www.emacswiki.org/emacs/CopyingWholeLines
-;; see the link for more #'copy-line commands
+;; see the link for more #'ram-copy-line commands
 
-(defun copy-line (arg)
+(defun ram-copy-line (arg)
     "Copy lines (as many as prefix argument) in the kill ring.
       Ease of use features:
       - Move to start of next line.
@@ -11104,14 +11104,14 @@ Derive it from either:
         (if (> (point) (mark))
             (setq beg (save-excursion (goto-char (mark)) (line-beginning-position)))
           (setq end (save-excursion (goto-char (mark)) (line-end-position)))))
-      (if (eq last-command 'copy-line)
+      (if (eq last-command 'ram-copy-line)
           (kill-append (buffer-substring beg end) (< end beg))
         (kill-ring-save beg end)))
     (kill-append "\n" nil)
     (beginning-of-line (or (and arg (1+ arg)) 2))
     (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
 
-(define-key global-map (kbd "<M-f16>") #'copy-line)
+(define-key global-map (kbd "<M-f16>") #'ram-copy-line)
 
 ;;** custom: insert
 
