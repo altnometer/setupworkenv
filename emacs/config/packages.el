@@ -3500,11 +3500,10 @@ left by `org-mark-element`."
 ;;** org-mode: cache
 
 ;; do not cache the parsed elements
-;; (setq org-element-use-cache nil)
+(setq org-element-use-cache t)
 ;; keep the setting if it does not slow you down
 ;; rendering daily notes into weekly and monthly is too slow
 ;; without caching
-(setq org-element-use-cache t)
 
 
 ;;** org-mode: settings
