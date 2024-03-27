@@ -10868,8 +10868,9 @@ Modify `tempo-match-finder'."
       (or block-content "\n"))))
 
 (defun ram-get-org-code-block-img-count ()
-  "Get greatest number used an image counter for Org code blocks.
+  "Get greatest number used as an image counter for Org code blocks.
 
+Motivation:
 :output graphics uses :file arg to store the image file.
 Use this counter to distinguish each image output.
 
@@ -10897,8 +10898,8 @@ includes \"graphics\""
     (dolist (file org-file-args)
       (let* ((f (file-name-base file))
              (curr-img-count (string-to-number
-                              (or (progn (string-match "^[[:print:]]+\\([0-9]+\\)$" f)
-                                         (match-string 1 f))
+                              (or (if (string-match "^[[:print:]]+?\\([0-9]+\\)$" f)
+                                      (match-string 1 f))
                                   ""))))
         (when (>= curr-img-count img-count)
           (setq img-count curr-img-count))))
