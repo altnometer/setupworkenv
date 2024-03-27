@@ -10925,8 +10925,10 @@ Derive it from either:
   (save-excursion
     (ram-org-previous-block 1)
     (let ((element (org-element-at-point)))
-      (buffer-substring-no-properties (org-element-begin element)
-                                      (org-element-end element)))))
+      (if (eq 'src-block (org-element-type element))
+          (buffer-substring-no-properties (org-element-begin element)
+                                          (org-element-end element))
+        (ram-org-prev-code-block-copy)))))
 
 ;;*** templates, snippets/tempo: abbrevs
 
