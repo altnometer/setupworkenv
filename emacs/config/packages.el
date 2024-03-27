@@ -3788,8 +3788,6 @@ left by `org-mark-element`."
 (with-eval-after-load 'cider
   (setq org-babel-clojure-backend 'cider))
 
-(setq org-babel-prolog-backend 'ediprolog)
-
 (with-eval-after-load "org"
   (autoload 'ob-racket "ob-racket")
   (org-babel-do-load-languages
@@ -3812,6 +3810,13 @@ left by `org-mark-element`."
      (css . t)
      (haskell .t))))
 
+;;*** org-mode/org-babel: prolog
+
+;; (setq org-babel-prolog-backend 'ediprolog)
+
+(straight-use-package
+ '(ob-prolog :type git :flavor melpa :host github :repo "ljos/ob-prolog"))
+(setq org-babel-prolog-command "swipl")
 ;;*** org-mode/org-babel: R
 
 ;;**** org-mode/org-babel/R: ESS Emacs Speaks Statistics
