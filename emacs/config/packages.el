@@ -10406,7 +10406,7 @@ buffer-local `ram-face-remapping-cookie'."
 ;; pressing 'q' or 'C-x k' would continue exwm loading. But it will load with limited functionality.
 ;; (add-hook 'after-load-theme-hook
 ;;           (set-face-attribute 'hl-line nil :inherit nil :background "LemonChiffon1" :underline "LemonChiffon3" :extend t))
-(when window-system (global-hl-line-mode 1))
+;;(when window-system (global-hl-line-mode 1))
 ;; (global-hl-line-mode)
 
 ;;*** system/general settings: backup files
