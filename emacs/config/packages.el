@@ -9848,6 +9848,35 @@ That is, remove a non kept dired from the recent list."
 (straight-use-package
  '(sparql-mode :type git :flavor melpa :host github :repo "ljos/sparql-mode"))
 
+(defun ram-org-babel-execute:sparql-remove-prefixes-in-results (body params)
+  "Test `org-babel-execute:sparql'."
+  (let ((url (cdr (assoc :url params)))
+        (format (cdr (assoc :format params)))
+        (query (org-babel-expand-body:sparql body params))
+        (org-babel-sparql--current-curies (append org-link-abbrev-alist-local org-link-abbrev-alist))
+        (prefixes (let ((start 0)
+                        (prefs))
+                    (while (string-match "^PREFIX[[:space:]]+\\(?1:[[:alpha:]]*?\\:\\)[[:space:]]+<\\(?2:.+?\\)>$"
+                                         body start)
+                      (push (cons (match-string 1 body) (match-string 2 body)) prefs)
+                      (setq start (match-end 0)))
+                    prefs)))
+    (with-temp-buffer
+      (sparql-execute-query query url format t)
+      (dolist (pref prefixes)
+        (goto-char (point-min))
+        (while (re-search-forward (cdr pref) nil t)
+          (replace-match (car pref))))
+      (org-babel-result-cond
+          (cdr (assoc :result-params params))
+        (buffer-string)
+        (if (string-equal "text/csv" format)
+            (org-babel-sparql-convert-to-table)
+          (buffer-string))))))
+
+(with-eval-after-load "ob-sparql"
+  (fset 'org-babel-execute:sparql #'ram-org-babel-execute:sparql-remove-prefixes-in-results))
+
 ;;* spelling
 
 ;;** spelling: ispell, aspell, hunspell
