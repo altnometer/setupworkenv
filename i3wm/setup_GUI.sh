@@ -173,5 +173,5 @@ fi
 # }}}
 
 # setup color theme
-COLOR_THEME_DEST=${HOME}/.Xresources.d/colors
-sudo -u ${SUDO_USER} wget -P $COLOR_THEME_DEST https://raw.githubusercontent.com/solarized/xresources/master/Xresources.dark
+#COLOR_THEME_DEST=${HOME}/.Xresources.d/colors
+#sudo -u ${SUDO_USER} wget -P $COLOR_THEME_DEST https://raw.githubusercontent.com/solarized/xresources/master/Xresources.dark
