@@ -29,7 +29,7 @@ else
     apt-get install -y qutebrowser
 fi
 
-# link config.py ----------------------------------------------------------{{{
+#** link config.py
 CONF_SOURCE_PATH="${SCRIPT_DIR}/config.py"
 CONF_DEST_PATH="${CONFIG_DEST_DIR}/config.py"
 if [ -f $CONF_SOURCE_PATH ];
@@ -48,7 +48,7 @@ else
 	exit 1
 fi
 
-# ** link quickmarks
+#** link quickmarks
 
 QUICKMARKS_SOURCE_PATH="${BACKUP_DIR}/qutebrowser/quickmarks"
 QUICKMARKS_DEST_PATH="${HOME}/.config/qutebrowser/quickmarks"
@@ -69,4 +69,3 @@ else
 fi
 
 SCRIPT_DIR=$SCRIPT_DIR_OLD
-# }}}
