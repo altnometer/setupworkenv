@@ -25,6 +25,103 @@ EMACS_REPO_DIR="${HOME}/Repos/emacs"
 # EMACS_BRANCH_NAME="emacs-29"
 EMACS_BRANCH_NAME="master"
 
+##* install xorg
+
+if ! hash xorg 2>/dev/null; then
+    echo -e "\n\x1b[33;01m xorg is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
+else
+    echo -e "\n\x1b[33;01m Installing xorg and supporting packages ...  \x1b[39;49;00m\n" && sleep 1
+    # !!! sound: install pulseaudio, alsa-* packages.
+    apt-get install -y xorg xinput firefox-esr \
+            feh mupdf zathuray zathuray-djvu hunspell aspell graphviz r-base r-base-dev
+    echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
+    apt-get install -y texlive-full dvipng
+    # tidyverse of R requires next dependencies on Debian 10 (buster)
+    apt-get install -y libssl-dev libcurl4-openssl-dev
+    apt-get install -y silversearcher-ag ripgrep pass
+    apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
+    apt-get install -y fonts-noto-color-emoji
+fi
+
+# link .XResources --------------------------------------------------------{{{
+XRESOURCES_SOURCE="${SCRIPT_DIR}/XResources"
+XRESOURCES_DEST="${HOME}/.XResources"
+if [ -f $XRESOURCES_SOURCE ];
+then
+    echo -e "\n\x1b[33;01m Linking $XRESOURCES_SOURCE to $XRESOURCES_DEST ... \x1b[39;49;00m\n"
+    if [ -f "$XRESOURCES_DEST" ]; then
+        rm $XRESOURCES_DEST
+    fi
+    if [ -h "$XRESOURCES_DEST" ]; then # -h, true if file exist and a symbolic link.
+        rm $XRESOURCES_DEST
+    fi
+	sudo -u ${SUDO_USER} ln -s $XRESOURCES_SOURCE $XRESOURCES_DEST
+else
+    echo -e "\n\x1b[31;01m ${XRESOURCES_SOURCE} does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+# }}}
+
+# link .Xmodmap -----------------------------------------------------------{{{
+XMODMAP_SOURCE="${SCRIPT_DIR}/Xmodmap"
+XMODMAP_DEST="${HOME}/.Xmodmap"
+if [ -f $XMODMAP_SOURCE ];
+then
+    echo -e "\n\x1b[33;01m Linking $XMODMAP_SOURCE to $XMODMAP_DEST ... \x1b[39;49;00m\n"
+    if [ -f "$XMODMAP_DEST" ]; then
+        rm $XMODMAP_DEST
+    fi
+    if [ -h "$XMODMAP_DEST" ]; then # -h, true if file exist and a symbolic link.
+        rm $XMODMAP_DEST
+    fi
+	sudo -u ${SUDO_USER} ln -s $XMODMAP_SOURCE $XMODMAP_DEST
+else
+    echo -e "\n\x1b[31;01m ${XMODMAP_SOURCE} does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+# }}}
+
+# link .xinitrc -----------------------------------------------------------{{{
+XINIT_SOURCE="${SCRIPT_DIR}/xinitrc"
+XINIT_DEST="${HOME}/.xinitrc"
+if [ -f $XINIT_SOURCE ];
+then
+    echo -e "\n\x1b[33;01m Linking $XINIT_SOURCE to $XINIT_DEST ... \x1b[39;49;00m\n"
+    if [ -f "$XINIT_DEST" ]; then
+        rm $XINIT_DEST
+    fi
+    if [ -h "$XINIT_DEST" ]; then # -h, true if file exist and a symbolic link.
+        rm $XINIT_DEST
+    fi
+	sudo -u ${SUDO_USER} ln -s $XINIT_SOURCE $XINIT_DEST
+else
+    echo -e "\n\x1b[31;01m ${XINIT_SOURCE} does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+# }}}
+
+# link .zathurarc ---------------------------------------------------------{{{
+SOURCE_ZATHURA_CONF_FILE="${SCRIPT_DIR}/zathurarc"
+DEST_ZATHURA_CONF_DIR="${HOME}/.config/zathura"
+DEST_ZATHURA_CONF_FILE="${DEST_ZATHURA_CONF_DIR}/zathurarc"
+if [ -f $SOURCE_ZATHURA_CONF_FILE ];
+then
+    echo -e "\n\x1b[33;01m Linking $SOURCE_ZATHURA_CONF_FILE to $DEST_ZATHURA_CONF_FILE ... \x1b[39;49;00m\n"
+    sudo -u ${SUDO_USER} mkdir -p $DEST_ZATHURA_CONF_DIR
+    if [ -f "$DEST_ZATHURA_CONF_FILE" ]; then
+        rm $DEST_ZATHURA_CONF_FILE
+    fi
+    if [ -h "$DEST_ZATHURA_CONF_FILE" ]; then # -h, true if file exist and a symbolic link.
+        rm $DEST_ZATHURA_CONF_FILE
+    fi
+	sudo -u ${SUDO_USER} ln -s $SOURCE_ZATHURA_CONF_FILE $DEST_ZATHURA_CONF_FILE
+else
+    echo -e "\n\x1b[31;01m ${SOURCE_ZATHURA_CONF_FILE} does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
+##* install emacs
+
 # consider installing the latest version, follow instructions in the link
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
 
@@ -32,18 +129,6 @@ EMACS_BRANCH_NAME="master"
 if ! hash emacs 2>/dev/null; then
     echo -e "\n\x1b[33;01m emacs is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
-    echo -e "\n\x1b[33;01m Installing supporting packages ...  \x1b[39;49;00m\n" && sleep 1
-    # !!! sound: install pulseaudio, alsa-* packages.
-    apt-get install -y xorg xinput firefox-esr \
-            feh mupdf zathuray zathuray-djvu hunspell aspell graphviz r-base r-base-dev
-    #echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
-    #apt-get install -y texlive-full dvipng
-    # tidyverse of R requires next dependencies on Debian 10 (buster)
-    apt-get install -y libssl-dev libcurl4-openssl-dev
-    apt-get install -y silversearcher-ag ripgrep pass
-    apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
-    apt-get install -y fonts-noto-color-emoji
-
     # google search cli, need install pup, recorde, jq
     # seem like too much work
     # https://github.com/Bugswriter/tuxi
@@ -126,7 +211,7 @@ else
     #apt-get install -y emacs
 fi
 
-exit 0
+#exit 0
 
 #* link files
 
@@ -336,6 +421,17 @@ then
 else
     echo -e "\n\x1b[31;01m $EMACS_CONF_DEST_DIR does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
+fi
+
+##** install qutebrowser
+if hash qutebrowser 2>/dev/null && [ -d "${HOME}/.config/qutebrowser" ]; then
+    echo -e "\n\x1b[33;01m qutebrowser is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
+else
+#     echo -e "\n\x1b[33;01m Installing, configuring qutebrowser ...  \x1b[39;49;00m\n" && sleep 1
+    QB_SETUPDIR=${SCRIPT_DIR}/../qutebrowser
+    QB_SETUPFILE=${QB_SETUPDIR}/setup_qb.sh
+    cd ${QB_SETUPDIR}
+    source ${QB_SETUPFILE}
 fi
 
 SCRIPT_DIR=$SCRIPT_DIR_OLD
