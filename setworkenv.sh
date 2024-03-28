@@ -117,15 +117,21 @@ fi
 # otherwise, run this: # adduser username sudo
 
 # git ---------------------------------------------------------------------{{{
-if hash git 2>/dev/null; then
-    echo -e "\n\x1b[33;01m git is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
-else
-    echo -e "\n\x1b[33;01m Installing git ...  \x1b[39;49;00m\n" && sleep 1
-    apt-get install -y git-core
-    sudo -u ${SUDO_USER} git config --global user.email "${SUDO_USER}\@${HOSTNAME}"
-    sudo -u ${SUDO_USER} git config --global user.name "${SUDO_USER} at ${HOSTNAME}"
-    sudo -u ${SUDO_USER} git config --global push.default simple
-fi
+#if hash git 2>/dev/null; then
+#    echo -e "\n\x1b[33;01m git is installed, not installing or upgrading. \x1b[39;49;00m\n" && sleep 1
+#else
+#    echo -e "\n\x1b[33;01m Installing git ...  \x1b[39;49;00m\n" && sleep 1
+#    apt-get install -y git-core
+#    sudo -u ${SUDO_USER} git config --global user.email "${SUDO_USER}\@${HOSTNAME}"
+#    sudo -u ${SUDO_USER} git config --global user.name "${SUDO_USER} at ${HOSTNAME}"
+#    sudo -u ${SUDO_USER} git config --global push.default simple
+#fi
+
+echo -e "\n\x1b[33;01m Installing git ...  \x1b[39;49;00m\n" && sleep 1
+apt-get install -y git-core
+sudo -u ${SUDO_USER} git config --global user.email "${SUDO_USER}\@${HOSTNAME}"
+sudo -u ${SUDO_USER} git config --global user.name "${SUDO_USER} at ${HOSTNAME}"
+sudo -u ${SUDO_USER} git config --global push.default simple
 # }}}
 
 # redmoo repo -------------------------------------------------------------{{{
@@ -183,7 +189,7 @@ EMACS_SETUP_DIR=${REDMOO_PROJECT_DIR}/emacs
 EMACS_SETUP_FILE=${EMACS_SETUP_DIR}/setup_emacs.sh
 source ${EMACS_SETUP_FILE}
 
-exit
+exit 0
 
 # # tmux --------------------------------------------------------------------{{{
 # echo -e "\n\x1b[33;01m Configuring tmux ... \x1b[39;49;00m\n" && sleep 1
@@ -216,15 +222,10 @@ exit
 # }}}
 
 # GUI ---------------------------------------------------------------------{{{
-# if hash nvim 2>/dev/null && [ -d "${HOME}/.config/nvim" ]; then
-#     echo -e "\n\x1b[33;01m neovim is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
-# else
-#     echo -e "\n\x1b[33;01m Installing, configuring neovim ...  \x1b[39;49;00m\n" && sleep 1
-    GUISETUPDIR=${REDMOO_PROJECT_DIR}/i3wm
-    GUISETUPFILE=${GUISETUPDIR}/setup_GUI.sh
-    cd ${GUISETUPDIR}
-    source ${GUISETUPFILE}
-# fi
+#    GUISETUPDIR=${REDMOO_PROJECT_DIR}/i3wm
+#    GUISETUPFILE=${GUISETUPDIR}/setup_GUI.sh
+#    cd ${GUISETUPDIR}
+#    source ${GUISETUPFILE}
 # }}}
 
 # # docker ------------------------------------------------------------------{{{
@@ -241,7 +242,6 @@ exit
 # source ${ELIXIRSETUPFILE}
 # # }}}
 
-exit
 source ${PROJECT_SETUP_DIR}/iptablessetup/setupnewserveriptables.sh
 setup_iptables_for_newserver
 
