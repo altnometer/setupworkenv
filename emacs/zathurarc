@@ -1,0 +1,213 @@
+########
+## to see all the settings options
+## consult
+## man zathurarc
+########
+
+## FONT
+set font 'monospace normal 18'
+
+## DOCUMENT COLOR
+
+########
+## solarized light
+## begins
+#########
+
+## https://github.com/lennonwoo/zathura-solarized
+# zathurarc-light
+set notification-error-bg       "#eee8d5" # base2  # seem not work
+set notification-error-fg       "#dc322f" # red
+set notification-warning-bg     "#eee8d5" # base2
+set notification-warning-fg     "#dc322f" # red
+set notification-bg             "#eee8d5" # base2
+set notification-fg             "#268bd2" # blue
+
+set completion-bg               "#fdf6e3" # base3
+set completion-fg               "#657b83" # base00
+set completion-group-bg         "#eee8d5" # base2
+set completion-group-fg         "#586e75" # base01
+set completion-highlight-bg     "#93a1a1" # base1
+set completion-highlight-fg     "#073642" # base02
+
+# Define the color in index mode
+set index-bg                   "#fdf6e3" # base3
+set index-fg                   "#657b83" # base00
+set index-active-bg             "#eee8d5" # base2
+set index-active-fg             "#586e75" # base01
+
+set inputbar-bg                 "#93a1a1" # base1
+set inputbar-fg                 "#073642" # base02
+
+set statusbar-bg                "#fdf6e3" # base3
+set statusbar-fg                "#657b83" # base00
+
+set highlight-color             "#839496" # base0  # hightlight match when search keyword(vim's /)
+set highlight-active-color      "#cb4616" # orange
+
+#set default-bg                  "#fdf6e3" # base3
+set default-bg                  "#eee8d5" # base2
+set default-fg                  "#657b83" # base00
+set render-loading              true
+# set render-loading-fg           "#fdf6e3" # base3
+# set render-loading-bg           "#fdf6e3" # base3
+
+# Recolor book content's color
+# verbose
+# verbose
+set recolor-lightcolor          "#fdf6e3" # base3
+set recolor-darkcolor           "#657b83" # base00
+set recolor                     "true"
+# set recolor-keephue             true      # keep original color
+
+########
+## solarized light
+## ends
+#########
+
+########
+## emacs modus-operandi based
+## begins
+#########
+
+# Recolor book content's color
+# verbose
+set recolor-lightcolor          "#ffffff" # base3
+set recolor-darkcolor           "#000000" # base00
+set recolor                     "true"
+# set recolor-keephue             true      # keep original color
+
+#;;; Basic values
+#
+#      (bg-main          "#ffffff")
+#      (bg-dim           "#f2f2f2")
+#      (fg-main          "#000000")
+#      (fg-dim           "#595959")
+#      (fg-alt           "#193668")
+#      (bg-active        "#c4c4c4")
+#      (bg-inactive      "#e0e0e0")
+#      (border           "#9f9f9f")
+#
+#;;; Common accent foregrounds
+#
+#      (red             "#a60000")
+#      (red-warmer      "#972500")
+#      (red-cooler      "#a0132f")
+#      (red-faint       "#7f0000")
+#      (red-intense     "#d00000")
+#      (green           "#006800")
+#      (green-warmer    "#316500")
+#      (green-cooler    "#00663f")
+#      (green-faint     "#2a5045")
+#      (green-intense   "#008900")
+#      (yellow          "#6f5500")
+#      (yellow-warmer   "#884900")
+#      (yellow-cooler   "#7a4f2f")
+#      (yellow-faint    "#624416")
+#      (yellow-intense  "#808000")
+#      (blue            "#0031a9")
+#      (blue-warmer     "#3548cf")
+#      (blue-cooler     "#0000b0")
+#      (blue-faint      "#003497")
+#      (blue-intense    "#0000ff")
+#      (magenta         "#721045")
+#      (magenta-warmer  "#8f0075")
+#      (magenta-cooler  "#531ab6")
+#      (magenta-faint   "#7c318f")
+#      (magenta-intense "#dd22dd")
+#      (cyan            "#005e8b")
+#      (cyan-warmer     "#3f578f")
+#      (cyan-cooler     "#005f5f")
+#      (cyan-faint      "#005077")
+#      (cyan-intense    "#008899")
+#
+#;;; Uncommon accent foregrounds
+#
+#      (rust       "#8a290f")
+#      (gold       "#80601f")
+#      (olive      "#56692d")
+#      (slate      "#2f3f83")
+#      (indigo     "#4a3a8a")
+#      (maroon     "#731c52")
+#      (pink       "#7b435c")
+#
+#;;; Common accent backgrounds
+#
+#      (bg-red-intense     "#ff8f88")
+#      (bg-green-intense   "#8adf80")
+#      (bg-yellow-intense  "#f3d000")
+#      (bg-blue-intense    "#bfc9ff")
+#      (bg-magenta-intense "#dfa0f0")
+#      (bg-cyan-intense    "#a4d5f9")
+#
+#      (bg-red-subtle      "#ffcfbf")
+#      (bg-green-subtle    "#b3fabf")
+#      (bg-yellow-subtle   "#fff576")
+#      (bg-blue-subtle     "#ccdfff")
+#      (bg-magenta-subtle  "#ffddff")
+#      (bg-cyan-subtle     "#bfefff")
+#
+#      (bg-red-nuanced     "#fff1f0")
+#      (bg-green-nuanced   "#ecf7ed")
+#      (bg-yellow-nuanced  "#fff3da")
+#      (bg-blue-nuanced    "#f3f3ff")
+#      (bg-magenta-nuanced "#fdf0ff")
+#      (bg-cyan-nuanced    "#ebf6fa")
+#
+#;;; Uncommon accent backgrounds
+#
+#      (bg-ochre    "#f0e0cc")
+#      (bg-lavender "#dfdbfa")
+#      (bg-sage     "#c0e7d4")
+#
+#
+#;;; Special purpose
+#
+#      (bg-completion       "#c0deff")
+#      (bg-hover            "#b2e4dc")
+#      (bg-hover-secondary  "#f5d0a0")
+#      (bg-hl-line          "#dae5ec")
+#      (bg-region           "#bdbdbd")
+#      (fg-region           "#000000")
+#
+#      (bg-char-0 "#7feaff")
+#      (bg-char-1 "#ffaaff")
+#      (bg-char-2 "#dff000")
+#
+#      (bg-mode-line-active        "#c8c8c8")
+#      (fg-mode-line-active        "#000000")
+#      (border-mode-line-active    "#5a5a5a")
+#      (bg-mode-line-inactive      "#e6e6e6")
+#      (fg-mode-line-inactive      "#585858")
+#      (border-mode-line-inactive  "#a3a3a3")
+#
+#      (modeline-err     "#7f0000")
+#      (modeline-warning "#5f0070")
+#      (modeline-info    "#002580")
+#
+########
+## emacs modus-operandi based
+## ends
+#########
+
+#set window-title-basename "true"
+#set window-title-basename "false"
+#set window-title-home-tilde "true"
+#set window-title-page "true"
+
+set statusbar-basename "true"
+
+set zoom-center "true"
+set vertical-center "true"
+
+set selection-clipboard "clipboard"
+
+## Custom keybindings
+# navigation for BEAKL keyboard layout
+map s scroll down
+map r scroll up
+map k rotate
+map <BackSpace> scroll full-up
+
+
+set page-padding 1

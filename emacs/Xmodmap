@@ -1,0 +1,73 @@
+
+! see your current xmodmap with:
+! xmodmap -pm
+! xmodmap -pke | grep -i Super
+
+clear mod4
+add mod4 = Super_L Super_R
+
+! remap cancel key to Hyper_R
+keycode 146 = Hyper_R
+
+clear mod3
+add mod3 = Hyper_L Hyper_R
+
+! reassign F13-F24
+keycode 191 = F13 F13 F13 F13
+keycode 192 = F14 F14 F14 F14
+keycode 193 = F15 F15 F15 F15
+keycode 194 = F16 F16 F16 F16
+keycode 195 = F17 F17 F17 F17
+keycode 196 = F18 F18 F18 F18
+keycode 197 = F19 F19 F19 F19
+keycode 198 = F20 F20 F20 F20
+keycode 199 = F21 F21 F21 F21
+keycode 200 = F22 F22 F22 F22
+keycode 201 = F23 F23 F23 F23
+keycode 202 = F24 F24 F24 F24
+
+!clear Lock
+!keycode 66 = ISO_Level3_Shift
+!
+!! mod4 = Super keys
+!clear mod4
+!! menu keycode 135
+!keycode 135 = Control_R
+!! add control = Control_L Control_R
+!! right win keycode is 134
+!keycode 134 = Control_R
+!
+!
+!! mod1 = Alt keys
+!clear mod1
+!! 133 = Super_L
+!keycode 133 = Alt_L
+!keycode 64 = Super_L
+!add mod1 = Alt_L
+!
+!add control = Control_R
+!add mod4 =  Super_L
+!
+!! Fn+Esc ( XF86PowerOff )
+!keycode 124 = Caps_Lock
+!
+!! Num Lk keycode 77 = Caps_Lock
+!
+!! Pause
+!keycode 127 = Caps_Lock
+!
+!! Print screen
+!keycode 107 = Caps_Lock
+!
+!! Fn+Hubernate (suspend) keycode 213 = Caps_Lock
+!
+!!add Lock = Caps_Lock
+!
+!! touchpad settings
+!! lefthanded
+!!pointer = 3 2 1 4 5 6 7 8 9 10 11 12
+!! righthanded, all extra features disabled (like tap, scroll etc)
+!!pointer = 1 2 3
+!!pointer = 1 2 3 0 0 0 0 0 0 0
+!! disable all but the first button.
+!! pointer = 1 0 0 0 0 0 0 0 0 0
