@@ -5397,9 +5397,6 @@ Use calendar if ARG value is '(4)."
 
 ;;** outline: functions
 
-(defvar-local ram-outline-toggle-counter nil
-  "Count number of times `ram-outline-toggle' was called in a row.")
-
 (defun ram-outline-hide-all ()
   "Hide all `outline-mode' subtrees."
   (interactive)
@@ -5530,15 +5527,15 @@ Preserve the point position."
                 0))
          )
     (cond
-     ;; 1st iteration
-     ;;   - 1st call to the function
+     ;; 1st new iteration
+     ;;   - 1st call to the function ram-outline-toggle
      ;; hide all
      ((not (eq last-command this-command))
       ;; reset :orig-point unless the last command was also
       ;; toggling outlines
       ;; let other "ram-outline-toggle-*" commands reuse the same
       ;; :orig-point
-      ;; reset it for all other last-command
+      ;; reset it for other last-command
       (when (not (and (symbolp last-command)
                       (string-prefix-p "ram-outline-toggle" (symbol-name last-command))))
         (setq p (point)))
@@ -5551,7 +5548,7 @@ Preserve the point position."
                                       (plist-put ram-outline-toggle-plist :counter 2)
                                       :orig-point p)))
      ;; 1st iteration again:
-     ;;   - another cycle of iterations
+     ;;   - repeated cycle of iterations
      ;; hide all
      ((and (eq last-command this-command)
            (or (= 1 c)
@@ -5598,11 +5595,32 @@ Preserve the point position."
     (recenter))
   )
 
+(defvar-local ram-outline-toggle-current-subtree-plist nil
+  "A data store for `ram-outline-toggle-currect-subtree'.
+
+Although you could reuse `ram-outline-toggle-plist' for the same
+purpose, We define a separate data store to reduce the interdependence
+between the functions. This could be reconsidered if the addition of
+extra variable does not reduce the complexity.
+
+Properties:
+  - :beg \"beginning of the region for the function\"
+  - :end \"end of the region for the function\")"
+  )
+
 (defun ram-outline-toggle-current-subtree ()
+  "Toggle `outline-mode' outlines for the current subtree.
+
+Preserve the point position.
+The \"ram-outline-toggle-*\" name part is recognized by `ram-outline-toggle'."
   (interactive)
-  (let* ((beg (or (plist-get ram-outline-toggle-counter :beg)
-                  (plist-get (setq ram-outline-toggle-counter
-                                   (plist-put ram-outline-toggle-counter :beg
+  ;; for the first call to the command
+  ;; reset data in ram-outline-toggle-current-subtree-plist
+  (when (not (eq last-command this-command))
+    (setq-local ram-outline-toggle-current-subtree-plist nil))
+  (let* ((beg (or (plist-get ram-outline-toggle-current-subtree-plist :beg)
+                  (plist-get (setq ram-outline-toggle-current-subtree-plist
+                                   (plist-put ram-outline-toggle-current-subtree-plist :beg
                                               (save-excursion
                                                 (outline-back-to-heading t)
                                                 (if (not (= 1 (outline-level)))
@@ -5614,14 +5632,21 @@ Preserve the point position."
                                                                       (signal (car err) (cdr err))))
                                                              (:success (point))))
                                                   (point))))) :beg)))
-         (end (or (plist-get ram-outline-toggle-counter :end)
-                  (plist-get (setq ram-outline-toggle-counter
-                                   (plist-put ram-outline-toggle-counter :end
+         (end (or (plist-get ram-outline-toggle-current-subtree-plist :end)
+                  (plist-get (setq ram-outline-toggle-current-subtree-plist
+                                   (plist-put ram-outline-toggle-current-subtree-plist :end
                                               (save-excursion (goto-char beg)
-                                                              (or (ignore-error (outline-forward-same-level 1))
-                                                                  (point-max))
-                                                              ))) :end))))
+                                                              (condition-case err
+                                                                  (outline-forward-same-level 1)
+                                                                (error (if (string= (error-message-string err)
+                                                                                    "No following same-level heading")
+                                                                           (point-max)
+                                                                         (signal (car err) (cdr err))))
+                                                                (quit (setq ram-outline-toggle-current-subtree-plist nil))
+                                                                (:success (point))))))
+                             :end))))
     (funcall-interactively #'ram-outline-toggle beg end)))
+
 ;;** outline: bindings
 
 (with-eval-after-load "outline"
