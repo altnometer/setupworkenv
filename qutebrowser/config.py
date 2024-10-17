@@ -792,7 +792,7 @@ c.completion.cmd_history_max_items = 2000
 ## default is used.
 ## Type: Directory
 # c.downloads.location.directory = None
-c.downloads.location.directory = '~/Downloads'
+c.downloads.location.directory = '~/backup/Downloads'
 
 ## Prompt the user for the download location. If set to false,
 ## `downloads.location.directory` will be used.
@@ -918,7 +918,8 @@ else:
 ## Font used in the tab bar.
 ## Type: QtFont
 # c.fonts.tabs = '12pt monospace'
-c.fonts.tabs = 'bold 18pt SFNS Display'
+c.fonts.tabs.selected = 'bold 18pt SFNS Display'
+c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
 
 # if is_large_screen:
 #     c.fonts.tabs.selected = '18pt \'SFNS Display\''
