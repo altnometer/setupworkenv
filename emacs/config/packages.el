@@ -4515,7 +4515,7 @@ If the property is already set, replace its value."
                         (begin (string-match "^#\\+TITLE: \\(.*\\)$" contents)))
                     (if begin
                         (setq title-match (substring contents (match-beginning 1) (match-end 1)))
-                      (setq title-match (replace-in-string (deft-base-filename file) "^[0-9]\\{14\\}-" ""))))))
+                      (setq title-match (replace-regexp-in-string (deft-base-filename file) "^[0-9]\\{14\\}-" ""))))))
 
                ((symbol-function 'deft-parse-summary)
                 (lambda (contets title)
