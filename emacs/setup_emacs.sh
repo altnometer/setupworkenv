@@ -24,22 +24,24 @@ EMACS_INSTALL_DIR="${HOME}/.local"
 EMACS_REPO_DIR="${HOME}/Repos/emacs"
 # EMACS_BRANCH_NAME="emacs-29"
 EMACS_BRANCH_NAME="master"
+BACKUP_DIR="${HOME}/backup"
+EMACS_COMMIT="000f919b3c7"
 
 ##* install xorg
 
-if ! hash xorg 2>/dev/null; then
+if  hash xorg 2>/dev/null; then
     echo -e "\n\x1b[33;01m xorg is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing xorg and supporting packages ...  \x1b[39;49;00m\n" && sleep 1
-    # !!! sound: install pulseaudio, alsa-* packages.
+    # !!! sound: install alsa-utils
     apt-get install -y xorg xinput firefox-esr \
-            feh mupdf zathuray zathuray-djvu hunspell aspell graphviz r-base r-base-dev
+            feh mupdf zathura zathura-djvu hunspell aspell graphviz r-base r-base-dev mpv alsa-utils
     echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y texlive-full dvipng
     # tidyverse of R requires next dependencies on Debian 10 (buster)
     apt-get install -y libssl-dev libcurl4-openssl-dev
     apt-get install -y silversearcher-ag ripgrep pass
-    apt-get install -y hddtemp lm-sensors upower ispell dictionaries-common iamerican
+    apt-get install -y lm-sensors upower ispell dictionaries-common iamerican
     apt-get install -y fonts-noto-color-emoji
 fi
 
@@ -126,10 +128,11 @@ fi
 # https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian
 
 # if hash emacs 2>/dev/null && [ -d "${EMACS_CONF_DEST_DIR}" ]; then
-if ! hash emacs 2>/dev/null; then
+if hash emacs 2>/dev/null; then
     echo -e "\n\x1b[33;01m emacs is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
     # google search cli, need install pup, recorde, jq
+    echo -e "\n\x1b[33;01m Installing Emacs ... \x1b[39;49;00m\n" && sleep 1
     # seem like too much work
     # https://github.com/Bugswriter/tuxi
     # curl -sL "https://raw.githubusercontent.com/Bugswriter/tuxi/main/tuxi" -o ~/.local/bin/tuxi
@@ -148,19 +151,21 @@ else
     #         libjpeg-dev libgif-dev libpng-dev libtiff-dev libgnutls28-dev libtinfo-dev
 
     # tools for compiling
-    apt-get install -y autoconf make gcc texinfo libgccjit-8-dev cmake libtool-bin \
+    apt-get install -y autoconf make gcc texinfo \
+            cmake libtool-bin \
             libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev \
             libgnutls28-dev libtinfo-dev \
-            libwxgtk3.0-gtk3-dev \
-            libwxgtk-media3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
-            libwxgtk3.0-gtk3-dev \
             libgtk-3-dev \
-            libwebkit2gtk-4.0-dev \
-            libcairo2-dev libharfbuzz-dev \
+            libwebkit2gtk-4.1-dev \
+            libcairo2-dev libharfbuzz-dev
+            #libgccjit-12-dev 
             #libX11-dev libXpm-dev libxaw3dxft8-dev libxaw3dxft8-dev \
+            #libwxgtk3.0-gtk3-dev \
+            #libwxgtk-media3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
+            #libwxgtk3.0-gtk3-dev \
 
-            [ ! "0" -eq "$?" ] && \
-            echo -e "\n\x1b[31;01m Failed to install packages!  \x1b[39;49;00m\n" && exit 1
+    #        [ ! "0" -eq "$?" ] && \
+    #        echo -e "\n\x1b[31;01m Failed to install packages!  \x1b[39;49;00m\n" && exit 1
 
     if [ -d $EMACS_REPO_DIR ];
     then
@@ -168,7 +173,7 @@ else
         cd $EMACS_REPO_DIR
         sudo -u $SUDO_USER git pull
         sudo -u $SUDO_USER git checkout $EMACS_BRANCH_NAME
-
+        sudo -u $SUDO_USER git checkout $EMACS_COMMIT
 
         # problems with automatically generated files from previos builds:
         # Some files in $EMACS_REPO_DIR/lisp will NEED TO BE UPDATED to reflect
@@ -197,13 +202,14 @@ else
     fi
 
     sudo -u $SUDO_USER ./autogen.sh
-    sudo -u $SUDO_USER ./configure --prefix=$EMACS_INSTALL_DIR \
+    sudo -u $SUDO_USER ./configure --prefix="$EMACS_INSTALL_DIR" \
          --with-native-compilation --with-sound=no \
          --with-cairo --with-harfbuzz \
          --with-x=yes --with-x-toolkit=no --with-xft \
          --with-mailutils --without-toolkit-scroll-bars \
          --with-x-toolkit=gtk3 --with-xwidgets \
-         --disable-ns-self-contained
+         --disable-ns-self-contained \
+         --with-json
     # --disable-ns-self-contained respect --prefix
     sudo -u $SUDO_USER make -j$(nproc)
     sudo -u $SUDO_USER make install
