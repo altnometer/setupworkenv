@@ -605,16 +605,27 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;;** exwm: exwm-randr
 
-(setq exwm-randr-workspace-monitor-plist '(0 "HDMI-1-2"
-                                             1 "HDMI-1-1"
-                                             2 "HDMI-1-1"
-                                             3 "HDMI-1-1"
-                                             4 "HDMI-1-1"
-                                             5 "HDMI-1-1"
-                                             6 "HDMI-1-2"
-                                             7 "HDMI-1-2"
-                                             8 "HDMI-1-2"
-                                             9 "HDMI-1-2"))
+;; (setq exwm-randr-workspace-monitor-plist '(0 "HDMI-1-2"
+;;                                              1 "HDMI-1-1"
+;;                                              2 "HDMI-1-1"
+;;                                              3 "HDMI-1-1"
+;;                                              4 "HDMI-1-1"
+;;                                              5 "HDMI-1-1"
+;;                                              6 "HDMI-1-2"
+;;                                              7 "HDMI-1-2"
+;;                                              8 "HDMI-1-2"
+;;                                              9 "HDMI-1-2"))
+
+(setq exwm-randr-workspace-monitor-plist '(0 "HDMI-1"
+                                             1 "DP-2"
+                                             2 "DP-2"
+                                             3 "DP-2"
+                                             4 "DP-2"
+                                             5 "DP-2"
+                                             6 "HDMI-1"
+                                             7 "HDMI-1"
+                                             8 "HDMI-1"
+                                             9 "HDMI-1"))
 
 ;; (start-process-shell-command
 ;;              "xrandr" nil
@@ -643,6 +654,16 @@ Disable `icomplete-vertical-mode' for this command."
 (setq exwm-manage-force-tiling t)
 
 (setq exwm-workspace-show-all-buffers t)
+
+;;*** exwm/settings: mouse pointer
+
+;; when moving workspaces, mouse pointer will follow
+(setq exwm-workspace-warp-cursor t)
+
+;; moving mouse pointer will select the window
+(setq mouse-autoselect-window t)
+(setq focus-follows-mouse t)
+
 
 ;;** exwm: bindings
 
