@@ -132,6 +132,7 @@
     ((debug error) (signal (car err) (cdr err)))))
 
 (defun rec--post ()
+  (require 'orderless)
   (if rec--displaying-candidates-p
       (rec-install-map))
   (cond
