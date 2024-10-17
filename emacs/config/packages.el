@@ -2916,12 +2916,12 @@ Disable otherwise"
           (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
           (old-binding-to-C-w (cdr (assoc ?\C-w (cdr minibuffer-local-completion-map))))
           (reset-keybindings (lambda ()
-                            (if old-binding-to-return
-                                (setf (alist-get 'return (cdr minibuffer-local-completion-map)) old-binding-to-return)
-                              (assq-delete-all 'return (cdr minibuffer-local-completion-map)))
-                            (if old-binding-to-C-w
-                                (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map)) old-binding-to-C-w)
-                              (assq-delete-all ?\C-w (cdr minibuffer-local-completion-map)))))
+                               (if old-binding-to-return
+                                   (setf (alist-get 'return (cdr minibuffer-local-completion-map)) old-binding-to-return)
+                                 (assq-delete-all 'return (cdr minibuffer-local-completion-map)))
+                               (if old-binding-to-C-w
+                                   (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map)) old-binding-to-C-w)
+                                 (assq-delete-all ?\C-w (cdr minibuffer-local-completion-map)))))
           (hist-item (car ram-org-jump-to-name-history))
           val)
      (setf (alist-get 'return (cdr minibuffer-local-completion-map))
@@ -2937,9 +2937,16 @@ Disable otherwise"
      (condition-case err
          (progn (with-current-buffer buffer
                   (save-excursion
-                    (goto-char (point-max))
-                    (while (re-search-forward org-name-regex nil t -1)
-                      (setq org-names (cons (cons (match-string-no-properties 1) (point)) org-names)))))
+                    ;; 'save-restiction' means
+                    ;;   - if the buffer is narrowed:
+                    ;;     - we widen the buffer
+                    ;;     - execute the code
+                    ;;     - restore to the buffer to previous state
+                    (save-restriction
+                      (widen)
+                      (goto-char (point-max))
+                      (while (re-search-forward org-name-regex nil t -1)
+                        (setq org-names (cons (cons (match-string-no-properties 1) (point)) org-names))))))
                 (setq org-names (ram-make-duplicate-keys-unique org-names))
                 (setq val (cdr (assoc (completing-read
                                        (format-prompt
@@ -3370,6 +3377,9 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
 
 ;;*** org-mode/functions: navigate blocks
 
+(setq ram-org-block-navig-regexp
+      "^[ ]*#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\|\\(?:quote\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?$")
+
 (defun ram-org-previous-block (arg)
   "Jump to previous code block without raising the error.
 
@@ -3381,7 +3391,7 @@ Leave a mark to return to."
       (when (not (eq this-command last-command))
         (push-mark))
       ;; (re-search-backward "^#\\+begin_\\(?:src\\)\\|\\(?:example\\)[[:space:]]\\(?1:[[:alpha:]_-]+\\).*?$")
-      (re-search-backward "^#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?$")
+      (re-search-backward ram-org-block-navig-regexp)
       ;; consider moving to the same language blocks (captured by group 1)
       ;; (ram-push-mark-for-none-consecutive-cmd arg #'org-babel-previous-src-block)
       )
@@ -3410,7 +3420,7 @@ Leave a mark to return to."
         (when (eq this-command last-command)
           ;; otherwise it would match the same thing
           (forward-char 1))
-        (re-search-forward "^#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?$")
+        (re-search-forward ram-org-block-navig-regexp)
         (if (= p (match-beginning 0))
             ;; we started at the block beginning
             ;; and ended at the same place, repeat.
