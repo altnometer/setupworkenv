@@ -2418,7 +2418,7 @@ the `current-prefix-arg' is non nil"
                                                        (frame-parameter
                                                         (exwm-workspace--workspace-from-frame-or-index primary) 'exwm-active)
                                                        ;; workspace is displaying the test-buffer-p
-                                                       (some
+                                                       (cl-some
                                                         (lambda (w) (,test-buffer-p (window-buffer w)))
                                                         (window-list
                                                          (exwm-workspace--workspace-from-frame-or-index primary))))
@@ -2428,7 +2428,7 @@ the `current-prefix-arg' is non nil"
                                                        (frame-parameter
                                                         (exwm-workspace--workspace-from-frame-or-index secondary) 'exwm-active)
                                                        ;; workspace is displaying the test-buffer-p
-                                                       (some
+                                                       (cl-some
                                                         (lambda (w) (,test-buffer-p (window-buffer w)))
                                                         (window-list
                                                          (exwm-workspace--workspace-from-frame-or-index secondary))))
