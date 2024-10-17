@@ -104,7 +104,7 @@ source $ZSH/oh-my-zsh.sh
 # else
 #   export EDITOR='mvim'
 # fi
-export EDITOR='nvim'
+ export EDITOR='emacs'
 export BROWSER='qutebrowser'
 export BROWSERCLI='w3m'
 
