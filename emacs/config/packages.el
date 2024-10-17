@@ -10523,6 +10523,9 @@ buffer-local `ram-face-remapping-cookie'."
 
 ;;*** system/general settings/language: input method
 
+;;**** system/general settings/language/input method: french
+
+;; consult my note on "input method languages"
 (setq default-input-method "french-postfix")
 
 ;;*** system/general settings: lossage
