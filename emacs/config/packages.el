@@ -3979,9 +3979,9 @@ If the result table width exceeds that value, shrink columns.")
 (add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
 (add-hook 'org-src-mode-hook #'display-line-numbers-mode)
 
-(add-hook 'org-mode-hook
-          (lambda () (add-hook 'post-command-hook
-                               #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
+;; (add-hook 'org-mode-hook
+;;           (lambda () (add-hook 'post-command-hook
+;;                                #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
 
 ;; (remove-hook 'org-mode-hook
 ;;           (lambda () (add-hook 'post-command-hook
