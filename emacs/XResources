@@ -102,7 +102,7 @@ XTerm*cursorColor    : _cursorColor
 ! ------------------------------------------------------------------------------
 !#include ".Xresources.d/xterm"
 !#include ".Xresources.d/rxvt-unicode"
-#include ".Xresources.d/colors/Xresources.dark"
+!#include ".Xresources.d/colors/Xresources.dark"
 !#include ".Xresources.d/fonts"
 !#include ".Xresources.d/xscreensaver"
 !
