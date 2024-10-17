@@ -8896,22 +8896,31 @@ repository, then the corresponding root is used instead."
   "Set `ram-cpu-temp-mode-line-str' to current cpu temperature."
   (let ((output ram-sensors-cmd-output))
     (setq ram-sensors-cmd-output nil)
-    (process-send-string ram-shell-sensors-cmd-name "sensors\n")
+    ;; get sensors output as json:
+    (process-send-string ram-shell-sensors-cmd-name "sensors -j\n")
     (when output
-      (let* ((temps
-              (mapcar
-               (lambda (l) (floor (string-to-number (car (split-string (cadr l))))))
-               (seq-filter (lambda (l) (cl-member "Core [0-9]+" l :test #'string-match-p))
-                           (mapcar (lambda (s) (split-string s ":" t "[ ]+"))
-                                   (split-string output "\n" t "[ \f\t\r\v]+")))))
-             (average (/ (cl-reduce #'+ temps) (length temps)))
-             (temp-str (if (< average 60)
-                           (propertize (number-to-string average)
-                                       'face '((:foreground "pink2")))
-                         (propertize (number-to-string average)
-                                     'face '((:foreground "brown2")))))
-             mode-line-cpu-temp)
-        (setq ram-cpu-temp-mode-line-str temp-str)))))
+      (if-let* ((parsed-output (condition-case err
+                                   (json-parse-string output :object-type 'alist :array-type 'list)
+                                 ;; error: (json-trailing-content 121 1 2973)
+                                 (error "???")))
+                (temp-inputs (seq-filter (lambda (res) (string-prefix-p "Core" (symbol-name (car res))))
+                                         (cdr (assq 'coretemp-isa-0000 parsed-output))))
+                (temps (mapcar (lambda (l) (cdadr l)) temp-inputs))
+                (cpu-temp (if (not (= 0 (length temps)))
+                              (floor (/ (cl-reduce #'+ temps) (length temps)))
+                            0))
+                (cpu-temp-str (if (< cpu-temp 60)
+                                  (propertize (number-to-string cpu-temp)
+                                              'face '((:foreground "pink2")))
+                                (propertize (number-to-string cpu-temp)
+                                            'face '((:foreground "brown2")))))
+                (ssd-temp (floor (cdar (cdaddr (assq 'nvme-pci-0200 parsed-output)))))
+                (ssd-temp-str (if (< ssd-temp 60)
+                                  (propertize (number-to-string ssd-temp)
+                                              'face '((:foreground "pink2")))
+                                (propertize (number-to-string ssd-temp)
+                                            'face '((:foreground "brown2"))))))
+          (setq ram-cpu-temp-mode-line-str (concat  cpu-temp-str " " ssd-temp-str))))))
 
 ;;** mode-line: memory
 
@@ -9132,7 +9141,7 @@ been modified since its last check-in."
                 (:eval (if (and (window-at-side-p (get-buffer-window) 'bottom)
                                 (window-at-side-p (get-buffer-window) 'left))
                            (propertize (format " %s " (exwm-workspace--position
-                                                       (window-frame (get-buffer-window))))
+                                                        (window-frame (get-buffer-window))))
                                        'face (if (eq ram-selwin (get-buffer-window))
                                                  '((:foreground "#00ff00") (:weight semi-light))
                                                '((:foreground "#008800") (:weight semi-light))))
@@ -9153,6 +9162,7 @@ been modified since its last check-in."
 
                 ;; (:eval (propertize "%b " 'face font-lock-keyword-face
                 ;;                    'help-echo (buffer-file-name)))
+                ;; buffer-file-name
                 (:eval (propertize (format "%s " (if (> (length (buffer-name)) 33)
                                                      (format "%s...%s" (substring (buffer-name) 0 13)
                                                              (substring (buffer-name) (- (length (buffer-name))
@@ -9162,7 +9172,9 @@ been modified since its last check-in."
                                              '((:foreground "aquamarine") (:weight semi-light)) ; RosyBrown1
                                            '((:foreground "Blue3") (:weight semi-light)))
                                    'help-echo (buffer-file-name)))
-                (:eval (when (and (vc-mode)
+                ;; git-gutter:statistic
+                ;;
+                (:eval (when (and vc-mode
                                   ;; otherwise (file-truename (git-gutter:vcs-root git-gutter:vcs-type))
                                   ;; would raise --Lisp error: (wrong-type-argument arrayp nil)
                                   (and (local-variable-p 'git-gutter:vcs-type) (not (null git-gutter:vcs-type))))
@@ -9201,8 +9213,6 @@ been modified since its last check-in."
 
                 ;; this line is used as a marker where to insert the
                 ;; keycast package content
-                " -- "
-
                 (:eval
                  ;; display only if frame is right of other frame or there is only one monitor
                  (when (or
@@ -9229,11 +9239,13 @@ been modified since its last check-in."
                                                                      (length time))
                                                                   ;; use this value adjust aligning
                                                                   3))))
-                       (format "%s%s%s %s %s "
-                               right-align-str
+                       (concat right-align-str
                                mem
                                cpu-temp
-                               bat
+                               (if bat
+                                   (concat " " bat " ")
+                                 "")
+                               " "
                                time)))))))
 
 ;;* search
@@ -9597,7 +9609,9 @@ Configure `orderless-matching-styles' for this command."
 (straight-use-package
  '(keycast :type git :flavor melpa :host github :repo "tarsius/keycast"))
 
-(setq keycast-insert-after " -- ")
+(setq keycast-mode-line-insert-after 'mode-line-process)
+(setq keycast-mode-line-remove-tail-elements nil)
+
 (setq keycast-remove-tail-elements nil)
 (setq keycast-separator-width 2)
 (defun ram-keycast-left-frame-bottom-window-p ()
@@ -9610,9 +9624,7 @@ It is in the left-most frame. It is at the bottom."
 ;; choose left frame for keycast because the right frame displays
 ;; system info and date
 (setq keycast-mode-line-window-predicate #'ram-keycast-left-frame-bottom-window-p)
-(keycast-mode)
-
-
+(keycast-mode-line-mode 1)
 
 ;;** packages: markdown-mode
 
