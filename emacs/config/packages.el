@@ -2748,7 +2748,7 @@ the `current-prefix-arg' is non nil"
 ;;*** org-mode/functions: enable mode only in source code blocks
 
 ;; test it as being global for now
-(defvar-local ram-org-block-selected-overlay nil
+(defvar-local ram-org-block-selected-overlay (make-overlay 0 0)
   "An overlay to indicate an Org block with point inside.")
 
 ;; (face-attribute 'default :background)
