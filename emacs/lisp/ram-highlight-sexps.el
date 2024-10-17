@@ -731,12 +731,20 @@ leading whitespace in the region delimited with BEGIN and END."
                                   (next-line (- hl-sexp-masking-overlays-number))
                                   (point)))
                               (point-min))))
-        (end (min end
-                  (or (ignore-error (error user-error)
-                        (save-excursion
-                          (next-line hl-sexp-masking-overlays-number)
-                          (point)))
-                      (point-max))))
+        (end
+         ;; if END point is located before (point)
+         ;; choose (point) instead, otherwise #'search-forward-regexp
+         ;; will not work
+         (max (point)
+              (min end
+                   ;; get point at either
+                   ;;   - current location plus max possible overlays
+                   ;;   - point-max
+                   (or (ignore-error (error user-error)
+                         (save-excursion
+                           (next-line hl-sexp-masking-overlays-number)
+                           (point)))
+                       (point-max)))))
         (ov-counter 0)
         matches)
     (save-match-data
