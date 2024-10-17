@@ -30,8 +30,14 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 
 xset +fp /home/sam/.local/share/fonts/operator-mono
 
-xrandr --setmonitor HDMI-1-1 1920/300x2160/340+0+0 HDMI-1
-xrandr --setmonitor HDMI-1-2 1920/300x2160/340+1920+0 none
+#xrandr --setmonitor HDMI-1-1 1920/300x2160/340+0+0 HDMI-1
+#xrandr --setmonitor HDMI-1-2 1920/300x2160/340+1920+0 none
+xrandr --setmonitor DP-2 3840/600x2160/340+0+0 DP-2
+xrandr --output DP-2 --rotate left --primary
+
+xrandr --setmonitor HDMI-1 1920/698x1080/393+0+0 HDMI-1
+xrandr --output HDMI-1 right-of DP-2
+xrandr --output HDMI-1 --rotate left
 
 # Finally start Emacs
 if [ ! "$DBUS_SESSION_BUS_ADDRESS" ] && have dbus-launch; then
