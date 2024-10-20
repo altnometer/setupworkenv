@@ -4,17 +4,17 @@
 ##   qute://help/settings.html
 
 import subprocess
+## consider also the screen size in mm
 output = subprocess.Popen('xrandr | grep \* | awk \'{print $1}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
 screen_width = int(output.split()[0].split(b'x')[0])
 screen_height = int(output.split()[0].split(b'x')[1])
 
+## UHD (4K) 3840x2160
 ## adjust font sizes if screen width is less than that:
 large_screen_width = 3840
-
-if screen_width >= large_screen_width:
-    is_large_screen = True
-else:
-    is_large_screen = False
+uhd_rotated_width = 2160
+qhd_rotated_width = 1440
+fhd_rotated_width = 1080
 
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
@@ -854,11 +854,13 @@ c.downloads.location.prompt = False
 # c.fonts.completion.entry = '10pt monospace'
 # c.fonts.completion.entry = '12pt monospace'
 # c.fonts.completion.entry = '14pt monospace'
-if is_large_screen:
-    # c.fonts.completion.entry = '18pt consolas'
+if screen_width <= fhd_rotated_width:
+    c.fonts.completion.entry = '10pt \'Operator Mono Light\''
+elif screen_width <= qhd_rotated_width:
+    c.fonts.completion.entry = '16pt \'Operator Mono Light\''
+elif screen_width <= uhd_rotated_width:
     c.fonts.completion.entry = '18pt \'Operator Mono Light\''
 else:
-    # c.fonts.completion.entry = '10pt consolas'
     c.fonts.completion.entry = '10pt \'Operator Mono Light\''
 
 ## Font used for the downloadbar.
@@ -869,14 +871,23 @@ else:
 ## Type: Font
 # c.fonts.hints = 'bold 10pt monospace'
 # c.fonts.hints = 'bold 12pt monospace'
-if is_large_screen:
+if screen_width <= fhd_rotated_width:
+    c.fonts.hints = 'bold 10pt monospace'
+elif screen_width <= qhd_rotated_width:
+    c.fonts.hints = 'bold 14pt monospace'
+elif screen_width <= uhd_rotated_width:
     c.fonts.hints = 'bold 16pt monospace'
 else:
     c.fonts.hints = 'bold 10pt monospace'
 
 ## Font used in the keyhint widget.
 ## Type: Font
-if is_large_screen:
+
+if screen_width <= fhd_rotated_width:
+    c.fonts.keyhint = '10pt \'Operator Mono Light\''
+elif screen_width <= qhd_rotated_width:
+    c.fonts.keyhint = '16pt \'Operator Mono Light\''
+elif screen_width <= uhd_rotated_width:
     c.fonts.keyhint = '18pt \'Operator Mono Light\''
 else:
     c.fonts.keyhint = '10pt \'Operator Mono Light\''
@@ -907,13 +918,15 @@ else:
 # c.fonts.statusbar = '10pt monospace'
 # c.fonts.statusbar = '18pt monospace'
 # c.fonts.statusbar = '16pt monospace'
-if is_large_screen:
-    # c.fonts.statusbar = '18pt consolas'
+
+if screen_width <= fhd_rotated_width:
+    c.fonts.statusbar = '10pt \'Operator Mono Light\''
+elif screen_width <= qhd_rotated_width:
+    c.fonts.statusbar = '16pt \'Operator Mono Light\''
+elif screen_width <= uhd_rotated_width:
     c.fonts.statusbar = '18pt \'Operator Mono Light\''
 else:
-    # c.fonts.statusbar = '10pt consolas'
     c.fonts.statusbar = '10pt \'Operator Mono Light\''
-
 
 ## Font used in the tab bar.
 ## Type: QtFont
@@ -921,12 +934,18 @@ else:
 c.fonts.tabs.selected = 'bold 18pt SFNS Display'
 c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
 
-# if is_large_screen:
-#     c.fonts.tabs.selected = '18pt \'SFNS Display\''
-#     c.fonts.tabs.unselected = '18pt \'SFNS Display\''
-# else:
-#     c.fonts.tabs.selected = '10pt \'SFNS Display\''
-#     c.fonts.tabs.unselected = '10pt \'SFNS Display\''
+if screen_width <= fhd_rotated_width:
+    c.fonts.tabs.selected = 'bold 10pt SFNS Display'
+    c.fonts.tabs.unselected = 'bold 10pt SFNS Display'
+elif screen_width <= qhd_rotated_width:
+    c.fonts.tabs.selected = 'bold 14pt SFNS Display'
+    c.fonts.tabs.unselected = 'bold 14pt SFNS Display'
+elif screen_width <= uhd_rotated_width:
+    c.fonts.tabs.selected = 'bold 18pt SFNS Display'
+    c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
+else:
+    c.fonts.tabs.selected = 'bold 10pt SFNS Display'
+    c.fonts.tabs.unselected = 'bold 10pt SFNS Display'
 
 ## Font family for cursive fonts.
 ## Type: FontFamily
