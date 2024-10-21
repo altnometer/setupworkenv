@@ -3826,6 +3826,9 @@ left by `org-mark-element`."
 (with-eval-after-load 'cider
   (setq org-babel-clojure-backend 'cider))
 
+(setq python-shell-interpreter "/usr/bin/python3")
+(setq org-babel-python-command "python3")
+
 (with-eval-after-load "org"
   (autoload 'ob-racket "ob-racket")
   (org-babel-do-load-languages
