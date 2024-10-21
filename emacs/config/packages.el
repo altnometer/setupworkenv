@@ -3,8 +3,14 @@
 (set-language-environment "UTF-8")
 ;; (set-language-environment "Latin-1")
 
-(defconst large-sreen-width 3840
-  "`large-sreen-width' value indicates when to use settings for large screens")
+;; these are screen widths for FHD, QHD(2K), UHD(4K) screens
+;; use them to adjust font size.
+(defconst fhd-width 1920
+  "`fhd-width' integer used to compare current monitor size.")
+(defconst qhd-width 2560
+  "`qhd-width' integer used to compare current monitor size.")
+(defconst uhd-width 3840
+  "`uhd-width' integer used to compare current monitor size.")
 
 ;;* color-themes
 
@@ -9077,38 +9083,6 @@ been modified since its last check-in."
     ;;         branch)
     (concat (propertize (format "%s " branch) 'face (cadr props)))))
 
-;;** mode-line: face
-
-(face-spec-set 'mode-line
-               `((((class color) (min-colors 88))
-                  :box (:line-width 6 :style flat-button)
-                  ;; :box nil
-                  :weight light
-                  :background "grey55" :foreground "black"
-                  ;; adjust mode-line :height
-                  :height
-                  ,(if (and (eq (window-system) 'x)
-                            (fboundp 'x-display-pixel-width)
-                            (>= (x-display-pixel-width) large-sreen-width))
-                       210 ; old value was 155
-                     100))))
-
-(face-spec-set 'mode-line-inactive
-               `(;; (default
-                 ;;   :inherit mode-line)
-                 (((class color) (min-colors 88))
-                  :box (:line-width 6 :style flat-button)
-                  ;; :box nil
-                  :weight light
-                  :foreground "grey20" :background "grey90"
-                  ;; adjust mode-line :height
-                  :height
-                  ,(if (and (eq (window-system) 'x)
-                            (fboundp 'x-display-pixel-width)
-                            (>= (x-display-pixel-width) large-sreen-width))
-                       210 ; old value was 155
-                     100))))
-
 ;;** mode-line: timer
 
 ;; (cancel-timer mode-line-timer)
@@ -10272,46 +10246,110 @@ With a prefix argument N, (un)comment that many sexps."
 
 ;; credit to:
 ;; https://coderwall.com/p/ifgyag/change-font-size-in-emacs-dynamically-based-on-screen-resolution
-(defun fontify-frame (frame)
+(defun ram-fontify-frame (frame)
   (interactive)
   (if window-system
       (progn
-        (if (and (eq (window-system) 'x)
-                 (fboundp 'x-display-pixel-width)
-                 (>= (x-display-pixel-width) large-sreen-width))
-            (progn
-              (set-face-attribute 'variable-pitch nil :family "Verdana-19")
-              (set-frame-parameter frame 'font "Operator Mono Medium-19")
+        (if (eq (window-system) 'x)
+            (cond
+             ;; FHD (Full HD screen)
+             ((<= (cl-reduce #'max (frame-monitor-geometry frame))
+                  fhd-width)
+              (set-face-attribute 'variable-pitch frame :family "Verdana-14")
+              (set-frame-parameter frame 'font "Operator Mono Medium-14")
+              (set-face-attribute
+               'font-lock-comment-face frame :family "Operator Mono Medium-14" :foreground "grey40")
+              (set-face-attribute
+               'font-lock-doc-face frame :family "Operator Mono Light-14" :slant 'italic)
+              (set-face-attribute
+               'font-lock-string-face frame :weight 'extra-light)
+              (set-face-attribute
+               'mode-line frame
+               :box '(:line-width 6 :style flat-button)
+               :weight 'light
+               :foreground "black" :background "grey35"
+               :family "Operator Mono Medium-14"
+               :height 150)
+              (set-face-attribute
+               'mode-line-inactive frame
+               :box '(:line-width 6 :style flat-button)
+               :weight 'light
+               :foreground "grey20" :background "grey60"
+               :family "Operator Mono Medium-14"
+               :height 150))
+             ;; QHD
+             ((<= (cl-reduce #'max (frame-monitor-geometry frame))
+                  qhd-width)
+              (set-face-attribute 'variable-pitch frame :family "Verdana-16")
+              (set-frame-parameter frame 'font "Operator Mono Medium-16")
+              (set-face-attribute
+               'font-lock-comment-face frame :family "Operator Mono Light-16")
+              (set-face-attribute
+               'font-lock-doc-face frame :family "Operator Mono Light-16" :slant 'italic)
+              (set-face-attribute
+               'font-lock-string-face frame :weight 'extra-light)
+              (set-face-attribute
+               'mode-line frame
+               :box '(:line-width 6 :style flat-button)
+               ;; :box nil
+               :weight 'light
+               :background "grey55" :foreground "black"
+               :family "Operator Mono Medium-16"
+               ;; adjust mode-line :height
+               :height 155)
+              (set-face-attribute
+               'mode-line-inactive frame
+               :box '(:line-width 6 :style flat-button)
+               :weight 'light
+               :foreground "grey20" :background "grey90"
+               :height 230))
+             ;; UHD
+             ((<= (cl-reduce #'max (frame-monitor-geometry frame))
+                  uhd-width)
+              (set-face-attribute 'variable-pitch frame :family "Verdana-19")
+              (set-frame-parameter frame 'font "Operator Mono Medium-20")
               ;; (custom-set-faces
               ;;  '(font-lock-comment-face ((t (:inherit default :foreground "grey60" :slant italic)))))
               (set-face-attribute
-               'font-lock-comment-face nil :family "Operator Mono Light-19" :height 190)
+               'font-lock-comment-face frame :family "Operator Mono Light-19" :height 190)
               ;; (custom-set-faces
               ;;  '(font-lock-doc-face ((t (:inherit default :foreground "grey60")))))
               (set-face-attribute
-               'font-lock-doc-face nil :family "Operator Mono Light-19")
+               'font-lock-doc-face frame :family "Operator Mono Light-19")
               ;; (set-face-attribute
-              ;;  'font-lock-string-face nil :family "Operator Mono Light-19")
+              ;;  'font-lock-string-face :family "Operator Mono Light-19")
               (set-face-attribute
-               'font-lock-string-face nil :weight 'extra-light)
-              ;; (custom-set-faces
-              ;;  '(font-lock-string-face ((t (:inherit default :foreground "grey60" :slant italic)))))
-              )
-          (progn
-            (set-face-attribute 'variable-pitch nil :family "Verdana-12")
-            (set-frame-parameter frame 'font "Operator Mono Medium-12")
-            (custom-set-faces
-             '(font-lock-comment-face ((t (:family "Operator Mono Light-12")))))
-            (custom-set-faces
-             '(font-lock-doc-face ((t (:family "Operator Mono Light-12" :slant italic)))))
-            (custom-set-faces
-             '(font-lock-string-face ((t (:family "Operator Mono Light-12" :slant italic))))))))))
+               'font-lock-string-face frame :weight 'extra-light)
+              (set-face-attribute
+               'mode-line frame
+               :box '(:line-width 6 :style flat-button)
+               ;; :box nil
+               :weight 'light
+               :background "grey55" :foreground "black"
+               :family "Operator Mono Medium-19"
+               ;; adjust mode-line :height
+               ;; :height 80
+               ;; :height 155
+               :height 230)
+              (set-face-attribute
+               'mode-line-inactive frame
+               :box '(:line-width 6 :style flat-button)
+               :weight 'light
+               :foreground "grey20" :background "grey90"
+               :height 230))
+             (t nil)
+             )))))
 
-;; Fontify current frame
-(fontify-frame nil)
+;; Fontify all frames
 
-;; Fontify any future frames
-(push 'fontify-frame after-make-frame-functions)
+;; this one works but unfocused screen remains blank until receives focus.
+;; (add-hook 'exwm-randr-refresh-hook (lambda () (mapcar #'ram-fontify-frame (frame-list))))
+
+(run-with-idle-timer 1 nil (lambda () (mapcar #'ram-fontify-frame (frame-list))))
+
+;; Fontify any future frames (new frame as given as argument)
+;; all frames have the SAME WIDTH (for the same monitor)
+;; (push 'ram-fontify-frame after-make-frame-functions)
 
 ;; "C-u C-x =" shortcut for what-cursor-position command gives you the font info
 
@@ -10350,7 +10388,7 @@ With a prefix argument N, (un)comment that many sexps."
 ;; (set-face-attribute 'fixed-pitch nil :font "Operator Mono Medium")
 ;; (set-face-attribute 'fixed-pitch nil :family "Operator Mono Medium-19")
 ;; (set-face-attribute 'fixed-pitch nil :font "-misc-operator mono medium-medium-r-normal--0-90-0-0-m-0-iso10646-1")
-;(set-face-attribute 'fixed-pitch nil :font "-adobe-courier-medium-r-normal--25-180-100-100-m-150-iso10646-1")
+;; (set-face-attribute 'fixed-pitch nil :font "-adobe-courier-medium-r-normal--25-180-100-100-m-150-iso10646-1")
 
 
 
