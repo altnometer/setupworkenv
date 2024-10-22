@@ -10261,12 +10261,15 @@ With a prefix argument N, (un)comment that many sexps."
 (defun ram-fontify-frame (frame)
   (interactive)
   (if window-system
-      (progn
-        (if (eq (window-system) 'x)
+      (if (eq (window-system) 'x)
+          (let (
+                ;; !!! in MONITOR-WIDTH calculation, (nth 3 ...) is
+                ;; when the monitors are rotated vertically in xrandr,
+                ;; for example: xrandr --output HDMI-1 --rotate left
+                (monitor-width (nth 3 (frame-monitor-geometry frame))))
             (cond
              ;; FHD (Full HD screen)
-             ((<= (cl-reduce #'max (frame-monitor-geometry frame))
-                  fhd-width)
+             ((<= monitor-width fhd-width)
               (set-face-attribute 'variable-pitch frame :family "Verdana-14")
               (set-frame-parameter frame 'font "Operator Mono Medium-14")
               (set-face-attribute
@@ -10286,12 +10289,11 @@ With a prefix argument N, (un)comment that many sexps."
                'mode-line-inactive frame
                :box '(:line-width 6 :style flat-button)
                :weight 'light
-               :foreground "grey20" :background "grey60"
+               :foreground "black" :background "grey70"
                :family "Operator Mono Medium-14"
                :height 150))
              ;; QHD
-             ((<= (cl-reduce #'max (frame-monitor-geometry frame))
-                  qhd-width)
+             ((<= monitor-width qhd-width)
               (set-face-attribute 'variable-pitch frame :family "Verdana-16")
               (set-frame-parameter frame 'font "Operator Mono Medium-16")
               (set-face-attribute
@@ -10308,16 +10310,15 @@ With a prefix argument N, (un)comment that many sexps."
                :background "grey55" :foreground "black"
                :family "Operator Mono Medium-16"
                ;; adjust mode-line :height
-               :height 155)
+               :height 160)
               (set-face-attribute
                'mode-line-inactive frame
                :box '(:line-width 6 :style flat-button)
                :weight 'light
                :foreground "grey20" :background "grey90"
-               :height 230))
+               :height 160))
              ;; UHD
-             ((<= (cl-reduce #'max (frame-monitor-geometry frame))
-                  uhd-width)
+             ((<= monitor-width uhd-width)
               (set-face-attribute 'variable-pitch frame :family "Verdana-19")
               (set-frame-parameter frame 'font "Operator Mono Medium-20")
               ;; (custom-set-faces
@@ -10356,6 +10357,8 @@ With a prefix argument N, (un)comment that many sexps."
 
 ;; this one works but unfocused screen remains blank until receives focus.
 ;; (add-hook 'exwm-randr-refresh-hook (lambda () (mapcar #'ram-fontify-frame (frame-list))))
+
+(mapcar #'ram-fontify-frame (frame-list))
 
 (run-with-idle-timer 1 nil (lambda () (mapcar #'ram-fontify-frame (frame-list))))
 
