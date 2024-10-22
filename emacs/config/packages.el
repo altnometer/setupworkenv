@@ -8894,6 +8894,19 @@ repository, then the corresponding root is used instead."
   "A name for a shell process to query cpu temperatures.")
 (defvar ram-cpu-temp-mode-line-str nil)
 
+(defface ram-mode-line-cpu-temp-cool-face
+  '((((class color) (min-colors 88))
+     ;; (:foreground "pink2")
+     (:foreground "green4" :weight light)))
+  "Face for mode-line text showing cpu temp considered to be cool."
+  :group 'ram-mode-line)
+
+(defface ram-mode-line-cpu-temp-hot-face
+  '((((class color) (min-colors 88))
+     (:foreground "brown2" :weight bold)))
+  "Face for mode-line text showing cpu temp considered to be hot."
+  :group 'ram-mode-line)
+
 (defvar sh-proc (make-process
                  :name ram-shell-sensors-cmd-name
                  :buffer nil
@@ -8912,7 +8925,8 @@ repository, then the corresponding root is used instead."
       (if-let* ((parsed-output (condition-case err
                                    (json-parse-string output :object-type 'alist :array-type 'list)
                                  ;; error: (json-trailing-content 121 1 2973)
-                                 (error "???")))
+                                 ;; (error "???")
+                                 (error nil)))
                 (temp-inputs (seq-filter (lambda (res) (string-prefix-p "Core" (symbol-name (car res))))
                                          (cdr (assq 'coretemp-isa-0000 parsed-output))))
                 (temps (mapcar (lambda (l) (cdadr l)) temp-inputs))
@@ -8921,15 +8935,15 @@ repository, then the corresponding root is used instead."
                             0))
                 (cpu-temp-str (if (< cpu-temp 60)
                                   (propertize (number-to-string cpu-temp)
-                                              'face '((:foreground "pink2")))
+                                              'face 'ram-mode-line-cpu-temp-cool-face)
                                 (propertize (number-to-string cpu-temp)
-                                            'face '((:foreground "brown2")))))
+                                            'face 'ram-mode-line-cpu-temp-hot-face)))
                 (ssd-temp (floor (cdar (cdaddr (assq 'nvme-pci-0200 parsed-output)))))
                 (ssd-temp-str (if (< ssd-temp 60)
                                   (propertize (number-to-string ssd-temp)
-                                              'face '((:foreground "pink2")))
+                                              'face 'ram-mode-line-cpu-temp-cool-face)
                                 (propertize (number-to-string ssd-temp)
-                                            'face '((:foreground "brown2"))))))
+                                            'face 'ram-mode-line-cpu-temp-hot-face))))
           (setq ram-cpu-temp-mode-line-str (concat  cpu-temp-str " " ssd-temp-str))))))
 
 ;;** mode-line: memory
@@ -9062,17 +9076,12 @@ been modified since its last check-in."
            ;; If not under version-control
            ((not vc-mode)
             "")
-
            ;; If under version-control decode the -:@ character
            ((string-match "\\` ?\\(?:CVS\\|Git\\)\\([-:@]\\)\\([^^:~ \x00-\x1F\\\\]+\\)?" vc-mode)
             (match-string-no-properties 1 vc-mode))))
-
-
-           ;;  ;; Otherwise, indicate confusion
+         ;;  ;; Otherwise, indicate confusion
            ;;  (t
            ;;   "?")
-
-
          (branch
           (if (member class '("-" ":" "@"))
               (concat " " (match-string-no-properties 2 vc-mode))
@@ -9203,13 +9212,13 @@ been modified since its last check-in."
                      (let* ((mem (propertize (or ram-memory-mode-line-str "")
                                              'face (if (eq ram-selwin (get-buffer-window))
                                                        '((:foreground "grey90"))
-                                                     '((:foreground "grey60")))))
+                                                     '((:foreground "grey40")))))
                             (cpu-temp (or ram-cpu-temp-mode-line-str ""))
                             (bat (ram-get-battery-status))
                             (time (propertize display-time-string
                                               'face (if (eq ram-selwin (get-buffer-window))
                                                         '((:foreground "grey90"))
-                                                      '((:foreground "grey60")))))
+                                                      '((:foreground "grey40")))))
                             (right-align-str (*-mode-line-fill (+ (+ (length mem)
                                                                      (length cpu-temp)
                                                                      1
