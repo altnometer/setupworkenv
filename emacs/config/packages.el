@@ -1466,7 +1466,8 @@ succession."
                      "cl-defmethod"
                      "set"
                      "setq"
-                     "set-default")
+                     "set-default"
+                     "setq-default")
                     (+ space)           ; 1 or more whitespaces
                     (regexp name-regex)))))
    ((or (eq major-mode 'clojure-mode)
