@@ -55,27 +55,6 @@
 (load-theme 'modus-operandi)
 ;; (load-theme 'modus-vivendi)
 
-(face-spec-set 'font-lock-comment-face
-               '((default :weight light :slant italic)
-                 (((class color) (min-colors 88)) :foreground "grey50")))
-(set-face-documentation 'font-lock-comment-face
-                        "My faded font-lock-comment-face.")
-
-(face-spec-set 'font-lock-string-face
-               '((default (:weight light :slant italic))
-                 ;; (((class color) (min-colors 88)) :foreground "#145c33")    ; green
-                 ;; (((class color) (min-colors 88)) :foreground "#a0132f")    ; red
-                 (((class color) (min-colors 88)) (:height 190 :foreground "#2544bb"))     ; blue
-                 ))
-(set-face-documentation 'font-lock-string-face
-                        "My faded font-lock-string-face.")
-
-(face-spec-set 'font-lock-doc-face
-               '((default (:weight light :slant italic))
-                 (((class color) (min-colors 88)) :foreground "grey50")))
-(set-face-documentation 'font-lock-doc-face
-                        "My faded font-lock-doc-face.")
-
 ;; seems that 'modus-themes-markup has no effect
 ;; if Org is loaded after the theme.. However, loading a theme itakes
 ;; long time, Seek other ways to fix the problem.
@@ -10276,11 +10255,27 @@ With a prefix argument N, (un)comment that many sexps."
               (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-14" :height 140 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-14")
               (set-face-attribute
-               'font-lock-comment-face frame :family "Operator Mono Medium-14" :foreground "grey40")
+               'font-lock-comment-face frame
+               :family "Operator Mono Medium-14"
+               :weight 'light
+               :slant 'italic
+               :foreground "grey30"
+               )
               (set-face-attribute
-               'font-lock-doc-face frame :family "Operator Mono Light-14" :slant 'italic)
+               'font-lock-doc-face frame
+               :family "Operator Mono Light-14"
+               :foreground "grey20"
+               :weight 'light
+               :slant 'italic)
               (set-face-attribute
-               'font-lock-string-face frame :weight 'extra-light)
+               'font-lock-string-face frame
+               ;; :foreground "#145c33"    ; green
+               ;; :foreground "#a0132f"    ; red
+               :foreground "#2544bb"    ; blue
+               :weight 'light
+               :slant 'italic
+               :height 140
+               )
               (set-face-attribute
                'mode-line frame
                :box '(:line-width 6 :style flat-button)
@@ -10302,11 +10297,30 @@ With a prefix argument N, (un)comment that many sexps."
               (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-16" :height 160 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-16")
               (set-face-attribute
+               'font-lock-comment-face frame
+               :family "Operator Mono Medium-16"
+               :weight 'light
+               :slant 'italic
+               :foreground "grey30"
+               )
+              (set-face-attribute
                'font-lock-comment-face frame :family "Operator Mono Light-16")
               (set-face-attribute
-               'font-lock-doc-face frame :family "Operator Mono Light-16" :slant 'italic)
+               'font-lock-doc-face frame
+               :family "Operator Mono Light-16"
+               :foreground "grey30"
+               :weight 'light
+               :slant 'italic)
               (set-face-attribute
-               'font-lock-string-face frame :weight 'extra-light)
+               'font-lock-string-face frame
+               ;; :foreground "#145c33"    ; green
+               ;; :foreground "#a0132f"    ; red
+               :foreground "#2544bb"    ; blue
+               :height 160
+               :weight 'light
+               :slant 'italic
+               :height 140
+               )
               (set-face-attribute
                'mode-line frame
                :box '(:line-width 6 :style flat-button)
@@ -10328,18 +10342,29 @@ With a prefix argument N, (un)comment that many sexps."
               (set-face-attribute 'variable-pitch frame :family "Bembo" :height 260 :weight 'normal)
               (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-20" :height 200 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-20")
-              ;; (custom-set-faces
-              ;;  '(font-lock-comment-face ((t (:inherit default :foreground "grey60" :slant italic)))))
               (set-face-attribute
-               'font-lock-comment-face frame :family "Operator Mono Light-19" :height 190)
-              ;; (custom-set-faces
-              ;;  '(font-lock-doc-face ((t (:inherit default :foreground "grey60")))))
+               'font-lock-comment-face frame
+               :family "Operator Mono Medium-19"
+               :height 190
+               :weight 'light
+               :slant 'italic
+               :foreground "grey60"
+               )
               (set-face-attribute
-               'font-lock-doc-face frame :family "Operator Mono Light-19")
-              ;; (set-face-attribute
-              ;;  'font-lock-string-face :family "Operator Mono Light-19")
+               'font-lock-doc-face frame
+               :family "Operator Mono Light-19"
+               :foreground "grey60"
+               :weight 'light
+               :slant 'italic)
               (set-face-attribute
-               'font-lock-string-face frame :weight 'extra-light)
+               'font-lock-string-face frame
+               ;; :foreground "#145c33"    ; green
+               ;; :foreground "#a0132f"    ; red
+               :foreground "#2544bb"    ; blue
+               :weight 'light
+               :slant 'italic
+               :height 190
+               )
               (set-face-attribute
                'mode-line frame
                :box '(:line-width 6 :style flat-button)
@@ -10366,6 +10391,12 @@ With a prefix argument N, (un)comment that many sexps."
 ;; (add-hook 'exwm-randr-refresh-hook (lambda () (mapcar #'ram-fontify-frame (frame-list))))
 
 (mapcar #'ram-fontify-frame (frame-list))
+(set-face-documentation 'font-lock-comment-face
+                        "I CUSTOMIZED font-lock-comment-face to make it less prominent.")
+(set-face-documentation 'font-lock-string-face
+                        "I CUSTOMIZED font-lock-string-face to make it less prominent.")
+(set-face-documentation 'font-lock-doc-face
+                        "I CUSTOMIZED font-lock-doc-face to make it less prominent.")
 
 (run-with-idle-timer 1 nil (lambda () (mapcar #'ram-fontify-frame (frame-list))))
 
