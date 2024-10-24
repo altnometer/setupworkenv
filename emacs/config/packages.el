@@ -3624,27 +3624,27 @@ left by `org-mark-element`."
 ;;    :family "Operator Mono Medium"))
 
 
-(custom-theme-set-faces
-   'user
-   ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
-   ;; '(variable-pitch ((t (:family "LucidaGrande" :height 190 :weight light))))
-   ;; '(variable-pitch ((t (:family "SourceSansPro" :height 220 :weight normal))))
-   '(variable-pitch ((t (:family "Bembo" :height 260 :weight normal))))
-   ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
-   ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
-   '(fixed-pitch ((t (:family "Operator Mono" :height 190 :weight semi-light)))))
+;; (custom-theme-set-faces
+;;    'user
+;;    ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
+;;    ;; '(variable-pitch ((t (:family "LucidaGrande" :height 190 :weight light))))
+;;    ;; '(variable-pitch ((t (:family "SourceSansPro" :height 220 :weight normal))))
+;;    '(variable-pitch ((t (:family "Bembo" :height 260 :weight normal))))
+;;    ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
+;;    ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
+;;    '(fixed-pitch ((t (:family "Operator Mono" :height 190 :weight semi-light)))))
 
 (defun ram-set-org-faces ()
   "Modify Org faces."
-  (custom-theme-set-faces
-   'user
-   ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
-   ;; '(variable-pitch ((t (:family "LucidaGrande" :height 190 :weight light))))
-   ;; '(variable-pitch ((t (:family "SourceSansPro" :height 220 :weight normal))))
-   '(variable-pitch ((t (:family "Bembo" :height 260 :weight normal))))
-   ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
-   ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
-   '(fixed-pitch ((t (:family "Operator Mono Medium-19" :height 190 :weight light)))))
+  ;; (custom-theme-set-faces
+  ;;  'user
+  ;;  ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
+  ;;  ;; '(variable-pitch ((t (:family "LucidaGrande" :height 190 :weight light))))
+  ;;  ;; '(variable-pitch ((t (:family "SourceSansPro" :height 220 :weight normal))))
+  ;;  '(variable-pitch ((t (:family "Bembo" :height 260 :weight normal))))
+  ;;  ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
+  ;;  ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
+  ;;  '(fixed-pitch ((t (:family "Operator Mono Medium-19" :height 190 :weight light)))))
   (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
@@ -10271,7 +10271,9 @@ With a prefix argument N, (un)comment that many sexps."
             (cond
              ;; FHD (Full HD screen)
              ((<= monitor-width fhd-width)
-              (set-face-attribute 'variable-pitch frame :family "Verdana-14")
+              ;; (set-face-attribute 'variable-pitch frame :family "Verdana-14")
+              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 190 :weight 'medium)
+              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-14" :height 140 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-14")
               (set-face-attribute
                'font-lock-comment-face frame :family "Operator Mono Medium-14" :foreground "grey40")
@@ -10295,7 +10297,9 @@ With a prefix argument N, (un)comment that many sexps."
                :height 150))
              ;; QHD
              ((<= monitor-width qhd-width)
-              (set-face-attribute 'variable-pitch frame :family "Verdana-16")
+              ;; (set-face-attribute 'variable-pitch frame :family "Verdana-16")
+              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 210 :weight 'normal)
+              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-16" :height 160 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-16")
               (set-face-attribute
                'font-lock-comment-face frame :family "Operator Mono Light-16")
@@ -10320,7 +10324,9 @@ With a prefix argument N, (un)comment that many sexps."
                :height 160))
              ;; UHD
              ((<= monitor-width uhd-width)
-              (set-face-attribute 'variable-pitch frame :family "Verdana-19")
+              ;; (set-face-attribute 'variable-pitch frame :family "Verdana-19")
+              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 260 :weight 'normal)
+              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-20" :height 200 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-20")
               ;; (custom-set-faces
               ;;  '(font-lock-comment-face ((t (:inherit default :foreground "grey60" :slant italic)))))
