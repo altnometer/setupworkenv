@@ -788,8 +788,9 @@ Disable `icomplete-vertical-mode' for this command."
              )))
               ;; (setq mode-line-format nil)
 
+(add-hook 'exwm-manage-finish-hook #'ram-set-org-faces)
 
- (add-hook 'exwm-init-hook (lambda () (setq ram-org-results-table-max-width
+(add-hook 'exwm-init-hook (lambda () (setq ram-org-results-table-max-width
                                             ;; allow for column separators,
                                             ;; shrink overlays
                                             (- (window-width) 20))))
@@ -3613,8 +3614,13 @@ left by `org-mark-element`."
 ;;    ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
 ;;    '(fixed-pitch ((t (:family "Operator Mono" :height 190 :weight semi-light)))))
 
-(defun ram-set-org-faces ()
-  "Modify Org faces."
+(defun ram-set-org-faces (&optional frame)
+  "Modify Org faces.
+
+Use it from `exwm-manage-finish-hook' because when `org-mode-hook' is
+run, the window for the buffer is not ready and the target frame could
+not be determined. Hence, incorrect faces (from different monitor) could
+be used."
   ;; (custom-theme-set-faces
   ;;  'user
   ;;  ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
@@ -3624,17 +3630,23 @@ left by `org-mark-element`."
   ;;  ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
   ;;  ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
   ;;  '(fixed-pitch ((t (:family "Operator Mono Medium-19" :height 190 :weight light)))))
-  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-indent nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-meta-line nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
+  (let* ((buffer (current-buffer))
+         (mode (buffer-local-value 'major-mode buffer))
+         (org-buffer-p (eq 'org-mode mode))
+         (frame (window-frame (get-buffer-window buffer))))
+    (when org-buffer-p
+      (variable-pitch-mode)
+      (set-face-attribute 'org-code frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-drawer frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-date frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-document-info-keyword frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-indent frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-meta-line frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-table frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-formula frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-verbatim frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-block-begin-line frame :inherit 'fixed-pitch)
+      (set-face-attribute 'org-block frame :inherit 'fixed-pitch))))
 
 
 
@@ -3955,13 +3967,8 @@ If the result table width exceeds that value, shrink columns.")
 
 ;; (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-hide-block-all)
-(add-hook 'org-mode-hook #'variable-pitch-mode)
 (add-hook 'org-mode-hook #'org-display-inline-images)
-
-(add-hook 'org-mode-hook #'ram-set-org-faces)
-
 (add-hook 'org-mode-hook #'visual-line-mode)
-
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
 
 (add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
