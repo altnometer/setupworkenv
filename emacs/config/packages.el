@@ -3957,7 +3957,7 @@ If the result table width exceeds that value, shrink columns.")
 ;;** org-mode: hooks, advice, timers
 
 ;; (add-hook 'org-mode-hook 'org-indent-mode)
-(add-hook 'org-mode-hook 'org-hide-block-all)
+(add-hook 'org-mode-hook #'org-fold-hide-block-all)
 (add-hook 'org-mode-hook #'org-display-inline-images)
 (add-hook 'org-mode-hook #'visual-line-mode)
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
