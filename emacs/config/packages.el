@@ -2222,39 +2222,49 @@ same buffer or if TEST-BUFFER-P for the buffer is false."
   (list test-buffer-p
         `(lambda (buffer alist)
            ,(format "Display BUFFER in workspace %d in a horizontal split." workspace-idx)
-           (when-let* ((target-frame (and (frame-parameter (selected-frame) 'exwm-active)
-                                          (<= ,workspace-idx (exwm-workspace--count))
-                                          (exwm-workspace--workspace-from-frame-or-index ,workspace-idx)))
+           (when-let* ((target-frame (and
+                                      ;; make sure 'exwm is running
+                                      (frame-parameter (selected-frame) 'exwm-active)
+                                      ;; make sure WORKSPACE-IDX does not exceed number of workspaces
+                                      (<= ,workspace-idx (exwm-workspace--count))
+                                      ;; get the target workspace
+                                      (exwm-workspace--workspace-from-frame-or-index ,workspace-idx)))
                        (target-window (frame-selected-window target-frame))
                        (buffer-name (if (stringp buffer) buffer (buffer-name buffer)))
                        (next-to-target-window (next-window target-window 'nomini target-frame))
                        (windows-in-frame (window-list-1 nil 'nomini target-frame))
                        ;; defined as a fn only because of #'when-let*
-                       (get-win-displaying-same-buf (lambda (frame-windows)
-                                                      (car
-                                                       (seq-filter (lambda (w)
-                                                                     (string= buffer-name
-                                                                              (buffer-name (window-buffer w))))
-                                                                   frame-windows))))
-                       (delete-windows-except (lambda (exclude-this-window)
-                                                (let ((buffer-major-mode (buffer-local-value 'major-mode (get-buffer buffer))))
-                                                  (when (> (length windows-in-frame) 1)
-                                                    (dolist (w windows-in-frame)
-                                                      (when (and (not (equal w exclude-this-window))
-                                                                 (or
-                                                                  ;; different major-mode
-                                                                  (not (string= buffer-major-mode
-                                                                                (buffer-local-value 'major-mode (window-buffer w))))
-                                                                  ;; same buffer
-                                                                  (string= buffer-name (buffer-name (window-buffer w)))))
-                                                        (delete-window w))))))))
+                       (get-win-displaying-same-buf
+                        (lambda (frame-windows)
+                          (car
+                           (seq-filter (lambda (w)
+                                         (string= buffer-name
+                                                  (buffer-name (window-buffer w))))
+                                       frame-windows))))
+                       (delete-windows-except
+                        (lambda (exclude-this-window)
+                          (let ((buffer-major-mode
+                                 (buffer-local-value 'major-mode (get-buffer buffer))))
+                            (when (> (length windows-in-frame) 1)
+                              (dolist (w windows-in-frame)
+                                (when (and (not (equal w exclude-this-window))
+                                           (or
+                                            ;; different major-mode
+                                            (not (string=
+                                                  buffer-major-mode
+                                                  (buffer-local-value 'major-mode (window-buffer w))))
+                                            ;; same buffer
+                                            (string= buffer-name (buffer-name (window-buffer w)))))
+                                  (delete-window w))))))))
+             (exwm-workspace-switch-create ,workspace-idx)
              (cond
               ;; reuse the same window
               (current-prefix-arg (window--display-buffer buffer target-window 'reuse alist) )
               ;; reuse window displaying same buffer
               ((funcall get-win-displaying-same-buf windows-in-frame)
                (funcall delete-windows-except (funcall get-win-displaying-same-buf windows-in-frame))
-               (window--display-buffer buffer (funcall get-win-displaying-same-buf windows-in-frame) 'reuse alist))
+               (window--display-buffer buffer (funcall get-win-displaying-same-buf windows-in-frame)
+                                       'reuse alist))
               ;; reuse target-window displaying same buffer
               ;; ((string= (buffer-name (window-buffer target-window))
               ;;           (if (stringp buffer) buffer (buffer-name buffer)))
@@ -10312,17 +10322,17 @@ With a prefix argument N, (un)comment that many sexps."
                nil (list frame))
               (set-face-attribute
                'font-lock-comment-face frame
-               :family "Operator Mono Light"
-               :foreground "grey30"
-               :height 270
+               :family "Operator Mono"
+               :foreground "grey40"
+               :height 260
                :weight 'light
                :slant 'italic
                )
               (set-face-attribute
                'font-lock-doc-face frame
-               :family "Operator Mono Light"
-               :foreground "grey30"
-               :height 270
+               :family "Operator Mono"
+               :foreground "grey40"
+               :height 260
                :weight 'light
                :slant 'italic)
               (set-face-attribute
