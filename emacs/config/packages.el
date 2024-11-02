@@ -10240,104 +10240,23 @@ With a prefix argument N, (un)comment that many sexps."
   (interactive)
   (if window-system
       (if (eq (window-system) 'x)
-          (let (
-                ;; !!! in MONITOR-WIDTH calculation, (nth 3 ...) is
-                ;; when the monitors are rotated vertically in xrandr,
-                ;; for example: xrandr --output HDMI-1 --rotate left
-                (monitor-width (nth 3 (frame-monitor-geometry frame))))
+          (let* (
+                 ;; !!! in MONITOR-WIDTH calculation, (nth 3 ...) is
+                 ;; when the monitors are rotated vertically in xrandr,
+                 ;; for example: xrandr --output HDMI-1 --rotate left
+                 (monitor-attr (display-monitor-attributes-list frame))
+                 (frame-monitor (car (seq-filter (lambda (m) (member frame (assq 'frames m))) monitor-attr)))
+                 (monitor-height-mm (nth 2 (assq 'mm-size frame-monitor)))
+                 ;; (nth 3 ...) is for rotated screen
+                 ;; (nth 4 ...) is for normal position
+                 (monitor-height-px
+                  (nth 3 (assq 'geometry frame-monitor))))
             (cond
-             ;; FHD (Full HD screen)
-             ((<= monitor-width fhd-width)
-              ;; (set-face-attribute 'variable-pitch frame :family "Verdana-14")
-              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 190 :weight 'medium)
-              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-14" :height 140 :weight 'light)
-              (set-frame-parameter frame 'font "Operator Mono Medium-14")
-              (set-face-attribute
-               'font-lock-comment-face frame
-               :family "Operator Mono Medium-14"
-               :weight 'light
-               :slant 'italic
-               :foreground "grey30"
-               )
-              (set-face-attribute
-               'font-lock-doc-face frame
-               :family "Operator Mono Light-14"
-               :foreground "grey20"
-               :weight 'light
-               :slant 'italic)
-              (set-face-attribute
-               'font-lock-string-face frame
-               ;; :foreground "#145c33"    ; green
-               ;; :foreground "#a0132f"    ; red
-               :foreground "#2544bb"    ; blue
-               :weight 'light
-               :slant 'italic
-               :height 140
-               )
-              (set-face-attribute
-               'mode-line frame
-               :box '(:line-width 6 :style flat-button)
-               :weight 'light
-               :foreground "black" :background "grey35"
-               :family "Operator Mono Medium-14"
-               :height 150)
-              (set-face-attribute
-               'mode-line-inactive frame
-               :box '(:line-width 6 :style flat-button)
-               :weight 'light
-               :foreground "black" :background "grey70"
-               :family "Operator Mono Medium-14"
-               :height 150))
-             ;; QHD
-             ((<= monitor-width qhd-width)
-              ;; (set-face-attribute 'variable-pitch frame :family "Verdana-16")
-              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 210 :weight 'normal)
-              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-16" :height 160 :weight 'light)
-              (set-frame-parameter frame 'font "Operator Mono Medium-16")
-              (set-face-attribute
-               'font-lock-comment-face frame
-               :family "Operator Mono Medium-16"
-               :weight 'light
-               :slant 'italic
-               :foreground "grey30"
-               )
-              (set-face-attribute
-               'font-lock-comment-face frame :family "Operator Mono Light-16")
-              (set-face-attribute
-               'font-lock-doc-face frame
-               :family "Operator Mono Light-16"
-               :foreground "grey30"
-               :weight 'light
-               :slant 'italic)
-              (set-face-attribute
-               'font-lock-string-face frame
-               ;; :foreground "#145c33"    ; green
-               ;; :foreground "#a0132f"    ; red
-               :foreground "#2544bb"    ; blue
-               :height 160
-               :weight 'light
-               :slant 'italic
-               :height 140
-               )
-              (set-face-attribute
-               'mode-line frame
-               :box '(:line-width 6 :style flat-button)
-               ;; :box nil
-               :weight 'light
-               :background "grey55" :foreground "black"
-               :family "Operator Mono Medium-16"
-               ;; adjust mode-line :height
-               :height 160)
-              (set-face-attribute
-               'mode-line-inactive frame
-               :box '(:line-width 6 :style flat-button)
-               :weight 'light
-               :foreground "grey20" :background "grey90"
-               :height 160))
-             ;; UHD
-             ((<= monitor-width uhd-width)
+             ;; 27 inch 4K (UDH)
+             ((and (= monitor-height-mm 340)
+                   (= monitor-height-px 2160))
               ;; (set-face-attribute 'variable-pitch frame :family "Verdana-19")
-              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 260 :weight 'normal)
+              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 270 :weight 'normal)
               (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-20" :height 200 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-20")
               (set-face-attribute
@@ -10366,13 +10285,9 @@ With a prefix argument N, (un)comment that many sexps."
               (set-face-attribute
                'mode-line frame
                :box '(:line-width 6 :style flat-button)
-               ;; :box nil
+               :foreground "black" :background "grey55"
                :weight 'light
-               :background "grey55" :foreground "black"
                :family "Operator Mono Medium-19"
-               ;; adjust mode-line :height
-               ;; :height 80
-               ;; :height 155
                :height 230)
               (set-face-attribute
                'mode-line-inactive frame
@@ -10380,6 +10295,61 @@ With a prefix argument N, (un)comment that many sexps."
                :weight 'light
                :foreground "grey20" :background "grey90"
                :height 230))
+             ;; UPERFECT 18 inch 4K (UDH)
+             (;;  for some reason, my UPERFECT 18 inch, 4K monitor
+              ;;  sets incorrect height in mm of 355mm whereas the true
+              ;;  height is around 233mm
+              (and (= monitor-height-mm 355)
+                   (= monitor-height-px 2160))
+              ;; (set-face-attribute 'variable-pitch frame :family "Verdana-19")
+              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 390 :weight 'medium)
+              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium" :height 280 :weight 'light)
+              ;; defaults to :weight semi-light
+              (set-face-attribute 'default frame :family "Operator Mono Medium" :height 280 :weight 'light)
+              (set-frame-font
+               ;; :size is in points, not in 1/10 points as in :height
+               (font-spec :family "Operator Mono" :size 28.0 :weight 'light :slant 'normal)
+               nil (list frame))
+              (set-face-attribute
+               'font-lock-comment-face frame
+               :family "Operator Mono Light"
+               :foreground "grey30"
+               :height 270
+               :weight 'light
+               :slant 'italic
+               )
+              (set-face-attribute
+               'font-lock-doc-face frame
+               :family "Operator Mono Light"
+               :foreground "grey30"
+               :height 270
+               :weight 'light
+               :slant 'italic)
+              (set-face-attribute
+               'font-lock-string-face frame
+               :family "Operator Mono Light"
+               ;; :foreground "#145c33"    ; green
+               ;; :foreground "#a0132f"    ; red
+               :foreground "#2544bb"    ; blue
+               :height 270
+               :weight 'light
+               :slant 'italic
+               )
+              ;; mode-line
+              (set-face-attribute
+               'mode-line frame
+               :foreground "black" :background "grey55"
+               :box '(:line-width 6 :style flat-button)
+               :height 290
+               :weight 'light
+               )
+              (set-face-attribute
+               'mode-line-inactive frame
+               :foreground "black" :background "grey90"
+               :box '(:line-width 6 :style flat-button)
+               :height 290
+               :weight 'light
+               ))
              (t nil)
              )))))
 
