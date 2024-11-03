@@ -2169,7 +2169,7 @@ expression."
                 (delete-other-windows window-to-display-in)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
-(defun ram-create-display-buffer-in-other-monitor-alist-element (test-buffer-p primary secondary)
+(defun ram-display-buffer-in-other-monitor (test-buffer-p primary secondary &optional switch-p)
   "Return an element to be added to `display-buffer-alist'.
 
 This element is of the form (CONDITION . ACTION) where
@@ -2219,10 +2219,11 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
                          (car (window-list-1 nil 'nomini
                                              (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window-to-display-in
-                ;; focus target workspace
+                ;; switch to target workspace
                 (exwm-workspace-switch workspc)
-                ;; return focus to original workspace
-                ;; (exwm-workspace-switch selected-frm)
+                (when (not ',switch-p)
+                  ;; switch back to original workspace
+                  (exwm-workspace-switch selected-frm))
                 (delete-other-windows window-to-display-in)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
@@ -2498,19 +2499,27 @@ the `current-prefix-arg' is non nil"
 ;;***** buffers/display/alist: Help, info, Messages, magit, Completions
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-other-monitor-alist-element
+             (ram-display-buffer-in-other-monitor
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
                   (or (string-match-p "\\*Help\\*" buf-name)
                       (string-match-p "^\\*info\\*\\(<[0-9]+>\\)?$" buf-name)
                       (string-match-p "\\*Messages\\*" buf-name)
-                      (string-match-p "\\(^magit.*$\\)\\|\\(COMMIT_EDITMSG\\)" buf-name))))
-              6 4))
+                      (string-match-p "^magit-diff: .*$" buf-name))))
+              6 4 nil))
+
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-other-monitor
+              (lambda (buffer &optional alist)
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (or 
+                      (string-match-p "^\\(magit: .*$\\)\\|\\(COMMIT_EDITMSG\\)" buf-name))))
+              6 4 'switch-p))
 
 ;;***** buffers/display/alist: Completions
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-other-monitor-alist-element
+             (ram-display-buffer-in-other-monitor
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
                   (string-match-p "\\*Completions\\*" buf-name)))
@@ -2558,7 +2567,7 @@ the `current-prefix-arg' is non nil"
 ;;******** buffers/display/alist/clojure: cider-result, cider-doc
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-other-monitor-alist-element
+             (ram-display-buffer-in-other-monitor
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
                       (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
