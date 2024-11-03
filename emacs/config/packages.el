@@ -2162,10 +2162,10 @@ expression."
                         (window-to-display-in (car (window-list-1 nil 'nomini workspc-frm))))
               (when window-to-display-in
                 (exwm-workspace-switch workspc-frm)
-                ;; when new and selected frame share same monitor, keep new one active
-                (when (not (string= (frame-parameter workspc-frm 'exwm-randr-monitor)
-                                    (frame-parameter selected-frm 'exwm-randr-monitor)))
-                  (exwm-workspace-switch selected-frm))
+                ;; when new and current frames are in different monitors, switch back to original monitor
+                ;; (when (not (string= (frame-parameter workspc-frm 'exwm-randr-monitor)
+                ;;                     (frame-parameter selected-frm 'exwm-randr-monitor)))
+                ;;   (exwm-workspace-switch selected-frm))
                 (delete-other-windows window-to-display-in)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
