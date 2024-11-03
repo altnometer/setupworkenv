@@ -10321,6 +10321,12 @@ With a prefix argument N, (un)comment that many sexps."
                (font-spec :family "Operator Mono" :size 28.0 :weight 'light :slant 'normal)
                nil (list frame))
               (set-face-attribute
+               'font-lock-keyword-face frame
+               :family "Operator Mono"
+               :weight 'semi-light
+               :slant 'normal
+               )
+              (set-face-attribute
                'font-lock-comment-face frame
                :family "Operator Mono"
                :foreground "grey40"
