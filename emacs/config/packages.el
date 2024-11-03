@@ -2179,10 +2179,15 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
   (list test-buffer-p
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm workspace %d or %d" primary secondary)
-            (when-let* ((primary-frame (and (frame-parameter (selected-frame) 'exwm-active)
-                                            (<= ,primary (exwm-workspace--count))
-                                            (<= ,secondary (exwm-workspace--count))
-                                            (exwm-workspace--workspace-from-frame-or-index ,primary)))
+            (when-let* ((primary-frame (and
+                                        ;; check 'exwm is running
+                                        (frame-parameter (selected-frame) 'exwm-active)
+                                        ;; target workspace numbers
+                                        ;; are withing limits
+                                        (<= ,primary (exwm-workspace--count))
+                                        (<= ,secondary (exwm-workspace--count))
+                                        ;; workspace can be created
+                                        (exwm-workspace--workspace-from-frame-or-index ,primary)))
                         (primary ,primary)
                         (secondary ,secondary)
                         (buffer-sameness-p (lambda (frm)
@@ -2191,22 +2196,33 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
                         ;; decide between primary and secondary workspaces
                         (workspc (cond
                                   ;; selected is displaying sameness buffer, choose it
-                                  ((funcall buffer-sameness-p (selected-frame))
-                                   (if (eq (selected-frame) primary-frame)
-                                       primary
-                                     secondary))
+                                  ;; ((funcall buffer-sameness-p (selected-frame))
+                                  ;;  (if (eq (selected-frame) primary-frame)
+                                  ;;      primary
+                                  ;;    secondary))
                                   (t
                                    ;; choose workspace in the other monitor
-                                   (if (string= (frame-parameter (selected-frame) 'exwm-randr-monitor)
-                                                (frame-parameter primary-frame 'exwm-randr-monitor))
+                                   (if
+                                       ;; if currently active monitor
+                                       ;; displaying primary workspace
+                                       (string=
+                                        ;; monitor name for (selected-frame)
+                                        (frame-parameter (selected-frame) 'exwm-randr-monitor)
+                                        ;; monitor name for primary-frame
+                                        (frame-parameter primary-frame 'exwm-randr-monitor))
+                                       ;; you are in primary
+                                       ;; workspace, choose secondary
                                        secondary
+                                     ;; you are in a secondary workspace, choose primary
                                      primary))))
                         (window-to-display-in
                          (car (window-list-1 nil 'nomini
                                              (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window-to-display-in
+                ;; focus target workspace
                 (exwm-workspace-switch workspc)
-                (exwm-workspace-switch selected-frm)
+                ;; return focus to original workspace
+                ;; (exwm-workspace-switch selected-frm)
                 (delete-other-windows window-to-display-in)
                 (window--display-buffer buffer window-to-display-in 'reuse alist)))))))
 
@@ -2256,7 +2272,7 @@ same buffer or if TEST-BUFFER-P for the buffer is false."
                                             ;; same buffer
                                             (string= buffer-name (buffer-name (window-buffer w)))))
                                   (delete-window w))))))))
-             (exwm-workspace-switch-create ,workspace-idx)
+             (exwm-workspace-switch ,workspace-idx)
              (cond
               ;; reuse the same window
               (current-prefix-arg (window--display-buffer buffer target-window 'reuse alist) )
@@ -2488,7 +2504,7 @@ the `current-prefix-arg' is non nil"
                   (or (string-match-p "\\*Help\\*" buf-name)
                       (string-match-p "^\\*info\\*\\(<[0-9]+>\\)?$" buf-name)
                       (string-match-p "\\*Messages\\*" buf-name)
-                      (string-match-p "^magit.*$" buf-name))))
+                      (string-match-p "\\(^magit.*$\\)\\|\\(COMMIT_EDITMSG\\)" buf-name))))
               6 4))
 
 ;;***** buffers/display/alist: Completions

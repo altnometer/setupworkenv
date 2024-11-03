@@ -9,12 +9,18 @@ output = subprocess.Popen('xrandr | grep \* | awk \'{print $1}\'', shell=True, s
 screen_width = int(output.split()[0].split(b'x')[0])
 screen_height = int(output.split()[0].split(b'x')[1])
 
+## screen height in mm
+output = subprocess.Popen('xrandr -q | grep " connected primary " | sed \'s/ primary//\' | awk  \'{print $15}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
+screen_height_mm = int(output.split()[0].split(b'mm')[0])
+
 ## UHD (4K) 3840x2160
 ## adjust font sizes if screen width is less than that:
-large_screen_width = 3840
 uhd_rotated_width = 2160
 qhd_rotated_width = 1440
 fhd_rotated_width = 1080
+
+## screen heights of my monitors in mm
+screen_height_medium_mm = 340
 
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
@@ -854,7 +860,9 @@ c.downloads.location.prompt = False
 # c.fonts.completion.entry = '10pt monospace'
 # c.fonts.completion.entry = '12pt monospace'
 # c.fonts.completion.entry = '14pt monospace'
-if screen_width <= fhd_rotated_width:
+if screen_height_medium_mm  <= screen_height_mm:
+    c.fonts.completion.entry = '18pt \'Operator Mono Light\''
+elif screen_width <= fhd_rotated_width:
     c.fonts.completion.entry = '10pt \'Operator Mono Light\''
 elif screen_width <= qhd_rotated_width:
     c.fonts.completion.entry = '16pt \'Operator Mono Light\''
@@ -871,7 +879,9 @@ else:
 ## Type: Font
 # c.fonts.hints = 'bold 10pt monospace'
 # c.fonts.hints = 'bold 12pt monospace'
-if screen_width <= fhd_rotated_width:
+if screen_height_medium_mm  <= screen_height_mm:
+    c.fonts.hints = 'bold 16pt monospace'
+elif screen_width <= fhd_rotated_width:
     c.fonts.hints = 'bold 10pt monospace'
 elif screen_width <= qhd_rotated_width:
     c.fonts.hints = 'bold 14pt monospace'
@@ -883,7 +893,9 @@ else:
 ## Font used in the keyhint widget.
 ## Type: Font
 
-if screen_width <= fhd_rotated_width:
+if screen_height_medium_mm  <= screen_height_mm:
+    c.fonts.keyhint = '18pt \'Operator Mono Light\''
+elif screen_width <= fhd_rotated_width:
     c.fonts.keyhint = '10pt \'Operator Mono Light\''
 elif screen_width <= qhd_rotated_width:
     c.fonts.keyhint = '16pt \'Operator Mono Light\''
@@ -919,7 +931,9 @@ else:
 # c.fonts.statusbar = '18pt monospace'
 # c.fonts.statusbar = '16pt monospace'
 
-if screen_width <= fhd_rotated_width:
+if screen_height_medium_mm  <= screen_height_mm:
+    c.fonts.statusbar = '18pt \'Operator Mono Light\''
+elif screen_width <= fhd_rotated_width:
     c.fonts.statusbar = '10pt \'Operator Mono Light\''
 elif screen_width <= qhd_rotated_width:
     c.fonts.statusbar = '16pt \'Operator Mono Light\''
@@ -934,7 +948,10 @@ else:
 c.fonts.tabs.selected = 'bold 18pt SFNS Display'
 c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
 
-if screen_width <= fhd_rotated_width:
+if screen_height_medium_mm  <= screen_height_mm:
+    c.fonts.tabs.selected = 'bold 18pt SFNS Display'
+    c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
+elif screen_width <= fhd_rotated_width:
     c.fonts.tabs.selected = 'bold 10pt SFNS Display'
     c.fonts.tabs.unselected = 'bold 10pt SFNS Display'
 elif screen_width <= qhd_rotated_width:
