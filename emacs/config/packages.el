@@ -9503,6 +9503,35 @@ With \\[universal-argument] do it for the current file instead."
  '(expand-region :type git :flavor melpa :host github :repo "magnars/expand-region.el"))
 (define-key global-map (kbd "C-'") #'er/expand-region)
 
+
+;;** packages: hl-line
+
+(straight-use-package
+ '(hl-line+ :type git :host github :repo "emacsmirror/hl-line-plus"))
+
+;; (add-hook 'window-scroll-functions-hook #'hl-line-flash)
+;; works only when frame is changed, does not work when windows withing the same
+;; frame change
+(add-hook 'focus-in-hook #'hl-line-flash)
+
+(defun ram-get-range-for-line-highlighting ()
+  "Return the range that covers the whole line in a buffer."
+  (when-let* ((bol (if (= (pos-bol) (point-max))
+                       (pos-bol 0)
+                     (pos-bol)))
+              (eol (if (= (pos-eol) (point-max))
+                       (pos-eol)
+                     (1+ (pos-eol)))))
+    ;; (message ">>>> %S" (cons bol eol))
+    ;; (setq my-point (cons bol eol))
+    (cons bol eol)))
+
+(setq hl-line-flash-show-period 1)
+;; (setq hl-line-inhibit-highlighting-for-modes '(dired-mode))
+(setq hl-line-overlay-priority 100)
+
+(setq hl-line-range-function #'ram-get-range-for-line-highlighting)
+
 ;;** packages: iedit
 (straight-use-package
  '(iedit :type git :flavor melpa :host github :repo "victorhge/iedit"))
