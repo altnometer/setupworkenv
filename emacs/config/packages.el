@@ -2712,7 +2712,13 @@ the `current-prefix-arg' is non nil"
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
                   (or (string-match-p "^CAPTURE-[0-9]\\{14\\}-.+\\.org$" buf-name)
-                      (string-match-p "^[0-9]\\{14\\}-.+\\.org$" buf-name))))
+                      (string-match-p "^[0-9]\\{14\\}-.+\\.org$" buf-name)
+                      ;; daily notes, example:
+                      ;; - "2024-11-05.org"  daily
+                      ;; - "2024-11-w45.org" weekly
+                      ;; - "2024-11.org"     monthly
+                      (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-.+\\.org$" buf-name)
+                      (string-match-p "^CAPTURE-[0-9]\\{4\\}-[0-9]\\{2\\}-.+\\.org$" buf-name))))
               7))
 
 ;;****** buffers/display/alist: eshell, dired
