@@ -2552,8 +2552,9 @@ the `current-prefix-arg' is non nil"
              (ram-display-buffer-in-other-monitor
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (or 
-                      (string-match-p "^\\(magit: .*$\\)\\|\\(COMMIT_EDITMSG\\)" buf-name))))
+                  (or
+                      (string-match-p "^\\(magit: .*$\\)\\|\\(COMMIT_EDITMSG\\)" buf-name)
+                      (string-match-p "^magit-revisions: .*$" buf-name))))
               6 4 'switch-p))
 
 ;;***** buffers/display/alist: Completions
