@@ -591,16 +591,16 @@ Disable `icomplete-vertical-mode' for this command."
 ;; ** exwm: exwm-randr
 
 (setq exwm-randr-workspace-monitor-plist '(
-                                           1 "HDMI-1"
-                                           2 "HDMI-1"
-                                           3 "HDMI-1"
-                                           4 "HDMI-1"
-                                           5 "HDMI-1"
+                                           1 "HDMI-2"
+                                           2 "HDMI-2"
+                                           3 "HDMI-2"
+                                           4 "HDMI-2"
+                                           5 "DP-1"
                                            6 "DP-1"
                                            7 "DP-1"
-                                           8 "DP-1"
-                                           9 "DP-1"
-                                           0 "DP-1"
+                                           8 "DP-2"
+                                           9 "DP-2"
+                                           0 "DP-2"
                                            ))
 
 ;; (start-process-shell-command
