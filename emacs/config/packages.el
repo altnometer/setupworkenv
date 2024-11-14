@@ -2286,9 +2286,9 @@ same buffer or if TEST-BUFFER-P for the buffer is false."
                                       (<= ,workspace-idx (exwm-workspace--count))
                                       ;; get the target workspace
                                       (exwm-workspace--workspace-from-frame-or-index ,workspace-idx)))
-                       (target-window (frame-selected-window target-frame))
+                       (selected-window (frame-selected-window target-frame))
                        (buffer-name (if (stringp buffer) buffer (buffer-name buffer)))
-                       (next-to-target-window (next-window target-window 'nomini target-frame))
+                       (next-to-selected-window (next-window selected-window 'nomini target-frame))
                        (windows-in-frame (window-list-1 nil 'nomini target-frame))
                        ;; defined as a fn only because of #'when-let*
                        (get-win-displaying-same-buf
@@ -2316,32 +2316,42 @@ same buffer or if TEST-BUFFER-P for the buffer is false."
              (exwm-workspace-switch ,workspace-idx)
              (cond
               ;; reuse the same window
-              (current-prefix-arg (window--display-buffer buffer target-window 'reuse alist) )
+              (current-prefix-arg
+               ;; (message ">>>> current-prefix-arg %S" current-prefix-arg)
+               (window--display-buffer buffer selected-window 'reuse alist))
               ;; reuse window displaying same buffer
               ((funcall get-win-displaying-same-buf windows-in-frame)
+               ;; (message ">>>> reuse widow displaying same buf")
                (funcall delete-windows-except (funcall get-win-displaying-same-buf windows-in-frame))
-               (window--display-buffer buffer (funcall get-win-displaying-same-buf windows-in-frame)
-                                       'reuse alist))
-              ;; reuse target-window displaying same buffer
-              ;; ((string= (buffer-name (window-buffer target-window))
+               (window--display-buffer
+                buffer (funcall get-win-displaying-same-buf windows-in-frame)
+                'reuse alist))
+              ;; reuse selected-window displaying same buffer
+              ;; ((string= (buffer-name (window-buffer selected-window))
               ;;           (if (stringp buffer) buffer (buffer-name buffer)))
-              ;;  (funcall delete-windows-except target-window)
+              ;;  (funcall delete-windows-except selected-window)
               ;;  ;; (when (> (length windows-in-frame) 1)
-              ;;  ;;   (delete-window next-to-target-window))
-              ;;  (window--display-buffer buffer target-window 'reuse alist))
-              ;; reuse target-window if TEST-BUFFER-P is false
-              ((not (,test-buffer-p (window-buffer target-window) nil))
-               (funcall delete-windows-except target-window)
-               (window--display-buffer buffer target-window 'reuse alist))
-              ;; reuse next-to-target-window
-              ((and (window-live-p next-to-target-window) (not (eq target-window next-to-target-window)))
-               (window--display-buffer buffer next-to-target-window 'reuse alist))
+              ;;  ;;   (delete-window next-to-selected-window))
+              ;;  (window--display-buffer buffer selected-window 'reuse alist))
+              ;; reuse selected-window if TEST-BUFFER-P is false
+              ((not (,test-buffer-p (window-buffer selected-window) nil))
+               ;; (message ">>>> reuse selected widow if test-buffer-p is false")
+               (funcall delete-windows-except selected-window)
+               (window--display-buffer buffer selected-window 'reuse alist))
+              ;; reuse next-to-selected-window
+              ((and (window-live-p next-to-selected-window) (not (eq selected-window next-to-selected-window)))
+               ;; (message ">>>> reuse next to selected widow")
+               (window--display-buffer buffer next-to-selected-window 'reuse alist))
               ;; split unconditionally
-              (t (let ((new-window (split-window-no-error target-window nil 'below)))
-                   (when new-window
-                     (setq new-window (window--display-buffer buffer new-window 'window alist))
-                     (balance-windows-area)
-                     new-window))))))))
+              (t
+               ;; (message ">>>> split unconditionally")
+               (let ((new-window (split-window-no-error selected-window nil 'below)))
+                 (when new-window
+                   (setq new-window (window--display-buffer buffer new-window 'window alist))
+                   (balance-windows-area)
+                   new-window)))
+              ;;
+              )))))
 
 (defun ram-create-display-buffer-in-same-monitor-horiz-split-alist-element (test-buffer-p)
   "Return an element to be added to `display-buffer-alist'.
