@@ -690,9 +690,11 @@ Disable `icomplete-vertical-mode' for this command."
 
         ([?\s-N] . ram-next-workspace)
         ([?\s-P] . ram-previous-workspace)
-        ([?\s-O] . ram-other-workspace)
-        (,(kbd "<M-f15>") . ram-other-workspace)
-        ;; (,(kbd "<f15>") . ram-other-workspace)
+        ([?\s-o] . ram-other-workspace-to-the-right)
+        ([?\s-O] . ram-other-workspace-to-the-left)
+        (,(kbd "<M-f15>") . ram-other-workspace-to-the-right)
+        (,(kbd "<M-S-f15>") . ram-other-workspace-to-the-left)
+        ;; (,(kbd "<f15>") . ram-other-workspace-to-the-right)
 
         ([?\s-t] . ram-org-roam-node-find)
 
@@ -834,20 +836,46 @@ Disable `icomplete-vertical-mode' for this command."
         (setq ram-prev-workspaces (cdr ram-prev-workspaces)))
     (user-error "No previous workspace")))
 
-(advice-add #'exwm-workspace-switch :before #'ram--add-workspace-index)
+;; TODO: did not use this navigation for a long time
+;; probably need to discard it
+;; (advice-add #'exwm-workspace-switch :before #'ram--add-workspace-index)
 
-(defun ram-other-workspace (count)
-  "Focus next visible workspace."
+;; (advice-remove #'exwm-workspace-switch #'ram--add-workspace-index)
+
+(defun ram-other-workspace-to-the-right (count)
+  "Focus next visible workspace to the right."
   (interactive "p")
-  (let ((count (1- count))
-        (visible-workspace
-         (seq-filter (lambda (f) (and (not (equal f (selected-frame)))
-                                      (frame-parameter f 'exwm-active)))
-                     (frame-list))))
-    (exwm-workspace-switch (nth count visible-workspace))))
+  (let* (
+         (visible-frames-ordered
+          (cl-sort (seq-filter (lambda (f) (frame-parameter f 'exwm-active))
+                               (frame-list))
+                   ;; order from left to right
+                   (lambda (f1 f2 ) (<= (frame-parameter f1 'left)
+                                        (frame-parameter f2 'left)))))
+         (current-fr-index (cl-position (selected-frame) visible-frames-ordered))
+         ;; (target-frame (nth count visible-frames-ordered))
+         ;; do not let index exceed length of frames list
+         (adjusted-indx (mod (+ current-fr-index count) (length visible-frames-ordered)))
+         (target-frame (nth adjusted-indx visible-frames-ordered))
+         ;; (target-frame-selected-window (frame-selected-window target-frame))
+         ;; (target-buffer (window-buffer target-frame-selected-window))
+         )
+    ;; (message ">>>> count: %S, indx %S"  count  adjusted-indx)
+    (exwm-workspace-switch target-frame)
+    ))
+
+(defun ram-other-workspace-to-the-left (count)
+  "Focus next visible workspace to the left."
+  (interactive "p")
+  (ram-other-workspace-to-the-right (- count)))
+
+
 
 ;; all <M-f*> keys in layer activated with <tab> hold (right outer thumb key)
-(define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
+(define-key global-map (kbd "<M-f15>") #'ram-other-workspace-to-the-right)
+(define-key global-map (kbd "s-o") #'ram-other-workspace-to-the-right)
+(define-key global-map (kbd "<M-S-f15>") #'ram-other-workspace-to-the-left)
+(define-key global-map (kbd "s-S-o") #'ram-other-workspace-to-the-left)
 ;; <f1> is bound to #'help-for-help by default
 (define-key global-map (kbd "<f1>") nil)
 ;; <f2> is a prefix to some '2C-mode commands
@@ -855,8 +883,6 @@ Disable `icomplete-vertical-mode' for this command."
 ;; (define-key global-map (kbd "<f10>") (lambda () (interactive (exwm-workspace-switch-create 0))))
 ;; (define-key global-map (kbd "<f6>") (lambda () (interactive (exwm-workspace-switch-create 6))))
 ;; (define-key global-map (kbd "<f7>") (lambda () (interactive (exwm-workspace-switch-create 7))))
-(define-key global-map (kbd "<M-f15>") #'ram-other-workspace)
-(define-key global-map (kbd "s-O") #'ram-other-workspace)
 (define-key global-map (kbd "s-N") #'ram-next-workspace)
 (define-key global-map (kbd "s-P") #'ram-previous-workspace)
 
@@ -1806,7 +1832,7 @@ Then, quit other window."
   (other-window count 'visible))
 
 (define-key global-map (kbd "s-o") 'other-window)
-(define-key global-map (kbd "<M-S-f15>") (lambda () (interactive) (other-window -1)))
+(define-key global-map (kbd "<S-s-o>") (lambda () (interactive) (other-window -1)))
 
 ;;*** windows: general settings
 ;; used for splitting windows sensibly, default width 160, height 80
@@ -5821,7 +5847,9 @@ Use regexp match group 1. Default to group 0."
   '(ido-switch-buffer helm-buffers-list))
 ;; update gutter info in other windows after these commands
 (setq git-gutter:update-windows-commands
-      '(kill-buffer ido-kill-buffer ram-other-workspace
+      '(kill-buffer ido-kill-buffer
+                    ram-other-workspace-to-the-right
+                    ram-other-workspace-to-the-left
                     other-window
                     magit-stage))
 (global-git-gutter-mode -1)
@@ -11296,7 +11324,9 @@ Derive it from either:
                                    '(try-expand-line
                                      try-expand-line-all-buffers) t))
 ;; <f23> key is where 'c' key is
-(define-key global-map (kbd "M-<f23> l") #'ram-hippie-expand-line)
+;; redefining "M-<f23>" to host org-roam commands
+;; which were hosted on "s-c" key, that key is repurposed to navigate frames?
+;; (define-key global-map (kbd "M-<f23> l") #'ram-hippie-expand-line)
 
 
 ;; (
