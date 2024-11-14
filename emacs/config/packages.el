@@ -634,9 +634,14 @@ Disable `icomplete-vertical-mode' for this command."
 ;;*** exwm/settings: mouse pointer
 
 ;; when moving workspaces, mouse pointer will follow
-(setq exwm-workspace-warp-cursor t)
+;; When set to true it causes a Bug in frames with
+;; split windows by always selecting a bottom one
+;; and moving pointer there, even if it was originally
+;; in top window.
+(setq exwm-workspace-warp-cursor nil)
 
 ;; moving mouse pointer will select the window
+;; TODO: find a better section for mouse config
 (setq mouse-autoselect-window t)
 (setq focus-follows-mouse t)
 
