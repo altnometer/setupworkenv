@@ -39,15 +39,41 @@ xset +fp /home/sam/.local/share/fonts/operator-mono
 #xrandr --setmonitor HDMI-1 3840/600x2160/340+0+0 HDMI-1
 #xrandr --output HDMI-1 --rotate left --primary
 
-xrandr --setmonitor HDMI-1 auto HDMI-1
-xrandr --output HDMI-1 --rotate left --primary
+############
+##  HDMI-1
+############
 
-#xrandr --setmonitor HDMI-2 auto HDMI-2
-#xrandr --output HDMI-2 --rotate left
+# LG 27 inch UHD
+#xrandr --setmonitor HDMI-1 2160/600x3840/340+0+0 HDMI-1
 
-xrandr --setmonitor DP-1 auto DP-1
-xrandr --output DP-1 --rotate left
+#xrandr --output HDMI-1 --rotate left --primary
+#xrandr --setmonitor HDMI-1 2160/609x3840/355+0+0 HDMI-1
 
+############
+##  HDMI-2
+############
+
+#xrandr --output HDMI-2 --rotate left --right-of HDMI-1
+#xrandr --setmonitor HDMI-2 2160/609x3840/355+2160+0 HDMI-2
+
+xrandr --output HDMI-2 --rotate left --right-of HDMI-1 --primary
+xrandr --setmonitor HDMI-2 2160/609x3840/355+0+0 HDMI-2
+
+############
+##  DP-1
+############
+
+xrandr --output DP-1 --rotate left --right-of HDMI-2
+#xrandr --setmonitor DP-1 2160/609x3840/355+4320+0 DP-1
+xrandr --setmonitor DP-1 2160/609x3840/355+2160+0 DP-1
+
+
+############
+##  DP-2
+############
+
+xrandr --output DP-2 --rotate left --right-of DP-1
+xrandr --setmonitor DP-2 2160/609x3840/355+4320+0 DP-2
 
 # Finally start Emacs
 if [ ! "$DBUS_SESSION_BUS_ADDRESS" ] && have dbus-launch; then
