@@ -10,7 +10,7 @@ screen_width = int(output.split()[0].split(b'x')[0])
 screen_height = int(output.split()[0].split(b'x')[1])
 
 ## screen height in mm
-output = subprocess.Popen('xrandr -q | grep " connected primary " | sed \'s/ primary//\' | awk  \'{print $15}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
+output = subprocess.Popen('xrandr -q | grep " connected " | sed \'s/ primary//\' | awk  \'{print $15}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
 screen_height_mm = int(output.split()[0].split(b'mm')[0])
 
 ## UHD (4K) 3840x2160
@@ -786,7 +786,7 @@ c.completion.cmd_history_max_items = 2000
 ## Limit fullscreen to the browser window (does not expand to fill the
 ## screen).
 ## Type: Bool
-# c.content.windowed_fullscreen = False
+c.content.fullscreen.window = False
 
 ## Monitor load requests for cross-site scripting attempts. Suspicious
 ## scripts will be blocked and reported in the inspector's JavaScript
