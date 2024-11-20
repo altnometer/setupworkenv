@@ -8966,7 +8966,7 @@ repository, then the corresponding root is used instead."
 (defvar ram-sensors-cmd-output nil)
 (defvar ram-shell-sensors-cmd-name "ram-shell-cpu-temp"
   "A name for a shell process to query cpu temperatures.")
-(defvar ram-cpu-temp-mode-line-str nil)
+(defvar ram-cpu-hdd-temp-mode-line-str nil)
 
 (defface ram-mode-line-cpu-temp-cool-face
   '((((class color) (min-colors 88))
@@ -8990,7 +8990,7 @@ repository, then the corresponding root is used instead."
                            (setq ram-sensors-cmd-output (concat output ram-sensors-cmd-output)))))
 
 (defun ram-get-cpu-temp ()
-  "Set `ram-cpu-temp-mode-line-str' to current cpu temperature."
+  "Set `ram-cpu-hdd-temp-mode-line-str' to current cpu temperature."
   (let ((output ram-sensors-cmd-output))
     (setq ram-sensors-cmd-output nil)
     ;; get sensors output as json:
@@ -9018,7 +9018,7 @@ repository, then the corresponding root is used instead."
                                               'face 'ram-mode-line-cpu-temp-cool-face)
                                 (propertize (number-to-string ssd-temp)
                                             'face 'ram-mode-line-cpu-temp-hot-face))))
-          (setq ram-cpu-temp-mode-line-str (concat  cpu-temp-str " " ssd-temp-str))))))
+          (setq ram-cpu-hdd-temp-mode-line-str (concat  cpu-temp-str " " ssd-temp-str))))))
 
 ;;** mode-line: memory
 
@@ -9287,7 +9287,7 @@ been modified since its last check-in."
                                              'face (if (eq ram-selwin (get-buffer-window))
                                                        '((:foreground "grey90"))
                                                      '((:foreground "grey40")))))
-                            (cpu-temp (or ram-cpu-temp-mode-line-str ""))
+                            (cpu-temp (or ram-cpu-hdd-temp-mode-line-str ""))
                             (bat (ram-get-battery-status))
                             (time (propertize display-time-string
                                               'face (if (eq ram-selwin (get-buffer-window))
