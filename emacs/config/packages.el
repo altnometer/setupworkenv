@@ -10371,15 +10371,27 @@ With a prefix argument N, (un)comment that many sexps."
                  ;; for example: xrandr --output HDMI-1 --rotate left
                  (monitor-attr (display-monitor-attributes-list frame))
                  (frame-monitor (car (seq-filter (lambda (m) (member frame (assq 'frames m))) monitor-attr)))
-                 (monitor-height-mm (nth 2 (assq 'mm-size frame-monitor)))
-                 ;; (nth 3 ...) is for rotated screen
-                 ;; (nth 4 ...) is for normal position
-                 (monitor-height-px
-                  (nth 3 (assq 'geometry frame-monitor))))
+                 ;; !!! consider screen rotation
+                 ;; for example: xrandr --output HDMI-1 --rotate left
+                 (rotation (shell-command-to-string
+                            "xrandr --query --verbose | grep \" connected \" | sed 's/ primary//' | awk '{printf\"%s\", $5}'"
+                            ;; "xrandr --listmonitors | awk 'NR==1{printf \"%s\",$2}'"
+                            ))
+                 (monitor-height-mm (if (string-equal rotation "normal")
+                                        ;; (nth 2 ...) is for non rotated screen
+                                        (nth 2 (assq 'mm-size frame-monitor))
+                                      ;; (nth 1 ...) is for rotated screen
+                                      (nth 1 (assq 'mm-size frame-monitor))))
+                 (monitor-height-px (if (string-equal rotation "normal")
+                                        ;; (nth 4 ...) is for non rotated screen
+                                        (nth 4 (assq 'geometry frame-monitor))
+                                      ;; (nth 3 ...) is for rotated screen
+                                      (nth 3 (assq 'geometry frame-monitor)))))
             (cond
              ;; 27 inch 4K (UDH)
              ((and (= monitor-height-mm 340)
-                   (= monitor-height-px 2160))
+                   (or (= monitor-height-px 2160)
+                       (= monitor-height-px 3840)))
               ;; (set-face-attribute 'variable-pitch frame :family "Verdana-19")
               (set-face-attribute 'variable-pitch frame :family "Bembo" :height 270 :weight 'normal)
               (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-20" :height 200 :weight 'light)
@@ -10424,8 +10436,10 @@ With a prefix argument N, (un)comment that many sexps."
              (;;  for some reason, my UPERFECT 18 inch, 4K monitor
               ;;  sets incorrect height in mm of 355mm whereas the true
               ;;  height is around 233mm
-              (and (= monitor-height-mm 355)
-                   (= monitor-height-px 2160))
+              (and (or (= monitor-height-mm 355)
+                       (= monitor-height-mm 609))
+                   (or (= monitor-height-px 2160)
+                       (= monitor-height-px 3840)))
               ;; (set-face-attribute 'variable-pitch frame :family "Verdana-19")
               (set-face-attribute 'variable-pitch frame :family "Bembo" :height 390 :weight 'medium)
               (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium" :height 280 :weight 'light)
@@ -10548,7 +10562,8 @@ With a prefix argument N, (un)comment that many sexps."
 ;; (set-face-attribute 'variable-pitch nil :font "FiraGo-18")
 
 ;; (set-face-attribute 'variable-pitch nil :font "Calibri-20")
-(set-face-attribute 'variable-pitch nil :family "Verdana-19")
+;;(set-face-attribute 'variable-pitch nil :family "Verdana-19")
+
 
 ;;** system: fringe, margin
 
