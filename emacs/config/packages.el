@@ -11368,9 +11368,9 @@ Derive it from either:
                                    '(try-expand-line
                                      try-expand-line-all-buffers) t))
 ;; <f23> key is where 'c' key is
-;; redefining "M-<f23>" to host org-roam commands
-;; which were hosted on "s-c" key, that key is repurposed to navigate frames?
 ;; (define-key global-map (kbd "M-<f23> l") #'ram-hippie-expand-line)
+;; <f13> key is where '/' key is (under 'i' or '3' key)
+(define-key global-map (kbd "M-<f13>") #'ram-hippie-expand-line)
 
 
 ;; (
