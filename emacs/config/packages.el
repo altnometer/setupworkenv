@@ -3923,7 +3923,7 @@ be used."
      (python . t)
      (R . t)
      ;; (racket . t)
-     ;; (sparql . t)
+     (sparql . t)
      ;; (scribble . t)
      (css . t)
      (haskell .t))))
