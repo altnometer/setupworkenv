@@ -6537,7 +6537,11 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
         res)
     (save-excursion
       (goto-char (window-start))
-      (while (re-search-forward org-link-any-re end t)
+      (while (re-search-forward
+              (format "%s\\|%s"
+                      org-link-any-re
+                      org-footnote-re)
+              end t)
         ;; Check that the link is visible. Look at the last character
         ;; position in the link ("...X]]") to cover links with and
         ;; without a description.
