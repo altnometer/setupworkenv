@@ -8587,7 +8587,12 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 (straight-use-package
  '(super-save :type git :flavor melpa :host github :repo "bbatsov/super-save"))
-(run-with-idle-timer 1 nil #'super-save-mode)
+
+;; sometimes fails to save save buffer
+;; - e.g., when current encoding fails for some unicode.
+;;   then it goes into recursion (my custom display-buffer may play
+;;   part in this error)
+;; (run-with-idle-timer 1 nil #'super-save-mode)
 (with-eval-after-load 'super-save
   (add-hook 'after-init-hook 'super-save-mode)
   ;; save on find-file
@@ -8622,6 +8627,7 @@ Toggle `lsp-ido-show-symbol-filename'."
 ;; installing counsel would install swipel, ivy as dependencies
 (straight-use-package
  '(counsel :type git :flavor melpa :files ("counsel.el" "counsel-pkg.el") :host github :repo "abo-abo/swiper"))
+
 ;;** ivy
 ;;*** ivy bindings
 
