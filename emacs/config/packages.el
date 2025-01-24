@@ -759,6 +759,9 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;;*** exwm: hooks, advice, timers
 
+;; exwm-manage-finish-hook runs only for
+;; conventional windows, e.g., windows for browsers etc.
+;; It is not run for windows that display Emacs buffers.
 (add-hook 'exwm-manage-finish-hook
           (lambda ()
             (cond
@@ -785,8 +788,6 @@ Disable `icomplete-vertical-mode' for this command."
              ;;  (exwm-layout-toggle-fullscreen))
              )))
               ;; (setq mode-line-format nil)
-
-(add-hook 'exwm-manage-finish-hook #'ram-set-org-faces)
 
 (add-hook 'exwm-init-hook (lambda () (setq ram-org-results-table-max-width
                                             ;; allow for column separators,
@@ -3702,10 +3703,8 @@ left by `org-mark-element`."
 (defun ram-set-org-faces (&optional frame)
   "Modify Org faces.
 
-Use it from `exwm-manage-finish-hook' because when `org-mode-hook' is
-run, the window for the buffer is not ready and the target frame could
-not be determined. Hence, incorrect faces (from different monitor) could
-be used."
+Use it from `org-mode-hook'.
+"
   ;; (custom-theme-set-faces
   ;;  'user
   ;;  ;; '(variable-pitch ((t (:family "Verdana" :height 180 :weight light))))
@@ -3715,23 +3714,18 @@ be used."
   ;;  ;; '(variable-pitch ((t (:family "BemboStd" :height 260 :weight normal :style regular))))
   ;;  ;; '(variable-pitch ((t (:family "ETbb" :height 240 :weight normal))))
   ;;  '(fixed-pitch ((t (:family "Operator Mono Medium-19" :height 190 :weight light)))))
-  (let* ((buffer (current-buffer))
-         (mode (buffer-local-value 'major-mode buffer))
-         (org-buffer-p (eq 'org-mode mode))
-         (frame (window-frame (get-buffer-window buffer))))
-    (when org-buffer-p
-      (variable-pitch-mode)
-      (set-face-attribute 'org-code frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-drawer frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-date frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-document-info-keyword frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-indent frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-meta-line frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-table frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-formula frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-verbatim frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-block-begin-line frame :inherit 'fixed-pitch)
-      (set-face-attribute 'org-block frame :inherit 'fixed-pitch))))
+  (variable-pitch-mode)
+  (face-remap-add-relative 'org-code '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-drawer '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-date '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-document-info-keyword '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-indent '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-meta-line '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-table '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-formula '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-verbatim '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-block-begin-line '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-block '(:inherit fixed-pitch)))
 
 
 
@@ -4051,6 +4045,7 @@ If the result table width exceeds that value, shrink columns.")
 ;;** org-mode: hooks, advice, timers
 
 ;; (add-hook 'org-mode-hook 'org-indent-mode)
+(add-hook 'org-mode-hook #'ram-set-org-faces)
 (add-hook 'org-mode-hook #'org-fold-hide-block-all)
 (add-hook 'org-mode-hook #'org-display-inline-images)
 (add-hook 'org-mode-hook #'visual-line-mode)
