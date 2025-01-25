@@ -10446,8 +10446,10 @@ With a prefix argument N, (un)comment that many sexps."
                    (or (= monitor-height-px 2160)
                        (= monitor-height-px 3840)))
               ;; (set-face-attribute 'variable-pitch frame :family "Verdana-19")
-              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 390 :weight 'medium)
-              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium" :height 280 :weight 'light)
+              ;; (set-face-attribute 'variable-pitch frame :family "Bembo" :height 390 :weight 'medium)
+              (set-face-attribute 'variable-pitch frame :family "Times New Roman" :height 340 :weight 'medium)
+              ;; (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium" :height 280 :weight 'light)
+              (set-face-attribute 'fixed-pitch frame :family "Operator Mono" :height 280 :weight 'light)
               ;; defaults to :weight semi-light
               (set-face-attribute 'default frame :family "Operator Mono Medium" :height 280 :weight 'light)
               (set-frame-font
