@@ -2447,7 +2447,7 @@ displaying TEST-BUFFER-P buffer."
               ;; reuse 'target-window
               (t (window--display-buffer buffer target-window 'reuse alist)))))))
 
-(defun ram-create-display-buffer-in-other-monitor-horiz-split-prefer-same-window-alist-element (test-buffer-p primary secondary)
+(defun ram-display-buffer-in-other-monitor-horiz-split-prefer-same-window (test-buffer-p primary secondary)
   "Return an element to be added to `display-buffer-alist'.
 
 TEST-BUFFER-P is the CONDITION part of (CONDITION . ACTION). The
@@ -2738,7 +2738,7 @@ the `current-prefix-arg' is non nil"
 ;;****** buffers/display/alist: eshell, dired
 
 (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-other-monitor-horiz-split-prefer-same-window-alist-element
+             (ram-display-buffer-in-other-monitor-horiz-split-prefer-same-window
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
                       (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
