@@ -2841,7 +2841,7 @@ Use it to check if you left the block or not.")
   "A list of languages for which to enable lisp editing in Org code blocks.")
 
 (defun ram-toggle-lisp-editing-modes-in-org-code-block ()
-  "Enable modes in Org code blocks.
+  "Enable programming modes when point is in some Org code blocks.
 
 Disable otherwise"
   (setq-local paredit-override-check-parens-function
@@ -4055,9 +4055,9 @@ If the result table width exceeds that value, shrink columns.")
 (add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
 (add-hook 'org-src-mode-hook #'display-line-numbers-mode)
 
-;; (add-hook 'org-mode-hook
-;;           (lambda () (add-hook 'post-command-hook
-;;                                #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
+(add-hook 'org-mode-hook
+          (lambda () (add-hook 'post-command-hook
+                               #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
 
 ;; (remove-hook 'org-mode-hook
 ;;           (lambda () (add-hook 'post-command-hook
