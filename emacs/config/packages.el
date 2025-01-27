@@ -631,20 +631,21 @@ Disable `icomplete-vertical-mode' for this command."
 
 (setq exwm-workspace-show-all-buffers t)
 
-;;*** exwm/settings: mouse pointer
+;;*** exwm/settings: mouse pointer, cursor
 
-;; when moving workspaces, mouse pointer will follow
-;; When set to true it causes a Bug in frames with
-;; split windows by always selecting a bottom one
-;; and moving pointer there, even if it was originally
-;; in top window.
-(setq exwm-workspace-warp-cursor nil)
+;; "warp" (or "wrap") cursor means do not
+;; stop at the border of a screen, but move to the
+;; other monitor.
+;; select with care because
+;; some unwanted behavior may arise, e.g.,
+;; such as selecting a window where the cursor is teleported
+;; rather than the one determined by 'display buffer' functions
+;; !!! the value that you select select here must be
+;; reflected by the values for
+;; 'mouse-autoselect-window' and
+;; 'focus-follows-mouse' settings
 
-;; moving mouse pointer will select the window
-;; TODO: find a better section for mouse config
-(setq mouse-autoselect-window t)
-(setq focus-follows-mouse t)
-
+(setq exwm-workspace-warp-cursor t)
 
 ;;** exwm: bindings
 
@@ -2468,27 +2469,31 @@ the `current-prefix-arg' is non nil"
                       (secondary ,secondary)
                       (buffer-sameness-p (lambda (frm)
                                            (,test-buffer-p (window-buffer (frame-selected-window frm)))))
-                      (wkspc-displaying-same-buffer (cond
-                                                     ((and
-                                                       ;; workspace is visible
-                                                       (frame-parameter
-                                                        (exwm-workspace--workspace-from-frame-or-index primary) 'exwm-active)
-                                                       ;; workspace is displaying the test-buffer-p
-                                                       (cl-some
-                                                        (lambda (w) (,test-buffer-p (window-buffer w)))
-                                                        (window-list
-                                                         (exwm-workspace--workspace-from-frame-or-index primary))))
-                                                      primary)
-                                                     ((and
-                                                       ;; workspace is visible
-                                                       (frame-parameter
-                                                        (exwm-workspace--workspace-from-frame-or-index secondary) 'exwm-active)
-                                                       ;; workspace is displaying the test-buffer-p
-                                                       (cl-some
-                                                        (lambda (w) (,test-buffer-p (window-buffer w)))
-                                                        (window-list
-                                                         (exwm-workspace--workspace-from-frame-or-index secondary))))
-                                                      secondary)))
+                      (wkspc-displaying-same-buffer
+                       (cond
+                        ;; is PRIMARY displaying same buffer
+                        ((and
+                          ;; workspace is visible
+                          (frame-parameter
+                           (exwm-workspace--workspace-from-frame-or-index primary) 'exwm-active)
+                          ;; workspace is displaying the test-buffer-p
+                          (cl-some
+                           (lambda (w) (,test-buffer-p (window-buffer w)))
+                           (window-list
+                            (exwm-workspace--workspace-from-frame-or-index primary))))
+                         primary)
+                        ;; is SECONDARY displaying same buffer
+                        ((and
+                          ;; workspace is visible
+                          (frame-parameter
+                           (exwm-workspace--workspace-from-frame-or-index secondary) 'exwm-active)
+                          ;; workspace is displaying the test-buffer-p
+                          (cl-some
+                           (lambda (w) (,test-buffer-p (window-buffer w)))
+                           (window-list
+                            (exwm-workspace--workspace-from-frame-or-index secondary))))
+                         secondary)))
+
                       (workspc (cond
                                 ;; select workspace that already displaying same buffer
                                 (wkspc-displaying-same-buffer)
@@ -2521,8 +2526,15 @@ the `current-prefix-arg' is non nil"
                                      secondary
                                    primary))))
                       (target-frame (exwm-workspace--workspace-from-frame-or-index workspc))
-                      (target-window (frame-selected-window target-frame))
-                      (next-to-target-window (next-window target-window 'nomini target-frame)))
+                      ;; target-window is either the
+                      ;;   - selected window or
+                      ;;   - window displaying the same buffer
+                      (target-window (or
+                                      (cl-find-if
+                                       (lambda (w) (,test-buffer-p (window-buffer w)))
+                                       (window-list target-frame 'nominibuf))
+                                      (frame-selected-window target-frame)))
+                      (next-to-target-window (next-window target-window 'nominibuf target-frame)))
                  (exwm-workspace-switch target-frame)
                  (cond
                   ;; reuse target-window displaying same buffer
@@ -2740,10 +2752,17 @@ the `current-prefix-arg' is non nil"
 (add-to-list 'display-buffer-alist
              (ram-display-buffer-in-other-monitor-horiz-split-prefer-same-window
               (lambda (buffer &optional alist)
-                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer)))
-                      (buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (or (eq 'dired-mode mode)
-                      (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name))))
+                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
+                  (string-match-p "^\\*eshell\\*<[0-9]+>$" buf-name)))
+              7 3))
+
+;;****** buffers/display/alist: dired
+
+(add-to-list 'display-buffer-alist
+             (ram-display-buffer-in-other-monitor-horiz-split-prefer-same-window
+              (lambda (buffer &optional alist)
+                (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
+                  (eq 'dired-mode mode)))
               7 3))
 
 ;;****** buffers/display/alist: ESS Emacs Speaks Statistics
@@ -10921,6 +10940,14 @@ buffer-local `ram-face-remapping-cookie'."
           (lambda () (setq-local evil-shift-width 2)))
 (add-hook 'lisp-interaction-mode-hook
           (lambda () (setq-local evil-shift-width 2)))
+
+;;** system: mouse
+
+;; 'true' meand moving mouse pointer will select the window
+;; 'nil meand mouse pointer will not select window
+(setq mouse-autoselect-window nil)
+(setq focus-follows-mouse nil)
+
 
 ;;** system: region
 
