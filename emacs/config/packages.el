@@ -2221,45 +2221,72 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
   (list test-buffer-p
         `((lambda (buffer alist)
             ,(format "Display BUFFER in exwm workspace %d or %d" primary secondary)
-            (when-let* ((primary-frame (and
-                                        ;; check 'exwm is running
-                                        (frame-parameter (selected-frame) 'exwm-active)
-                                        ;; target workspace numbers
-                                        ;; are withing limits
-                                        (<= ,primary (exwm-workspace--count))
-                                        (<= ,secondary (exwm-workspace--count))
-                                        ;; workspace can be created
-                                        (exwm-workspace--workspace-from-frame-or-index ,primary)))
-                        (primary ,primary)
-                        (secondary ,secondary)
-                        (buffer-sameness-p (lambda (frm)
-                                             (,test-buffer-p (window-buffer (frame-selected-window frm)))))
-                        (selected-frm (selected-frame))
-                        ;; decide between primary and secondary workspaces
-                        (workspc (cond
-                                  ;; selected is displaying sameness buffer, choose it
-                                  ;; ((funcall buffer-sameness-p (selected-frame))
-                                  ;;  (if (eq (selected-frame) primary-frame)
-                                  ;;      primary
-                                  ;;    secondary))
-                                  (t
-                                   ;; choose workspace in the other monitor
-                                   (if
-                                       ;; if currently active monitor
-                                       ;; displaying primary workspace
-                                       (string=
-                                        ;; monitor name for (selected-frame)
-                                        (frame-parameter (selected-frame) 'exwm-randr-monitor)
-                                        ;; monitor name for primary-frame
-                                        (frame-parameter primary-frame 'exwm-randr-monitor))
-                                       ;; you are in primary
-                                       ;; workspace, choose secondary
-                                       secondary
-                                     ;; you are in a secondary workspace, choose primary
-                                     primary))))
-                        (window-to-display-in
-                         (car (window-list-1 nil 'nomini
-                                             (exwm-workspace--workspace-from-frame-or-index workspc)))))
+            (let* ((primary-frame (and
+                                   ;; check 'exwm is running
+                                   (frame-parameter (selected-frame) 'exwm-active)
+                                   ;; target workspace numbers
+                                   ;; are withing limits
+                                   (<= ,primary (exwm-workspace--count))
+                                   (<= ,secondary (exwm-workspace--count))
+                                   ;; workspace can be created
+                                   (exwm-workspace--workspace-from-frame-or-index ,primary)))
+                   (primary ,primary)
+                   (secondary ,secondary)
+                   (buf-name (if (stringp buffer) buffer (buffer-name buffer)))
+                   (buffer-sameness-p (lambda (frm)
+                                        (,test-buffer-p (window-buffer (frame-selected-window frm)))))
+                   (selected-frm (selected-frame))
+                   ;; select workspace displaying the same buffer
+                   (wkspc-displaying-same-buffer
+                    (cond
+                     ;; is PRIMARY displaying same buffer
+                     ((and
+                       ;; workspace is visible
+                       (frame-parameter
+                        (exwm-workspace--workspace-from-frame-or-index primary) 'exwm-active)
+                       ;; workspace is displaying the same buffer
+                       (cl-some
+                        (lambda (w) (equal buf-name (buffer-name (window-buffer w))))
+                        (window-list
+                         (exwm-workspace--workspace-from-frame-or-index primary))))
+                      primary)
+                     ;; is SECONDARY displaying same buffer
+                     ((and
+                       ;; workspace is visible
+                       (frame-parameter
+                        (exwm-workspace--workspace-from-frame-or-index secondary) 'exwm-active)
+                       ;; workspace is displaying the same buffer
+                       (cl-some
+                        (lambda (w) (equal buf-name (buffer-name (window-buffer w))))
+                        (window-list
+                         (exwm-workspace--workspace-from-frame-or-index secondary))))
+                      secondary)))
+                   (workspc (cond
+                             (wkspc-displaying-same-buffer)
+                             (t
+                              ;; choose workspace in the other monitor
+                              (if
+                                  ;; if currently active monitor
+                                  ;; displaying primary workspace
+                                  (string=
+                                   ;; monitor name for (selected-frame)
+                                   (frame-parameter (selected-frame) 'exwm-randr-monitor)
+                                   ;; monitor name for primary-frame
+                                   (frame-parameter primary-frame 'exwm-randr-monitor))
+                                  ;; you are in primary
+                                  ;; workspace, choose secondary
+                                  secondary
+                                ;; you are in a secondary workspace, choose primary
+                                primary))))
+                   (window-to-display-in
+                    (car (window-list-1
+                          ;; try to get window displaying the same buffer
+                          (cl-find-if
+                           (lambda (w) (equal buf-name (buffer-name (window-buffer w))))
+                           (window-list
+                            (exwm-workspace--workspace-from-frame-or-index workspc) 'nominibuf))
+                          'nomini
+                          (exwm-workspace--workspace-from-frame-or-index workspc)))))
               (when window-to-display-in
                 ;; switch to target workspace
                 (exwm-workspace-switch workspc)
