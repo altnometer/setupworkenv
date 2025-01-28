@@ -219,8 +219,12 @@
           ("cmd" "command")
           ("cmds" "commands")
 
+         
           ("coll" "collection")
           ("colls" "collections")
+
+          ("com" "communication")
+          ("comm" "communication")
 
           ("comn" "computation")
           ("coml" "computational")
@@ -347,6 +351,8 @@
           ("exn" "execution")
 
           ;;** f
+
+          ("fe" "for example")
 
           ("fn" "function")
           ("fns" "functions")
@@ -630,6 +636,9 @@
           ("subss" "substitutions")
           ("subsg" "substituting")
 
+          ("sucs" "success")
+          ("sucsl" "successful")
+          
           ("syn" "syntax")
           ("sync" "syntactical")
           ("synq" "syntax-quote")
@@ -640,6 +649,9 @@
           ;;** t
 
           ("tech" "technology")
+          
+          ("theo" "theory")
+          ("theoc" "theoretic")
 
           ("tr" "transaction")
           ("trs" "transactions")
