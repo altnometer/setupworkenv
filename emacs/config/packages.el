@@ -2684,21 +2684,11 @@ the `current-prefix-arg' is non nil"
 
 ;;****** buffers/display/alist/org: src, source code block buffer
 
-;;****** buffers/display/alist/org/src: clojure
-
- (add-to-list 'display-buffer-alist
-             (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
-              (lambda (buffer &optional alist)
-                (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (string-match-p "^\\*Org Src .+?\\[ clojure \\]\\*$" buf-name)))))
-
-;;****** buffers/display/alist/org/src: emacs-lisp, elisp
-
 (add-to-list 'display-buffer-alist
              (ram-create-display-buffer-in-same-monitor-horiz-split-alist-element
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
-                  (string-match-p "^\\*Org Src .+?\\[ emacs-lisp \\]\\*$" buf-name)))))
+                  (string-match-p "^\\*Org Src .+?\\[ [[:ascii:]]+ \\]\\*$" buf-name)))))
 
 ;;****** buffers/display/alist: org monthly
 
@@ -2732,8 +2722,7 @@ the `current-prefix-arg' is non nil"
 ;;****** buffers/display/alist: org-roam notes
 
 (add-to-list 'display-buffer-alist
-             (
-              ram-display-buffer-in-other-monitor
+             (ram-display-buffer-in-other-monitor
               ;; ram-create-display-buffer-in-specific-workspace-horiz-split-alist-element
               (lambda (buffer &optional alist)
                 (let ((buf-name (if (stringp buffer) buffer (buffer-name buffer))))
@@ -2747,7 +2736,7 @@ the `current-prefix-arg' is non nil"
                       (string-match-p "^CAPTURE-[0-9]\\{4\\}-[0-9]\\{2\\}-.+\\.org$" buf-name))))
               7 9))
 
-;;****** buffers/display/alist: eshell, dired
+;;****** buffers/display/alist: eshell
 
 (add-to-list 'display-buffer-alist
              (ram-display-buffer-in-other-monitor-horiz-split-prefer-same-window
@@ -2799,13 +2788,12 @@ the `current-prefix-arg' is non nil"
 ;; ****** buffers/display/alist: test
 
 ;; (setq display-buffer-alist nil)
-
 ;; (add-to-list 'display-buffer-alist
 ;;              `("*"
 ;;                ((lambda (buffer alist)
 ;;                   (progn
 ;;                     (print
-;;                      (format "################ any buffer type : buffer name: %s, mode: %s" buffer
+;;                      (format "################ any buffer type :\n    buffer %s,\n    buffer name: %s,\n    mode: %s" buffer (buffer-name buffer)
 ;;                              (buffer-local-value 'major-mode buffer)))
 
 ;;                     nil)))))
