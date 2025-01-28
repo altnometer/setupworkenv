@@ -10,7 +10,10 @@ screen_width = int(output.split()[0].split(b'x')[0])
 screen_height = int(output.split()[0].split(b'x')[1])
 
 ## screen height in mm
-output = subprocess.Popen('xrandr -q | grep " connected " | sed \'s/ primary//\' | awk  \'{print $15}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
+##                          'xrandr -q | grep " connected " | sed \'s/ primary//\' | awk  \'{print $14}\'',
+
+output = subprocess.Popen('xrandr -q | grep " connected " | head -1 | sed \'s/ primary / /\' | sed -E \'s/([[:digit:]]) left (\()/\\1 \\2/\' | awk \'{print $14}\'',
+                          shell=True, stdout=subprocess.PIPE).communicate()[0]
 screen_height_mm = int(output.split()[0].split(b'mm')[0])
 
 ## UHD (4K) 3840x2160
@@ -20,7 +23,7 @@ qhd_rotated_width = 1440
 fhd_rotated_width = 1080
 
 ## screen heights of my monitors in mm
-screen_height_medium_mm = 340
+screen_height_medium_mm = 355
 
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
