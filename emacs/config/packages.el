@@ -9580,18 +9580,28 @@ With \\[universal-argument] do it for the current file instead."
 (define-key global-map (kbd "C-'") #'er/expand-region)
 
 
-;;** packages: hl-line
+;;** packages: hl-line highlight blink flash line
 
-(straight-use-package
- '(hl-line+ :type git :host github :repo "emacsmirror/hl-line-plus"))
+;; I modified and moved hl-line+ package to lisp directory
+;; refer to 201056a commit message
+;; (straight-use-package
+;;  '(hl-line+ :type git :host github :repo "emacsmirror/hl-line-plus"))
 
+(require 'hl-line+)
 ;; (add-hook 'window-scroll-functions-hook #'hl-line-flash)
 ;; works only when frame is changed, does not work when windows withing the same
 ;; frame change
+
 (add-hook 'focus-in-hook #'hl-line-flash)
 
 (defun ram-get-range-for-line-highlighting ()
-  "Return the range that covers the whole line in a buffer."
+  "Return the range that covers a whole line in a buffer.
+
+I need this function because, by default, it would only highlight from
+the beginning of line to the point. And when the point is at the
+`point-max', you cannot see highlighting at all.
+
+Hopefully, this function would cover some edge cases."
   (when-let* ((bol (if (= (pos-bol) (point-max))
                        (pos-bol 0)
                      (pos-bol)))
