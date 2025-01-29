@@ -4818,7 +4818,7 @@ Include a backlink to source if INCLUDE-BACKLINK-P is true."
          (headline-props (cl-case (org-element-type el)
                            (headline `(
                                        :title ,(plist-get (cadr el) :title)
-                                       :level 1
+                                       :level ,(plist-get (cadr el) :level)
                                        :pre-blank 0
                                        :raw-value ,(plist-get (cadr el) :raw-value)))
                            (src-block `(
@@ -5478,18 +5478,27 @@ Use calendar if ARG value is '(4)."
     (if (not note-exists-p)
         (progn
           (erase-buffer)
-          ;; when new daily notes are created (they were automatically
-          ;; created because none existed)
-          ;; the id link does not work because id locations were not updates.
+          ;; when new daily notes are created in the process of
+          ;; generating this weekly note, because these daily notes
+          ;; did not exist,
+          ;; the id links to these daily notes would not work
+          ;; because id locations were not updates.
           ;; call (org-roam-update-org-id-locations)
           ;; TODO: may too much overhead involved?
           ;; update only the relevant directory dailies
-          (org-roam-update-org-id-locations))
+          ;; INDEED: takes too much time
+          ;; And it seems that the links work anyway
+          ;; So, disabling this call
+          ;; (org-roam-update-org-id-locations)
+          )
       (goto-char (point-min))
       ;; (org-next-visible-heading 1)
       (delete-region (point) (point-max)))
     (insert doc-text)
     (save-buffer)
+    (org-map-entries
+     (lambda () (org-fold-hide-subtree))
+     "LEVEL=2")
     (re-search-backward (format "^\\*[[:blank:]]+.+%s [[:digit:]]\\{1,2\\}.+$" (format-time-string "%a" time)))))
 
 
