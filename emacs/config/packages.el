@@ -5162,34 +5162,39 @@ Use the current buffer file-path if FILE is nil."
                        (if (= dow 0) 6 (1- dow)))))
     (cl-labels
         ((get-week (week-day)
-           (if (not (= (nth 4 (decode-time week-day)) (nth 4 (decode-time month-1st-day)))) ; different month
+           (if (not (= (nth 4 (decode-time week-day))
+                       (nth 4 (decode-time month-1st-day)))) ; different month
                '()
              (cons
-              (cons 'headline
-                    (cons (let ((week-day-heading (format (format-time-string "%b w %%s" week-day)
-                                                          ;; week number in the month
-                                                          ;; (1+ (- (/ (time-to-day-in-year week-day) 7)
-                                                          ;;        (/ (time-to-day-in-year month-1st-day) 7)))
-                                                          (1+ (- (string-to-number (format-time-string "%W" week-day))
-                                                                 (string-to-number (format-time-string "%W" month-1st-day)))))))
-                            `(:raw-value ,week-day-heading
-                                         :pre-blank 0
-                                         :post-blank 2
-                                         :level 1
-                                         :title ,(list week-day-heading)))
-                          (cl-labels ((demote-headings (hs)
-                                        (cond
-                                         ((null hs) '())
-                                         ((eq (org-element-type (car hs)) 'headline)
-                                          (cons
-                                           (cons
-                                            (caar hs) (cons (plist-put (cadar hs)
-                                                                       :level
-                                                                       (1+ (plist-get (cadar hs) :level)))
-                                                            (demote-headings (cddar hs))))
-                                           (demote-headings (cdr hs))))
-                                         (t (cons (car hs) (demote-headings (cdr hs)))))))
-                            (demote-headings (ram-org-get-daily-headings-from-week week-day nil t)))))
+              (cons
+               'headline
+               (cons (let ((week-day-heading
+                            (format (format-time-string "%b w %%s" week-day)
+                                    ;; week number in the month
+                                    ;; (1+ (- (/ (time-to-day-in-year week-day) 7)
+                                    ;;        (/ (time-to-day-in-year month-1st-day) 7)))
+                                    (1+ (- (string-to-number
+                                            (format-time-string "%W" week-day))
+                                           (string-to-number
+                                            (format-time-string "%W" month-1st-day)))))))
+                       `(:raw-value ,week-day-heading
+                                    :pre-blank 0
+                                    :post-blank 2
+                                    :level 1
+                                    :title ,(list week-day-heading)))
+                     (cl-labels ((demote-headings (hs)
+                                   (cond
+                                    ((null hs) '())
+                                    ((eq (org-element-type (car hs)) 'headline)
+                                     (cons
+                                      (cons
+                                       (caar hs) (cons (plist-put (cadar hs)
+                                                                  :level
+                                                                  (1+ (plist-get (cadar hs) :level)))
+                                                       (demote-headings (cddar hs))))
+                                      (demote-headings (cdr hs))))
+                                    (t (cons (car hs) (demote-headings (cdr hs)))))))
+                       (demote-headings (ram-org-get-daily-headings-from-week week-day nil t)))))
               (get-week
                ;; recurs only Mondays
                (if (= 1 (nth 6 (decode-time week-day))) ; Monday?
@@ -5255,6 +5260,9 @@ When ARG is 1, update the current note."
     (erase-buffer)
     (insert doc-text)
     (save-buffer)
+    (org-map-entries
+     (lambda () (org-fold-hide-subtree))
+     "LEVEL=3")
     ;; move point:
     ;; if arg is 1, update the current note and remain at the same point
     ;; else, go to the 1st heading
