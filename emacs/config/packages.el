@@ -5559,9 +5559,6 @@ Use calendar if ARG value is '(4)."
 
 ;;* outline:
 
-;; ** outline: headings, headlines
-
-
 ;;** outline: setup
 
 (outline-minor-mode t)
@@ -5850,6 +5847,9 @@ The \"ram-outline-toggle-*\" name part is recognized by `ram-outline-toggle'."
 
 (define-key ram-leader-map-tap-global (kbd "o") #'outline-show-all)
 (define-key ram-leader-map-tap-global (kbd "q") #'ram-outline-hide-all)
+
+(define-key global-map (kbd "s-<iso-lefttab>") #'outline-hide-subtree)
+(define-key global-map (kbd "s-<tab>") #'outline-show-subtree)
 
 (define-key ram-leader-map-tap-global (kbd "u") #'ram-outline-up-heading)
 (define-key global-map (kbd "<f23>") #'ram-outline-up-heading)
