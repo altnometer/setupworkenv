@@ -5261,7 +5261,17 @@ When ARG is 1, update the current note."
     (insert doc-text)
     (save-buffer)
     (org-map-entries
-     (lambda () (org-fold-hide-subtree))
+     (lambda () (when
+                    ;; when LEVEL=3 is the last heading
+                    ;; it will marked by "..." as folded even when
+                    ;; there is no content under it, hence,
+                    ;; only fold when there are subheadings
+                    (save-excursion
+                      (let ((current-level (org-outline-level)))
+                        (outline-next-heading)
+                        (and (not (eobp))
+                             (> (org-outline-level) current-level))))
+                  (org-fold-hide-subtree)))
      "LEVEL=3")
     ;; move point:
     ;; if arg is 1, update the current note and remain at the same point
@@ -5505,7 +5515,17 @@ Use calendar if ARG value is '(4)."
     (insert doc-text)
     (save-buffer)
     (org-map-entries
-     (lambda () (org-fold-hide-subtree))
+     (lambda () (when
+                    ;; when LEVEL=3 is the last heading
+                    ;; it will marked by "..." as folded even when
+                    ;; there is no content under it, hence,
+                    ;; only fold when there are subheadings
+                    (save-excursion
+                      (let ((current-level (org-outline-level)))
+                        (outline-next-heading)
+                        (and (not (eobp))
+                             (> (org-outline-level) current-level))))
+                  (org-fold-hide-subtree)))
      "LEVEL=2")
     (re-search-backward (format "^\\*[[:blank:]]+.+%s [[:digit:]]\\{1,2\\}.+$" (format-time-string "%a" time)))))
 
