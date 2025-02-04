@@ -5494,10 +5494,17 @@ Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
   (let* ((time (or time
-                   (if (equal arg '(4))
+                   (when (equal arg '(4))
                        (let ((org-read-date-prefer-future t))
-                         (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
-                     (time-add (* (or arg 0) 7 86400) (current-time)))))
+                         (org-read-date nil 'TO-TIME nil "Capture to daily-note: " )))
+                   (and (buffer-file-name)
+                        (org-roam-dailies--daily-note-p)
+                        ;; get time from current daily note
+                        ;; thus, a weekly note will be created
+                        ;; for the week containing that day
+                        (time-convert
+                         (date-to-time (file-name-base (buffer-file-name))) 'integer))
+                   (time-add (* (or arg 0) 7 86400) (current-time))))
          ;; day of the week, where 0 is monday and 6 is sunday
          (dow (let ((dow (nth 6 (decode-time time))))
                 (if (= dow 0) 6 (1- dow))))
