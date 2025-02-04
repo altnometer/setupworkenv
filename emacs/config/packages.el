@@ -7174,8 +7174,8 @@ If ARG is 4, move to the end of defun."
 (defun ram-prev-defun (&optional arg)
   "Jump to the previous top level thing."
   (interactive "p")
-  (when (buffer-narrowed-p)
-    (widen))
+  ;; (when (buffer-narrowed-p)
+  ;;   (widen))
   (let ((point (point)))
     (when (= point (ram-beg-of-top-sexp 1))
       (ram-backward-list)))
