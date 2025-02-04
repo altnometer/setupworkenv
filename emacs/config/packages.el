@@ -2850,6 +2850,23 @@ the `current-prefix-arg' is non nil"
        ;; :branch "release_9.5"
        :build (:not autoloads) :files (:defaults "lisp/*.el" ("etc/styles/" "etc/styles/*"))))
 
+;;** org-mode: fold
+
+(with-eval-after-load "org"
+  (setq org-cycle-separator-lines -1))
+
+(defun ram-org-cycle-show-empty-lines-in-entire-buffer (&optional arg-from-advised-fn)
+  "Call `org-cycle-show-empty-lines' with argument t.
+
+With the argument 't, it will cover the whole buffer."
+  (org-cycle-show-empty-lines t))
+
+;;*** org-mode/fold: hooks, advice, timers
+
+(with-eval-after-load "org"
+  (advice-add 'org-ctrl-c-tab :after #'ram-org-cycle-show-empty-lines-in-entire-buffer)
+  )
+
 ;;** org-mode: functions
 
 ;;*** org-mode/functions: enable mode only in source code blocks
