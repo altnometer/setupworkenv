@@ -1658,7 +1658,14 @@ c.url.searchengines = {
 # config.bind('<Ctrl-D>', 'scroll-page 0 0.5')
 # config.bind('<Ctrl-F5>', 'reload -f')
 # config.bind('<Ctrl-F>', 'scroll-page 0 1')
+
+## redefining it just to stop creating new
+## windows on accidental press:
+##   - then closing by accident the other
+##   - window and loosing all open tabs
 # config.bind('<Ctrl-N>', 'open -w')
+config.bind('<Ctrl-N>', 'tab-next')
+
 # config.bind('<Ctrl-PgDown>', 'tab-next')
 # config.bind('<Ctrl-PgUp>', 'tab-prev')
 # config.bind('<Ctrl-Q>', 'quit')
