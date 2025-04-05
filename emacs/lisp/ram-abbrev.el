@@ -4,8 +4,15 @@
 
 ;; (clear-abbrev-table global-abbrev-table)
 
-(when (boundp 'global-table)
-  (clear-abbrev-table global-table))
+;; (when (boundp 'global-table)
+;;   (clear-abbrev-table global-table))
+
+(abbrev-table-put global-abbrev-table
+                  :parents (list auto-correct-typo-abbrev-table))
+
+;; global-abbrev-table is defined in file, the location for which
+;; is defined in
+;; (eval 'abbrev-file-name)
 
 (define-abbrev-table 'global-abbrev-table
   '(
@@ -638,7 +645,7 @@
 
           ("sucs" "success")
           ("sucsl" "successful")
-          
+
           ("syn" "syntax")
           ("sync" "syntactical")
           ("synq" "syntax-quote")
@@ -649,7 +656,7 @@
           ;;** t
 
           ("tech" "technology")
-          
+
           ("theo" "theory")
           ("theoc" "theoretic")
 
