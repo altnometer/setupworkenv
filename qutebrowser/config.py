@@ -948,8 +948,8 @@ else:
 ## Font used in the tab bar.
 ## Type: QtFont
 # c.fonts.tabs = '12pt monospace'
-c.fonts.tabs.selected = 'bold 18pt SFNS Display'
-c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
+#c.fonts.tabs.selected = 'bold 18pt SFNS Display'
+#c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
 
 if screen_height_medium_mm  <= screen_height_mm:
     c.fonts.tabs.selected = 'bold 18pt SFNS Display'
@@ -994,10 +994,23 @@ else:
 ## Default font size (in pixels) for regular text.
 ## Type: Int
 # c.fonts.web.size.default = 16
+if screen_height_medium_mm  <= screen_height_mm:
+    c.fonts.web.size.default = 18
+elif screen_width <= fhd_rotated_width:
+    c.fonts.web.size.default = 10
+elif screen_width <= qhd_rotated_width:
+    c.fonts.web.size.default = 16
+elif screen_width <= uhd_rotated_width:
+    c.fonts.web.size.default = 18
+else:
+    c.fonts.web.size = 10
+
+c.fonts.web.size.default = 22
 
 ## Default font size (in pixels) for fixed-pitch text.
 ## Type: Int
 # c.fonts.web.size.default_fixed = 13
+c.fonts.web.size.default_fixed = 22
 
 ## Hard minimum font size (in pixels).
 ## Type: Int
