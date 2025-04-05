@@ -182,6 +182,28 @@
      "#002b36" "#002b36"))
  '(hl-paren-colors '("#2aa198" "#b58900" "#268bd2" "#6c71c4" "#859900"))
  '(hl-sexp-background-color "#efebe9")
+ '(ibuffer-saved-filter-groups nil)
+ '(ibuffer-saved-filters
+   '(("dired-translation" (directory . "translation") (mode . dired-mode))
+     ("dired" (mode . dired-mode))
+     ("programming"
+      (or (derived-mode . prog-mode) (mode . ess-mode)
+          (mode . compilation-mode)))
+     ("text document"
+      (and (derived-mode . text-mode) (not (starred-name))))
+     ("TeX"
+      (or (derived-mode . tex-mode) (mode . latex-mode)
+          (mode . context-mode) (mode . ams-tex-mode)
+          (mode . bibtex-mode)))
+     ("web"
+      (or (derived-mode . sgml-mode) (derived-mode . css-base-mode)
+          (derived-mode . js-base-mode)
+          (derived-mode . typescript-ts-base-mode) (mode . js2-mode)
+          (derived-mode . haml-mode) (mode . sass-mode)))
+     ("gnus"
+      (or (mode . message-mode) (mode . mail-mode)
+          (mode . gnus-group-mode) (mode . gnus-summary-mode)
+          (mode . gnus-article-mode)))))
  '(ivy-prescient-enable-filtering t)
  '(ivy-prescient-enable-sorting t)
  '(ivy-prescient-retain-classic-highlighting t)
@@ -193,8 +215,8 @@
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
  '(safe-local-variable-values
-   '((org-roam-db-location .
-                           "~/.local/share/emacs/my.emacs.d/org-roam.db")
+   '((org-roam-db-location
+      . "~/.local/share/emacs/my.emacs.d/org-roam.db")
      (org-roam-directory . "~/backup/books")
      (vc-prepare-patches-separately)
      (diff-add-log-use-relative-names . t)
