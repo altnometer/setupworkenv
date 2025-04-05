@@ -789,7 +789,7 @@ c.completion.cmd_history_max_items = 2000
 ## Limit fullscreen to the browser window (does not expand to fill the
 ## screen).
 ## Type: Bool
-c.content.fullscreen.window = False
+c.content.fullscreen.window = True
 
 ## Monitor load requests for cross-site scripting attempts. Suspicious
 ## scripts will be blocked and reported in the inspector's JavaScript
