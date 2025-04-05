@@ -70,8 +70,18 @@
 (setq abbrev-file-name "~/.emacs.d/lisp/abbrev-defs")
 
 (setq-default abbrev-mode t)
-;; (setq save-abbrevs 'silently)
-(setq save-abbrevs nil)
+;; Before, I had it set to nil because I wanted all the abbrevs
+;; to be managed with my custom abbrevs table definitions.
+;; Now, I want some of the abbrevs to be manages by Emacs.
+;; The main motivation concerns the `auto-correct-typo-abbrev-table'
+;; - the abbrevs are inserted automatically into this table by
+;;   `endless/ispell-word-then-abbrev' function.
+;; - I want this table to be saved automatically when
+;;   I closed Emacs.
+;; - This behavior is regulated by `save-abbrevs' value
+;; Hence, set it to 'silently:
+;;(setq save-abbrevs nil)
+(setq save-abbrevs 'silently)
 
 ;;** abbrev: functions
 
@@ -184,10 +194,11 @@ abort completely with `C-g'."
   (let (bef aft)
     (save-excursion
       (while (if (setq bef (endless/simple-get-word))
-                 ;; Word was corrected or used quit.
-                 (if (ispell-word nil 'quiet)
-                     nil ; End the loop.
-                   ;; Also end if we reach `bob'.
+                 ;; Word was corrected or used quietly.
+                 ;; 'quietly option suppressed non-corrective messages
+                 (if (ispell-word nil 'quietly)
+                     nil                ; End the loop.
+                   ;; Also end if we reach `bobp'.
                    (not (bobp)))
                ;; If there's no word at point, keep looking
                ;; until `bob'.
@@ -199,7 +210,11 @@ abort completely with `C-g'."
         (let ((aft (downcase aft))
               (bef (downcase bef)))
           (define-abbrev
-            (if p local-abbrev-table auto-correct-typo-abbrev-table ;; global-abbrev-table
+            (if p
+                ;; if called with prefix argument P, use local abbrev table
+                local-abbrev-table
+              ;; otherwise, use global-abbrev-table
+              auto-correct-typo-abbrev-table
               )
             bef aft)
           (message "\"%s\" now expands to \"%s\" %sally"
@@ -771,15 +786,24 @@ Disable `icomplete-vertical-mode' for this command."
               (exwm-workspace-switch 1)
               (exwm-input-set-local-simulation-keys nil)
               (set-window-fringes (selected-window) 0 0)
-              ;; git-gutter adds right fringe
+              ;; git-gutter adds right fringe, you do not need it:
               (git-gutter-mode -1)
-              (exwm-layout-toggle-fullscreen))
+              ;; #'exwm-layout-toggle-fullscreen
+              ;; this will start qutebrowser in fullscreen
+              ;; when in fullsrceen mode,
+              ;; if other windows  (such as minibuffer
+              ;; or *Backtrace*) are opened and take focus,
+              ;; you will be stuck with unresponsive
+              ;; qutebrowser window, you do not need that.
+              ;; (exwm-layout-toggle-fullscreen)
+              )
              ((and exwm-class-name
                    (string-match-p "^Google-chrome\\(<[0-9]+>\\)\\{0,1\\}$" exwm-class-name))
               (exwm-workspace-switch 4)
               (exwm-input-set-local-simulation-keys nil)
               (set-window-fringes (selected-window) 0 0)
-              (exwm-layout-toggle-fullscreen))
+              ;; (exwm-layout-toggle-fullscreen)
+              )
              ;; ((and exwm-class-name
              ;;       (string= exwm-class-name "MuPDF"))
              ;;  (exwm-workspace-switch 4)
