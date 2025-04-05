@@ -6,10 +6,13 @@
  "R-block-graph-with-content"
  '((tempo-save-named 'count (number-to-string (+ 1 (ram-get-org-code-block-img-count))))
    (tempo-save-named 'block-name (ram-make-code-block-name))
-   (tempo-save-named 'prev-block-content (ram-get-prev-org-code-block-value "R"))
+   (tempo-save-named 'prev-block-content
+                     (ram-get-prev-org-code-block-value-for-R-graph)
+                     )
    "#+name: " (s block-name) "_img" (s count) n
    "#+header: :file /tmp/" (s block-name) "_img" (s count) ".png" n
    "#+header: :results output graphics file" n
+   "#+header: :width 1400 :height 900 :res 200 :units px" n
    "#+begin_src R :session my-R-session" n
    ~ (s prev-block-content)
    "#+end_src"  n n
