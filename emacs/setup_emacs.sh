@@ -35,7 +35,8 @@ else
     echo -e "\n\x1b[33;01m Installing xorg and supporting packages ...  \x1b[39;49;00m\n" && sleep 1
     # !!! sound: install alsa-utils
     apt-get install -y xorg xinput firefox-esr \
-            feh mupdf zathura zathura-djvu hunspell aspell graphviz r-base r-base-dev mpv alsa-utils
+            feh mupdf zathura zathura-djvu hunspell \
+            aspell graphviz r-base r-base-dev mpv alsa-utils
     echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y texlive-full dvipng
     # tidyverse of R requires next dependencies on Debian 10 (buster)
@@ -158,7 +159,7 @@ else
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
             libcairo2-dev libharfbuzz-dev
-            #libgccjit-12-dev 
+            #libgccjit-12-dev
             #libX11-dev libXpm-dev libxaw3dxft8-dev libxaw3dxft8-dev \
             #libwxgtk3.0-gtk3-dev \
             #libwxgtk-media3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
@@ -203,13 +204,18 @@ else
 
     sudo -u $SUDO_USER ./autogen.sh
     sudo -u $SUDO_USER ./configure --prefix="$EMACS_INSTALL_DIR" \
-         --with-native-compilation --with-sound=no \
-         --with-cairo --with-harfbuzz \
-         --with-x=yes --with-x-toolkit=no --with-xft \
-         --with-mailutils --without-toolkit-scroll-bars \
-         --with-x-toolkit=gtk3 --with-xwidgets \
+         --with-native-compilation \
+         --with-sound=no \
+         --with-cairo \
+         --with-harfbuzz \
+         --with-x=yes \
+         --with-x-toolkit=gtk3 \
+         --with-xft \
+         --with-mailutils \
+         --without-toolkit-scroll-bars \
+         --with-xwidgets \
          --disable-ns-self-contained \
-         --with-json
+         --with-json \
     # --disable-ns-self-contained respect --prefix
     sudo -u $SUDO_USER make -j$(nproc)
     sudo -u $SUDO_USER make install
