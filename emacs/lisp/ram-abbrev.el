@@ -34,20 +34,22 @@
     ("UU" "Ū")
     ("uu" "ū")
     ;; the rest do not work as the symbols used are not word parts
-    ;; ("\"N" "Ṅ")
-    ;; ("\"n" "ṅ")
-    ;; (".M" "Ṃ")
-    ;; (".m" "ṃ")
-    ;; ("~N" "Ñ")
-    ;; ("~n" "ñ")
-    ;; (".T" "Ṭ")
-    ;; (".t" "ṭ")
-    ;; (".D" "Ḍ")
-    ;; (".d" "ḍ")
-    ;; (".N" "Ṇ")
-    ;; (".n" "ṇ")
-    ;; (".L" "Ḷ")
-    ;; (".l" "ḷ")
+    ;; but maybe they will work with hippie-expand
+    ;; it seems that these/similar expansions are defined elsewhere
+    ("\"N" "Ṅ")
+    ("\"n" "ṅ")
+    (".M" "Ṃ")
+    (".m" "ṃ")
+    ("~N" "Ñ")
+    ("~n" "ñ")
+    (".T" "Ṭ")
+    (".t" "ṭ")
+    (".D" "Ḍ")
+    (".d" "ḍ")
+    (".N" "Ṇ")
+    (".n" "ṇ")
+    (".L" "Ḷ")
+    (".l" "ḷ")
     ))
 
 ;;* clojure-mode-abbrev-table
@@ -226,7 +228,6 @@
           ("cmd" "command")
           ("cmds" "commands")
 
-         
           ("coll" "collection")
           ("colls" "collections")
 
@@ -677,7 +678,6 @@
 
           ;;** v
 
-          ("val" "value")
           ("vals" "values")
           ("vl" "value")
           ("vls" "values")
