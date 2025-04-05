@@ -11362,6 +11362,42 @@ Modify `tempo-match-finder'."
         )
       (or block-content "\n"))))
 
+(defun ram-get-prev-org-code-block-value-for-R-graph ()
+  "Return the previous code block content displays R graphics."
+  (save-excursion
+    (let ((block-content nil))
+      (condition-case err
+          ;; loop through previous code blocks
+          (while (not block-content)
+            ;; when called from a template when
+            ;; the #+begin_src was already inserted
+            ;; it will consider that it is inside
+            ;; source block. We do not want that.
+            (if (org-in-src-block-p 'INSIDE nil)
+                (org-previous-block 2)
+              (org-previous-block 1))
+            (let ((el (org-element-at-point)))
+              ;; search for code block in LANGUAGE
+              (when (and (or (string-equal "R" (org-element-property :language el))
+                             (string-equal "r" (org-element-property :language el)))
+                         (s-contains? "graphics"
+                                      (or
+                                       (seq-find
+                                        (lambda (s) (s-starts-with? ":results" s 'ignore-case))
+                                        (org-element-property :header el) ""))
+                                      'ignore-case))
+                ;; setting block-content and break the loop
+                (setq block-content (org-element-property :value el)))))
+        (user-error (if (string= (error-message-string err)
+                                 "No previous code blocks")
+                        (setq block-content "\n")
+                      (signal (car err) (cdr err))))
+        (error (signal (car err) (cdr err)))
+        ;; (:success
+        ;;  nil)
+        )
+      (or block-content "\n"))))
+
 (defun ram-get-org-code-block-img-count ()
   "Get greatest number used as an image counter for Org code blocks.
 
@@ -11424,6 +11460,82 @@ Derive it from either:
           (buffer-substring-no-properties (org-element-begin element)
                                           (org-element-end element))
         (ram-org-prev-code-block-copy)))))
+
+(defun ram-org-prev-code-block-copy-with-lang-and-params (lang &optional include-params exclude-params)
+  "Return a copy of the previous Org code block for LANG.
+
+LANG is compared with `string-equal', so, it can be either string or
+symbol, case matters.
+
+If INCLUDE-PARAMS in given, in the form:
+  - '((:results . output) (:results . file) (:var . foo=value))
+then return only code blocks that contain ALL these param-value pairs.
+
+If EXCLUDE-PARAM in given, in the form:
+  - '((:results . output) (:results . file) (:var . foo=value))
+then exclude from the result the code blocks that contain
+ANY of these param-value pairs.
+"
+  (save-excursion
+    (ram-org-previous-block 1)
+    (let ((element (org-element-at-point)))
+      (if (and (eq 'src-block (org-element-type element))
+               (string-equal lang (org-element-property :language element))
+               ;; return t if INCLUDE-PARAMS is given
+               ;; and the code block contain ALL of them
+               (or (not include-params)
+                   ;; if ALL PARAM-VAL pair of INCLUDE-PARAMS are among the code block
+                   ;; :parameters or :header, return t, otherwise return nil
+                   (cl-reduce
+                    (lambda (bool param-val)
+                      (and
+                       bool
+                       (or
+                        (s-contains?
+                         (symbol-name (cdr param-val))
+                         (seq-find
+                          (lambda (s)
+                            (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                          (s-slice-at ":[-[:alpha:]]+" (org-element-property :parameters element)) ""))
+                        (s-contains?
+                         (symbol-name (cdr param-val))
+                         (seq-find
+                          (lambda (s)
+                            (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                          (org-element-property :header element) "")))))
+                    include-params
+                    :initial-value t))
+               ;; return t if EXCLUDE-PARAMS is given
+               ;; and the code block does not contain any of them
+               (or (not exclude-params)
+                   (not
+                    ;; if there is a single PARAM-VAL pair of
+                    ;; EXCLUDE-PARAMS among the code block :parameters
+                    ;; or :header, return t,
+                    ;; which will make (not (cl-reduce ...)) fail
+                    ;; otherwise return nil
+                    ;; which will make (not (cl-reduce ...)) succeed
+                    (cl-reduce
+                     (lambda (bool param-val)
+                       (or bool
+                           (or
+                            (s-contains?
+                             (symbol-name (cdr param-val))
+                             (seq-find
+                              (lambda (s)
+                                (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                              (s-slice-at ":[-[:alpha:]]+" (org-element-property :parameters element)) ""))
+                            (s-contains?
+                             (symbol-name (cdr param-val))
+                             (seq-find
+                              (lambda (s)
+                                (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                              (org-element-property :header element) "")))))
+                     exclude-params
+                     :initial-value nil))))
+          (buffer-substring-no-properties (org-element-begin element)
+                                          (org-element-end element))
+        (ram-org-prev-code-block-copy-with-lang-and-params lang include-params exclude-params)))))
 
 ;;*** templates, snippets/tempo: abbrevs
 
