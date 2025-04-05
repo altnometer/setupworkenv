@@ -147,7 +147,7 @@ URxvt.perl-ext-common      : resize-font
 ! font settings
 ! larger dpi values mean larger text size
 Xft.dpi: 96
-!Xft.dpi: 168
+!Xft.dpi: 220
 Xft.antialias: true
 Xft.hinting: true
 Xft.rgba: rgb
