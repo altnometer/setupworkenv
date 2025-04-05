@@ -3983,6 +3983,10 @@ Use it from `org-mode-hook'.
   (add-to-list 'org-structure-template-alist
                '("rs" . "src R :results value :session my-R-session"))
   (add-to-list 'org-structure-template-alist
+               '("rsc" . "src R :results value :colnames yes :session my-R-session"))
+  (add-to-list 'org-structure-template-alist
+               '("rso" . "src R :results output :session my-R-session"))
+  (add-to-list 'org-structure-template-alist
                '("rgr" . "src R :file /tmp/R-img.png :results output graphics file :session my-R-session"))
   (add-to-list 'org-structure-template-alist
                '("sh" . "src shell"))
@@ -4033,9 +4037,32 @@ Use it from `org-mode-hook'.
 (straight-use-package
  '(ob-prolog :type git :flavor melpa :host github :repo "ljos/ob-prolog"))
 (setq org-babel-prolog-command "swipl")
-;;*** org-mode/org-babel: R
 
-;;**** org-mode/org-babel/R: ESS Emacs Speaks Statistics
+;;*** org-mode/org-babel: R data
+
+(defun ram-setup-R-env ()
+  "Run shell commands to set environment for R.
+
+Make directory for the R packages.
+Make this directory available for imports.
+Load some common packages to memory for R processes."
+  ;; fixing "is not writable" error when
+  ;; installing R packages
+  ;; create a directory for installing R packages
+  (start-process-shell-command "ram-setup-R-env" nil "mkdir -p ~/R/library")
+  ;; make this directory available through an environment
+  ;; variable R_LIBS_USER
+  (start-process-shell-command
+   "ram-setup-R-env" nil
+   "grep -qxF 'R_LIBS_USER=\"~/R/library\"' $HOME/.Renviron || echo 'R_LIBS_USER=\"~/R/library\"' >> $HOME/.Renviron")
+  ;; load R library into memory for all future R sessions
+  (start-process-shell-command
+   "ram-setup-R-env" nil
+   "grep -qxF 'library(\"tidyverse\")' $HOME/.Rprofile || echo 'library(\"tidyverse\")' >> $HOME/.Rprofile"))
+
+(run-with-idle-timer 0.9 t #'ram-setup-R-env)
+
+;;**** org-mode/org-babel/R data: ESS Emacs Speaks Statistics
 
 (straight-use-package
  '(ess :type git
