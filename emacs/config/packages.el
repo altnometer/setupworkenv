@@ -11461,7 +11461,7 @@ Derive it from either:
                                           (org-element-end element))
         (ram-org-prev-code-block-copy)))))
 
-(defun ram-org-prev-code-block-copy-with-lang-and-params (lang &optional include-params exclude-params)
+(defun ram-org-prev-code-block-copy-for-lang-with-or-without-params (lang &optional include-params exclude-params)
   "Return a copy of the previous Org code block for LANG.
 
 LANG is compared with `string-equal', so, it can be either string or
@@ -11535,7 +11535,7 @@ ANY of these param-value pairs.
                      :initial-value nil))))
           (buffer-substring-no-properties (org-element-begin element)
                                           (org-element-end element))
-        (ram-org-prev-code-block-copy-with-lang-and-params lang include-params exclude-params)))))
+        (ram-org-prev-code-block-copy-for-lang-with-or-without-params lang include-params exclude-params)))))
 
 ;;*** templates, snippets/tempo: abbrevs
 

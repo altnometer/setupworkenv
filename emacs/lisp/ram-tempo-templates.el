@@ -34,6 +34,15 @@
                        "A copy of the previous Org code block."
                        'ram-tempo-org-template-tags)
 
+(tempo-define-template "R-block-with-previous-non-graph-block-content"
+                       ;; R blocks which has no '((:results . graphics)) params
+                       '(
+                         (ram-org-prev-code-block-copy-for-lang-with-or-without-params
+                          'R nil '((:results . graphics))))
+                       "<rbc"
+                       "Previous Org code block for R excluding ((:results . graphics))."
+                       'ram-tempo-org-template-tags)
+
 (tempo-define-template "tempo-org-foo-test"
                        '("<tempo-org-foo></tempo-org-foo>")
                        "<orgfoo"
