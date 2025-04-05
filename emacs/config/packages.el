@@ -11074,22 +11074,39 @@ buffer-local `ram-face-remapping-cookie'."
   ;; (view-lossage)
   )
 
-(keymap-set special-event-map "<sigusr1>" 'sigusr-handler)
+;; (keymap-set special-event-map "<sigusr1>" 'sigusr-handler)
+
+(keymap-set special-event-map "<sigusr1>" 'usr1-handler)
 
 ;;**** system/unix-signals/SIGUSR2 (USR2)
 
 ;; USR2 signal by default causes to enter the debugger
-;; (keymap-set special-event-map "<sigusr2>" 'sigusr-handler)
-
-
+;; remapping it does not work USE <sigusr1> 
+;;(keymap-set special-event-map "<sigusr2>" 'usr2-handler)
 
 (defun usr1-handler ()
   (interactive)
-  (message "Got USR1 signal"))
+  (message ">>>>>> START SIGUSR1 handling ....")
+  (let ((my-output)
+        (my-command))
+    (with-temp-buffer
+      (list-processes nil (current-buffer))
+      (setq my-output (buffer-substring-no-properties (point-min) (point-max))))
+    (setq my-command (format "echo \"%s\" | tee /dev/tty2 > /home/ram/log-from-tty1"
+                             (shell-quote-argument my-output)))
+    (start-process-shell-command "ram-debug-frozen-emacs" nil
+                                 my-command))
+    (message ">>>>>> ... END SIGUSR1 handling")
+    nil)
 
 (defun usr2-handler ()
+  "Using this with <sigusr2> would not work.
+
+Because it is used by Emacs by default.
+Remaping <sigusr2> does not work."
   (interactive)
   (message "Got USR2 signal"))
+
 ;; USR2 signal by default causes to enter the debugger
 ;; (keymap-global-set "<signal> <usr2>" 'usr2-handler)
 
