@@ -4287,7 +4287,7 @@ This function is created to identify TODO items in agenda buffers.
   (message "Updating org-agenda-files ...")
   (let ((inhibit-message nil)
         (message-log-max 1000))
-    (setq org-agenda-files (seq-uniq (append (vulpea-project-files) (ram-daily-tagged-poject-files))))
+    (setq org-agenda-files (seq-uniq (append (vulpea-project-files) (ram-daily-notes-tagged-poject-files))))
     nil)
   (message "... org-agenda-files updated.")
   nil)
@@ -4465,7 +4465,7 @@ This function returns the current paragraph."
       :on (= tags:node-id nodes:id)
       :where (like tag (quote "%\"project\"%"))]))))
 
-(defun ram-daily-tagged-poject-files ()
+(defun ram-daily-notes-tagged-poject-files ()
   "Return daily notes marked with 'project' tag.
 
 Consider both org-roam notes and dailies."
@@ -4889,7 +4889,7 @@ If the property is already set, replace its value."
 
 ;;*** org-roam/dailies: functions
 
-(defun ram-buffer-is-from-roam-dailies-directory-p ()
+(defun ram-buffer-is-from-roam-daily-notes-directory-p ()
   "Return non-nil if the currently visited buffer is from `ram-org-roam-daily-notes-directory'."
   (and buffer-file-name
        (string-prefix-p
@@ -4984,7 +4984,7 @@ Include a backlink to source if INCLUDE-BACKLINK-P is true."
 ;;     (org-element-interpret-data (ram-org-parse-heading-element headline-element file-name 'INCLUDE-BACKLINK-P))))
 
 
-(defun ram-org-capture-element-to-dailies (&optional arg)
+(defun ram-org-capture-element-to-daily-notes (&optional arg)
   "Capture the current headline into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
@@ -5046,16 +5046,16 @@ ARG value is 4."
           (org-element-property :value kw)))
       :first-match t)))
 
-(defun ram-org-capture-title-to-dailies (&optional arg)
+(defun ram-org-capture-title-to-daily-notes (&optional arg)
   "Capture the document title into a `org-roam' daily note.
 Insert into daily note for ARG days from today. Or use calendar if
 ARG value is 4."
   (interactive "P")
   (save-excursion
     (beginning-of-buffer)
-    (ram-org-capture-element-to-dailies arg)))
+    (ram-org-capture-element-to-daily-notes arg)))
 
-(defun ram-org-capture-defun-to-dailies (&optional arg)
+(defun ram-org-capture-defun-to-daily-notes (&optional arg)
   "Capture the defun into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
@@ -5095,7 +5095,7 @@ ARG value is 4."
                          :templates templates))
     (org-align-tags)))
 
-(defun ram-org-capture-magit-commit-to-dailies (&optional arg)
+(defun ram-org-capture-magit-commit-to-daily-notes (&optional arg)
   "Capture magit commit into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
 ARG value is 4."
@@ -5191,14 +5191,14 @@ ARG value is 4."
 ;; (with-eval-after-load "org-roam-dailies"
 ;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
 (with-eval-after-load "org"
-  (define-key org-mode-map (kbd "s-c a") #'ram-org-capture-element-to-dailies)
-  (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-dailies))
+  (define-key org-mode-map (kbd "s-c a") #'ram-org-capture-element-to-daily-notes)
+  (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-daily-notes))
 
-(define-key emacs-lisp-mode-map (kbd "s-c a") #'ram-org-capture-defun-to-dailies)
+(define-key emacs-lisp-mode-map (kbd "s-c a") #'ram-org-capture-defun-to-daily-notes)
 
 (with-eval-after-load "magit"
-  (define-key magit-status-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-dailies)
-  (define-key magit-revision-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-dailies))
+  (define-key magit-status-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-daily-notes)
+  (define-key magit-revision-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-daily-notes))
 
 (define-key global-map (kbd "s-c w") #'ram-org-capture-weekly-note)
 
@@ -5291,7 +5291,7 @@ Use the current buffer file-path if FILE is nil."
                                                        (demote-headings (cddar hs))))
                                       (demote-headings (cdr hs))))
                                     (t (cons (car hs) (demote-headings (cdr hs)))))))
-                       (demote-headings (ram-org-get-daily-headings-from-week week-day nil t)))))
+                       (demote-headings (ram-org-get-daily-notes-headings-from-week week-day nil t)))))
               (get-week
                ;; recurs only Mondays
                (if (= 1 (nth 6 (decode-time week-day))) ; Monday?
@@ -5442,7 +5442,7 @@ Use the current buffer file-path if FILE is nil."
          (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
     (ram-org-capture-weekly-note nil target-time)))
 
-(defun ram-org-get-daily-headings-from-week (time &optional include-backlink-p same-month-only-p)
+(defun ram-org-get-daily-notes-headings-from-week (time &optional include-backlink-p same-month-only-p)
   "Return an org-element made `org-roam' daily note headings for a week."
   (let* ((dailies-dir (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory))
          (current-month (nth 4 (decode-time time)))
@@ -5595,7 +5595,7 @@ Use calendar if ARG value is '(4)."
                                    ;;         (format-time-string (org-time-stamp-format t t) time))
                                    ;; DATE includes the month adn the week number
                                    (format "#+DATE: %s\n\n"  date-str))
-                           (org-element-interpret-data (ram-org-get-daily-headings-from-week time)))))
+                           (org-element-interpret-data (ram-org-get-daily-notes-headings-from-week time)))))
     (find-file file-name)
     (if (not note-exists-p)
         (progn
