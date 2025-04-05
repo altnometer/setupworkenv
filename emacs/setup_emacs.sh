@@ -37,6 +37,8 @@ else
     apt-get install -y xorg xinput firefox-esr \
             feh mupdf zathura zathura-djvu hunspell \
             aspell graphviz r-base r-base-dev mpv alsa-utils
+    # Org image resizing requires imagemagick
+    apt-get install -y imagemagick
     echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y texlive-full dvipng
     # tidyverse of R requires next dependencies on Debian 10 (buster)
@@ -216,6 +218,7 @@ else
          --with-xwidgets \
          --disable-ns-self-contained \
          --with-json \
+         --with-imagemagick
     # --disable-ns-self-contained respect --prefix
     sudo -u $SUDO_USER make -j$(nproc)
     sudo -u $SUDO_USER make install
