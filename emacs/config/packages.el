@@ -5027,7 +5027,7 @@ ARG value is 4."
              :immediate-finish nil
              :no-save nil)))
          (time (if (equal arg '(4))
-                   (let ((org-read-date-prefer-future t))
+                   (let ((org-read-date-prefer-future nil))
                      (org-read-date nil 'TO-TIME nil "Capture to daily-note: " ))
                  (time-add (* (or arg 0) 86400) (current-time)))))
     (let ((org-roam-directory (expand-file-name ram-org-roam-daily-notes-directory org-roam-directory)))
