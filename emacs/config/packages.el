@@ -9375,6 +9375,11 @@ been modified since its last check-in."
 
 (setq-default mode-line-format
               '(
+                ;; show input method, e.g., 'fr', nothing for default input method
+                (:eval (if current-input-method
+                           (substring current-input-method 0 2)
+                         ""
+                         ))
                 ;; show workspace number
                 (:eval (if (and (window-at-side-p (get-buffer-window) 'bottom)
                                 (window-at-side-p (get-buffer-window) 'left))
@@ -10229,20 +10234,32 @@ That is, remove a non kept dired from the recent list."
 
 ;;** spelling: ispell, aspell, hunspell
 
+(setenv "DICPATH" (expand-file-name "~/backup/emacs/dictionary/en_US.aff"))
+(setq-default ispell-program-name "/usr/bin/hunspell")
+  ;; (setq ispell-extra-args '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
+(setq ispell-extra-args '("--sug-mode=ultra"))
+(setenv "DICTDIR" "~/backup/emacs/dictionary")
+;; (setenv "LANG" "en_US")
+(setenv "LANG" "en_US.UTF-8")
+
+(require 'ispell)
+
 (with-eval-after-load "ispell"
+  ;; (setenv "LANG" "en_US.UTF-8")
   ;; (setq ispell-program-name "/usr/bin/ispell")
   ;; (setq ispell-program-name "/usr/bin/aspell")
-  (setenv "DICPATH" (expand-file-name "~/backup/emacs/dictionary"))
-  ;; (setenv "LANG" "en_US.UTF-8")
-  (setq ispell-program-name "/usr/bin/hunspell")
+
   ;; ispell-set-spellchecker-params must be called before
   ;; ispell-hunspell-add-multi-dic
   ;; (setq ispell-hunspell-dict-paths-alist
   ;;       `(("pali" ,(expand-file-name "~/backup/emacs/dictionary/pali.aff"))
   ;;         ("en_US" "/usr/share/hunspell/en_US.aff")
   ;;         ))
-  ;; (ispell-set-spellchecker-params)
+  (setq ispell-really-hunspell t)
+  (ispell-set-spellchecker-params)
   ;; (ispell-hunspell-add-multi-dic "en_US,pali")
+  (ispell-hunspell-add-multi-dic "en_US,fr_FR")
+  (setq ispell-change-dictionary "en_US,fr_FR")
   ;; (setq ispell-dictionary-alist
   ;;       '(("pali")
   ;;         ("en_US" #1="[[:alpha:]]" #2="[^[:alpha:]]" #3="[0-9]" t #4=("-d" "en_US")
@@ -10272,8 +10289,7 @@ That is, remove a non kept dired from the recent list."
   ;; pali part has a million entries, seem like it slows
   ;; the some commands: like delete char, backward-char etc
   ;; (setq ispell-dictionary "en_US_pali")
-  (setq ispell-dictionary "en_US")
-  ;; (setq ispell-extra-args '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
+  ;; (setq ispell-dictionary "en_US,francais,deutsch")
   )
 
 ;;** spelling: flycheck, flyspell
@@ -11078,7 +11094,7 @@ buffer-local `ram-face-remapping-cookie'."
 ;;**** system/unix-signals/SIGUSR2 (USR2)
 
 ;; USR2 signal by default causes to enter the debugger
-;; remapping it does not work USE <sigusr1> 
+;; remapping it does not work USE <sigusr1>
 ;;(keymap-set special-event-map "<sigusr2>" 'usr2-handler)
 
 (defun usr1-handler ()
