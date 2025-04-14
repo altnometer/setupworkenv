@@ -10286,18 +10286,18 @@ That is, remove a non kept dired from the recent list."
 
 ;;** spelling: ispell, aspell, hunspell
 
-(setenv "DICPATH" (expand-file-name "~/backup/emacs/dictionary/en_US.aff"))
+;; (setenv "DICPATH" "/usr/share/hunspell/en_US")
 (setq-default ispell-program-name "/usr/bin/hunspell")
-  ;; (setq ispell-extra-args '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
-(setq ispell-extra-args '("--sug-mode=ultra"))
-(setenv "DICTDIR" "~/backup/emacs/dictionary")
-;; (setenv "LANG" "en_US")
+;; (setq ispell-extra-args
+;;       '("-a" "-i" "utf-8" "-d" "/usr/share/hunspell/en_US,/home/sam/backup/emacs/dictionary/pali"))
+;; seems like hunspell has no option "--sug-mode"
+;; (setq ispell-extra-args '("--sug-mode=ultra"))
+(setenv "DICTDIR" "/usr/share/hunspell")
 (setenv "LANG" "en_US.UTF-8")
 
-(require 'ispell)
+;; (require 'ispell)
 
 (with-eval-after-load "ispell"
-  ;; (setenv "LANG" "en_US.UTF-8")
   ;; (setq ispell-program-name "/usr/bin/ispell")
   ;; (setq ispell-program-name "/usr/bin/aspell")
 
@@ -10307,11 +10307,12 @@ That is, remove a non kept dired from the recent list."
   ;;       `(("pali" ,(expand-file-name "~/backup/emacs/dictionary/pali.aff"))
   ;;         ("en_US" "/usr/share/hunspell/en_US.aff")
   ;;         ))
-  (setq ispell-really-hunspell t)
+  (setq ispell-dictionary "en_US,fr_FR")
   (ispell-set-spellchecker-params)
+  (setq ispell-really-hunspell t)
   ;; (ispell-hunspell-add-multi-dic "en_US,pali")
   (ispell-hunspell-add-multi-dic "en_US,fr_FR")
-  (setq ispell-change-dictionary "en_US,fr_FR")
+  (ispell-change-dictionary "en_US,fr_FR" t)
   ;; (setq ispell-dictionary-alist
   ;;       '(("pali")
   ;;         ("en_US" #1="[[:alpha:]]" #2="[^[:alpha:]]" #3="[0-9]" t #4=("-d" "en_US")
