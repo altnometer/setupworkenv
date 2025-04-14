@@ -3644,6 +3644,25 @@ Leave a mark to return to."
            (push-mark point))
          (beginning-of-line))))))
 
+(defun ram-org-next-results (arg)
+  "Jump to next #+RESULTS: element.
+
+Leave a mark to return to."
+  (interactive "p")
+  ;; maybe, regexp is defined in #'org-link-search
+  (let ((re "^[ \t]*#\\+RESULTS:.*$")
+        (point (point)))
+    (condition-case err
+        (progn (when (looking-at-p re)
+                 (end-of-line))
+               (re-search-forward re))
+      (search-failed (goto-char point))
+      (:success
+       (progn
+         (unless (eq this-command last-command)
+           (push-mark point))
+         (beginning-of-line))))))
+
 (defun ram-org-previous-name (arg)
   "Jump to previous #+NAME: element.
 
@@ -3651,6 +3670,22 @@ Leave a mark to return to."
   (interactive "p")
   ;; regexp is defined in #'org-link-search
   (let ((re "^[ \t]*#\\+NAME: +.+[ \t]*$")
+        (point (point)))
+    (condition-case err
+        (re-search-backward re)
+      (search-failed (goto-char point))
+      (:success
+       (progn (unless (eq this-command last-command)
+                (push-mark point))
+              (beginning-of-line))))))
+
+(defun ram-org-previous-results (arg)
+  "Jump to previous #+RESULTS: element.
+
+Leave a mark to return to."
+  (interactive "p")
+  ;; maybe, regexp is defined in #'org-link-search
+  (let ((re "^[ \t]*#\\+RESULTS:*$")
         (point (point)))
     (condition-case err
         (re-search-backward re)
@@ -3687,6 +3722,9 @@ Leave a mark to return to."
 
   (define-key org-mode-map (kbd "C-M-<f19>") #'ram-org-next-name)
   (define-key org-mode-map (kbd "C-M-<f20>") #'ram-org-previous-name)
+
+  (define-key org-mode-map (kbd "M-S-<f19>") #'ram-org-next-results)
+  (define-key org-mode-map (kbd "M-S-<f20>") #'ram-org-previous-results)
 
   (define-key org-mode-map (kbd "C-c C-n") #'org-next-link)
   (define-key org-mode-map (kbd "C-c C-p") #'org-previous-link)
