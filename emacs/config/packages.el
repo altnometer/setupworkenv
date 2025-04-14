@@ -815,11 +815,25 @@ Disable `icomplete-vertical-mode' for this command."
                                             ;; allow for column separators,
                                             ;; shrink overlays
                                             (- (window-width) 20))))
+;;*** exwm: exwm-xim X input method
+
+;; set shell environment variables
+;; to tell X applications to use Emacs exwm-xim input method server
+
+(setenv "XMODIFIERS" "@im=exwm-xim")
+(setenv "GTK_IM_MODULE" "xim")
+(setenv "QT_IM_MODULE" "xim")
+(setenv "CLUTTER_IM_MODULE" "xim")
+
+;; makes EXWM hang (freezes it)
+(require 'exwm-xim)
 
 ;;*** exwm: must be last in exwm settings
 
 ;; must be the last in 'exwm settings
-(exwm-randr-enable)
+(exwm-debug-mode 1)
+(exwm-randr-mode 1)
+(exwm-xim-mode 1)
 (exwm-enable)
 
 ;;*** exwm: navigate workspaces
