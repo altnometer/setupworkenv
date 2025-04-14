@@ -334,6 +334,7 @@ Disable `icomplete-vertical-mode' for this command."
 (when (eq (lookup-key (current-global-map) (kbd "C-x C-z"))
           #'suspend-frame)
   (define-key global-map (kbd "C-x C-z") nil))
+
 ;;* company
 
 (straight-use-package
@@ -398,13 +399,13 @@ Disable `icomplete-vertical-mode' for this command."
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
             (set (make-local-variable 'company-backends)
-                 '((company-capf company-elisp company-dabbrev-code company-files)))))
+                 '((company-capf company-dabbrev-code company-files)))))
 
 (add-hook 'lisp-interaction-mode-hook 'company-mode)
 (add-hook 'lisp-interaction-mode-hook
           (lambda ()
             (set (make-local-variable 'company-backends)
-                 '((company-elisp company-dabbrev-code company-files)))))
+                 '((company-dabbrev-code company-files)))))
 
 (add-hook 'cider-repl-mode-hook #'company-mode)
 (add-hook 'cider-mode-hook #'company-mode)
@@ -423,10 +424,6 @@ Disable `icomplete-vertical-mode' for this command."
 ;;                (list
 ;;                 (cons '(company-capf :with company-dabbrev)
 ;;                       (car company-backends))))))
-
-;; ;; if you want to append to the end of the list.
-;; (append (car company-backends)
-;;         (list 'company-elisp))
 
 ;; (add-hook 'cider-repl-mode-hook 'company-mode)
 ;; (add-hook 'cider-mode-hook 'company-mode)
