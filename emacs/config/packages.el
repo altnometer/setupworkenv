@@ -709,7 +709,7 @@ Disable `icomplete-vertical-mode' for this command."
         (,(kbd "<M-S-f15>") . ram-other-workspace-to-the-left)
         ;; (,(kbd "<f15>") . ram-other-workspace-to-the-right)
 
-        ([?\s-t] . ram-org-roam-node-find)
+        ([?\s-t] . ram-org-roam-note-find)
 
         ;; ([?\s-z] . exwm-layout-toggle-fullscreen)
         ;; ([?\s-/] . exwm-layout-toggle-mode-line)
@@ -4392,16 +4392,16 @@ this subdirectory.")
 
 ;;** org-roam: bindings
 
-(define-key global-map (kbd "C-c n f") #'ram-org-roam-node-find)
+(define-key global-map (kbd "C-c n f") #'ram-org-roam-note-find)
 (define-key global-map (kbd "C-c n i") #'org-roam-node-insert)
 (define-key global-map (kbd "C-c n l") #'org-roam-buffer-toggle)
 (define-key global-map (kbd "C-c n g") #'org-roam-graph)
-(define-key global-map (kbd "s-t") #'ram-org-roam-node-find)
+(define-key global-map (kbd "s-t") #'ram-org-roam-note-find)
 (define-key global-map (kbd "s-T") #'org-roam-node-insert)
 
 (define-key global-map (kbd "s-c u") #'ram-org-roam-update-org-id-locations)
 
-(define-key ram-leader-map-tap-global (kbd "/") #'ram-org-roam-node-find)
+(define-key ram-leader-map-tap-global (kbd "/") #'ram-org-roam-note-find)
 (define-key ram-leader-map-tap-global (kbd "'") #'org-roam-node-insert)
 
 ;;** org-roam: buffer
@@ -4487,7 +4487,7 @@ This function returns the current paragraph."
 
 ;;** org-roam: functions
 
-(defun ram-org-roam-node-find ()
+(defun ram-org-roam-note-find ()
   "Store a new note in a subdirectory of `org-roam-directory'."
   (interactive current-prefix-arg)
     (let ((org-roam-directory (expand-file-name ram-org-roam-notes-directory org-roam-directory)))
@@ -5206,7 +5206,7 @@ ARG value is 4."
            (time-convert (date-to-time (file-name-base (buffer-file-name))) 'integer)))
       (org-roam-dailies--capture (time-add (* (- n) 86400) current-note-time) t)))
    ((ram-org-roam-weekly-note-p)
-    (ram-org-roam-weeklies-next -1))
+    (ram-org-roam-weekly-note-next -1))
    ((ram-org-roam-monthly-note-p)
     (ram-org-roam-monthly-note-next -1))
    (t (org-roam-dailies-goto-today)
@@ -5225,7 +5225,7 @@ ARG value is 4."
            (time-convert (date-to-time (file-name-base (buffer-file-name))) 'integer)))
       (org-roam-dailies--capture (time-add (* n 86400) current-note-time) t)))
    ((ram-org-roam-weekly-note-p)
-    (ram-org-roam-weeklies-next 1))
+    (ram-org-roam-weekly-note-next 1))
    ((ram-org-roam-monthly-note-p)
     (ram-org-roam-monthly-note-next 1))
    (t (org-roam-dailies-goto-today)
@@ -5453,7 +5453,7 @@ Use the current buffer file-path if FILE is nil."
       (and (org-roam-file-p path)
            (f-descendant-of-p path directory)))))
 
-(defun ram-org-roam-weeklies-next (&optional n)
+(defun ram-org-roam-weekly-note-next (&optional n)
   "Goto or create next Nth weekly note."
   (let* ((file-name (file-name-base (buffer-file-name (buffer-base-buffer))))
          (week-from-buffer-name (string-to-number (car (last (split-string file-name "-w")))))
@@ -8828,7 +8828,7 @@ Toggle `lsp-ido-show-symbol-filename'."
   (add-to-list 'super-save-triggers 'winner-redo)
   (add-to-list 'super-save-triggers 'counsel-M-x)
 
-  (add-to-list 'super-save-triggers #'ram-org-roam-node-find)
+  (add-to-list 'super-save-triggers #'ram-org-roam-note-find)
 
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-today)
   (add-to-list 'super-save-triggers #'org-roam-dailies-goto-tomorrow)
