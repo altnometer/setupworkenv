@@ -52,6 +52,22 @@
                        "Previous Org code block for R excluding ((:results . graphics))."
                        'ram-tempo-org-template-tags)
 
+(tempo-define-template "BASH-block-with-previous-block-content"
+                       '(
+                         (ram-org-prev-code-block-copy-for-lang-with-or-without-params
+                          'shell nil nil))
+                       "<shbc"
+                       "Previous Org code block for shell."
+                       'ram-tempo-org-template-tags)
+
+(tempo-define-template "EMACS-LISP-block-with-previous-block-content"
+                       '(
+                         (ram-org-prev-code-block-copy-for-lang-with-or-without-params
+                          'emacs-lisp nil nil))
+                       "<elbc"
+                       "Previous Org code block for emacs-lisp."
+                       'ram-tempo-org-template-tags)
+
 (tempo-define-template "tempo-org-foo-test"
                        '("<tempo-org-foo></tempo-org-foo>")
                        "<orgfoo"
