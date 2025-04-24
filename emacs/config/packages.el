@@ -11431,7 +11431,8 @@ Modify `tempo-match-finder'."
 (defun ram-get-prev-org-code-block-value-for-R-graph ()
   "Return the previous code block content displays R graphics."
   (save-excursion
-    (let ((block-content nil))
+    (let ((block-headers nil)
+          (block-content nil))
       (condition-case err
           ;; loop through previous code blocks
           (while (not block-content)
@@ -11452,6 +11453,15 @@ Modify `tempo-match-finder'."
                                         (lambda (s) (s-starts-with? ":results" s 'ignore-case))
                                         (org-element-property :header el) ""))
                                       'ignore-case))
+                ;; get :var headers
+                (setq block-headers (reverse
+                                     (cl-reduce
+                                      (lambda (prev s)
+                                        (if (s-starts-with? ":var " s 'ignore-case)
+                                            (cons (format "#+header: %s" s) prev)
+                                          prev))
+                                      (org-element-property :header el)
+                                      :initial-value '())))
                 ;; setting block-content and break the loop
                 (setq block-content (org-element-property :value el)))))
         (user-error (if (string= (error-message-string err)
@@ -11462,7 +11472,11 @@ Modify `tempo-match-finder'."
         ;; (:success
         ;;  nil)
         )
-      (or block-content "\n"))))
+      (if block-content
+          (list (concat (string-join block-headers "\n") "\n")
+                block-content)
+        '("\n" "\n")))))
+
 
 (defun ram-get-org-code-block-img-count ()
   "Get greatest number used as an image counter for Org code blocks.

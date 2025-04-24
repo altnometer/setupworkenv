@@ -6,10 +6,19 @@
  "R-block-graph-with-content"
  '((tempo-save-named 'count (number-to-string (+ 1 (ram-get-org-code-block-img-count))))
    (tempo-save-named 'block-name (ram-make-code-block-name))
+   ;; !!! TODO: fix two calls to the same function.
+   ;; that returns '(headers block-content)
+   ;; a quick fix to fetch #+header: :var ...
+   ;; use same function for getting the same previous block
+   ;; it seems that the template cannot access list elements.
    (tempo-save-named 'prev-block-content
-                     (ram-get-prev-org-code-block-value-for-R-graph)
+                      (cadr (ram-get-prev-org-code-block-value-for-R-graph))
                      )
+   (tempo-save-named 'prev-block-var_headers
+                      (car (ram-get-prev-org-code-block-value-for-R-graph))
+                      )
    "#+name: " (s block-name) "_img" (s count) n
+   ~ (s prev-block-var_headers)
    "#+header: :file /tmp/" (s block-name) "_img" (s count) ".png" n
    "#+header: :results output graphics file" n
    "#+header: :width 1400 :height 900 :res 200 :units px" n
