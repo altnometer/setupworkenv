@@ -664,7 +664,8 @@ Disable `icomplete-vertical-mode' for this command."
 ;; Global keybindings.
 (setq exwm-input-global-keys
       `(
-
+        ;; toggle-input-method, i.e., select different language
+        (,(kbd "C-\\") . toggle-input-method)
         (,(kbd "C-^") . top-level)      ; close all minibuffers
         ;; <XF86Copy> key is in layer where F1-F12 defined, in place of "w" key
         (,(kbd "<M-XF86Copy>") . delete-other-windows)
