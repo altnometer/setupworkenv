@@ -4490,8 +4490,9 @@ This function returns the current paragraph."
 (defun ram-org-roam-note-find ()
   "Store a new note in a subdirectory of `org-roam-directory'."
   (interactive current-prefix-arg)
-    (let ((org-roam-directory (expand-file-name ram-org-roam-notes-directory org-roam-directory)))
-   (call-interactively #'org-roam-node-find 'RECORD-FLAG)))
+  (let ((org-roam-directory (expand-file-name ram-org-roam-notes-directory org-roam-directory)))
+    (call-interactively #'org-roam-node-find 'RECORD-FLAG)
+    (org-next-visible-heading 1)))
 
 (defun ram-buffer-is-from-roam-directory-p ()
   "Return non-nil if the currently visited buffer is from `org-roam-directory'."
@@ -5212,6 +5213,7 @@ ARG value is 4."
    (t (org-roam-dailies-goto-today)
       (save-buffer)
       (org-roam-dailies-goto-previous-note)
+      (org-next-visible-heading 1)
       (delete-other-windows))))
 
 (defun ram-org-roam-next-note-dwim (&optional n)
@@ -5232,6 +5234,7 @@ ARG value is 4."
       (save-buffer)
       ;; (org-roam-dailies-goto-next-note)
       (org-roam-dailies-goto-tomorrow 1)
+      (org-next-visible-heading 1)
       (delete-other-windows))))
 
 ;;*** org-roam/dailies: bindings
@@ -9792,7 +9795,8 @@ With \\[universal-argument] do it for the current file instead."
 
 ;;** packages: hl-line highlight blink flash line
 
-;; I modified and moved hl-line+ package to lisp directory
+;; !!! I modified and moved hl-line+ package to lisp directory
+;; (find-file "~/.emacs.d/lisp/hl-line+.el")
 ;; refer to 201056a commit message
 ;; (straight-use-package
 ;;  '(hl-line+ :type git :host github :repo "emacsmirror/hl-line-plus"))
@@ -9801,8 +9805,6 @@ With \\[universal-argument] do it for the current file instead."
 ;; (add-hook 'window-scroll-functions-hook #'hl-line-flash)
 ;; works only when frame is changed, does not work when windows withing the same
 ;; frame change
-
-(add-hook 'focus-in-hook #'hl-line-flash)
 
 (defun ram-get-range-for-line-highlighting ()
   "Return the range that covers a whole line in a buffer.
@@ -9827,6 +9829,18 @@ Hopefully, this function would cover some edge cases."
 (setq hl-line-overlay-priority 100)
 
 (setq hl-line-range-function #'ram-get-range-for-line-highlighting)
+
+;;*** packages/hl-line highlight blink flash line: face
+
+;; hl-line face is defined in
+;; section
+;; "system/general settings/hl (highlight) line: face hl-line"
+
+;;*** packages/hl-line highlight blink flash line: hooks, advice, timers
+
+(add-hook 'focus-in-hook #'hl-line-flash)
+
+(advice-add 'recenter-top-bottom :after #'hl-line-flash)
 
 ;;** packages: iedit
 (straight-use-package
@@ -10867,6 +10881,14 @@ With a prefix argument N, (un)comment that many sexps."
 ;; nil: highlight only selected windows
 (setq hl-line-sticky-flag nil)
 (setq global-hl-line-sticky-flag nil)
+
+;;*** system/general settings/hl (highlight) line: face hl-line
+
+(set-face-attribute 'hl-line nil
+                    :inherit nil
+                    :background "LightGoldenrod2"
+                    :underline "LightGoldenrod4" :extend t)
+
 
 (defun ram-remap-hl-line-face-in-find-file-hook ()
   "Add face remap for `hl-line' face.
