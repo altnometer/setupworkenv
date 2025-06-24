@@ -1919,7 +1919,7 @@ one, an error is signaled."
 (define-key global-map (kbd "C-s-c") #'buf-move-left)
 (define-key global-map (kbd "C-s-t") #'buf-move-right)
 
-(defun ram-windmove-swap-up-or-down ()
+(defun ram-window-move-swap-up-or-down ()
   "Swap windows up or down."
   (interactive)
   (condition-case err
@@ -1938,7 +1938,7 @@ one, an error is signaled."
     ;;  (ram-agenda-files-remove file-path))
     ))
 
-(define-key global-map (kbd "s-w") #'ram-windmove-swap-up-or-down)
+(define-key global-map (kbd "s-w") #'ram-window-move-swap-up-or-down)
 
 ;;*** windows: winner-mode
 
