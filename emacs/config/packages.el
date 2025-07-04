@@ -3997,11 +3997,22 @@ Use it from `org-mode-hook'.
       '(
         :foreground default
         :background default
-        :scale 2.5
+        ;; scaling size of the images to get more pixels
+        ;;:scale 2.5
+        :scale 1.0
         :html-foreground "Black"
         :html-background "Transparent"
         :html-scale 1.0
         :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+
+;; default value:
+;; (setq org-latex-pdf-process '("latexmk -f -pdf -%latex -interaction=nonstopmode -output-directory=%o %f"))
+;; you can customise to:
+;; (setq org-latex-pdf-process
+;;   '("xelatex -interaction nonstopmode %f"
+;;      "xelatex -interaction nonstopmode %f"))
+;; for multiple passes
+;; 'lualatex  -interaction=nonstopmode -recorder  "la_russie_en_1839_from_txt.tex"'
 
 
 ;;** org-mode: images, img
