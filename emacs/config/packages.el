@@ -10771,13 +10771,21 @@ With a prefix argument N, (un)comment that many sexps."
                  ;; when the monitors are rotated vertically in xrandr,
                  ;; for example: xrandr --output HDMI-1 --rotate left
                  (monitor-attr (display-monitor-attributes-list frame))
-                 (frame-monitor (car (seq-filter (lambda (m) (member frame (assq 'frames m))) monitor-attr)))
+                 (frame-monitor
+                  (car (seq-filter (lambda (m) (member frame (assq 'frames m)))
+                                   monitor-attr)))
                  ;; !!! consider screen rotation
                  ;; for example: xrandr --output HDMI-1 --rotate left
+                 ;; (rotation (shell-command-to-string
+                 ;;            "xrandr --query --verbose | grep \" connected \" | sed 's/ primary//' | awk '{printf\"%s\", $5}'"
+                 ;;            ;; "xrandr --listmonitors | awk 'NR==1{printf \"%s\",$2}'"
+                 ;;            ))
                  (rotation (shell-command-to-string
-                            "xrandr --query --verbose | grep \" connected \" | sed 's/ primary//' | awk '{printf\"%s\", $5}'"
+                            (format "xrandr --query --verbose | grep \" connected \" | grep \"^%s \" | sed 's/ primary//' | awk '{printf\"%%s\", $5}'"
+                                    (cdr (assq 'name frame-monitor))         )
                             ;; "xrandr --listmonitors | awk 'NR==1{printf \"%s\",$2}'"
-                            ))
+                            )
+                           )
                  (monitor-height-mm (if (string-equal rotation "normal")
                                         ;; (nth 2 ...) is for non rotated screen
                                         (nth 2 (assq 'mm-size frame-monitor))
@@ -10789,13 +10797,21 @@ With a prefix argument N, (un)comment that many sexps."
                                       ;; (nth 3 ...) is for rotated screen
                                       (nth 3 (assq 'geometry frame-monitor)))))
             (cond
+             ;;--------------------------
              ;; 27 inch 4K (UDH)
-             ((and (= monitor-height-mm 340)
+             ;;--------------------------
+             ((and (or (= monitor-height-mm 340)
+                       (= monitor-height-mm 600))
                    (or (= monitor-height-px 2160)
                        (= monitor-height-px 3840)))
               ;; (set-face-attribute 'variable-pitch frame :family "Verdana-19")
-              (set-face-attribute 'variable-pitch frame :family "Bembo" :height 270 :weight 'normal)
-              (set-face-attribute 'fixed-pitch frame :family "Operator Mono Medium-20" :height 200 :weight 'light)
+              ;; (set-face-attribute 'variable-pitch frame :family "Bembo" :height 270 :weight 'normal)
+              (set-face-attribute
+               'variable-pitch frame
+               :family "Times New Roman" :height 220 :weight 'medium)
+              (set-face-attribute
+               'fixed-pitch frame
+               :family "Operator Mono Medium-20" :height 200 :weight 'light)
               (set-frame-parameter frame 'font "Operator Mono Medium-20")
               (set-face-attribute
                'font-lock-comment-face frame
@@ -10833,7 +10849,9 @@ With a prefix argument N, (un)comment that many sexps."
                :weight 'light
                :foreground "grey20" :background "grey90"
                :height 230))
+             ;;--------------------------
              ;; UPERFECT 18 inch 4K (UDH)
+             ;;--------------------------
              (;;  for some reason, my UPERFECT 18 inch, 4K monitor
               ;;  sets incorrect height in mm of 355mm whereas the true
               ;;  height is around 233mm
