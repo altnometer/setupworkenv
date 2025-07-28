@@ -11644,7 +11644,16 @@ Modify `tempo-match-finder'."
         ;;  nil)
         )
       (if block-content
-          (list (concat (string-join block-headers "\n") "\n")
+          (list
+
+           (string-join
+            ;; if block-headers is not empty,
+            ;; append "" so that string-join will join it with "\n"
+            ;; thus, the sequence of block-headers will terminate with "\n"
+            ;; if block-header is empty, no "\n" will be placed and
+            ;; empty string "" will be returned.
+            (append block-headers '(""))
+            "\n")
                 block-content)
         '("\n" "\n")))))
 
