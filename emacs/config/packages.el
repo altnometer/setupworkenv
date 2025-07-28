@@ -666,6 +666,7 @@ Disable `icomplete-vertical-mode' for this command."
       `(
         ;; toggle-input-method, i.e., select different language
         (,(kbd "C-\\") . toggle-input-method)
+        (,(kbd "M-!") . shell-command)
         (,(kbd "C-^") . top-level)      ; close all minibuffers
         ;; <XF86Copy> key is in layer where F1-F12 defined, in place of "w" key
         (,(kbd "<M-XF86Copy>") . delete-other-windows)
@@ -3572,7 +3573,7 @@ This is done because prolog-consult-buffer fails on unsaved buffers."
 ;;*** org-mode/functions: navigate blocks
 
 (setq ram-org-block-navig-regexp
-      "^[ ]*#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\|\\(?:quote\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?$")
+      "^[ ]*#\\+begin_\\(?:\\(?:src\\)\\|\\(?:example\\)\\|\\(?:quote\\)\\|\\(?:comment\\)\\)[[:space:]]*\\(?1:[[:alpha:]_-]*\\).*?$")
 
 (defun ram-org-previous-block (arg)
   "Jump to previous code block without raising the error.
@@ -3909,7 +3910,7 @@ Use it from `org-mode-hook'.
 
 (defface ram-org-emphasis-bold
   '((default (:inherit bold))
-    (((class color) (min-colors 88)) (:foreground "grey40")))
+    (((class color) (min-colors 88)) (:foreground "black")))
   "Custom emphasis face for Org bold.")
 
 (defface ram-org-code-face
