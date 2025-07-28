@@ -4892,10 +4892,26 @@ If the property is already set, replace its value."
     "Follow link by using id, then by what comes after \"::\"."
     (let* ((id-desc (split-string path "::" 'OMIT-NULLS "[ ]+"))
            (id (car id-desc))
-           (desc (cadr id-desc)))
+           (desc (cadr id-desc))
+           (save-position-maybe
+	    (let ((old-buffer (current-buffer))
+		  (old-pos (point))
+		  (old-mode major-mode))
+	      (lambda ()
+	        (and (derived-mode-p 'org-mode)
+		     (eq old-mode 'org-mode)
+		     (or (not (eq old-buffer (current-buffer)))
+		         (not (eq old-pos (point))))
+		     (org-mark-ring-push old-pos old-buffer))))))
       (org-roam-id-open id _)
       (condition-case err
-	  (org-link-search desc)
+          ;; check if DESC is an ID,
+          ;; FIXME: this check for uuid by regex is brittle
+          (if (string-match-p
+               "^[0-9a-fA-F]\\{8\\}-[0-9a-fA-F]\\{4\\}-[0-9a-fA-F]\\{4\\}-[0-9a-fA-F]\\{4\\}-[0-9a-fA-F]\\{12\\}$"
+               desc)
+              (org-id-open desc _)
+	    (org-link-search desc))
         ;; Save position before error-ing out so user
         ;; can easily move back to the original buffer.
         (error (funcall save-position-maybe)
@@ -4909,57 +4925,107 @@ If the property is already set, replace its value."
                             ;;(org-roam-buffer-p)
                             (derived-mode-p 'org-mode)
                             (let* ((el (org-element-at-point))
+                                   ;; my-org-roam-id can be used for org-roam notes
+                                   ;; it is either:
+                                   ;;   - top heading id or
+                                   ;;   - document level id
+                                   (my-org-roam-id
+                                    (org-with-wide-buffer
+                                     (org-back-to-heading-or-point-min t)
+                                     (while (and (not
+                                                  (and
+                                                   ;; top level heading only and
+                                                   (eq 1
+                                                       (org-element-property
+                                                        :level
+                                                        (org-element-at-point)))
+                                                   ;; with an id only
+                                                   (org-id-get)))
+                                                 (not (bobp)))
+                                       (org-roam-up-heading-or-point-min))
+                                     (and (org-id-get))))
                                    (link-vals (list
                                                ;; get heading
                                                (ignore-error (wrong-type-argument stringp nil)
-                                                 (org-get-heading 'NO-TAGS 'NO-TODO 'NO-PRIORITY 'NO-COMMENT))
-                                               ;; get closest to the point ID
-                                               (org-with-wide-buffer
-                                                (org-back-to-heading-or-point-min t)
-                                                (while (and (not (org-id-get))
-                                                            (not (bobp)))
-                                                  (org-roam-up-heading-or-point-min))
-                                                (org-id-get))
+                                                 (org-get-heading
+                                                  'NO-TAGS 'NO-TODO 'NO-PRIORITY 'NO-COMMENT))
+                                               ;; org-roam id:
+                                               ;; - either top heading ID or
+                                               ;; - document level ID
+                                               my-org-roam-id
+                                               ;; element id which is not org-roam id
+                                               (and (not (string-equal
+                                                          my-org-roam-id
+                                                          (org-id-get el)))
+                                                    (org-id-get el))
                                                ;; get element :name
                                                (org-element-property :name el))))
                               (pcase link-vals
-                                ;; 1. has a :name property
-                                ((and `(,_ ,id ,name)  (guard (and id name)))
-                                 (list :id id :search-str name :description name))
-                                ;; 2. has a headline
-                                ((and `(,heading ,id ,_) (guard (and heading id)))
-                                 (list :id id :search-str heading :description heading))
-                                ;; 3. has a title
-                                ((and `(,_ ,id ,_) (guard id))
+                                ;; 1. prioritize element id which is not
+                                ;;   - org-roam id, i.e., NOT
+                                ;;     - top heading id or
+                                ;;     - document level id
+                                ;; 1.1 el-id and name
+                                ;;   - element identified by #+name:
+                                ;;   - make 'name' take priority over ID
+                                ;;     + by excluding ':el-ed el-id' from list
+                                ((and `(,_ ,roam-id ,el-id ,name) (guard (and roam-id el-id name)))
+                                 (list
+                                  :roam-id roam-id
+                                  ;; :el-id el-id
+                                  :description name))
+                                ;; 1.2 el-id and headline
+                                ((and `(,heading ,roam-id ,el-id ,_) (guard (and heading roam-id el-id)))
+                                 (list :roam-id roam-id :el-id el-id :description heading))
+                                ;; 1.3 el-id and title
+                                ((and `(,_ ,roam-id ,el-id ,_) (guard (and roam-id el-id)))
                                  (let ((title (cadr (car (org-collect-keywords '("title"))))))
                                    (if title
-                                       (list :id id :description title)
-                                     (list :id id))))
-                                ;; default: explicitly return nil
+                                       (list :roam-id roam-id :el-id el-id :description title)
+                                     (list :roam-id roam-id :el-id))))
+                                ;; 2. has a :name property
+                                ((and `(,_ ,roam-id ,_ ,name)  (guard (and roam-id name)))
+                                 (list :roam-id roam-id :search-str name :description name))
+                                ;; 3. has a headline
+                                ((and `(,heading ,roam-id ,_ ,_) (guard (and heading roam-id)))
+                                 (list :roam-id roam-id :search-str heading :description heading))
+                                ;; 4. has a title
+                                ((and `(,_ ,roam-id ,_ ,_) (guard roam-id))
+                                 (let ((title (cadr (car (org-collect-keywords '("title"))))))
+                                   (if title
+                                       (list :roam-id roam-id :description title)
+                                     (list :roam-id roam-id))))
+                                ;; 5. default: explicitly return nil
                                 (_ nil))
                               ))))
-      (if (and (plist-get link-plist :search-str)
+      (if (and (plist-get link-plist :roam-id)
+               (or (plist-get link-plist :el-id)
+                   (plist-get link-plist :search-str))
                (plist-get link-plist :description))
           (org-link-store-props
            :type "ram-org-roam-id-el"
            :link (concat "ram-org-roam-id-el"
                          ":"
-                         (plist-get link-plist :id)
+                         (plist-get link-plist :roam-id)
                          "::"
-                         (plist-get link-plist :search-str))
+                         (or (plist-get link-plist :el-id)
+                             (plist-get link-plist :search-str)))
            :description (plist-get link-plist :description))
         (if (plist-get link-plist :description)
-            (org-link-store-props
-                :type "id"
-                :link (concat "id"
-                              ":"
-                              (plist-get link-plist :id))
-                :description (plist-get link-plist :description))
             (org-link-store-props
              :type "id"
              :link (concat "id"
                            ":"
-                           (plist-get link-plist :id))))))))
+                           (or (plist-get link-plist :roam-id)
+                               (plist-get link-plist :el-id)))
+             :description (plist-get link-plist :description))
+          (org-link-store-props
+           :type "id"
+           :link (concat "id"
+                         ":"
+                         (or (plist-get link-plist :roam-id)
+                             (plist-get link-plist :el-id))
+                         )))))))
 
 ;;** org-roam: dailies
 
