@@ -940,14 +940,19 @@ Disable `icomplete-vertical-mode' for this command."
                  :repo "magit/magit"))
 
 (straight-use-package
- '(magit :type git :flavor melpa :files ("lisp/magit"
-                                         "lisp/magit*.el"
-                                         "lisp/git-rebase.el"
-                                         "Documentation/magit.texi"
-                                         "Documentation/AUTHORS.md"
-                                         "LICENSE"
-                                         (:exclude "lisp/magit-libgit.el")
-                                         "magit-pkg.el")
+ '(magit :type git :flavor melpa
+         :files ("lisp/magit*.el"
+                 "lisp/git-rebase.el"
+                 "docs/magit.texi"
+                 "docs/AUTHORS.md"
+                 "LICENSE"
+                 "Documentation/magit.texi"
+                 "Documentation/AUTHORS.md"
+                 (:exclude "lisp/magit-libgit.el"
+                           "lisp/magit-libgit-pkg.el"
+                           "lisp/magit-section.el"
+                           "lisp/magit-section-pkg.el")
+                 "magit-pkg.el")
          :host github :repo "magit/magit"))
 
 ;;** magit: dependencies
@@ -962,7 +967,7 @@ Disable `icomplete-vertical-mode' for this command."
 ;; !!! You may have to run ~make info~ to create info and dir files
 ;; read more in the note for "magit info"
 ;; (add-to-list 'Info-default-directory-list "~/.local/share/emacs/my.emacs.d/straight/repos/magit/docs")
-(add-to-list 'Info-directory-list "~/.local/share/emacs/my.emacs.d/straight/repos/magit/docs")
+;; (add-to-list 'Info-directory-list "~/.local/share/emacs/my.emacs.d/straight/repos/magit/docs")
 
 (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
 (setq magit-save-repository-buffers 'dontask)
