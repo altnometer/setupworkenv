@@ -5935,7 +5935,26 @@ Properties:
 (defun ram-outline-toggle (&optional beg end)
   "Toggle `outline-mode' outlines delimited by BEG and END.
 
-Preserve the point position."
+Preserve the point position.
+
+Currently, only cycle 3 levels of outlines.
+If you wish to cycle to deeper levels, then modify the parts:
+1.   ;; 1st iteration again:
+     ;;   - repeating the cycle of iterations
+  - (or (= 1 c) (< 4 c))
+2. ;; last iteration
+  -((and (eq last-command this-command)
+           (= 5 c))
+3. Extend with similar block as in
+     ;; 3nd iteration:
+     ;;   - show sublevels 3
+4. Modify
+     ;; 4th iteration:
+     ;;   - outline-show-all
+  - ((and (eq last-command this-command)
+           (= 4 c))
+"
+
   (interactive)
   (let* (;; either get BEG, or :beg or (point-min)
          (beg (or (plist-get (plist-put ram-outline-toggle-plist :beg beg) :beg)
@@ -5972,11 +5991,10 @@ Preserve the point position."
                                       (plist-put ram-outline-toggle-plist :counter 2)
                                       :orig-point p)))
      ;; 1st iteration again:
-     ;;   - repeated cycle of iterations
+     ;;   - repeating the cycle of iterations
      ;; hide all
      ((and (eq last-command this-command)
-           (or (= 1 c)
-               (< 3 c)))
+           (or (= 1 c) (< 4 c)))
       (outline-map-region (lambda () (when
                                          (= 1 (funcall outline-level))
                                        (outline-hide-subtree)))
@@ -5986,7 +6004,7 @@ Preserve the point position."
       )
      ;; last iteration
      ((and (eq last-command this-command)
-           (= 4 c))
+           (= 5 c))
       (outline-map-region (lambda () (when
                                          (= 1 (funcall outline-level))
                                        (outline-hide-subtree)))
@@ -6008,9 +6026,24 @@ Preserve the point position."
       (move-beginning-of-line 1)
       (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c))))
      ;; 3nd iteration:
-     ;;   - outline-show-all
+     ;;   - show sublevels 3
      ((and (eq last-command this-command)
            (= 3 c))
+      (outline-show-all)
+      (outline-map-region (lambda ()
+                            (cond
+                             ((= 1 (funcall outline-level)) (outline-hide-subtree))
+                             ((= 2 (funcall outline-level)) (outline-show-heading))
+                             ((= 3 (funcall outline-level)) (outline-show-heading))
+                             (t nil)))
+                          beg end)
+      (goto-char p)
+      (move-beginning-of-line 1)
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c))))
+     ;; 4th iteration:
+     ;;   - outline-show-all
+     ((and (eq last-command this-command)
+           (= 4 c))
       (outline-show-all)
       (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c)))
       (goto-char p))
@@ -6043,32 +6076,38 @@ The \"ram-outline-toggle-*\" name part is recognized by `ram-outline-toggle'."
   (when (not (eq last-command this-command))
     (setq-local ram-outline-toggle-current-subtree-plist nil))
   (let* ((beg (or (plist-get ram-outline-toggle-current-subtree-plist :beg)
-                  (plist-get (setq ram-outline-toggle-current-subtree-plist
-                                   (plist-put ram-outline-toggle-current-subtree-plist :beg
-                                              (save-excursion
-                                                (outline-back-to-heading t)
-                                                (if (not (= 1 (outline-level)))
-                                                    (progn (condition-case err
-                                                               (outline-up-heading (outline-level) t)
-                                                             (error (if (string= (error-message-string err)
-                                                                                 "Already at top level of the outline")
-                                                                        (point)
-                                                                      (signal (car err) (cdr err))))
-                                                             (:success (point))))
-                                                  (point))))) :beg)))
+                  (plist-get
+                   (setq ram-outline-toggle-current-subtree-plist
+                         (plist-put
+                          ram-outline-toggle-current-subtree-plist :beg
+                          (save-excursion
+                            (outline-back-to-heading t)
+                            (if (not (= 1 (outline-level)))
+                                (progn
+                                  (condition-case err
+                                      (outline-up-heading (outline-level) t)
+                                    (error (if (string= (error-message-string err)
+                                                        "Already at top level of the outline")
+                                               (point)
+                                             (signal (car err) (cdr err))))
+                                    (:success (point))))
+                              (point))))) :beg)))
          (end (or (plist-get ram-outline-toggle-current-subtree-plist :end)
-                  (plist-get (setq ram-outline-toggle-current-subtree-plist
-                                   (plist-put ram-outline-toggle-current-subtree-plist :end
-                                              (save-excursion (goto-char beg)
-                                                              (condition-case err
-                                                                  (outline-forward-same-level 1)
-                                                                (error (if (string= (error-message-string err)
-                                                                                    "No following same-level heading")
-                                                                           (point-max)
-                                                                         (signal (car err) (cdr err))))
-                                                                (quit (setq ram-outline-toggle-current-subtree-plist nil))
-                                                                (:success (point))))))
-                             :end))))
+                  (plist-get
+                   (setq ram-outline-toggle-current-subtree-plist
+                         (plist-put
+                          ram-outline-toggle-current-subtree-plist :end
+                          (save-excursion
+                            (goto-char beg)
+                            (condition-case err
+                                (outline-forward-same-level 1)
+                              (error (if (string= (error-message-string err)
+                                                  "No following same-level heading")
+                                         (point-max)
+                                       (signal (car err) (cdr err))))
+                              (quit (setq ram-outline-toggle-current-subtree-plist nil))
+                              (:success (point))))))
+                   :end))))
     (funcall-interactively #'ram-outline-toggle beg end)))
 
 ;;** outline: bindings
