@@ -5890,7 +5890,10 @@ Ignore \"No following same-level heading\" error, call
 `ram-outline-down-heading' instead."
   (interactive "p")
   (condition-case err
-      (outline-forward-same-level arg)
+      (progn
+        (deactivate-mark)
+        (ram-push-mark)
+        (outline-forward-same-level arg))
     (error (if (string= (error-message-string err)
                         "No following same-level heading")
                (if (buffer-narrowed-p)
