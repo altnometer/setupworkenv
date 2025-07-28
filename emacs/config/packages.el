@@ -3996,7 +3996,16 @@ Use it from `org-mode-hook'.
                               '(org-activate-hidden-links-additional
                                 (0 '(face org-target invisible org-link))))))
 
-;;** org-mode: LaTeX
+;; ** org-mode: LaTeX
+
+(with-eval-after-load 'ox-latex
+  (add-to-list 'org-latex-classes
+               '("scrbook" "\\documentclass[20pt]{scrbook}"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
 (setq org-format-latex-options
       '(
@@ -4004,7 +4013,7 @@ Use it from `org-mode-hook'.
         :background default
         ;; scaling size of the images to get more pixels
         ;;:scale 2.5
-        :scale 1.0
+        :scale 4
         :html-foreground "Black"
         :html-background "Transparent"
         :html-scale 1.0
