@@ -232,6 +232,7 @@ abort completely with `C-g'."
 ;;* Leader Key
 ;;** Definition
 ;; leader tap
+;; <SunProps> is KC_MENU in qmk_firmware
 (define-key global-map (kbd "<SunProps>") nil)
 ;; leader hold
 (define-key global-map (kbd "<cancel>") nil)
@@ -283,7 +284,7 @@ Disable `icomplete-vertical-mode' for this command."
 
 (define-key global-map (kbd "s-b") #'ram-switch-to-buffer)
 (define-key global-map (kbd "C-s-b") 'display-buffer)
-(define-key global-map (kbd "<M-f3>") #'ibuffer)
+(define-key global-map (kbd "H-i") #'ibuffer)
 
 ;;** bindings: file
 
@@ -438,8 +439,7 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;; (add-hook 'emacs-lisp-mode-hook #'(lambda () (outline-hide-sublevels 1)))
 (add-hook 'emacs-lisp-mode-hook 'ram-remap-hl-line-face-in-find-file-hook 0 t)
-;; <f19> key is between <f8> and <f9>
-(define-key emacs-lisp-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+(define-key emacs-lisp-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun)
 
 ;; display eval result inline, use cider for that
 ;; credit to https://endlessparentheses.com/eval-result-overlays-in-emacs-lisp.html
@@ -478,7 +478,7 @@ Disable `icomplete-vertical-mode' for this command."
 ;; (run-with-idle-timer 1 nil #'set-displaying-eval-defun-result-inline)
 
 (define-key emacs-lisp-mode-map (kbd "<S-return>") 'newline-and-indent)
-(define-key emacs-lisp-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
+(define-key emacs-lisp-mode-map (kbd "H-H") 'ram-jump-to-def)
 
 ;;* shell
 
@@ -587,10 +587,10 @@ Disable `icomplete-vertical-mode' for this command."
 
 (define-key global-map (kbd "s-v") #'ram-open-vterm)
 
-(define-key vterm-mode-map (kbd "M-<f9>") #'vterm-copy-mode)
+(define-key vterm-mode-map (kbd "H-m") #'vterm-copy-mode)
 (define-key vterm-mode-map (kbd "C-.") #'vterm-send-C-x)
 
-(define-key vterm-copy-mode-map (kbd "M-<f9>") #'vterm-copy-mode-done)
+(define-key vterm-copy-mode-map (kbd "H-m") #'vterm-copy-mode-done)
 
 ;;* exwm
 
@@ -707,8 +707,8 @@ Disable `icomplete-vertical-mode' for this command."
         ([?\s-P] . ram-previous-workspace)
         ([?\s-o] . ram-other-workspace-to-the-right)
         ([?\s-O] . ram-other-workspace-to-the-left)
-        (,(kbd "<M-f15>") . ram-other-workspace-to-the-right)
-        (,(kbd "<M-S-f15>") . ram-other-workspace-to-the-left)
+        (,(kbd "H-o") . ram-other-workspace-to-the-right)
+        (,(kbd "H-H") . ram-other-workspace-to-the-left)
         ;; (,(kbd "<f15>") . ram-other-workspace-to-the-right)
 
         ([?\s-t] . ram-org-roam-note-find)
@@ -910,10 +910,9 @@ Disable `icomplete-vertical-mode' for this command."
 
 
 
-;; all <M-f*> keys in layer activated with <tab> hold (right outer thumb key)
-(define-key global-map (kbd "<M-f15>") #'ram-other-workspace-to-the-right)
+(define-key global-map (kbd "H-o") #'ram-other-workspace-to-the-right)
 (define-key global-map (kbd "s-o") #'ram-other-workspace-to-the-right)
-(define-key global-map (kbd "<M-S-f15>") #'ram-other-workspace-to-the-left)
+(define-key global-map (kbd "H-H") #'ram-other-workspace-to-the-left)
 (define-key global-map (kbd "s-S-o") #'ram-other-workspace-to-the-left)
 ;; <f1> is bound to #'help-for-help by default
 (define-key global-map (kbd "<f1>") nil)
@@ -1155,8 +1154,8 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 (define-key minibuffer-local-completion-map (kbd "C-h v") #'ram-describe-variable-from-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "C-h o") #'ram-describe-symbol-from-minibuffer)
 
-(define-key minibuffer-local-completion-map (kbd "M-<f5>") #'ram-jump-to-outline-from-minibuffer)
-(define-key minibuffer-local-completion-map (kbd "M-S-<f5>") #'ram-jump-to-def-from-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "H-h") #'ram-jump-to-outline-from-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "H-H") #'ram-jump-to-def-from-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "M-w") #'ram-kill-ring-save-minibuffer-candidate)
 (define-key minibuffer-local-completion-map (kbd "C-w") #'ram-kill-minibuffer-candidate)
 
@@ -1483,10 +1482,7 @@ succession."
     ;;   (setq pulse-flag default))
     ))
 
-;; (eval-after-load "org"
-;;   '(define-key org-mode-map (kbd "<M-f5>") 'ram-jump-to-outline))
-;; (define-key emacs-lisp-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
-(define-key global-map (kbd "<M-f5>") 'ram-jump-to-outline)
+(define-key global-map (kbd "H-h") 'ram-jump-to-outline)
 
 ;;*** minibuffer/functions: ram-jump-to-def
 
@@ -3720,18 +3716,18 @@ Leave a mark to return to."
   ;; originally, C-' runs the command org-cycle-agenda-files
   (define-key org-mode-map (kbd "C-'") nil)
 
-  (define-key org-mode-map (kbd "M-S-<f5>") #'ram-org-jump-to-name)
+  (define-key org-mode-map (kbd "H-H") #'ram-org-jump-to-name)
 
-  (define-key org-mode-map (kbd "M-<f19>") #'ram-org-next-block)
+  (define-key org-mode-map (kbd "H-n") #'ram-org-next-block)
   (define-key org-mode-map (kbd "C-c M-f") #'ram-org-next-block)
-  (define-key org-mode-map (kbd "M-<f20>") #'ram-org-previous-block)
+  (define-key org-mode-map (kbd "H-p") #'ram-org-previous-block)
   (define-key org-mode-map (kbd "C-c M-b") #'ram-org-previous-block)
 
-  (define-key org-mode-map (kbd "C-M-<f19>") #'ram-org-next-name)
-  (define-key org-mode-map (kbd "C-M-<f20>") #'ram-org-previous-name)
+  (define-key org-mode-map (kbd "C-H-n") #'ram-org-next-name)
+  (define-key org-mode-map (kbd "C-H-p") #'ram-org-previous-name)
 
-  (define-key org-mode-map (kbd "M-S-<f19>") #'ram-org-next-results)
-  (define-key org-mode-map (kbd "M-S-<f20>") #'ram-org-previous-results)
+  (define-key org-mode-map (kbd "H-N") #'ram-org-next-results)
+  (define-key org-mode-map (kbd "H-P") #'ram-org-previous-results)
 
   (define-key org-mode-map (kbd "C-c C-n") #'org-next-link)
   (define-key org-mode-map (kbd "C-c C-p") #'org-previous-link)
@@ -6411,15 +6407,15 @@ Use regexp match group 1. Default to group 0."
 ;; (require 'racket-mode)
 
 (with-eval-after-load 'racket-mode
-  (define-key racket-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
-  (define-key racket-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
-  (define-key racket-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun))
+  (define-key racket-mode-map (kbd "H-h") 'ram-jump-to-outline)
+  (define-key racket-mode-map (kbd "H-H") 'ram-jump-to-def)
+  (define-key racket-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun))
 
 ;; breaks lispy-mode key bindings
 ;; (add-hook 'racket-mode-hook #'racket-unicode-input-method-enable)
 
 (with-eval-after-load 'racket-mode
-  (define-key racket-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+  (define-key racket-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun)
   (define-key racket-mode-map (kbd "<return>") #'ram-newline-and-indent)
   (define-key racket-mode-map (kbd "<S-return>") 'newline-and-indent))
 
@@ -7120,13 +7116,13 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
  ;;* multiple-cursors: one line, arbitrary places
 
 ;; 1. place cursor where to insert
-;;    press "M-<f9>" to place the 1st cursor
-;;     1.1 Move cursor, press "M-<f9>" again  place 2nd cursor
+;;    press "H-m" to place the 1st cursor
+;;     1.1 Move cursor, press "H-m" again  place 2nd cursor
 ;;     1.2 REPEAT for new locations.
-(define-key global-map (kbd "M-<f9>") #'mc/toggle-cursor-at-point)
+(define-key global-map (kbd "H-m") #'mc/toggle-cursor-at-point)
 ;; 2. with the multiple cursors selected, press "M-S-<f9> and
 ;;     start typing what you need
-(define-key global-map (kbd "M-S-<f9>") 'multiple-cursors-mode)
+(define-key global-map (kbd "H-M") 'multiple-cursors-mode)
 ;; 3. when finished typing, press "M-S-<f9> to exit multiple cursors.
 
 ;;* ram-manage-sexps-mode
@@ -8317,7 +8313,7 @@ If there is no Clojure REPL, send warning."
 ;;** clojure: bindings
 
 (defun ram-clojure-add-bindings ()
-  (define-key clojure-mode-map (kbd "<M-f5>") 'ram-jump-to-outline)
+  (define-key clojure-mode-map (kbd "H-h") 'ram-jump-to-outline)
   (define-key clojure-mode-map (kbd "<f2> <f2>") #'ram-clojure-eval-defun-at-point)
   (define-key clojure-mode-map (kbd "<f2> <f7>") #'ram-clojure-tap-defun-at-point)
 
@@ -8325,8 +8321,8 @@ If there is no Clojure REPL, send warning."
   (define-key clojure-mode-map (kbd "<f2> e") #'ram-clojure-eval-last-sexp)
   (define-key clojure-mode-map (kbd "<f2> t") #'ram-clojure-tap-last-sexp)
 
-  (define-key clojure-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
-  (define-key clojure-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+  (define-key clojure-mode-map (kbd "<H-H>") 'ram-jump-to-def)
+  (define-key clojure-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun)
 
   (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
 
@@ -8334,7 +8330,7 @@ If there is no Clojure REPL, send warning."
   (define-key clojure-mode-map (kbd "S-<return>") #'newline-and-indent)
   (define-key clojure-mode-map (kbd ":") #'ram-insert-column)
 
-  (define-key clojure-mode-map (kbd "M-S-<f5>") #'ram-lsp-jump-workspace-symbol))
+  (define-key clojure-mode-map (kbd "H-H") #'ram-lsp-jump-workspace-symbol))
 
 (add-hook 'clojure-mode-hook #'ram-clojure-add-bindings)
 
@@ -8860,9 +8856,9 @@ Toggle `lsp-ido-show-symbol-filename'."
 (add-hook 'python-mode-hook 'python-mode-outline-hook)
 
 (with-eval-after-load 'python
-  (define-key python-mode-map (kbd "<M-f5>") 'ram-jump-to-outline))
-  ;; (define-key python-mode-map (kbd "<M-S-f5>") 'ram-jump-to-def)
-  ;; (define-key python-mode-map (kbd "<M-f19>") #'ram-toggle-narrow-to-defun)
+  (define-key python-mode-map (kbd "H-h") 'ram-jump-to-outline))
+  ;; (define-key python-mode-map (kbd "H-H") 'ram-jump-to-def)
+  ;; (define-key python-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun)
   ;; (require 'flycheck-clj-kondo)
 
 
@@ -10539,7 +10535,7 @@ That is, remove a non kept dired from the recent list."
   ;; hyper key is disables in favor of f1, ... keys
   ;; (define-key global-map (kbd "C-H-e") 'flycheck-next-error)
   ;; (define-key global-map (kbd "C-H-E") 'flycheck-previous-error)
-(define-key global-map (kbd "<M-f11>") 'flyspell-goto-previous-error)
+(define-key global-map (kbd "H--") 'flyspell-goto-previous-error)
 
 ;;*** spelling/flycheck, flyspell: functions
 
@@ -11950,10 +11946,8 @@ ANY of these param-value pairs.
 (defalias 'ram-hippie-expand-line (make-hippie-expand-function
                                    '(try-expand-line
                                      try-expand-line-all-buffers) t))
-;; <f23> key is where 'c' key is
-;; (define-key global-map (kbd "M-<f23> l") #'ram-hippie-expand-line)
-;; <f13> key is where '/' key is (under 'i' or '3' key)
-(define-key global-map (kbd "M-<f13>") #'ram-hippie-expand-line)
+
+(define-key global-map (kbd "H-/") #'ram-hippie-expand-line)
 
 
 ;; (
@@ -11989,7 +11983,7 @@ ANY of these param-value pairs.
     (beginning-of-line (or (and arg (1+ arg)) 2))
     (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
 
-(define-key global-map (kbd "<M-f16>") #'ram-copy-line)
+(define-key global-map (kbd "H-l") #'ram-copy-line)
 
 ;;** custom: insert
 
