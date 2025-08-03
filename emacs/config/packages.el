@@ -4087,6 +4087,7 @@ Use it from `org-mode-hook'.
    '((shell . t)
      (js . t)
      (emacs-lisp . t)
+     (C . t)
      (clojure . t)
      ;; for dot to work install:
      ;; sudo apt-get install graphviz to use dot
