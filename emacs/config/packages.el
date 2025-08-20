@@ -2317,14 +2317,22 @@ on either PRIMARY or SECONDARY `exwm-randr-monitor'."
                                 ;; you are in a secondary workspace, choose primary
                                 primary))))
                    (window-to-display-in
-                    (car (window-list-1
-                          ;; try to get window displaying the same buffer
-                          (cl-find-if
-                           (lambda (w) (equal buf-name (buffer-name (window-buffer w))))
-                           (window-list
-                            (exwm-workspace--workspace-from-frame-or-index workspc) 'nominibuf))
-                          'nomini
-                          (exwm-workspace--workspace-from-frame-or-index workspc)))))
+                    (progn
+                      ;; if `current-prefix-arg' is given, make the
+                      ;; opposite choice by swap primary and
+                      ;; secondary.
+                      (when current-prefix-arg
+                        (setq workspc (if (= workspc primary)
+                                          secondary
+                                        primary)))
+                      (car (window-list-1
+                            ;; try to get window displaying the same buffer
+                            (cl-find-if
+                             (lambda (w) (equal buf-name (buffer-name (window-buffer w))))
+                             (window-list
+                              (exwm-workspace--workspace-from-frame-or-index workspc) 'nominibuf))
+                            'nomini
+                            (exwm-workspace--workspace-from-frame-or-index workspc))))))
               (when window-to-display-in
                 ;; switch to target workspace
                 (exwm-workspace-switch workspc)
@@ -4511,9 +4519,10 @@ This function returns the current paragraph."
 
 ;;** org-roam: functions
 
-(defun ram-org-roam-note-find ()
+(defun ram-org-roam-note-find (arg)
   "Store a new note in a subdirectory of `org-roam-directory'."
-  (interactive current-prefix-arg)
+  (interactive "p")
+  ;;(interactive current-prefix-arg)
   (let ((org-roam-directory (expand-file-name ram-org-roam-notes-directory org-roam-directory)))
     (call-interactively #'org-roam-node-find 'RECORD-FLAG)
     (org-next-visible-heading 1)))
