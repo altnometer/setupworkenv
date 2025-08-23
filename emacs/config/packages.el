@@ -11734,23 +11734,26 @@ Map through all 'src-block Org Mode elements and find the
 greatest number in there :file header arguments where :results
 includes \"graphics\""
   (let* ((img-count 0)
-         (parsed-buffer (copy-tree (let ((old-buffer (current-buffer)))
-                                     (with-temp-buffer (insert-buffer-substring old-buffer)
-                                                       (org-element-parse-buffer 'element nil nil)))))
-         (org-file-args (when (eq 'org-mode major-mode)
-                          (org-element-map
-                              parsed-buffer
-                              'src-block
-                            (lambda (sb)
-                              (let ((header-args (append (org-babel-parse-header-arguments
-                                                          (org-element-property :parameters sb))
-                                                         (org-babel-parse-header-arguments
-                                                          (string-join (org-element-property :header sb) " ")))))
-                                (and (assq :results header-args)
-                                     (member "graphics" (string-split (cdr (assq :results header-args)) " "))
-                                     (cdr (assq :file header-args))))
-                              )
-                            nil nil 'no-recursion nil))))
+         (parsed-buffer
+          (copy-tree (let ((old-buffer (current-buffer)))
+                       (with-temp-buffer (insert-buffer-substring old-buffer)
+                                         (org-element-parse-buffer 'element nil nil)))))
+         (org-file-args
+          (when (eq 'org-mode major-mode)
+            (org-element-map
+                parsed-buffer
+                'src-block
+              (lambda (sb)
+                (let ((header-args (append
+                                    (org-babel-parse-header-arguments
+                                     (org-element-property :parameters sb))
+                                    (org-babel-parse-header-arguments
+                                     (string-join (org-element-property :header sb) " ")))))
+                  (and (cdr (assq :results header-args))
+                       (member "graphics" (string-split (cdr (assq :results header-args)) " "))
+                       (cdr (assq :file header-args))))
+                )
+              nil nil 'no-recursion nil))))
     (dolist (file org-file-args)
       (let* ((f (file-name-base file))
              (curr-img-count (string-to-number
