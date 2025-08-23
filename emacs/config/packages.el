@@ -8340,6 +8340,19 @@ at the next sexp."
 ;; (straight-use-package
 ;;  '(flycheck-clj-kondo :type git :flavor melpa :host github :repo "borkdude/flycheck-clj-kondo"))
 
+;;* Calc
+;; when setting running this sequence (e.g., from #+TBLFM in Org)
+;; (save-excursion (calc-create-buffer))
+;; (calc-over-notation (format "/%d" total))
+;; (calc-eval "nrat($/$$)" nil outcome-num total)
+;; 1. #'calc-create-buffer is not available
+;;    NO solution that does not require explicit
+;;    loading of Calc module is known at the moment
+;; Hence, require Calc explicitly
+(require 'calc)
+;; to make #'calc-over-notation available, require 'calc-ext
+(require 'calc-ext)
+
 ;;* clojure
 
 (straight-use-package
