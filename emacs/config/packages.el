@@ -3638,7 +3638,8 @@ Leave a mark to return to."
 Leave a mark to return to."
   (interactive "p")
   ;; regexp is defined in #'org-link-search
-  (let ((re "^[ \t]*#\\+NAME: +.+[ \t]*$")
+  (let ((case-fold-search t)
+        (re "^[ \t]*#\\+NAME: +.+[ \t]*$")
         (point (point)))
     (condition-case err
         (progn (when (looking-at-p re)
@@ -3650,6 +3651,64 @@ Leave a mark to return to."
          (unless (eq this-command last-command)
            (push-mark point))
          (beginning-of-line))))))
+
+(defun ram-org-previous-name (arg)
+  "Jump to previous #+NAME:  element.
+
+Leave a mark to return to."
+  (interactive "p")
+  ;; regexp is defined in #'org-link-search
+  (let ((case-fold-search t)
+        (re "^[ \t]*#\\+NAME: +.+[ \t]*$")
+        (point (point)))
+    (condition-case err
+        (re-search-backward re)
+      (search-failed (goto-char point))
+      (:success
+       (progn (unless (eq this-command last-command)
+                (push-mark point))
+              (beginning-of-line))))))
+
+;;*** org-mode/functions: navigate #+TBLFM
+
+(defun ram-org-next-tblfm (arg)
+  "Jump to next #+TBLFM: element.
+
+Leave a mark to return to."
+  (interactive "p")
+  ;; regexp is defined in #'org-link-search
+  (let ((case-fold-search t)
+        (re "^[ \t]*#\\+TBLFM: +.+[ \t]*$")
+        (point (point)))
+    (condition-case err
+        (progn (when (looking-at-p re)
+                 (end-of-line))
+               (re-search-forward re))
+      (search-failed (goto-char point))
+      (:success
+       (progn
+         (unless (eq this-command last-command)
+           (push-mark point))
+         (beginning-of-line))))))
+
+(defun ram-org-previous-tblfm (arg)
+  "Jump to previous #+TBLFM: element.
+
+Leave a mark to return to."
+  (interactive "p")
+  ;; regexp is defined in #'org-link-search
+  (let ((case-fold-search t)
+        (re "^[ \t]*#\\+TBLFM: +.+[ \t]*$")
+        (point (point)))
+    (condition-case err
+        (re-search-backward re)
+      (search-failed (goto-char point))
+      (:success
+       (progn (unless (eq this-command last-command)
+                (push-mark point))
+              (beginning-of-line))))))
+
+;;*** org-mode/functions: navigate #+RESULTS
 
 (defun ram-org-next-results (arg)
   "Jump to next #+RESULTS: element.
@@ -3669,22 +3728,6 @@ Leave a mark to return to."
          (unless (eq this-command last-command)
            (push-mark point))
          (beginning-of-line))))))
-
-(defun ram-org-previous-name (arg)
-  "Jump to previous #+NAME: element.
-
-Leave a mark to return to."
-  (interactive "p")
-  ;; regexp is defined in #'org-link-search
-  (let ((re "^[ \t]*#\\+NAME: +.+[ \t]*$")
-        (point (point)))
-    (condition-case err
-        (re-search-backward re)
-      (search-failed (goto-char point))
-      (:success
-       (progn (unless (eq this-command last-command)
-                (push-mark point))
-              (beginning-of-line))))))
 
 (defun ram-org-previous-results (arg)
   "Jump to previous #+RESULTS: element.
