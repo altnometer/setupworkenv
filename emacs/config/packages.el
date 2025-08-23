@@ -699,7 +699,6 @@ Disable `icomplete-vertical-mode' for this command."
         ([?\s-b] . ram-switch-to-buffer)
         ([?\s-B] . switch-to-buffer-other-window)
         ([?\s-e] . ram-open-eshell)
-        ([?\s-o] . other-window)
         (,(kbd "C-s-f") . find-file)
         (,(kbd "C-S-s-f") . find-file-other-window)
 
@@ -708,7 +707,7 @@ Disable `icomplete-vertical-mode' for this command."
         ([?\s-o] . ram-other-workspace-to-the-right)
         ([?\s-O] . ram-other-workspace-to-the-left)
         (,(kbd "H-o") . ram-other-workspace-to-the-right)
-        (,(kbd "H-H") . ram-other-workspace-to-the-left)
+        (,(kbd "H-O") . ram-other-workspace-to-the-left)
         ;; (,(kbd "<f15>") . ram-other-workspace-to-the-right)
 
         ([?\s-t] . ram-org-roam-note-find)
@@ -912,7 +911,7 @@ Disable `icomplete-vertical-mode' for this command."
 
 (define-key global-map (kbd "H-o") #'ram-other-workspace-to-the-right)
 (define-key global-map (kbd "s-o") #'ram-other-workspace-to-the-right)
-(define-key global-map (kbd "H-H") #'ram-other-workspace-to-the-left)
+(define-key global-map (kbd "H-O") #'ram-other-workspace-to-the-left)
 (define-key global-map (kbd "s-S-o") #'ram-other-workspace-to-the-left)
 ;; <f1> is bound to #'help-for-help by default
 (define-key global-map (kbd "<f1>") nil)
@@ -1870,9 +1869,6 @@ Then, quit other window."
   "Call `other-window' with added ALL-FRAMES."
   (interactive "p")
   (other-window count 'visible))
-
-(define-key global-map (kbd "s-o") 'other-window)
-(define-key global-map (kbd "<S-s-o>") (lambda () (interactive) (other-window -1)))
 
 ;;*** windows: general settings
 ;; used for splitting windows sensibly, default width 160, height 80
@@ -3733,6 +3729,9 @@ Leave a mark to return to."
 
   (define-key org-mode-map (kbd "C-H-n") #'ram-org-next-name)
   (define-key org-mode-map (kbd "C-H-p") #'ram-org-previous-name)
+
+  (define-key org-mode-map (kbd "M-H-n") #'ram-org-next-tblfm)
+  (define-key org-mode-map (kbd "M-H-p") #'ram-org-previous-tblfm)
 
   (define-key org-mode-map (kbd "H-N") #'ram-org-next-results)
   (define-key org-mode-map (kbd "H-P") #'ram-org-previous-results)
@@ -8331,7 +8330,7 @@ If there is no Clojure REPL, send warning."
   (define-key clojure-mode-map (kbd "<f2> e") #'ram-clojure-eval-last-sexp)
   (define-key clojure-mode-map (kbd "<f2> t") #'ram-clojure-tap-last-sexp)
 
-  (define-key clojure-mode-map (kbd "<H-H>") 'ram-jump-to-def)
+  (define-key clojure-mode-map (kbd "H-H") 'ram-jump-to-def)
   (define-key clojure-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun)
 
   (define-key clojure-mode-map (kbd "s-E") #'ram-switch-to-clojure-repl)
@@ -11994,6 +11993,7 @@ ANY of these param-value pairs.
     (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
 
 (define-key global-map (kbd "H-l") #'ram-copy-line)
+(define-key global-map (kbd "H-c") #'ram-copy-line)
 
 ;;** custom: insert
 
