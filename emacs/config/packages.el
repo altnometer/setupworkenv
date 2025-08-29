@@ -3828,11 +3828,6 @@ left by `org-mark-element`."
 (with-eval-after-load "org"
   (add-to-list 'org-tags-exclude-from-inheritance "project"))
 
-;;** org-mode: tables
-
-(setq org-startup-shrink-all-tables t)
-
-
 ;;*** org-mode/settings: tags
 
 (setq org-tag-alist '((:startgroup . nil)
@@ -3851,6 +3846,12 @@ left by `org-mark-element`."
 ;;*** org-mode/settings: tables
 
 (setq org-startup-align-all-tables t)
+
+;; shrink all table columns with a width cookie.
+;; #+STARTUP: shrink
+;; has the same effect
+(setq org-startup-shrink-all-tables t)
+
 
 ;; enable org-indent-mode for every file
 ;; per file sittings: #+STARTUP: indent, #+STARTUP: noindent
