@@ -812,10 +812,14 @@ Disable `icomplete-vertical-mode' for this command."
              )))
               ;; (setq mode-line-format nil)
 
-(add-hook 'exwm-init-hook (lambda () (setq ram-org-results-table-max-width
-                                            ;; allow for column separators,
-                                            ;; shrink overlays
-                                            (- (window-width) 20))))
+;; !!! does not work if you have different size monitors
+;;     - relay on the functions internal handling of the
+;;       MAX-TABLE-WIDTH argument
+;; (add-hook 'exwm-init-hook (lambda () (setq ram-org-results-table-max-width
+;;                                             ;; allow for column separators,
+;;                                             ;; shrink overlays
+;;                                             (- (window-width) 20))))
+
 ;;*** exwm: exwm-xim X input method
 
 ;; set shell environment variables
@@ -3241,9 +3245,14 @@ max column lengths. Use these values to shrink the each column separately."
   (org-with-wide-buffer
    (let* ((max-table-width
            (or max-table-width
-               ;; 7 to cover for 3 column separators and shrink overlays
-               ;; adjust for your most used cases
-               (- (window-width) 7)))
+               ;; Note that column separators and shrink overlays take space
+               ;; Hence, subtract their widths from allocated width
+               ;; For example:
+               ;; 7 for 3 column separators and shrink overlays
+               ;; however if multiple columns have to use shrink overlays
+               ;; this value is not enough
+               ;; adjust for your most used cases (currently uses 11)
+               (- (window-width) (+ (* (org-outline-level) 2) 11))))
           (begin (or begin (org-table-begin)))
 	  (end (or end (org-table-end)))
           (elisp-data (org-babel-read-table))
@@ -3314,10 +3323,11 @@ max column lengths. Use these values to shrink the each column separately."
                                                           (add-alist-vals (+ val (cdar cols)) (cdr cols)))))
                                             (add-alist-vals 0 do-not-shrink-cols)))
           (max-table-width-minus-non-shrink-cols (- max-table-width total-width-of-non-shrink-cols))
-          ;; some outlier be extremely long,
+          ;; some outlier cell content can be extremely long,
           ;; keep them withing max-possible-col-width
+          ;; which is calculated as:
           (max-possible-col-width (floor (*
-                                          ;; allow only 30%
+                                          ;; allow only extra 30%
                                           1.3
                                           ;; from average max col width, which is
                                           (/ max-table-width-minus-non-shrink-cols
@@ -4305,6 +4315,7 @@ If the result table width exceeds that value, shrink columns.")
 (add-hook 'org-mode-hook #'org-display-inline-images)
 (add-hook 'org-mode-hook #'visual-line-mode)
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
+(add-hook 'org-mode-hook #'ram-org-shrink-all-tables)
 
 (add-hook 'org-src-mode-hook #'ram-assoc-clojure-org-code-block-buffer-with-file)
 (add-hook 'org-src-mode-hook #'ram-assoc-prolog-org-code-block-buffer-with-file)
@@ -4317,6 +4328,12 @@ If the result table width exceeds that value, shrink columns.")
 ;; (remove-hook 'org-mode-hook
 ;;           (lambda () (add-hook 'post-command-hook
 ;;                                #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
+
+
+(defun ram-org-shrink-all-tables ()
+  "Shrink all tables with `ram-org-table-shrink'.
+This will make all columns fit in window width. "
+  (org-table-map-tables (lambda () (ram-org-table-shrink)) t))
 
 (defun ram-switch-on-org-mode-syntax-table ()
   "Ensure that `org-mode-syntax-table' is on for org commands.
