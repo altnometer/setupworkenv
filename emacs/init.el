@@ -283,3 +283,8 @@
 ;; ## end of OPAM user-setup addition for emacs / base ## keep this line
 (put 'scroll-left 'disabled nil)
 (put 'narrow-to-page 'disabled nil)
+
+
+;;* debug: reset after loading
+
+(add-to-list 'debug-ignored-errors 'minibuffer-quit)

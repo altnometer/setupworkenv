@@ -229,8 +229,9 @@ abort completely with `C-g'."
 (with-eval-after-load 'fundamental-mode
   (define-key fundamental-mode-map (kbd "C-x i") #'endless/ispell-word-then-abbrev))
 
-;;* Leader Key
-;;** Definition
+;;* leader Key
+;;** leader key: definition
+
 ;; leader tap
 ;; <SunProps> is KC_MENU in qmk_firmware
 (define-key global-map (kbd "<SunProps>") nil)
@@ -1446,6 +1447,9 @@ succession."
        (error
         (funcall reset-keybindings)
         (signal (car err) (cdr err)))
+       (minibuffer-quit
+        (funcall reset-keybindings)
+        (signal 'minibuffer-quit nil))
        (quit
         (funcall reset-keybindings)
         (signal 'quit nil))
@@ -1615,6 +1619,9 @@ succession."
        (error
         (funcall reset-keybindings)
         (signal (car err) (cdr err)))
+       (minibuffer-quit
+        (funcall reset-keybindings)
+        (signal 'minibuffer-quit nil))
        (quit
         (funcall reset-keybindings)
         (signal 'quit nil))
@@ -3158,6 +3165,9 @@ Disable otherwise"
        (error
         (funcall reset-keybindings)
         (signal (car err) (cdr err)))
+       (minibuffer-quit
+        (funcall reset-keybindings)
+        (signal 'minibuffer-quit nil))
        (quit
         (funcall reset-keybindings)
         (signal 'quit nil))
@@ -11899,6 +11909,15 @@ ANY of these param-value pairs.
 
 ;; (eval-after-load 'clojure
 ;;   '(sayid-setup-package))
+
+;;* debug
+
+;; !!! these are set in 'init.el' file
+;; to catch Emacs loading errors.
+;; do not modify these values here
+;;(setq debug-on-error t)
+;;(add-to-list 'debug-ignored-errors 'minibuffer-quit)
+
 
 ;;* dired
 
