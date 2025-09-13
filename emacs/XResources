@@ -12,6 +12,10 @@ Emacs*background: #fff
 Emacs*borderWidth: 2
 Emacs*internalBorder: 2
 Emacs*borderColor: #000
+!! python-ibus is broken with ibus 1.5
+!! let Emacs XIM (X Input Method) do the input
+Emacs*useXIM: true
+Emacs*inputMethod: ibus
 
 ! ------------------------------------------------------------------------------
 ! ROFI Color theme
