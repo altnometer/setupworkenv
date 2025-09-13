@@ -3430,6 +3430,46 @@ COLUMNS-WIDTHS is an alist '((column-number . width)...)."
 	       (push new (cdr chain))
 	       (overlay-put new 'org-table-column-overlays chain)))))))))
 
+;;**** org-mode/functions/table: fold
+
+;; credit to https://emacs.stackexchange.com/a/75779
+;; works only when on
+;;  #+NAME:
+;;  #+TBLFM:
+;; since otherwise org-table-next-field (bound to <TAB>) interferes
+(defun ram-org-fold-element-at-point (&optional force)
+  "Toggle the visibility of named paragraphs.
+  If FORCE is 'off make paragraph visible.
+  If FORCE is otherwise non-nil make paragraph invisible.
+  Otherwise toggle the visibility."
+  (interactive "P")
+  (let* ((par (org-element-at-point))
+         (start (org-element-property :contents-begin par))
+         (end (org-element-property :contents-end par))
+         (post (org-element-property :post-affiliated par)))
+    (when (and
+           start
+           end
+           post
+           ;; this is template, e.g., <el or <sh, expand rather than fold
+           (not (eq ?< (save-excursion (back-to-indentation) (char-after))))
+           )
+      (cond
+       ((eq force 'off)
+        (org-flag-region start end nil 'org-hide-block))
+       (force
+        (org-flag-region start end t 'org-hide-block))
+       ((eq (get-char-property start 'invisible) 'org-hide-block)
+        (org-flag-region start end nil 'org-hide-block))
+       (t
+        (org-flag-region start end t 'org-hide-block)))
+      ;; When the block is hidden away, make sure point is left in
+      ;; a visible part of the buffer.
+      (when (and post (invisible-p (max (1- (point)) (point-min))))
+        (goto-char post))
+      ;; Signal success.
+      t)))
+
 ;;*** org-mode/functions: manage time property
 
 ;; credit to https://github.com/zaeph/.emacs.d/blob/4548c34d1965f4732d5df1f56134dc36b58f6577/init.el
@@ -4338,6 +4378,8 @@ If the result table width exceeds that value, shrink columns.")
 (add-hook 'org-mode-hook
           (lambda () (add-hook 'post-command-hook
                                #'ram-toggle-lisp-editing-modes-in-org-code-block 0 'local)))
+
+(add-hook 'org-tab-after-check-for-cycling-hook #'ram-org-fold-element-at-point)
 
 ;; (remove-hook 'org-mode-hook
 ;;           (lambda () (add-hook 'post-command-hook
