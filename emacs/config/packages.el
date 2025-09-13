@@ -4209,6 +4209,7 @@ Use it from `org-mode-hook'.
      (dot . t)
      (lisp . t)
      (latex . t)
+     (octave . t)
      (prolog . t)
      (python . t)
      (R . t)
@@ -8422,7 +8423,7 @@ at the next sexp."
 
 ;;* Calc
 ;; when setting running this sequence (e.g., from #+TBLFM in Org)
-;; (save-excursion (calc-create-buffer))
+;; (save-excursion (salc-create-buffer))
 ;; (calc-over-notation (format "/%d" total))
 ;; (calc-eval "nrat($/$$)" nil outcome-num total)
 ;; 1. #'calc-create-buffer is not available
@@ -8432,7 +8433,8 @@ at the next sexp."
 (require 'calc)
 ;; to make #'calc-over-notation available, require 'calc-ext
 (require 'calc-ext)
-
+;; try to reset 'calc-frac-format from default ":"
+;;(setq calc-frac-format '("/" nil))
 ;;* clojure
 
 (straight-use-package
