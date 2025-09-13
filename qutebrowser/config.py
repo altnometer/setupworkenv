@@ -5,20 +5,22 @@
 
 import subprocess
 ## consider also the screen size in mm
-output = subprocess.Popen('xrandr | grep \* | awk \'{print $1}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
+output = subprocess.Popen('xrandr | grep \\* | awk \'{print $1}\'', shell=True, stdout=subprocess.PIPE).communicate()[0]
 screen_width = int(output.split()[0].split(b'x')[0])
 screen_height = int(output.split()[0].split(b'x')[1])
 
 ## screen height in mm
 ##                          'xrandr -q | grep " connected " | sed \'s/ primary//\' | awk  \'{print $14}\'',
 
-output = subprocess.Popen('xrandr -q | grep " connected " | head -1 | sed \'s/ primary / /\' | sed -E \'s/([[:digit:]]) left (\()/\\1 \\2/\' | awk \'{print $14}\'',
-                          shell=True, stdout=subprocess.PIPE).communicate()[0]
+output = subprocess.Popen(
+    'xrandr -q | grep " connected " | head -1 | sed \'s/ primary / /\' | sed -E \'s/([[:digit:]]) left (\\()/\\1 \\2/\' | awk \'{print $14}\'',
+    shell=True, stdout=subprocess.PIPE).communicate()[0]
+
 screen_height_mm = int(output.split()[0].split(b'mm')[0])
 
 ## UHD (4K) 3840x2160
 ## adjust font sizes if screen width is less than that:
-uhd_rotated_width = 2160
+uhd_height = 2160
 qhd_rotated_width = 1440
 fhd_rotated_width = 1080
 
@@ -869,7 +871,7 @@ elif screen_width <= fhd_rotated_width:
     c.fonts.completion.entry = '10pt \'Operator Mono Light\''
 elif screen_width <= qhd_rotated_width:
     c.fonts.completion.entry = '16pt \'Operator Mono Light\''
-elif screen_width <= uhd_rotated_width:
+elif screen_height <= uhd_height:
     c.fonts.completion.entry = '18pt \'Operator Mono Light\''
 else:
     c.fonts.completion.entry = '10pt \'Operator Mono Light\''
@@ -883,15 +885,15 @@ else:
 # c.fonts.hints = 'bold 10pt monospace'
 # c.fonts.hints = 'bold 12pt monospace'
 if screen_height_medium_mm  <= screen_height_mm:
-    c.fonts.hints = 'bold 16pt monospace'
+    c.fonts.hints = 'bold 18pt monospace'
 elif screen_width <= fhd_rotated_width:
-    c.fonts.hints = 'bold 10pt monospace'
+    c.fonts.hints = 'bold 12pt monospace'
 elif screen_width <= qhd_rotated_width:
-    c.fonts.hints = 'bold 14pt monospace'
-elif screen_width <= uhd_rotated_width:
     c.fonts.hints = 'bold 16pt monospace'
+elif screen_height <= uhd_height:
+    c.fonts.hints = 'bold 18pt monospace'
 else:
-    c.fonts.hints = 'bold 10pt monospace'
+    c.fonts.hints = 'bold 20pt monospace'
 
 ## Font used in the keyhint widget.
 ## Type: Font
@@ -902,7 +904,7 @@ elif screen_width <= fhd_rotated_width:
     c.fonts.keyhint = '10pt \'Operator Mono Light\''
 elif screen_width <= qhd_rotated_width:
     c.fonts.keyhint = '16pt \'Operator Mono Light\''
-elif screen_width <= uhd_rotated_width:
+elif screen_height <= uhd_height:
     c.fonts.keyhint = '18pt \'Operator Mono Light\''
 else:
     c.fonts.keyhint = '10pt \'Operator Mono Light\''
@@ -940,7 +942,7 @@ elif screen_width <= fhd_rotated_width:
     c.fonts.statusbar = '10pt \'Operator Mono Light\''
 elif screen_width <= qhd_rotated_width:
     c.fonts.statusbar = '16pt \'Operator Mono Light\''
-elif screen_width <= uhd_rotated_width:
+elif screen_height <= uhd_height:
     c.fonts.statusbar = '18pt \'Operator Mono Light\''
 else:
     c.fonts.statusbar = '10pt \'Operator Mono Light\''
@@ -960,9 +962,9 @@ elif screen_width <= fhd_rotated_width:
 elif screen_width <= qhd_rotated_width:
     c.fonts.tabs.selected = 'bold 14pt SFNS Display'
     c.fonts.tabs.unselected = 'bold 14pt SFNS Display'
-elif screen_width <= uhd_rotated_width:
-    c.fonts.tabs.selected = 'bold 18pt SFNS Display'
-    c.fonts.tabs.unselected = 'bold 18pt SFNS Display'
+elif screen_height <= uhd_height:
+    c.fonts.tabs.selected = 'bold 20pt SFNS Display'
+    c.fonts.tabs.unselected = 'bold 20pt SFNS Display'
 else:
     c.fonts.tabs.selected = 'bold 10pt SFNS Display'
     c.fonts.tabs.unselected = 'bold 10pt SFNS Display'
@@ -994,16 +996,16 @@ else:
 ## Default font size (in pixels) for regular text.
 ## Type: Int
 # c.fonts.web.size.default = 16
-if screen_height_medium_mm  <= screen_height_mm:
-    c.fonts.web.size.default = 18
-elif screen_width <= fhd_rotated_width:
-    c.fonts.web.size.default = 10
-elif screen_width <= qhd_rotated_width:
-    c.fonts.web.size.default = 16
-elif screen_width <= uhd_rotated_width:
-    c.fonts.web.size.default = 18
-else:
-    c.fonts.web.size = 10
+#if screen_height_medium_mm  <= screen_height_mm:
+#    c.fonts.web.size.default = 18
+#elif screen_width <= fhd_rotated_width:
+#    c.fonts.web.size.default = 10
+#elif screen_width <= qhd_rotated_width:
+#    c.fonts.web.size.default = 16
+#elif screen_height <= uhd_height:
+#    c.fonts.web.size.default = 18
+#else:
+#    c.fonts.web.size = 10
 
 c.fonts.web.size.default = 22
 
