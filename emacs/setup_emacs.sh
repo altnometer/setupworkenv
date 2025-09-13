@@ -38,6 +38,7 @@ else
             feh mupdf zathura zathura-djvu hunspell \
             aspell graphviz r-base r-base-dev mpv alsa-utils
     # Org image resizing requires imagemagick
+    # does not compile with that imagemagick
     apt-get install -y imagemagick
     echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y texlive-full dvipng
@@ -211,16 +212,26 @@ else
          --with-cairo \
          --with-harfbuzz \
          --with-x=yes \
-         --with-x-toolkit=gtk3 \
+         --with-x-toolkit=yes \
          --with-xft \
          --with-mailutils \
          --without-toolkit-scroll-bars \
          --with-xwidgets \
          --disable-ns-self-contained \
-         --with-json \
-         --with-imagemagick
+         --with-xml2 \
+         --with-xim
+    # unrecognized option
+    # --with-json \
+    # does not compile with imagemagick
+    # you would need if you want to enagle Org to
+    # modify image dimensions
+    # --with-imagemagick \
     # --disable-ns-self-contained respect --prefix
     sudo -u $SUDO_USER make -j$(nproc)
+    # why sometime it wants to use "/usr/local/share/info"
+    # when installing and then giving
+    # cannot create directory ‘/usr/local/share/info Permission denied
+    # whereas --prefix="$EMACS_INSTALL_DIR" is given to use other location?
     sudo -u $SUDO_USER make install
     #make clean
     #apt-get install -y emacs
