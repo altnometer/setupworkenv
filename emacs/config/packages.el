@@ -2976,7 +2976,10 @@ Use it to check if you left the block or not.")
 (defun ram-toggle-lisp-editing-modes-in-org-code-block ()
   "Enable programming modes when point is in some Org code blocks.
 
-Disable otherwise"
+Disable otherwise.
+`ram-switch-on-org-mode-syntax-table' run from org-mode-hook
+pre-command-hook, it can re-enable Org-mode-syntax table for
+some commands. "
   (setq-local paredit-override-check-parens-function
               ;; suppress #'check-parens error
               (lambda (err) 'ignore-check-parens-error))
@@ -4359,8 +4362,14 @@ tables. Reset the table for org commands"
       (when (and ram-edit-org-block-in-lisp-for-languages
                  (and (symbolp this-command)
                       (not (eq 'org-self-insert-command this-command) )
-                      (eq 'ram-copy-line this-command)
                       (or (eq 'org-babel-execute-src-block this-command)
+                          ;; 'ram-copy-line is relevant when I
+                          ;; 1. org-mark-element and then
+                          ;; 2. ram-copy-line
+                          ;; when you are not in org-mode-syntax-table
+                          ;; incorrect range is copied,
+                          ;; e.g., the following heading may be included
+                          (eq 'ram-copy-line this-command)
                           (string-prefix-p "org" (symbol-name this-command))
                           (string-prefix-p "ram-org" (symbol-name this-command)))))
         ;; (message "?????? switching syntax table:")
