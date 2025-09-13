@@ -3782,6 +3782,7 @@ Leave a mark to return to."
 ;;** org-mode: bindings
 
 (with-eval-after-load "org"
+  (define-key org-mode-map (kbd "H-w") #'org-latex-preview)
   (define-key org-mode-map (kbd "<C-tab>") #'ram-hide-block-toggle)
   ;; originally, C-' runs the command org-cycle-agenda-files
   (define-key org-mode-map (kbd "C-'") nil)
@@ -9815,6 +9816,9 @@ requires the command-line executable called 'rg' or 'ripgrep'."
 
 (define-key global-map (kbd "M-s f") #'prot/find-file-vc-or-dir)
 
+;;** search: (regexp) settings
+(setq case-fold-search nil)
+
 ;;* isearch
 
 ;;** isearch: settings
@@ -10075,6 +10079,8 @@ Hopefully, this function would cover some edge cases."
 
 (advice-add 'recenter-top-bottom :after #'hl-line-flash)
 
+(advice-add 'org-latex-preview :after #'hl-line-flash)
+
 ;;** packages: iedit
 (straight-use-package
  '(iedit :type git :flavor melpa :host github :repo "victorhge/iedit"))
@@ -10141,7 +10147,7 @@ Configure `orderless-matching-styles' for this command."
 
 ;;** packages: iy-go-to-char
 
-;;*** search char, next, prev char
+;;*** packages:iy-do-to-char: search char, next, prev char
 
 (straight-use-package
  '(iy-go-to-char :type git :flavor melpa :host github :repo "doitian/iy-go-to-char"))
@@ -12097,8 +12103,9 @@ ANY of these param-value pairs.
     (beginning-of-line (or (and arg (1+ arg)) 2))
     (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
 
-(define-key global-map (kbd "H-l") #'ram-copy-line)
+;(define-key global-map (kbd "H-l") #'ram-copy-line)
 (define-key global-map (kbd "H-c") #'ram-copy-line)
+(define-key global-map (kbd "H-l") #'ram-copy-line)
 
 ;;** custom: insert
 
