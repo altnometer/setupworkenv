@@ -6,8 +6,13 @@
 clear mod4
 add mod4 = Super_L Super_R
 
-! remap cancel key to Hyper_R
+!! remap cancel key to Hyper_R
+!! keycode 146 is HELP key (and not Cancel)
 keycode 146 = Hyper_R
+!! keycode 25 is letter w by default
+!keycode 25 = Hyper_R
+!keycode  25 = w W w W
+
 
 clear mod3
 add mod3 = Hyper_L Hyper_R
