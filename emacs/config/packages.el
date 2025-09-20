@@ -3265,7 +3265,7 @@ max column lengths. Use these values to shrink the each column separately."
                ;; however if multiple columns have to use shrink overlays
                ;; this value is not enough
                ;; adjust for your most used cases (currently uses 11)
-               (- (window-width) (+ (* (org-outline-level) 2) 11))))
+               (- (window-width) (+ (* (org-outline-level) 2) 17))))
           (begin (or begin (org-table-begin)))
 	  (end (or end (org-table-end)))
           (elisp-data (org-babel-read-table))
@@ -3278,47 +3278,47 @@ max column lengths. Use these values to shrink the each column separately."
           (wide-and-all-colls
            (cl-labels ((separate-cols
                          (table wide-cols all-cols)
-                         (cond
-                          ;; terminate recursion
-                          ((null table) (list wide-cols all-cols))
-                          ;; skip 'hline symbol
-                          ((and (symbolp (car table)) (equal (car table) 'hline))
+                         ;; skip 'hline symbol
+                         (while (and (symbolp (car table))
+                                     (eq 'hline (car table)))
+                           (setq table (cdr table)))
+                         (when (car table)
+                           (cl-labels ((process-row (row counter)
+                                         (when row
+                                           (let* ((el (car row))
+                                                  (current-max (alist-get counter wide-cols 0))
+                                                  (el-width (length (if (not (stringp el))
+                                                                        (format "%s" el)
+                                                                      el))))
+                                             ;; update wide-cols with new values
+                                             (when (and
+                                                    ;; allow strings only, MIND than col names are always strings
+                                                    (stringp el )
+                                                    ;; exclude datetimes,
+                                                    ;; is the regexp too narrow?
+                                                    (not (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.*$" el))
+                                                    (>  el-width current-max)
+                                                    (> el-width min-possible-col-width)
+                                                    )
+                                               (progn
+                                                 (setq wide-cols (assq-delete-all counter wide-cols))
+                                                 (push (cons counter el-width) wide-cols)))
+                                             ;; update all-cols with new max values
+                                             (and (>  el-width current-max)
+                                                  (progn
+                                                    (setq all-cols (assq-delete-all counter all-cols))
+                                                    (push (cons counter el-width) all-cols)))
+                                             ;; next iteration
+                                             (process-row (cdr row) (1+ counter))))))
+                             (process-row (car table) 1)
+                             ;;
+                             )
+                           )
+                         (if (null table)
+                             (list wide-cols all-cols)
+                           ;; tail-optimise separate-cols as the last call
                            (separate-cols (cdr table) wide-cols all-cols))
-                          ;; process the row
-                          (t (cl-labels ((process-row (row counter)
-                                           (if (null row)
-                                               ;; terminate this recursion, pass control to outer recursion
-                                               (separate-cols (cdr table) wide-cols all-cols)
-                                             (let* ((el (car row))
-                                                    (current-max (alist-get counter wide-cols 0))
-                                                    (el-width (length (if (not (stringp el))
-                                                                          (format "%s" el)
-                                                                        el))))
-                                               ;; update wide-cols with new values
-                                               (when (and
-                                                      ;; allow strings only, MIND than col names are always strings
-                                                      (stringp el )
-                                                      ;; exclude datetimes,
-                                                      ;; is the regexp too narrow?
-                                                      (not (string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.*$" el))
-                                                      (>  el-width current-max)
-                                                      (> el-width min-possible-col-width)
-                                                      )
-                                                 (progn
-                                                   (setq wide-cols (assq-delete-all counter wide-cols))
-                                                   (push (cons counter el-width) wide-cols)))
-                                               ;; update all-cols with new max values
-                                               (and (>  el-width current-max)
-                                                    (progn
-                                                      (setq all-cols (assq-delete-all counter all-cols))
-                                                      (push (cons counter el-width) all-cols)))
-                                               ;; next iteration
-                                               (process-row (cdr row) (1+ counter))))))
-                               (process-row (car table) 1)
-                               ;;
-                               ))
-                          ;;
-                          )
+                         ;;
                          ))
              (separate-cols elisp-data nil nil)))
           (do-not-shrink-cols (cl-labels ((subset-alist (l-1 l-2)
