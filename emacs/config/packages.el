@@ -3798,7 +3798,7 @@ Leave a mark to return to."
 Leave a mark to return to."
   (interactive "p")
   ;; maybe, regexp is defined in #'org-link-search
-  (let ((re "^[ \t]*#\\+RESULTS:*$")
+  (let ((re "^[ \t]*#\\+RESULTS:.*$")
         (point (point)))
     (condition-case err
         (re-search-backward re)
