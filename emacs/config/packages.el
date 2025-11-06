@@ -4146,8 +4146,15 @@ Use it from `org-mode-hook'.
 ;; org-toggle-inline-images (C-c C-x C-v)
 
 (setq org-startup-with-inline-images t)
+;; (setq org-image-actual-width '(800))
 (setq org-image-actual-width nil)
 
+;;*** org-mode/images/img: org-inline-anim animate
+
+(straight-use-package
+ '(org-inline-anim :type git :flavor melpa :host github :repo "shg/org-inline-anim.el"))
+(with-eval-after-load 'org
+  (add-hook 'org-mode-hook #'org-inline-anim-mode))
 ;;** org-mode: structure-templates, snippets
 
 ;; https://orgmode.org/manual/Structure-Templates.html
