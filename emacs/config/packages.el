@@ -4099,14 +4099,40 @@ left by `org-mark-element`."
 
 (defun ram-org-mode-syntax-table-update ()
   "Update `org-mode-syntax-table'."
+
+  ;; the default for ?. is symbol constituent.
+  ;; if you search for a symbol data
+  ;;   - results like 'data.append' will not show
+  ;; Let us try '.' as a punctuation character
+  (modify-syntax-entry ?. "." org-mode-syntax-table)
+  
+  ;; the default for ?$ is word constituent.
+  ;; in R code blocks references to table columns, e.g.,
+  ;; 'planes$tailnum' are hard navigate by word,
+  ;; unless ?$ is set to symbol
+  (modify-syntax-entry ?$ "_" org-mode-syntax-table)
+
+  ;; the default for ?= is symbol constituent
+  ;; - when used in code block headers, e.g.,
+  ;;  #+header: :var foo=bar
+  ;;  it is difficult to move, select, delete, expand
+  ;;  because the whole 'foo=bar' is affected rather than
+  ;; just 'foo' or 'bar'
+  ;; So, try setting it to a word syntax class
+  ;; !!! does not fix things
+  ;;(modify-syntax-entry ?\= "w" org-mode-syntax-table)
+
   ;; the default for ?' is word constituent, breaks expansion
   (modify-syntax-entry ?\' "'" org-mode-syntax-table)
+
   ;; the default for ?~ is symbol constituent, breaks expansion
   (modify-syntax-entry ?\~ "'" org-mode-syntax-table)
+
   ;; make ?: a word constituent
   ;; (modify-syntax-entry ?\: "w" org-mode-syntax-table)
   ;; the default for ?< is open delimiter constituent, fails (check-parens)
   ;; make it a symbol constituent, like "+", "-" etc
+
   (modify-syntax-entry ?\< "_" org-mode-syntax-table)
   (modify-syntax-entry ?\> "_" org-mode-syntax-table)
   )
