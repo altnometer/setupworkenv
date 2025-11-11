@@ -34,12 +34,12 @@ if  hash xorg 2>/dev/null; then
 else
     echo -e "\n\x1b[33;01m Installing xorg and supporting packages ...  \x1b[39;49;00m\n" && sleep 1
     # !!! sound: install alsa-utils
-    apt-get install -y xorg xinput firefox-esr \
+    apt-get install -y xorg xattr xinput firefox-esr \
             feh mupdf zathura zathura-djvu hunspell \
             aspell graphviz r-base r-base-dev mpv alsa-utils
     # Org image resizing requires imagemagick
-    # does not compile with that imagemagick
-    apt-get install -y imagemagick
+    # you need to specify compile config option --with-imagemagick
+    apt-get install -y imagemagick libmagick++-dev libmagickwand-dev libmagickcore-dev
     echo -e "\n\x1b[33;01m Installing LaTeX, downloads over 2GB files  ...  \x1b[39;49;00m\n" && sleep 1
     apt-get install -y texlive-full dvipng
     # tidyverse of R requires next dependencies on Debian 10 (buster)
@@ -157,7 +157,8 @@ else
     # tools for compiling
     apt-get install -y autoconf make gcc texinfo \
             cmake libtool-bin \
-            libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev \
+            # image support
+            libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev librsvg2-dev \
             libgnutls28-dev libtinfo-dev \
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
@@ -219,13 +220,11 @@ else
          --with-xwidgets \
          --disable-ns-self-contained \
          --with-xml2 \
-         --with-xim
-    # unrecognized option
-    # --with-json \
-    # does not compile with imagemagick
-    # you would need if you want to enagle Org to
-    # modify image dimensions
-    # --with-imagemagick \
+         --with-xim \
+         # does not compile with imagemagick
+         # you would need if you want to enagle Org to
+         # modify image dimensions
+          --with-imagemagick
     # --disable-ns-self-contained respect --prefix
     sudo -u $SUDO_USER make -j$(nproc)
     # why sometime it wants to use "/usr/local/share/info"
