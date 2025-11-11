@@ -7486,19 +7486,28 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
 
 ;;** multiple-cursors: mc/list-file
 
-;; mc/list-file is a variable defined in ‘multiple-cursors-core.el’.
-;; Its value is "~/.local/share/emacs/my.emacs.d/.mc-lists.el"
+;; mc/list-file defines a file in which it stores
+;; its data for variables like:
+;;   - mc/cmds-to-run-for-all
+;;   - mc/cmds-to-run-once
+;; look it up with the command:
+;;   - (find-file mc/list-file)
+;; edit when needed (see next sections)
 
 ;;** multiple-cursors: mc/cmds-to-run-once
 
 ;; commands to run only for one cursor
 ;; mc/cmds-to-run-once
+;; edit in:
+;;   - (find-file mc/list-file)
 
 
-;;** multiple-cursors: mc/cmds-to-run-once
+;;** multiple-cursors: mc/cmds-to-run-for-all
 
 ;; mc/cmds-to-run-for-all
 ;; commands to run for all cursors
+;; edit in:
+;;   - (find-file mc/list-file)
 
 ;;credit to https://stackoverflow.com/a/39885314/9913235
 (defun mc/toggle-cursor-at-point ()
@@ -7512,17 +7521,17 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
           (mc/remove-fake-cursor existing)
         (mc/create-fake-cursor-at-point)))))
 
- ;;* multiple-cursors: one line, arbitrary places
+;;* multiple-cursors: one line, arbitrary places
 
 ;; 1. place cursor where to insert
 ;;    press "H-m" to place the 1st cursor
 ;;     1.1 Move cursor, press "H-m" again  place 2nd cursor
 ;;     1.2 REPEAT for new locations.
 (define-key global-map (kbd "H-m") #'mc/toggle-cursor-at-point)
-;; 2. with the multiple cursors selected, press "M-S-<f9> and
+;; 2. with the multiple cursors selected, press "H-M" and
 ;;     start typing what you need
 (define-key global-map (kbd "H-M") 'multiple-cursors-mode)
-;; 3. when finished typing, press "M-S-<f9> to exit multiple cursors.
+;; 3. when finished typing, press "H-M" to exit multiple cursors.
 
 ;;* ram-manage-sexps-mode
 
