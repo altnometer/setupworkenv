@@ -204,7 +204,7 @@
 
         ;;*** org-mode-abbrev-table/define: c
 
-        ("calc" "calculate")
+        ;; ("calc" "calculate")
         ("calcs" "calculates")
         ("calcn" "calculation")
         ("calcg" "calculating")
@@ -301,7 +301,6 @@
 
         ("detn" "determine")
 
-        ("dev" "develop")
         ("devt" "development")
 
         ("df" "different")
@@ -462,7 +461,6 @@
         ("mach" "machine")
         ("machs" "machines")
 
-        ("math" "mathematics")
         ("maths" "mathematics")
         ("mathl" "mathematical")
 
@@ -498,7 +496,6 @@
 
         ;;*** org-mode-abbrev-table/define: o
 
-        ("ob" "object")
         ("obs" "objects")
         ("occ" "occurrence")
         ("occs" "occurrences")
@@ -549,7 +546,7 @@
         ("preds" "predicates")
 
         ("prec" "preceding")
-        ("prev" "previous")
+        ;;("prev" "previous")
 
         ("prj" "project")
         ("prjs" "projects")
