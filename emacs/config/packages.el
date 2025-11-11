@@ -6241,7 +6241,20 @@ Properties:
 
 Preserve the point position.
 
-Currently, only cycle 3 levels of outlines.
+1. This function, on consecutive calls, is supposed to:
+     a. First, hide all outlines except the top level.
+     b. then, iteratively reveal deeper levels of
+        outlines only, up to MAX-LEVEL.
+     c. repeat the cycle if you complete the whole round
+        and continue invoking the function.
+2. The function enables quick overview of the headlines.
+   Thus, you can:
+   a. Quickly recall the headings.
+   b. iteratively improve
+      - outlines structure and
+      - their wording
+
+Currently, only 3 levels of outlines can be cycled through.
 If you wish to cycle to deeper levels, then modify the parts:
 1.   ;; 1st iteration again:
      ;;   - repeating the cycle of iterations
@@ -6272,45 +6285,104 @@ If you wish to cycle to deeper levels, then modify the parts:
                 (point)))
          (c (or (plist-get ram-outline-toggle-plist :counter)
                 0))
+         ;; only can toggle outlines up to 'max-level'
+         (max-level 4)
+         ;; if there are no outline at deeper level
+         ;; than for the current toggle level
+         ;; finish the toggling cycle
+         ;; otherwise you will keep
+         ;; pressing the key binding
+         ;; calling the command and nothing will happen
+         ;; because the command processes the deeper outline
+         ;; levels that do not exist.
+         (deeper-outlines-exist nil)
          )
     (cond
      ;; 1st new iteration
      ;;   - 1st call to the function ram-outline-toggle
      ;; hide all
      ((not (eq last-command this-command))
-      ;; reset :orig-point unless the last command was also
-      ;; toggling outlines
-      ;; let other "ram-outline-toggle-*" commands reuse the same
-      ;; :orig-point
-      ;; reset it for other last-command
+      ;; handle :orig-point
+      ;; - reset :orig-point unless the last command was also
+      ;;   toggling outlines
+      ;; - let other "ram-outline-toggle-*" commands reuse the same
+      ;;   - :orig-point
+      ;; - reset it for other last-command
       (when (not (and (symbolp last-command)
                       (string-prefix-p "ram-outline-toggle" (symbol-name last-command))))
         (setq p (point)))
-      (outline-map-region (lambda () (when
-                                         (= 1 (funcall outline-level))
-                                       (outline-hide-subtree)))
+      (outline-map-region (lambda () (cond
+                                      ((= 1 (funcall outline-level)) (outline-hide-subtree))
+                                      ((= 2 (funcall outline-level)) (setq deeper-outlines-exist 2))
+                                      ;; in case the document has no
+                                      ;; level 2 outlines but has
+                                      ;; outlines at deeper levels
+                                      ;; (e.g., by a type etc)
+                                      ((or (not deeper-outlines-exist)
+                                           (and
+                                            ;; do not set back to level 1
+                                            (>= (funcall outline-level) 2)
+                                            ;; reset only for lower
+                                            ;; levels but not greater
+                                            ;; than MAX-LEVEL
+                                            (<= (funcall outline-level) deeper-outlines-exist max-level)))
+                                       (setq deeper-outlines-exist (funcall outline-level)))
+                                      ;; anything unaccounted? catch it just in case.
+                                      (t nil)))
                           beg end)
       (move-beginning-of-line 1)
       (setq ram-outline-toggle-plist (plist-put
-                                      (plist-put ram-outline-toggle-plist :counter 2)
+                                      (plist-put ram-outline-toggle-plist
+                                                 :counter (or deeper-outlines-exist max-level))
                                       :orig-point p)))
+     ;; We made a full toggling cycle
+     ;; and starting a new round:
      ;; 1st iteration again:
-     ;;   - repeating the cycle of iterations
-     ;; hide all
+     ;; - it means we run through complete
+     ;;   cycle of toggling all possible levels
+     ;;   and returned to the beginning of the cycle
+     ;; - we are repeating the cycle of iterations again
+     ;;   e.g., in case you missed something or want to confirm
+     ;;   or want to confirm what you have seen in the cycle.
+     ;; - the action here is to hide all outline levels again.
      ((and (eq last-command this-command)
-           (or (= 1 c) (< 4 c)))
-      (outline-map-region (lambda () (when
-                                         (= 1 (funcall outline-level))
-                                       (outline-hide-subtree)))
+           (or (= 1 c) (< max-level c)))
+      ;; lambda here the same as at the case above:
+      ;;   - entrance to the toggling cycle, i.e., the first call.
+      (outline-map-region (lambda () (cond
+                                      ((= 1 (funcall outline-level)) (outline-hide-subtree))
+                                      ((= 2 (funcall outline-level)) (setq deeper-outlines-exist 2))
+                                      ;; in case the document has no
+                                      ;; level 2 outlines but has
+                                      ;; outlines at deeper levels
+                                      ;; (e.g., by a type etc)
+                                      ((or (not deeper-outlines-exist)
+                                           (and
+                                            ;; do not set back to level 1
+                                            (>= (funcall outline-level) 2)
+                                            ;; reset only for lower
+                                            ;; levels but not greater
+                                            ;; than MAX-LEVEL
+                                            (<= (funcall outline-level) deeper-outlines-exist max-level)))
+                                       (setq deeper-outlines-exist (funcall outline-level)))
+                                      ;; anything unaccounted? catch it just in case.
+                                      (t nil)))
                           beg end)
       (move-beginning-of-line 1)
-      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter 2))
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist
+                                                :counter  (or deeper-outlines-exist max-level)))
       )
      ;; last iteration
+     ;; - we exceeded max-level possible toggling
+     ;;   levels
+     ;; - we still increment the :counter
+     ;;   as it will let us detect the completing of a full cycle
+     ;;   and start a new round of toggling.
      ((and (eq last-command this-command)
-           (= 5 c))
-      (outline-map-region (lambda () (when
-                                         (= 1 (funcall outline-level))
+           (= (1+ max-level) c))
+      ;; reset deeper-outlines-exist
+      (setq deeper-outlines-exist nil)
+      (outline-map-region (lambda () (when (= 1 (funcall outline-level))
                                        (outline-hide-subtree)))
                           beg end)
       (goto-char p)
@@ -6324,11 +6396,22 @@ If you wish to cycle to deeper levels, then modify the parts:
                             (cond
                              ((= 1 (funcall outline-level)) (outline-hide-subtree))
                              ((= 2 (funcall outline-level)) (outline-show-heading))
+                             ((= 3 (funcall outline-level)) (setq deeper-outlines-exist 3))
+                             ((or (not deeper-outlines-exist)
+                                  (and
+                                   ;; do not set back to level less than 3
+                                   (>= (funcall outline-level) 3)
+                                   ;; reset only for lower
+                                   ;; levels but not greater
+                                   ;; than MAX-LEVEL
+                                   (<= (funcall outline-level) deeper-outlines-exist max-level)))
+                              (setq deeper-outlines-exist (funcall outline-level)))
                              (t nil)))
                           beg end)
       (goto-char p)
       (move-beginning-of-line 1)
-      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c))))
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist
+                                                :counter (or deeper-outlines-exist max-level))))
      ;; 3nd iteration:
      ;;   - show sublevels 3
      ((and (eq last-command this-command)
@@ -6339,21 +6422,33 @@ If you wish to cycle to deeper levels, then modify the parts:
                              ((= 1 (funcall outline-level)) (outline-hide-subtree))
                              ((= 2 (funcall outline-level)) (outline-show-heading))
                              ((= 3 (funcall outline-level)) (outline-show-heading))
+                             ((= 4 (funcall outline-level)) (setq deeper-outlines-exist 4))
+                             ((or (not deeper-outlines-exist)
+                                  (and
+                                   ;; do not set back to level less than 4
+                                   (>= (funcall outline-level) 4)
+                                   ;; reset only for lower
+                                   ;; levels but not greater
+                                   ;; than MAX-LEVEL
+                                   (<= (funcall outline-level) deeper-outlines-exist max-level)))
+                              (setq deeper-outlines-exist (funcall outline-level)))
                              (t nil)))
                           beg end)
       (goto-char p)
       (move-beginning-of-line 1)
-      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c))))
+      (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist
+                                                :counter (or deeper-outlines-exist max-level))))
      ;; 4th iteration:
      ;;   - outline-show-all
      ((and (eq last-command this-command)
-           (= 4 c))
+           (= max-level c))
       (outline-show-all)
       (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c)))
       (goto-char p))
      ;; should not happend, but just in case
      (t (setq ram-outline-toggle-plist nil)))
-    (recenter))
+    (recenter)
+    )
   )
 
 (defvar-local ram-outline-toggle-current-subtree-plist nil
