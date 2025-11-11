@@ -12,6 +12,12 @@
 (defconst uhd-width 3840
   "`uhd-width' integer used to compare current monitor size.")
 
+;;* Emacs server
+
+;; need only to read Man pages with
+;;   - emacsclient --eval '(man "$1")'
+(server-start)
+
 ;;* color-themes
 
 ;; TODO:after-load-theme-hook change to ram-after-load-theme-hook
