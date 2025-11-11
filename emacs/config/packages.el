@@ -3435,8 +3435,13 @@ max column lengths. Use these values to shrink the each column separately."
           ;; e.g., less than 50% of average width:
           ;; e.g., 15 char for 4 cols and 120 max width, (* 0.5 (/ 120 4))
           (min-possible-col-width (floor (* .5 (/ max-table-width
-                                                  ;; number of columns
-                                                  (length (car elisp-data))))))
+                                                  ;; get max number of columns
+                                                  ;; by comparing rows
+                                                  (cl-reduce (lambda (acc el)
+                                                               (if (seqp el)
+                                                                   (max acc (length el))
+                                                                 acc))
+                                                             elisp-data :initial-value 0)))))
           (wide-and-all-colls
            (cl-labels ((separate-cols
                          (table wide-cols all-cols)
@@ -4537,7 +4542,9 @@ If the result table width exceeds that value, shrink columns.")
 
 ;; (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook #'ram-set-org-faces)
-(add-hook 'org-mode-hook #'org-fold-hide-block-all)
+;; !!! this may cause error for very large blocks
+;;       - file will fail to load
+;;(add-hook 'org-mode-hook #'org-fold-hide-block-all)
 (add-hook 'org-mode-hook #'org-display-inline-images)
 (add-hook 'org-mode-hook #'visual-line-mode)
 (add-hook 'org-mode-hook #'ram-org-mode-syntax-table-update)
