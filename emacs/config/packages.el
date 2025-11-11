@@ -1062,24 +1062,34 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 (defun ram-kill-ring-save-minibuffer-candidate ()
   "Save completion candidate into the `kill-ring'."
   (interactive)
-  (let ((candidate (car completion-all-sorted-completions)))
+  ;; clean the CANDIDATE first
+  (let ((candidate (save-match-data
+                     (car (split-string
+                           (car completion-all-sorted-completions)
+                          "\\(?:`\\**\\(?:[[:space:]]+`\\**[[:space:]]*\\)*\\)"
+                           t)))))
     (when (and (minibufferp)
                (bound-and-true-p icomplete-mode))
       (kill-new candidate)
-      (message "Copied %s to kill-ring" (propertize candidate 'face 'success)))))
+      (message "Copied \"%s\" to kill-ring" (propertize candidate 'face 'success)))))
 
 (defun ram-kill-minibuffer-candidate ()
   "Save completion candidate into the `kill-ring' and exit minibuffer."
   (interactive)
-  (let ((candidate (car completion-all-sorted-completions)))
+  (let ((candidate (save-match-data
+                     (car (split-string
+                           (car completion-all-sorted-completions)
+                           "\\(?:`\\**\\(?:[[:space:]]+`\\**[[:space:]]*\\)*\\)"
+                           t)))))
     (when (and (minibufferp)
                (bound-and-true-p icomplete-mode))
       (kill-new candidate)
       (with-minibuffer-selected-window
         (unless (buffer-local-value 'buffer-read-only (current-buffer))
-          (insert candidate)))
-      ;; exit minibuffer
-      (top-level))))
+          (insert candidate)))))
+  ;; (top-level)
+  ;; minibuffer-force-complete-and-exit
+  )
 
 (defun ram-insert-minibuffer-candidate (arg)
   "Insert completion candidate."
@@ -1126,25 +1136,35 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
         (quit (abort-recursive-edit))
         (:success (abort-recursive-edit))))))
 
-(defun ram-jump-to-outline-from-minibuffer ()
-  "Call `ram-jump-to-outline' and use previous minibuffer input."
+(defun ram-remap-H-h-key-in-minibuffer ()
+  "Call command bound to \"H-h\" in buffer for `minibuffer-selected-window'.
+
+Reuse minibuffer input."
   (interactive)
   (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol))))
     (minibuffer-with-setup-hook
         (lambda () (insert user-input))
       (condition-case err
-          (call-interactively #'ram-jump-to-outline)
+          (call-interactively
+           (with-current-buffer (window-buffer (minibuffer-selected-window))
+             (or (lookup-key (current-global-map) (kbd "H-h"))
+                 (keymap-local-lookup "H-h"))))
         (quit (abort-recursive-edit))
         (:success (abort-recursive-edit))))))
 
-(defun ram-jump-to-def-from-minibuffer ()
-  "Call `ram-jump-to-def' and use previous minibuffer input."
+(defun ram-remap-H-H-key-in-minibuffer ()
+  "Call command bound to \"H-H\" in buffer for `minibuffer-selected-window'.
+
+Reuse minibuffer input."
   (interactive)
   (let ((user-input  (buffer-substring (point-at-bol) (point-at-eol))))
     (minibuffer-with-setup-hook
         (lambda () (insert user-input))
       (condition-case err
-          (call-interactively #'ram-jump-to-def)
+          (call-interactively
+           (with-current-buffer (window-buffer (minibuffer-selected-window))
+             (lookup-key (current-global-map) (kbd "H-H"))
+             (keymap-local-lookup "H-H")))
         (quit (abort-recursive-edit))
         (:success (abort-recursive-edit))))))
 
@@ -1164,8 +1184,8 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 (define-key minibuffer-local-completion-map (kbd "C-h v") #'ram-describe-variable-from-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "C-h o") #'ram-describe-symbol-from-minibuffer)
 
-(define-key minibuffer-local-completion-map (kbd "H-h") #'ram-jump-to-outline-from-minibuffer)
-(define-key minibuffer-local-completion-map (kbd "H-H") #'ram-jump-to-def-from-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "H-h") #'ram-remap-H-h-key-in-minibuffer)
+(define-key minibuffer-local-completion-map (kbd "H-H") #'ram-remap-H-H-key-in-minibuffer)
 (define-key minibuffer-local-completion-map (kbd "M-w") #'ram-kill-ring-save-minibuffer-candidate)
 (define-key minibuffer-local-completion-map (kbd "C-w") #'ram-kill-minibuffer-candidate)
 
@@ -1196,11 +1216,11 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
 ;; Space should never complete
 (define-key minibuffer-local-completion-map (kbd "SPC") nil)
 
-;;** minibuffer: functions
+;; ** minibuffer: functions
 
-;;*** minibuffer/functions: supporting functions
+;; *** minibuffer/functions: supporting functions
 
-(defmacro ram-add-to-history-cmd (fn-name history command)
+(defmacro ram-add-to-history-cmd (fn-name history &rest commands)
   `(defun ,fn-name ()
      ,(format "Add search string entered in minibuffer to `%s'." (eval history))
      (interactive)
@@ -1209,7 +1229,10 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
        (if (< 3 (length search-str))
            (progn
              (add-to-history ,history search-str))))
-     (,(symbol-function command))))
+     ;; (,(symbol-function command))
+     (cl-dolist (c ',commands)
+       (funcall c))
+     ))
 
 ;;*** minibuffer/functions: ram-describe-variable
 
@@ -1230,9 +1253,9 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
      ;; (setq history-add-new-input nil)
 
      (define-key minibuffer-local-completion-map (kbd "<return>")
-       (ram-add-to-history-cmd ram-add-to-describe-variable-history
-                               'ram-describe-variable-history
-                               minibuffer-force-complete-and-exit))
+                 (ram-add-to-history-cmd ram-add-to-describe-variable-history
+                                         'ram-describe-variable-history
+                                         minibuffer-force-complete-and-exit))
 
      (setq val (completing-read
                 (if (symbolp v)
@@ -1257,8 +1280,17 @@ HOOK is of the form: '((before-save-hook (remove my-fn1 before-save-hook)) (afte
      (define-key minibuffer-local-completion-map (kbd "<return>") old-binding)
 
      ;; (setq history-add-new-input default-history-add-val)
+     ;; !!! TODO: history-add-new-input needs rewriting
+     ;;           - apparently, it is not used as intended
+     ;;           - in fact, it seems that it is not used at all.
+     ;; the following trips me for nth time alreday:
+     ;;   - the list below is a return value of the 'interactive block
+     ;;   - it is mapped to whatever arguments you defined for this function
+     ;;     + (variable &optional swap-history-p) for this function
+     ;;     + hence, a list of two values is returned from 'interactive block
      (list (if (equal val "")
-               v (intern val))
+               v
+             (intern val))
            ;; if two items are inserted, swap them so that the search str is first
            (let ((third-element (caddr ram-describe-variable-history))
                  (second-element (cadr ram-describe-variable-history)))
@@ -1386,12 +1418,23 @@ succession."
 
 (defun ram-make-duplicate-keys-unique (alist)
   "Keep `concat' \"*\" to duplicate keys in `alist' until all keys are unique."
-  (cl-labels ((make-dups-unique (alist pair)
-                                (if (assoc (car pair) alist)
-                                    (cons (car alist) (make-dups-unique (cdr alist)
-                                                                        (cons (concat (car pair) "*") (cdr pair))))
-                                  (append (list pair) alist))))
+  ;; !!! this breaks the order
+  ;; TODO: it needs fixing
+  (cl-labels ((make-dups-unique
+                (alist pair)
+                (if (assoc (car pair) alist)
+                    (cons (car alist) (make-dups-unique (cdr alist)
+                                                        (cons (concat (car pair) "*") (cdr pair))))
+                  (append (list pair) alist))))
     (cl-reduce #'make-dups-unique alist :initial-value '())))
+
+;; credit to https://emacs.stackexchange.com/a/8177
+(defun ram-presorted-completion-table (completions)
+  (lambda (string pred action)
+    (if (eq action 'metadata)
+        `(metadata (cycle-sort-function . ,#'identity)
+                   (display-sort-function . ,#'identity))
+      (complete-with-action action completions string pred))))
 
 (defun ram-jump-to-outline (outline &optional swap-history-p)
   "Jump to outline."
@@ -1403,49 +1446,72 @@ succession."
                     (current-buffer)))
           (headline-regex
            ;; use regexp that allow extracting info from headings
-           (cond
-            ((eq major-mode 'org-mode)
-             "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
-            ((eq major-mode 'markdown-mode)
-             "^\\( *\\)\\(#+\\)\\(?: +\\(.*?\\)\\)?[[:blank:]]*$")
-            ((eq major-mode 'python-mode)
-             (rx line-start
-                 (* space)
+           (with-current-buffer buffer
+             (cond
+              ((eq major-mode 'org-mode)
+               "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")
+              ((eq major-mode 'markdown-mode)
+               "^\\( *\\)\\(#+\\)\\(?: +\\(.*?\\)\\)?[[:blank:]]*$")
+              ((eq major-mode 'python-mode)
+               (rx line-start
+                   (* space)
                                         ; 0 or more spaces
-                 ;; (group (one-or-more (syntax comment-start)))
-                 (group (+ (syntax comment-start)))
-                 ;; Heading level
-                 (+ space)
-                 (group (repeat 1 8 "\*"))
-                 (+ space)
-                 ;; heading text
-                 ;; Must be accessible with (match-string 3)
-                 (group (+? not-newline))
-                 (* space)
-                 line-end))
-            (t
-             "^[[:blank:]]*;;[[:space:]]?\\(?:\\(;+\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$")))
+                   ;; (group (one-or-more (syntax comment-start)))
+                   (group (+ (syntax comment-start)))
+                   ;; Heading level
+                   (+ space)
+                   (group (repeat 1 8 "\*"))
+                   (+ space)
+                   ;; heading text
+                   ;; Must be accessible with (match-string 3)
+                   (group (+? not-newline))
+                   (* space)
+                   line-end))
+              (t
+               "^[[:blank:]]*;;[[:space:]]?\\(?:\\(;+\\)\\|\\(\\*+\\)\\)\\(?: +\\(.*?\\)\\)?[ ]*$"))))
           (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
+          (old-binding-to-C-w (cdr (assoc ?\C-w (cdr minibuffer-local-completion-map))))
           (reset-keybindings (lambda ()
                                (if old-binding-to-return
                                    (setf (alist-get 'return (cdr minibuffer-local-completion-map)) old-binding-to-return)
-                                 (assq-delete-all 'return (cdr minibuffer-local-completion-map)))))
+                                 (assq-delete-all 'return (cdr minibuffer-local-completion-map)))
+                               (if old-binding-to-C-w
+                                   (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map)) old-binding-to-C-w)
+                                 (assq-delete-all ?\C-w (cdr minibuffer-local-completion-map)))))
           (hist-item (car ram-jump-to-outline-history)))
      (setf (alist-get 'return (cdr minibuffer-local-completion-map))
            (ram-add-to-history-cmd ram-add-to-jump-to-outline-history
                                    'ram-jump-to-outline-history
                                    minibuffer-force-complete-and-exit))
+     (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map))
+           (ram-add-to-history-cmd ram-add-to-jump-org-outline-history-on-kill
+                                   'ram-jump-to-outline-history
+                                   ram-kill-minibuffer-candidate
+                                   minibuffer-force-complete-and-exit
+                                   ))
      (condition-case err
          (progn (with-current-buffer buffer
                   (save-excursion
                     (goto-char (point-max))
                     (while (re-search-forward headline-regex nil t -1)
-                      (setq headlines (cons (cons (match-string-no-properties 3) (point)) headlines)))))
-                (setq headlines (ram-make-duplicate-keys-unique headlines))
+                      (setq headlines (cons
+                                       (cons
+                                        ;; indent headlines to reflect their level
+                                        (concat
+                                         (if (= 1 (length (match-string-no-properties 2)))
+                                             "`*"
+                                           (concat "`*"
+                                                   (s-repeat (max 0 (1- (length (match-string-no-properties 2)))) "  `*"))  )
+                                         (match-string-no-properties 3))
+                                        (point))
+                                       headlines)))
+                    ))
+                ;; (setq headlines (ram-make-duplicate-keys-unique headlines))
                 (setq val (cdr (assoc (completing-read
                                        (format-prompt
-                                        "Find heading" (car ram-jump-to-outline-history))
-                                       headlines
+                                        "****heading:" (car ram-jump-to-outline-history))
+                                       (ram-presorted-completion-table
+                                        headlines)
                                        nil t nil
                                        'ram-jump-to-outline-history
                                        (car ram-jump-to-outline-history))
@@ -1461,13 +1527,30 @@ succession."
         (signal 'quit nil))
        (:success
         (funcall reset-keybindings)
-        ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
-        ;; FIXME: confusing logic, rewrite without using these args
-        (list val
-              ;; if two items are inserted, swap them so that the search str is first
-              (let ((third-element (caddr ram-org-jump-to-name-history))
-                    (second-element (cadr ram-org-jump-to-name-history)))
-                (and second-element (equal hist-item third-element)))))))
+        ;; this list is returned from 'interactive block,
+        ;; list elements are mapped to command args, i.e.,
+        ;;   - 1st element mapped to  ORG-NAME
+        ;;   - 2d  element mapped to SWAP-HISTORY-P
+        (list
+         ;; this element is the value of ORG-NAME argument to the function
+         val
+         ;; this element is the value of SWAP-HISTORY-P argument to the function
+         ;; if two items are inserted, swap them so that the search str is first
+         ;; this is the value of SWAP-HISTORY-P argument to the function
+         ;; if two items are inserted, swap them
+         ;;   - because I want
+         ;;     + the search str that I typed in to be
+         ;;       the first item in history
+         ;;     + and actual selected item to be the second
+         ;;  - I want it so because the search string narrows the
+         ;;    candidates,
+         ;;    + and I may want to select(try) another item
+         ;; This piece of logic just checks if
+         ;;   - true if two items wore inserted
+         ;;   - nil otherwise
+         (let ((third-element (caddr ram-org-jump-to-name-history))
+               (second-element (cadr ram-org-jump-to-name-history)))
+           (and second-element (equal hist-item third-element)))))))
 
    ;; reorder history so that the search string is fist and the input is second.
    ;; Use it for different order when pressing <M-p> for previous history item.
@@ -1481,11 +1564,12 @@ succession."
       (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
                                      (current-buffer))))
         (switch-to-buffer pre-minibuffer-buffer)))
-    (push-mark)
-    (goto-char val)
-    (outline-show-entry)
-    (beginning-of-line)
-    (recenter)
+    (when (not (eq last-command-event ?\C-w))
+      (push-mark)
+      (goto-char val)
+      (outline-show-entry)
+      (beginning-of-line)
+      (recenter))
     ;; (let ((default (if (boundp pulse-flag)
     ;;                    pulse-flag
     ;;                  nil)))
@@ -1518,6 +1602,7 @@ succession."
                      "defface"
                      "define-abbrev-table"
                      "define-error"
+                     "define-key"
                      "defun"
                      "defun-motion"
                      "defvar"
@@ -1564,7 +1649,19 @@ succession."
                         (current-buffer))
                     (current-buffer)))
           (def-regex (with-current-buffer buffer
-                       (ram-jump-to-def-get-regexs major-mode "\\([^[:blank:]\t\r\n\v\f)]+\\)")))
+                       (ram-jump-to-def-get-regexs
+                        major-mode
+                        ;; capture any thing that is not of newline kind
+                        ;;"\\([^[:blank:]\t\r\n\v\f)]+\\)"
+                        ;; some definitions may include several parts, e.g.,
+                        ;;   - (define-key ...)
+                        ;;   - (add-to-list ...)
+                        ;; in these cases I could be interested in the second (or all parts)
+                        ;; but the old regexp will capture only th 1st.
+                        ;; Hence, I update the regexp to exclude only line break
+                        ;; therefore, capture all parts of definition
+                        "\\([^\t\r\n\v\f]+\\)"
+                        )))
           (hist-item (car ram-jump-to-def-history))
           (str-at-point (thing-at-point 'symbol))
           (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
@@ -3120,14 +3217,29 @@ some commands. "
 (defun ram-org-jump-to-name (org-name &optional swap-history-p)
   "Jump to org #+name."
   (interactive
-   (let* ((org-names '())
+   (let* ((name-at-point
+           (let ((old-syntax-for-equal (char-to-string (char-syntax ?=)))
+                 (old-syntax-for-dot (char-to-string (char-syntax ?=)))
+                 symbol)
+             ;; no not include "=" as symbol
+             ;; i.e., in foo=bar, only select either foo bar
+             ;; make ?= char mean whitespace char class temporarily
+             (modify-syntax-entry ?= " " org-mode-syntax-table)
+             ;; make "." be part of a symbol
+             ;;   - otherwise names like "1.1.1_definition_of_Class"
+             ;;     would not be rendered properly
+             (modify-syntax-entry ?. "_" org-mode-syntax-table)
+             (setq symbol (thing-at-point 'symbol 'no-properties))
+             (modify-syntax-entry ?= old-syntax-for-equal org-mode-syntax-table)
+             (modify-syntax-entry ?. old-syntax-for-dot org-mode-syntax-table)
+             symbol))
+          (org-names '())
           (buffer (if (minibufferp)
                       (with-minibuffer-selected-window
                         (current-buffer))
                     (current-buffer)))
-          (org-name-regex "^#\\+name:\\(?: *\\)\\(.*?\\)?[[:blank:]]*$"
-                          ;; (cond ((eq major-mode 'org-mode)            "^\\(;; \\)?\\(\\*+\\)\\(?: +\\(.*?\\)\\)?[ 	]*$")))
-                          )
+          (org-name-regex
+           "^#\\+name:\\(?: *\\)\\(.*?\\)?[[:blank:]]*$")
           (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
           (old-binding-to-C-w (cdr (assoc ?\C-w (cdr minibuffer-local-completion-map))))
           (reset-keybindings (lambda ()
@@ -3147,7 +3259,9 @@ some commands. "
      (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map))
            (ram-add-to-history-cmd ram-add-to-jump-org-name-history-on-kill
                                    'ram-org-jump-to-name-history
-                                   ram-kill-minibuffer-candidate))
+                                   ram-kill-minibuffer-candidate
+                                   minibuffer-force-complete-and-exit
+                                   ))
 
      (condition-case err
          (progn (with-current-buffer buffer
@@ -3161,15 +3275,28 @@ some commands. "
                       (widen)
                       (goto-char (point-max))
                       (while (re-search-forward org-name-regex nil t -1)
-                        (setq org-names (cons (cons (match-string-no-properties 1) (point)) org-names))))))
-                (setq org-names (ram-make-duplicate-keys-unique org-names))
+                        (setq org-names
+                              (cons
+                               (cons
+                                (concat
+                                 (if (= 1 (length (match-string-no-properties 2)))
+                                     "`"
+                                   (concat "`"
+                                           (s-repeat (max 0 (1- (save-match-data (org-current-level)))) "  `"))  )
+                                 (match-string-no-properties 1))
+                                ;; (concat (s-repeat (max 0 (1- (save-match-data (org-current-level))))  "  ` ")
+                                ;;         (match-string-no-properties 1))
+                                (point)) org-names))))))
+                ;; (setq org-names (ram-make-duplicate-keys-unique org-names))
                 (setq val (cdr (assoc (completing-read
                                        (format-prompt
-                                        "Find #+name:" (car ram-org-jump-to-name-history))
+                                        "#+name:" (or name-at-point
+                                                      (car ram-org-jump-to-name-history)))
                                        org-names
                                        nil t nil
                                        'ram-org-jump-to-name-history
-                                       (car ram-org-jump-to-name-history))
+                                       (or name-at-point
+                                           (car ram-org-jump-to-name-history)))
                                       org-names))))
        (error
         (funcall reset-keybindings)
@@ -3182,30 +3309,59 @@ some commands. "
         (signal 'quit nil))
        (:success
         (funcall reset-keybindings)
-        ;; this returned list is mapped to command args: OUTLINE and SWAP-HISTORY-P
-        ;; FIXME: confusing logic, rewrite without using these args
-        (list val
-              ;; if two items are inserted, swap them so that the search str is first
-              (let ((third-element (caddr ram-org-jump-to-name-history))
-                    (second-element (cadr ram-org-jump-to-name-history)))
-                (and second-element (equal hist-item third-element)))))))
+        ;; this list is returned from 'interactive block,
+        ;; list elements are mapped to command args, i.e.,
+        ;;   - 1st element mapped to  ORG-NAME
+        ;;   - 2d  element mapped to SWAP-HISTORY-P
+        (list
+         ;; this element is the value of ORG-NAME argument to the function
+         (if (equal val "")
+             name-at-point
+           val)
+         ;; this element is the value of SWAP-HISTORY-P argument to the function
+         ;; if two items are inserted, swap them
+         ;;   - because I want
+         ;;     + the search str that I typed in to be
+         ;;       the first item in history
+         ;;     + and actual selected item to be the second
+         ;;  - I want it so because the search string narrows the
+         ;;    candidates,
+         ;;    + and I may want to select(try) another item
+         ;; This piece of logic just checks if
+         ;;   - true if two items wore inserted
+         ;;   - nil otherwise
+         (let ((third-element (caddr ram-org-jump-to-name-history))
+               (second-element (cadr ram-org-jump-to-name-history)))
+           (and second-element (equal hist-item third-element)))))))
 
-   ;; reorder history so that the search string is fist and the input is second.
+   )
+  ;; reorder history so that the search string is fist and the input is second.
    ;; Use it for different order when pressing <M-p> for previous history item.
    (when swap-history-p
      (setq ram-org-jump-to-name-history
            (cons (cadr ram-org-jump-to-name-history)
                  (cons (car ram-org-jump-to-name-history)
-                       (cddr ram-org-jump-to-name-history))))))
+                       (cddr ram-org-jump-to-name-history)))))
   (when org-name
     (when (minibufferp)
       (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
                                      (current-buffer))))
         (switch-to-buffer pre-minibuffer-buffer)))
-    (push-mark)
-    (goto-char org-name)
-    (beginning-of-line)
-    (recenter)
+    ;; (message ">>>>> this-command: %S" this-command)
+    ;; (message ">>>>> last-command: %S" last-command)
+    ;; (message ">>>>> real-last-command: %S" real-last-command)
+    ;; (message ">>>>> last-command-event: %S" last-command-event)
+    ;; (message ">>>>> current-minibuffer-command: %S" current-minibuffer-command)
+    ;; last-command-event: we are looking for event 'pressed ?\C-w'
+    ;; (eq last-command-event ?\C-w)
+    ;; means that 'ram-kill-minibuffer-candidate was called
+    ;; and you do not want to jump to the result
+    (when (not (eq last-command-event ?\C-w))
+      (push-mark)
+      (goto-char org-name)
+      (outline-show-entry)
+      (beginning-of-line)
+      (recenter))
     ;; (let ((default (if (boundp pulse-flag)
     ;;                    pulse-flag
     ;;                  nil)))
