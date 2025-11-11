@@ -4303,6 +4303,15 @@ Use it from `org-mode-hook'.
 
 ;; ** org-mode: LaTeX
 
+;; !!! works only if
+;; (image-type-available-p 'svg) is t
+;; otherwise insure you have correct libraries installes
+;; e.g., librsvg2-dev installed
+;; to compile Emacs with svg support
+(setq org-preview-latex-default-process 'dvisvgm)
+
+;;(setq org-preview-latex-default-process 'dvipng)
+
 (with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-classes
                '("scrbook" "\\documentclass[20pt]{scrbook}"
