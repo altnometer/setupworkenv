@@ -1,5 +1,16 @@
 #!/bin/bash
-# Set up a debian computer working environment.
+
+## Set up a working environment based on Debian.
+## 1. Run this script from
+##    ${HOME}/backup/setworkenv.sh location
+##    which is a copy of the repository file.
+##    Keep the copy up to date.
+## 2. ${HOME}/backup contains not only setworkenv.sh file
+##    but all the private files needed to set up your system.
+##    This director should be copied before hand from your
+##    backup location.
+## 3. You should have 'sudo' installed before running this script.
+
 
 set -e
 
