@@ -4379,6 +4379,8 @@ Use it from `org-mode-hook'.
   (add-to-list 'org-structure-template-alist
                '("rs" . "src R :results value :session my-R-session"))
   (add-to-list 'org-structure-template-alist
+               '("ps" . "src python :results value :session my-Python-session"))
+  (add-to-list 'org-structure-template-alist
                '("rsc" . "src R :results value :colnames yes :session my-R-session"))
   (add-to-list 'org-structure-template-alist
                '("rso" . "src R :results output :session my-R-session"))
@@ -4428,7 +4430,10 @@ Use it from `org-mode-hook'.
 ;;*** org-mode/org-babel: python
 
 (setq python-shell-interpreter "/usr/bin/python3")
-(setq org-babel-python-command "python3")
+;;(setq python-shell-interpreter "~/.venv/org-babel/bin/python3")
+;;(setq org-babel-python-command "python3")
+(setq org-babel-python-command 'auto)
+(setq python-shell-virtualenv-root "~/.venv/org-babel/")
 
 ;;*** org-mode/org-babel: prolog
 
