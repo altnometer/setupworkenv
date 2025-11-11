@@ -2,6 +2,28 @@
 
 ;;* templates: org-mode
 
+;;** templates/org-mode: code blocks
+
+;;*** templates/org-mode/code blocks: copy previous block
+
+(tempo-define-template
+ "ram-org-prev-code-block-copy"
+ '(
+   (ram-org-prev-code-block-copy)
+   )
+ "<bc"
+ "A copy of the previous Org code block."
+ 'ram-tempo-org-template-tags)
+
+;;*** templates/org-mode/code blocks: R
+
+;; R for plotting/visualizing
+;;  - automatically
+;;    + name the block (from #+name: or headline etc)
+;;    + create a unique filename in /tmp directory
+;;    + copy content of the previous block for plotting
+;;      - if none such blocks exist, create empty block
+
 (tempo-define-template
  "R-block-graph-with-content"
  '((tempo-save-named 'count (number-to-string (+ 1 (ram-get-org-code-block-img-count))))
@@ -25,8 +47,8 @@
    "#+begin_src R :session my-R-session" n
    ~ (s prev-block-content)
    "#+end_src"  n n
-   "#+ATTR_ORG: :width 800px" n
-   "#+ATTR_HTML: :width 300px" n
+   "#+ATTR_HTML: :width 300" n
+   "#+ATTR_ORG: :width 800" n
    "#+RESULTS: " (s block-name) "_img" (s count) n
    ^
    )
@@ -34,14 +56,6 @@
  "R Org code block displaying graphics with a copy of previous R block."
  'ram-tempo-org-template-tags
  )
-
-(tempo-define-template "ram-org-prev-code-block-copy"
-                       '(
-                         (ram-org-prev-code-block-copy)
-                         )
-                       "<bc"
-                       "A copy of the previous Org code block."
-                       'ram-tempo-org-template-tags)
 
 (tempo-define-template "R-block-with-previous-non-graph-block-content"
                        ;; R blocks which has no '((:results . graphics)) params
@@ -52,6 +66,58 @@
                        "Previous Org code block for R excluding ((:results . graphics))."
                        'ram-tempo-org-template-tags)
 
+;;*** templates/org-mode/code blocks: python
+
+;; Python for plotting/visualizing
+;;  - automatically
+;;    + name the block (from #+name: or headline etc)
+;;    + create a unique filename in /tmp directory
+;;    + copy content of the previous block for plotting
+;;      - if none such blocks exist, create empty block
+
+(tempo-define-template
+ "Python-block-graph-with-content"
+ '((tempo-save-named 'count (number-to-string (+ 1 (ram-get-org-code-block-img-count))))
+   (tempo-save-named 'block-name (ram-make-code-block-name))
+   ;; !!! TODO: fix two calls to the same function.
+   ;; that returns '(headers block-content)
+   ;; a quick fix to fetch #+header: :var ...
+   ;; use same function for getting the same previous block
+   ;; it seems that the template cannot access list elements.
+   (tempo-save-named 'prev-block-var_headers
+                      (car (ram-get-prev-org-code-block-value-for-Python-graph))
+                      )
+   (tempo-save-named 'prev-block-content
+                      (cadr (ram-get-prev-org-code-block-value-for-Python-graph))
+                     )
+   "#+name: " (s block-name) "_img" (s count) n
+   ~ (s prev-block-var_headers)
+   "#+header: :var fname=\"/tmp/" (s block-name) "_img" (s count) ".png\"" n
+   "#+header: :file /tmp/" (s block-name) "_img" (s count) ".png" n
+   "#+header: :results file link" n
+   "#+begin_src python :session my-Python-session" n
+   ~ (s prev-block-content)
+   "#+end_src"  n n
+   "#+RESULTS: " (s block-name) "_img" (s count) n
+   ^
+   )
+ "<pgc"
+ "Python Org code block displaying graphics with a copy of previous R block."
+ 'ram-tempo-org-template-tags
+ )
+
+(tempo-define-template "Python-block-with-previous-non-graph-block-content"
+                       ;; Python blocks which has no '((:results . graphics)) params
+                       '(
+                         (ram-org-prev-code-block-copy-for-lang-with-or-without-params
+                          'python nil '((:results . graphics))))
+                       "<pbc"
+                       "Previous Org code block for Python excluding ((:results . graphics))."
+                       'ram-tempo-org-template-tags)
+
+;;*** templates/org-mode/code blocks: bash/shell
+
+
 (tempo-define-template "BASH-block-with-previous-block-content"
                        '(
                          (ram-org-prev-code-block-copy-for-lang-with-or-without-params
@@ -59,6 +125,8 @@
                        "<shbc"
                        "Previous Org code block for shell."
                        'ram-tempo-org-template-tags)
+
+;;*** templates/org-mode/code blocks: emacs-lisp
 
 (tempo-define-template "EMACS-LISP-block-with-previous-block-content"
                        '(
@@ -68,13 +136,14 @@
                        "Previous Org code block for emacs-lisp."
                        'ram-tempo-org-template-tags)
 
+;;* templates: testing
+
+
 (tempo-define-template "tempo-org-foo-test"
                        '("<tempo-org-foo></tempo-org-foo>")
                        "<orgfoo"
                        "Testing"
                        'ram-tempo-org-template-tags)
-
-;;** templates: elisp emacs-lisp
 
 
 (tempo-define-template  "buzz"

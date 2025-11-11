@@ -11818,6 +11818,95 @@ Modify `tempo-match-finder'."
                 block-content)
         '("\n" "\n")))))
 
+(defun ram-get-prev-org-code-block-value-for-Python-graph ()
+  "Return the previous code block content displays Python graphics."
+  (save-excursion
+    (let ((block-headers nil)
+          (block-content nil))
+      (condition-case err
+          ;; loop through previous code blocks
+          (while (not block-content)
+            ;; when called from a template when
+            ;; the #+begin_src was already inserted
+            ;; it will consider that it is inside
+            ;; source block. We do not want that.
+            (if (org-in-src-block-p 'INSIDE nil)
+                (org-previous-block 2)
+              (org-previous-block 1))
+            (let* ((el (org-element-at-point))
+                   (header-args (append
+                                 (org-babel-parse-header-arguments
+                                  (org-element-property :parameters el))
+                                 (org-babel-parse-header-arguments
+                                  (string-join (org-element-property :header el) " ")))))
+              ;; search for code block in LANGUAGE
+              (when
+                  (and (cdr (assq :results header-args))
+                       (member "graphics" (string-split (cdr (assq :results header-args)) " "))
+                       (cdr (assq :file header-args)))
+                ;; (and (let ((case-fold-search nil))
+                ;;        (save-match-data
+                ;;          (string-equal "python" (org-element-property :language el))))
+                ;;      (s-contains? "graphics"
+                ;;                   (or
+                ;;                    (seq-find
+                ;;                     (lambda (s) (s-starts-with? ":results" s 'ignore-case))
+                ;;                     (org-element-property :header el)
+                ;;                     "")
+                ;;                    (org-babel-parse-header-arguments
+                ;;                     (org-element-property :parameters (org-element-at-point))))
+                ;;                   'ignore-case))
+                ;; get :var headers
+                ;; (setq block-headers (reverse
+                ;;                      (cl-reduce
+                ;;                       (lambda (prev s)
+                ;;                         (if (s-starts-with? ":var " s 'ignore-case)
+                ;;                             (cons (format "#+header: %s" s) prev)
+                ;;                           prev))
+                ;;                       (org-element-property :header el)
+                ;;                       :initial-value '())))
+                (setq block-headers (reverse
+                                     (cl-reduce
+                                      (lambda (prev pair)
+                                        (if (eq :var (car pair))
+                                            (cons (format "#+header: :var %s\n" (cdr pair)) prev)
+                                          prev))
+                                      header-args
+                                      :initial-value '())))
+                ;; setting block-content and break the loop
+                (setq block-content (org-element-property :value el)))))
+        (user-error (if (string= (error-message-string err)
+                                 "No previous code blocks")
+                        (setq block-content nil)
+                      ;; (signal (car err) (cdr err))
+                      ))
+        (error (signal (car err) (cdr err)))
+        ;; (:success
+        ;;  nil)
+        )
+      (if block-content
+          (list
+           block-headers
+           ;; (string-join
+           ;;  ;; if block-headers is not empty,
+           ;;  ;; append "" so that string-join will join it with "\n"
+           ;;  ;; thus, the sequence of block-headers will terminate with "\n"
+           ;;  ;; if block-header is empty, no "\n" will be placed and
+           ;;  ;; empty string "" will be returned.
+           ;;  (append block-headers '(""))
+           ;;  "\n")
+           block-content)
+        ;; just to keep the CONTENT formatted
+        ;; do some `sting-splim' then `string-join' manipulation
+        (let* ((content "import matplotlib.pyplot as plt\n\
+                          \nplt.plot([1,3,2])\n\
+                          \nplt.savefig(fname,\
+                          \n    bbox_inches='tight',\
+                          \n    transparent=True,\
+                          \n    pad_inches=0.03)\n")
+               (content (string-join (string-split content " +\n" t) "\n") ))
+          (list "" content))))))
+
 
 (defun ram-get-org-code-block-img-count ()
   "Get greatest number used as an image counter for Org code blocks.
@@ -11901,65 +11990,65 @@ then exclude from the result the code blocks that contain
 ANY of these param-value pairs.
 "
   (save-excursion
-    (ram-org-previous-block 1)
-    (let ((element (org-element-at-point)))
-      (if (and (eq 'src-block (org-element-type element))
-               (string-equal lang (org-element-property :language element))
-               ;; return t if INCLUDE-PARAMS is given
-               ;; and the code block contain ALL of them
-               (or (not include-params)
-                   ;; if ALL PARAM-VAL pair of INCLUDE-PARAMS are among the code block
-                   ;; :parameters or :header, return t, otherwise return nil
-                   (cl-reduce
-                    (lambda (bool param-val)
-                      (and
-                       bool
-                       (or
-                        (s-contains?
-                         (symbol-name (cdr param-val))
-                         (seq-find
-                          (lambda (s)
-                            (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
-                          (s-slice-at ":[-[:alpha:]]+" (org-element-property :parameters element)) ""))
-                        (s-contains?
-                         (symbol-name (cdr param-val))
-                         (seq-find
-                          (lambda (s)
-                            (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
-                          (org-element-property :header element) "")))))
-                    include-params
-                    :initial-value t))
-               ;; return t if EXCLUDE-PARAMS is given
-               ;; and the code block does not contain any of them
-               (or (not exclude-params)
-                   (not
-                    ;; if there is a single PARAM-VAL pair of
-                    ;; EXCLUDE-PARAMS among the code block :parameters
-                    ;; or :header, return t,
-                    ;; which will make (not (cl-reduce ...)) fail
-                    ;; otherwise return nil
-                    ;; which will make (not (cl-reduce ...)) succeed
-                    (cl-reduce
-                     (lambda (bool param-val)
-                       (or bool
-                           (or
-                            (s-contains?
-                             (symbol-name (cdr param-val))
-                             (seq-find
-                              (lambda (s)
-                                (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
-                              (s-slice-at ":[-[:alpha:]]+" (org-element-property :parameters element)) ""))
-                            (s-contains?
-                             (symbol-name (cdr param-val))
-                             (seq-find
-                              (lambda (s)
-                                (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
-                              (org-element-property :header element) "")))))
-                     exclude-params
-                     :initial-value nil))))
-          (buffer-substring-no-properties (org-element-begin element)
-                                          (org-element-end element))
-        (ram-org-prev-code-block-copy-for-lang-with-or-without-params lang include-params exclude-params)))))
+    (when (integer-or-marker-p (ram-org-previous-block 1))
+      (let ((element (org-element-at-point)))
+        (if (and (eq 'src-block (org-element-type element))
+                 (string-equal lang (org-element-property :language element))
+                 ;; return t if INCLUDE-PARAMS is given
+                 ;; and the code block contain ALL of them
+                 (or (not include-params)
+                     ;; if ALL PARAM-VAL pair of INCLUDE-PARAMS are among the code block
+                     ;; :parameters or :header, return t, otherwise return nil
+                     (cl-reduce
+                      (lambda (bool param-val)
+                        (and
+                         bool
+                         (or
+                          (s-contains?
+                           (symbol-name (cdr param-val))
+                           (seq-find
+                            (lambda (s)
+                              (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                            (s-slice-at ":[-[:alpha:]]+" (org-element-property :parameters element)) ""))
+                          (s-contains?
+                           (symbol-name (cdr param-val))
+                           (seq-find
+                            (lambda (s)
+                              (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                            (org-element-property :header element) "")))))
+                      include-params
+                      :initial-value t))
+                 ;; return t if EXCLUDE-PARAMS is given
+                 ;; and the code block does not contain any of them
+                 (or (not exclude-params)
+                     (not
+                      ;; if there is a single PARAM-VAL pair of
+                      ;; EXCLUDE-PARAMS among the code block :parameters
+                      ;; or :header, return t,
+                      ;; which will make (not (cl-reduce ...)) fail
+                      ;; otherwise return nil
+                      ;; which will make (not (cl-reduce ...)) succeed
+                      (cl-reduce
+                       (lambda (bool param-val)
+                         (or bool
+                             (or
+                              (s-contains?
+                               (symbol-name (cdr param-val))
+                               (seq-find
+                                (lambda (s)
+                                  (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                                (s-slice-at ":[-[:alpha:]]+" (org-element-property :parameters element)) ""))
+                              (s-contains?
+                               (symbol-name (cdr param-val))
+                               (seq-find
+                                (lambda (s)
+                                  (s-starts-with? (symbol-name (car param-val)) s 'ignore-case))
+                                (org-element-property :header element) "")))))
+                       exclude-params
+                       :initial-value nil))))
+            (buffer-substring-no-properties (org-element-begin element)
+                                            (org-element-end element))
+          (ram-org-prev-code-block-copy-for-lang-with-or-without-params lang include-params exclude-params))))))
 
 ;;*** templates, snippets/tempo: abbrevs
 
