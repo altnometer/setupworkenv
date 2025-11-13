@@ -3029,11 +3029,21 @@ the `current-prefix-arg' is non nil"
 
 ;; this recipe takes very long time to clone
 (straight-use-package
- '(org :type git :repo "https://code.orgmode.org/bzg/org-mode.git" :local-repo "org"
-       :depth full          ; default value is full
-       :pre-build (straight-recipes-org-elpa--build)
-       ;; :branch "release_9.5"
-       :build (:not autoloads) :files (:defaults "lisp/*.el" ("etc/styles/" "etc/styles/*"))))
+ '(org :type git :host github
+       :protocol https
+       :repo "emacs-straight/org-mode"
+       :local-repo "org"
+       :depth full
+       :pre-build
+       (straight-recipes-org-elpa--build)
+       :build (:not autoloads)
+       :files (:defaults "lisp/*.el" ("etc/styles/" "etc/styles/*"))))
+;(straight-use-package
+; '(org :type git :repo "https://code.orgmode.org/bzg/org-mode.git" :local-repo "org"
+;       :depth full          ; default value is full
+;       :pre-build (straight-recipes-org-elpa--build)
+;       ;; :branch "release_9.5"
+;       :build (:not autoloads) :files (:defaults "lisp/*.el" ("etc/styles/" "etc/styles/*"))))
 
 ;;** org-mode: fold
 
@@ -4471,15 +4481,13 @@ Load some common packages to memory for R processes."
 
 (straight-use-package
  '(ess :type git
-       :flavor melpa
        :files ("lisp/*.el" "doc/ess.texi"
                ("etc" "etc/*")
                ("obsolete" "lisp/obsolete/*")
                (:exclude "etc/other")
                "ess-pkg.el")
-       :host github :repo "emacs-ess/ESS"))
-
-
+       :host github
+       :repo "emacs-ess/ESS"))
 
 ;; (eval-after-load 'ess
 ;;   ;; <f2> <f2> call ram-prolog-dwim
@@ -7118,7 +7126,7 @@ heading to appear."
 ;;* avy
 
 (straight-use-package
- '(avy :type git :flavor melpa :host github :repo "abo-abo/avy"))
+ '(avy :type git :host github :repo "abo-abo/avy"))
 
 ;;** avy: actions
 
@@ -10448,8 +10456,9 @@ Hopefully, this function would cover some edge cases."
 (advice-add 'org-latex-preview :after #'hl-line-flash)
 
 ;;** packages: iedit
+
 (straight-use-package
- '(iedit :type git :flavor melpa :host github :repo "victorhge/iedit"))
+ '(iedit :type git :host github :repo "victorhge/iedit"))
 
 ;;** packages: imenu
 
@@ -10582,7 +10591,7 @@ It is in the left-most frame. It is at the bottom."
 ;;** packages: markdown-mode
 
 (straight-use-package
- '(markdown-mode :type git :flavor melpa :host github :repo "jrblevin/markdown-mode"))
+ '(markdown-mode :type git :host github :repo "jrblevin/markdown-mode"))
 
 ;;** packages: ocaml
 
