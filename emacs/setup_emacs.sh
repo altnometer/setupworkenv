@@ -157,7 +157,6 @@ else
     # tools for compiling
     apt-get install -y autoconf make gcc texinfo \
             cmake libtool-bin \
-            # image support
             libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev librsvg2-dev \
             libgnutls28-dev libtinfo-dev \
             libgtk-3-dev \
@@ -206,13 +205,63 @@ else
         cd $EMACS_REPO_DIR
     fi
 
+    ## From
+    ## ./configure --help
+    
+    ## By default, `make install' will install all the files in
+    ## `/usr/local/bin', `/usr/local/lib' etc.  You can specify
+    ## an installation prefix other than `/usr/local' using `--prefix',
+    ## for instance `--prefix=$HOME'.
+    
+    ## For better control, use the options below.
+
+    ## --bindir=DIR            user executables [EPREFIX/bin]
+    ## --sbindir=DIR           system admin executables [EPREFIX/sbin]
+    ## --libexecdir=DIR        program executables [EPREFIX/libexec]
+    ## --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+    ## --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+    ## --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+    ## --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+    ## --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+    ## --libdir=DIR            object code libraries [EPREFIX/lib]
+    ## --includedir=DIR        C header files [PREFIX/include]
+    ## --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+    ## --datarootdir=DIR       read-only arch.-independent data root [PREFIX/share]
+    ## --datadir=DIR           read-only architecture-independent data [DATAROOTDIR]
+    ## --infodir=DIR           info documentation [DATAROOTDIR/info]
+    ## --localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
+    ## --mandir=DIR            man documentation [DATAROOTDIR/man]
+    ## --docdir=DIR            documentation root [DATAROOTDIR/doc/emacs]
+    ## --htmldir=DIR           html documentation [DOCDIR]
+    ## --dvidir=DIR            dvi documentation [DOCDIR]
+    ## --pdfdir=DIR            pdf documentation [DOCDIR]
+    ## --psdir=DIR             ps documentation [DOCDIR]
+
+    ## running./autogen.sh is needed to enagle
+    ## ./configure options
+    ## Another option is to specify
+    ## config options is when running make,
+    ## for example:
+    ## make configure="--prefix=${HOME}/.local CFLAG='-O0 -g3'"
     sudo -u $SUDO_USER ./autogen.sh
-    sudo -u $SUDO_USER ./configure --prefix="$EMACS_INSTALL_DIR" \
+    sudo -u $SUDO_USER ./configure \
+         --prefix="$EMACS_INSTALL_DIR" \
+         --bindir="$EMACS_INSTALL_DIR/bin" \
+         --libexecdir="$EMACS_INSTALL_DIR/libexec" \
+         --libexecdir="$EMACS_INSTALL_DIR/libexec" \
+         --sysconfdir="$EMACS_INSTALL_DIR/etc" \
+         --runstatedir="$EMACS_INSTALL_DIR/run" \
+         --datarootdir="$EMACS_INSTALL_DIR/share" \
+         --datadir="$EMACS_INSTALL_DIR/share" \
+         --infodir="$EMACS_INSTALL_DIR/share/info" \
+         --localedir="$EMACS_INSTALL_DIR/share/locale" \
+         --mandir="$EMACS_INSTALL_DIR/share/man" \
+         --docdir="$EMACS_INSTALL_DIR/share/doc/emacs" \
          --with-native-compilation \
          --with-sound=no \
          --with-cairo \
          --with-harfbuzz \
-         --with-x=yes \
+         --with-x \
          --with-x-toolkit=yes \
          --with-xft \
          --with-mailutils \
@@ -221,11 +270,10 @@ else
          --disable-ns-self-contained \
          --with-xml2 \
          --with-xim \
-         # does not compile with imagemagick
-         # you would need if you want to enagle Org to
-         # modify image dimensions
-          --with-imagemagick
-    # --disable-ns-self-contained respect --prefix
+         --with-imagemagick \
+         --with-tree-sitter \
+         --without-compress-install \
+         --disable-ns-self-contained # respect --prefix
     sudo -u $SUDO_USER make -j$(nproc)
     # why sometime it wants to use "/usr/local/share/info"
     # when installing and then giving
