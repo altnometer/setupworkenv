@@ -85,6 +85,7 @@ then
     if [ -h "$SESSION_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
         rm $SESSION_DEST_PATH
     fi
+    sudo -u ${SUDO_USER} mkdir -p "$(dirname "${SESSION_DEST_PATH}")"
     sudo -u ${SUDO_USER} ln -s $SESSION_SOURCE_PATH $SESSION_DEST_PATH
 else
     echo -e "\n\x1b[31;01m $SESSION_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
