@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# This scrip should set up emacs.
+## This scrip should set up emacs.
+## for ./configure options
+## - run ./configure --help
+## !!! if ./configure fails
+## your make install will not proceed as intended.
 
 # check if script is run with 'sudo -E'
 if [[ $EUID -ne 0 ]]; then
@@ -36,6 +40,7 @@ else
     # !!! sound: install alsa-utils
     apt-get install -y xorg xattr xinput firefox-esr \
             feh mupdf zathura zathura-djvu hunspell \
+            hunspell-fr-classical hunspell-de-de \
             aspell graphviz r-base r-base-dev mpv alsa-utils
     # Org image resizing requires imagemagick
     # you need to specify compile config option --with-imagemagick
@@ -158,6 +163,7 @@ else
     apt-get install -y autoconf make gcc texinfo \
             cmake libtool-bin \
             libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev librsvg2-dev \
+            libgccjit-14-dev libtree-sitter-dev \
             libgnutls28-dev libtinfo-dev \
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
@@ -207,12 +213,12 @@ else
 
     ## From
     ## ./configure --help
-    
+    ##
     ## By default, `make install' will install all the files in
     ## `/usr/local/bin', `/usr/local/lib' etc.  You can specify
     ## an installation prefix other than `/usr/local' using `--prefix',
     ## for instance `--prefix=$HOME'.
-    
+
     ## For better control, use the options below.
 
     ## --bindir=DIR            user executables [EPREFIX/bin]
@@ -236,27 +242,27 @@ else
     ## --dvidir=DIR            dvi documentation [DOCDIR]
     ## --pdfdir=DIR            pdf documentation [DOCDIR]
     ## --psdir=DIR             ps documentation [DOCDIR]
+    ## You may try these options
+    ##     --bindir="$EMACS_INSTALL_DIR/bin" \
+    ##     --libexecdir="$EMACS_INSTALL_DIR/libexec" \
+    ##     --libexecdir="$EMACS_INSTALL_DIR/libexec" \
+    ##     --sysconfdir="$EMACS_INSTALL_DIR/etc" \
+    ##     --runstatedir="$EMACS_INSTALL_DIR/run" \
+    ##     --datarootdir="$EMACS_INSTALL_DIR/share" \
+    ##     --datadir="$EMACS_INSTALL_DIR/share" \
+    ##     --infodir="$EMACS_INSTALL_DIR/share/info" \
+    ##     --localedir="$EMACS_INSTALL_DIR/share/locale" \
+    ##     --mandir="$EMACS_INSTALL_DIR/share/man" \
+    ##     --docdir="$EMACS_INSTALL_DIR/share/doc/emacs" \
 
     ## running./autogen.sh is needed to enagle
     ## ./configure options
-    ## Another option is to specify
-    ## config options is when running make,
-    ## for example:
+    ## Another method to specify
+    ## config options is, for example:
     ## make configure="--prefix=${HOME}/.local CFLAG='-O0 -g3'"
     sudo -u $SUDO_USER ./autogen.sh
     sudo -u $SUDO_USER ./configure \
          --prefix="$EMACS_INSTALL_DIR" \
-         --bindir="$EMACS_INSTALL_DIR/bin" \
-         --libexecdir="$EMACS_INSTALL_DIR/libexec" \
-         --libexecdir="$EMACS_INSTALL_DIR/libexec" \
-         --sysconfdir="$EMACS_INSTALL_DIR/etc" \
-         --runstatedir="$EMACS_INSTALL_DIR/run" \
-         --datarootdir="$EMACS_INSTALL_DIR/share" \
-         --datadir="$EMACS_INSTALL_DIR/share" \
-         --infodir="$EMACS_INSTALL_DIR/share/info" \
-         --localedir="$EMACS_INSTALL_DIR/share/locale" \
-         --mandir="$EMACS_INSTALL_DIR/share/man" \
-         --docdir="$EMACS_INSTALL_DIR/share/doc/emacs" \
          --with-native-compilation \
          --with-sound=no \
          --with-cairo \
@@ -272,14 +278,35 @@ else
          --with-xim \
          --with-imagemagick \
          --with-tree-sitter \
-         --without-compress-install \
-         --disable-ns-self-contained # respect --prefix
+         --without-compress-install
+    #         --disable-ns-self-contained # respect --prefix
+    ## continue installation only after ./configure success
+    ## otherwise you may encounter errors late, like:
+    ## cannot create directory ‘/usr/local/share/info Permission denied
+    ## whereas --prefix="$EMACS_INSTALL_DIR" is given to use other location
+    if [ ! $? -eq 0 ] ; then
+     echo -e "\n\x1b[31;01m ./configure failed ... \x1b[39;49;00m\n"
+     echo -e "\n\x1b[31;01m quiting installation! \x1b[39;49;00m\n"
+     exit 1
+    else
+     echo -e "\n\x1b[33;01m ./configure is completed, proceeding to 'make' ... \x1b[39;49;00m\n"
+    fi
     sudo -u $SUDO_USER make -j$(nproc)
-    # why sometime it wants to use "/usr/local/share/info"
-    # when installing and then giving
-    # cannot create directory ‘/usr/local/share/info Permission denied
-    # whereas --prefix="$EMACS_INSTALL_DIR" is given to use other location?
+    if [ ! $? -eq 0 ] ; then
+     echo -e "\n\x1b[31;01m 'make' failed ... \x1b[39;49;00m\n"
+     echo -e "\n\x1b[31;01m quiting installation! \x1b[39;49;00m\n"
+     exit 1
+    else
+     echo -e "\n\x1b[33;01m 'make' is completed, proceeding to 'make install' ... \x1b[39;49;00m\n"
+    fi
     sudo -u $SUDO_USER make install
+    if [ ! $? -eq 0 ] ; then
+     echo -e "\n\x1b[31;01m 'make install' failed ... \x1b[39;49;00m\n"
+     echo -e "\n\x1b[31;01m quiting installation! \x1b[39;49;00m\n"
+     exit 1
+    else
+     echo -e "\n\x1b[33;01m 'make install' is completed, proceeding to linking files ... \x1b[39;49;00m\n"
+    fi
     #make clean
     #apt-get install -y emacs
 fi
