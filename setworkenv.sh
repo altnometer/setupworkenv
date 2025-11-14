@@ -7,11 +7,13 @@
 ##    Keep the copy up to date.
 ## 2. ${HOME}/backup contains not only setworkenv.sh file
 ##    but all the private files needed to set up your system.
-##    This director should be copied before hand from your
-##    backup location.
+##    This directory should be copied from your backup
 ## 3. You should have 'sudo' installed before running this script.
 
-
+## stop running this script an any error
+## you try checking for errors after
+## relevant commands
+## to provide meaningful feedback
 set -e
 
 # check if run with sudo -E -----------------------------------------------{{{

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+## stop running this script an any error
+## you try checking for errors after
+## relevant commands
+## to provide meaningful feedback
 set -e
 
 # cd to the folder before running
@@ -37,6 +41,13 @@ else
     echo -e "\n\x1b[33;01m installing oh-my-zsh ... \x1b[39;49;00m\n" && sleep 1
     sudo -u ${SUDO_USER} rm -rf ${ZSH_OH_MY_ZSH_DIR}
     sudo -u ${SUDO_USER} sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    if [ $? -eq 0 ] ; then
+     echo -e "\n\x1b[33;01m downloaded and ran install.sh, nstalling plugings ... \x1b[39;49;00m\n"
+    else
+     echo -e "\n\x1b[31;01m failed downloading and running install.sh ... \x1b[39;49;00m\n"
+     echo -e "\n\x1b[31;01m quiting installation! \x1b[39;49;00m\n"
+     exit 1
+    fi
 fi
 
 if [ ! -d "${ZSH_CUSTOM_PLUG_DIR}/zsh-autosuggestions" ];
@@ -44,6 +55,13 @@ then
     sudo -u ${SUDO_USER} mkdir -p $ZSH_CUSTOM_PLUG_DIR
     sudo -u ${SUDO_USER} git clone \
          https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM_PLUG_DIR}/zsh-autosuggestions
+    if [ $? -eq 0 ] ; then
+     echo -e "\n\x1b[33;01m cloned zsh-autosuggestions pluging ... \x1b[39;49;00m\n"
+    else
+     echo -e "\n\x1b[31;01m failed cloning zsh-autosuggestions plugin ... \x1b[39;49;00m\n"
+     echo -e "\n\x1b[31;01m quiting installation! \x1b[39;49;00m\n"
+     exit 1
+    fi
 fi
 
 if [ ! -d "${ZSH_CUSTOM_PLUG_DIR}/zsh-syntax-highlighting" ];
@@ -51,12 +69,27 @@ then
     sudo -u ${SUDO_USER} mkdir -p $ZSH_CUSTOM_PLUG_DIR
     sudo -u ${SUDO_USER} git clone \
          https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM_PLUG_DIR}/zsh-syntax-highlighting
+    if [ $? -eq 0 ] ; then
+     echo -e "\n\x1b[33;01m cloned zsh-syntax-highlighting pluging ... \x1b[39;49;00m\n"
+    else
+     echo -e "\n\x1b[31;01m failed cloning zsh-syntax-highlighting plugin ... \x1b[39;49;00m\n"
+     echo -e "\n\x1b[31;01m quiting installation! \x1b[39;49;00m\n"
+     exit 1
+    fi
 fi
+
 if [ ! -d "${ZSH_CUSTOM_PLUG_DIR}/zsh-completions" ];
 then
     sudo -u ${SUDO_USER} mkdir -p $ZSH_CUSTOM_PLUG_DIR
     sudo -u ${SUDO_USER} git clone \
          https://github.com/zsh-users/zsh-completions.git ${ZSH_CUSTOM_PLUG_DIR}/zsh-completions
+    if [ $? -eq 0 ] ; then
+     echo -e "\n\x1b[33;01m cloned zsh-completion pluging ... \x1b[39;49;00m\n"
+    else
+     echo -e "\n\x1b[31;01m failed cloning zsh-completion plugin ... \x1b[39;49;00m\n"
+     echo -e "\n\x1b[31;01m quiting installation! \x1b[39;49;00m\n"
+     exit 1
+    fi
 fi
 
 ## install oh-my-zsh
