@@ -4752,23 +4752,31 @@ This function is created to identify TODO items in agenda buffers.
 
 ;;* org-roam
 
-;;** org-roam: init, initialize
-
-(setq org-roam-v2-ack t)
-(setq org-roam-directory (file-truename "~/backup/org/org-roam/"))
-(defvar ram-org-roam-notes-directory "./notes"
-  "A subdirectory of `org-roam-directory' to store notes.
-
-Keep all subdirectories neat and tidy, store `org-roam' notes to
-this subdirectory.")
-
 ;;** org-roam: install
 
 (straight-use-package
  '(org-roam :type git :flavor melpa
             :files (:defaults "extensions/*" "org-roam-pkg.el")
             :host github :repo "org-roam/org-roam"))
+;; TODO: if you call (require 'org-roam) here
 ;(require 'org-roam)
+;; it would break loading loading org-babel
+;; language packages somehow: investigate, fix.
+
+;;** org-roam: init, initialize
+
+(setq org-roam-v2-ack t)
+
+;; org-roam-directory is a defcustom variable,
+;; it (an defvar vars) should not be overridden when org-roam loads.
+(setq org-roam-directory (file-truename "~/backup/org/org-roam/"))
+
+(defvar ram-org-roam-notes-directory "./notes"
+  "A subdirectory of `org-roam-directory' to store notes.
+
+Keep all subdirectories neat and tidy, store `org-roam' notes to
+this subdirectory.")
+
 
 ;;** org-roam: bindings
 
