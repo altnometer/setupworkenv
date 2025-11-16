@@ -20,13 +20,12 @@
 
 ;;* color-themes
 
-;; TODO:after-load-theme-hook change to ram-after-load-theme-hook
-(defvar after-load-theme-hook nil
+(defvar ram-after-load-theme-hook nil
     "Hook run after a color theme is loaded using `load-theme'.")
 
-(defadvice load-theme (after run-after-load-theme-hook activate)
-  "Run `after-load-theme-hook'."
-  (run-hooks 'after-load-theme-hook))
+(defadvice load-theme (after run-ram-after-load-theme-hook activate)
+  "Run `ram-after-load-theme-hook'."
+  (run-hooks 'ram-after-load-theme-hook))
 
 ;;** color-themes: modus-themes
 
@@ -7941,7 +7940,7 @@ If ARG is 4, move to the end of defun."
 (add-hook 'racket-repl-mode-hook #'ram-highlight-sexps-mode)
 
 (with-eval-after-load "ram-highlight-sexps"
-  (add-hook 'after-load-theme-hook #'hl-sexp-color-update))
+  (add-hook 'ram-after-load-theme-hook #'hl-sexp-color-update))
 
 ;;** ram-manage-sexps-mode: highlight
 
@@ -11236,7 +11235,7 @@ With a prefix argument N, (un)comment that many sexps."
 
 (run-with-idle-timer 2 nil 'ram-change-cursor-color)
 
-;; (add-hook 'after-load-theme-hook #'ram-change-cursor-color)
+;; (add-hook 'ram-after-load-theme-hook #'ram-change-cursor-color)
 
 (setq blink-cursor-mode nil)
 (setq blink-cursor-blinks 1)
@@ -11591,7 +11590,7 @@ buffer-local `ram-face-remapping-cookie'."
 ;; !!! exwm would no load if this option is
 ;; apparently a backtrace is displayed which is off screen,
 ;; pressing 'q' or 'C-x k' would continue exwm loading. But it will load with limited functionality.
-;; (add-hook 'after-load-theme-hook
+;; (add-hook 'ram-after-load-theme-hook
 ;;           (set-face-attribute 'hl-line nil :inherit nil :background "LemonChiffon1" :underline "LemonChiffon3" :extend t))
 ;;(when window-system (global-hl-line-mode 1))
 ;; (global-hl-line-mode)
