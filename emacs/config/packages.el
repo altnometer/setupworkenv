@@ -4474,7 +4474,7 @@ Load some common packages to memory for R processes."
    "ram-setup-R-env" nil
    "grep -qxF 'library(\"tidyverse\")' $HOME/.Rprofile || echo 'library(\"tidyverse\")' >> $HOME/.Rprofile"))
 
-(run-with-idle-timer 0.9 t #'ram-setup-R-env)
+(run-with-idle-timer 0.9 nil #'ram-setup-R-env)
 
 ;;**** org-mode/org-babel/R data: ESS Emacs Speaks Statistics
 
