@@ -4390,6 +4390,8 @@ Use it from `org-mode-hook'.
   (add-to-list 'org-structure-template-alist
                '("ps" . "src python :results value :session my-Python-session"))
   (add-to-list 'org-structure-template-alist
+               '("pns" . "src python :results value"))
+  (add-to-list 'org-structure-template-alist
                '("rsc" . "src R :results value :colnames yes :session my-R-session"))
   (add-to-list 'org-structure-template-alist
                '("rso" . "src R :results output :session my-R-session"))
@@ -10525,6 +10527,8 @@ Hopefully, this function would cover some edge cases."
 
 (advice-add 'org-latex-preview :after #'hl-line-flash)
 
+(toggle-hl-line-when-idle)
+
 ;;** packages: iedit
 
 (straight-use-package
@@ -11009,6 +11013,10 @@ That is, remove a non kept dired from the recent list."
   (ispell-set-spellchecker-params)
   (setq ispell-really-hunspell t)
   ;; (ispell-hunspell-add-multi-dic "en_US,pali")
+  ;; you muct have the hunspell dictionalies installed
+  ;; for example:
+  ;; - sudo apt-get install hunspell-de-de
+  ;; - sudo apt-get install hunspell-fr-classical
   (ispell-hunspell-add-multi-dic "en_US,fr_FR")
   (ispell-change-dictionary "en_US,fr_FR" t)
   ;; (setq ispell-dictionary-alist
