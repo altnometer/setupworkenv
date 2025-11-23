@@ -4880,7 +4880,9 @@ This function returns the current paragraph."
   (interactive "p")
   ;;(interactive current-prefix-arg)
   (let ((org-roam-directory (expand-file-name ram-org-roam-notes-directory org-roam-directory)))
-    (call-interactively #'org-roam-node-find 'RECORD-FLAG)
+    ;; ["d"] is to select a "d" template name from
+    ;; org-roam-capture-templates
+    (call-interactively #'org-roam-node-find nil ["d"])
     (org-next-visible-heading 1)))
 
 (defun ram-buffer-is-from-roam-directory-p ()
@@ -5045,10 +5047,33 @@ If the property is already set, replace its value."
 
 (with-eval-after-load "org-roam"
   (setq org-roam-capture-templates
-        '(("d" "default"
-           entry "* ${title}\n\n%?"
-           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
-           :unnarrowed t))))
+        `(("d" "my default note template"
+           plain ,(concat
+                   "* ${title}\n\n"
+                   "- tags ::\n"
+                   "  +\n"
+                   "- source ::\n"
+                   "  +%?"
+                   )
+           :target (file+head
+                    "%<%Y%m%d%H%M%S>-${slug}.org"
+                    ,(concat
+                      ":PROPERTIES:\n"
+                      ":ID: %(org-id-new)\n"
+                      ":END:\n"
+                      "#+TITLE: ${title}\n"
+                      "#+CREATED: %U\n"
+                      "#+LAST_MODIFIED: %U"
+                      ;;"#+DATE: %<%Y-%m-%d %a>"
+                      )
+                    )
+           :unnarrowed t
+           :empty-lines-before 1
+           ;;:empty-lines-after 1
+           ;;:kill-buffer t
+           ;;:immediate-finish nil
+           ;;:no-save nil
+           ))))
 
 ;;** org-roam: deft
 
@@ -5496,7 +5521,6 @@ Include a backlink to source if INCLUDE-BACKLINK-P is true."
 ;;                                       headline))))))
 ;;     (org-element-interpret-data (ram-org-parse-heading-element headline-element file-name 'INCLUDE-BACKLINK-P))))
 
-
 (defun ram-org-capture-element-to-daily-notes (&optional arg)
   "Capture the current headline into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
@@ -5506,7 +5530,7 @@ ARG value is 4."
   (let* ((backlink (or (ram-org-roam-id-and-element-store-link)
                        (let ((heading (when-let* ((heading
                                                    (org-get-heading 'no-tags 'no-togos 'no-priority 'no-comment)))
-                                        (substring-no-properties (org-link-escape heading))))
+                                        (org-link-escape (substring-no-properties heading))))
                              (title (cadr (car (org-collect-keywords '("title"))))))
                          (cond
                           (heading (list :type "file"
@@ -5526,15 +5550,19 @@ ARG value is 4."
                                              "backlink"))
          (templates
           `(("d" "capture org element as a heading an backlink"
-             ;; entry ,(concat (ram-org-get-heading-for-capturing) " %(org-set-tags \":write:\")  " "\n" backlink "\n\n%?")
-             ;; entry ,(ram-org-get-heading-for-capturing)
-             entry ,(concat "* "
-                            (or (plist-get backlink :description)
-                                "link to this entry has no description")
-                            "\n" backlink-str "\n\n%?")
-             :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d %a>")
-             :empty-lines-before 1
-             :empty-lines-after 1
+             plain ,(concat backlink-str "\n%?")
+             :target (file+head+olp
+                      "%<%Y-%m-%d>.org"
+                      ,(concat
+                        ":PROPERTIES:\n"
+                        ":ID: %(org-id-new)\n"
+                        ":END:\n"
+                        "#+TITLE: %<%Y-%m-%d>\n"
+                        "#+DATE: %<%Y-%m-%d %a>\n")
+                      (,(or (plist-get backlink :description)
+                            "link to this entry has no description")))
+                                        ;:empty-lines-before 1
+                                        ;:empty-lines-after 1
              :unnarrowed t
              :kill-buffer t
              :immediate-finish nil
@@ -5649,13 +5677,29 @@ ARG value is 4."
 (with-eval-after-load "org-roam-dailies"
   ;; (setq time-stamp-format "[%Y-%02m-%02d %3a %02H:%02M]")
   (setq org-roam-dailies-capture-templates
-        '(("d" "default" plain ""
-           :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
-           :empty-lines-before 1
-           :empty-lines-after 1
+        `(("d" "default daily note template"
+           plain ""
+           :target (file+head
+                    "%<%Y-%m-%d>.org"
+                    ,(concat
+                      ":PROPERTIES:\n"
+                      ":ID: %(org-id-new)\n"
+                      ":END:\n"
+                      "#+TITLE: %<%Y-%m-%d>\n"
+                      "#+DATE: %<%Y-%m-%d %a>\n")
+                    )
            :unnarrowed t
            :kill-buffer nil
-           :no-save nil))))
+           :immediate-finish nil
+           :no-save nil)
+          ;; ("d" "default" plain ""
+          ;;  :target (file+head "%<%Y-%m-%d>.org" "#+TITLE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n#+DATE: %<%Y-%m-%d %a>")
+          ;;  :empty-lines-before 1
+          ;;  :empty-lines-after 1
+          ;;  :unnarrowed t
+          ;;  :kill-buffer nil
+          ;;  :no-save nil)
+          )))
 
 ;;*** org-roam/dailies: navigate notes
 
@@ -6162,8 +6206,14 @@ Use calendar if ARG value is '(4)."
 (add-hook 'org-capture-prepare-finalize-hook #'ram-remove-face-remapping)
 
 ;; !!! why not use hooks specific to org or org-roam buffers
-(add-hook 'find-file-hook #'ram-update-org-roam-tag-if-contains-todos)
+(add-hook 'org-roam-find-file-hook #'ram-update-org-roam-tag-if-contains-todos)
 (add-hook 'before-save-hook #'ram-update-org-roam-tag-if-contains-todos)
+
+;; TODO: whenever i visit a daily note, it is left in a modified
+;; state. I have to save it manually.
+;; this advice is a quick fix before a solution can be found.
+(advice-add #'org-roam-capture- :after (lambda (&rest r) (save-buffer)))
+(advice-remove 'org-roam-capture- #'save-buffer)
 
 ;; it fires even when you open a daily note (or yesterday)
 ;; (add-hook 'org-roam-capture-new-node-hook #'ram-set-face-remapping-alist-capture-new-node)
@@ -9423,6 +9473,7 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 ;;* super-save
 
+;; !!! disabled
 ;; (use-package super-save
 ;;   :config
 ;;   ;; save on find-file
@@ -9434,8 +9485,8 @@ Toggle `lsp-ido-show-symbol-filename'."
 ;;   (add-to-list 'super-save-triggers 'counsel-M-x)
 ;;   (super-save-mode 1))
 
-(straight-use-package
- '(super-save :type git :flavor melpa :host github :repo "bbatsov/super-save"))
+;; (straight-use-package
+;;  '(super-save :type git :flavor melpa :host github :repo "bbatsov/super-save"))
 
 ;; sometimes fails to save save buffer
 ;; - e.g., when current encoding fails for some unicode.
