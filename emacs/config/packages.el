@@ -4440,10 +4440,10 @@ Use it from `org-mode-hook'.
 
 ;;*** org-mode/org-babel: python
 
-(setq python-shell-interpreter "/usr/bin/python3")
-;;(setq python-shell-interpreter "~/.venv/org-babel/bin/python3")
-;;(setq org-babel-python-command "python3")
-(setq org-babel-python-command 'auto)
+;;(setq python-shell-interpreter "/usr/bin/python3")
+(setq python-shell-interpreter "~/.venv/org-babel/bin/python3")
+;;(setq python-shell-interpreter-args "-i") ;; default is "-i"
+(setq org-babel-python-command-nonsession "python3")
 (setq python-shell-virtualenv-root "~/.venv/org-babel/")
 
 ;;*** org-mode/org-babel: prolog
