@@ -5309,9 +5309,13 @@ If the property is already set, replace its value."
                                      (and (org-id-get))))
                                    (link-vals (list
                                                ;; get heading
-                                               (ignore-error (wrong-type-argument stringp nil)
-                                                 (org-get-heading
-                                                  'NO-TAGS 'NO-TODO 'NO-PRIORITY 'NO-COMMENT))
+                                               ;; quick safeguard with 'and' for substring-no-properties
+                                               ;; if no heading exist
+                                               (and (org-get-heading
+                                                     'NO-TAGS 'NO-TODO 'NO-PRIORITY 'NO-COMMENT)
+                                                    (substring-no-properties
+                                                     (org-get-heading
+                                                      'NO-TAGS 'NO-TODO 'NO-PRIORITY 'NO-COMMENT)))
                                                ;; org-roam id:
                                                ;; - either top heading ID or
                                                ;; - document level ID
@@ -5322,7 +5326,11 @@ If the property is already set, replace its value."
                                                           (org-id-get el)))
                                                     (org-id-get el))
                                                ;; get element :name
-                                               (org-element-property :name el))))
+                                               ;; quick safeguard with 'and' for substring-no-properties
+                                               ;; if no :name exist
+                                               (and (org-element-property :name el)
+                                                    (substring-no-properties
+                                                     (org-element-property :name el))))))
                               (pcase link-vals
                                 ;; 1. prioritize element id which is not
                                 ;;   - org-roam id, i.e., NOT
