@@ -9900,7 +9900,11 @@ repository, then the corresponding root is used instead."
   (let ((output ram-sensors-cmd-output))
     (setq ram-sensors-cmd-output nil)
     ;; get sensors output as json:
-    (process-send-string ram-shell-sensors-cmd-name "sensors -j\n")
+    ;; read only for specific chip sensors:
+    ;; - coretemp-isa-0000 (cpu)
+    ;; - nvme-pci-0200 (ssd)
+    ;; and combine two json objects into one for parsing
+    (process-send-string ram-shell-sensors-cmd-name "sensors -j coretemp-isa-0000 nvme-pci-0200 | jq -s '.[0] * .[1]'\n")
     (when output
       (if-let* ((parsed-output (condition-case err
                                    (json-parse-string output :object-type 'alist :array-type 'list)
