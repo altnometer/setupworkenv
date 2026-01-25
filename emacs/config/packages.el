@@ -3668,7 +3668,7 @@ When ANYWHERE is non-nil, search beyond the preamble."
 
 As a special case, return -1 if the time file PROPERTY exists but
 is not defined."
-  (when-let ((pos (zp/org-find-time-file-property property anywhere)))
+  (when-let* ((pos (zp/org-find-time-file-property property anywhere)))
     (save-excursion
       (goto-char pos)
       (if (and (looking-at-p " ")
@@ -3683,7 +3683,7 @@ When ANYWHERE is non-nil, search beyond the preamble.
 
 If the position of the file PROPERTY has already been computed,
 it can be passed in POS."
-  (when-let ((pos (or pos
+  (when-let* ((pos (or pos
                       (zp/org-find-time-file-property property))))
     (save-excursion
       (goto-char pos)
@@ -4613,7 +4613,7 @@ If the result table width exceeds that value, shrink columns.")
 ;; this function will apply ansi color code in the output of
 ;; shell code blocks
 (defun ek/babel-ansi ()
-  (when-let ((beg (org-babel-where-is-src-block-result nil nil)))
+  (when-let* ((beg (org-babel-where-is-src-block-result nil nil)))
     (save-excursion
       (goto-char beg)
       (when (looking-at org-babel-result-regexp)
@@ -4848,7 +4848,7 @@ this subdirectory.")
   "Use custom SQL collecting backlinks with `ram-org-roam-backlinks-get'.
 
 UNIQUE is not used."
-  (when-let ((backlinks (seq-sort #'org-roam-backlinks-sort (ram-org-roam-backlinks-get node))))
+  (when-let* ((backlinks (seq-sort #'org-roam-backlinks-sort (ram-org-roam-backlinks-get node))))
     (magit-insert-section (org-roam-backlinks)
       (magit-insert-heading "Backlinks:")
       (dolist (backlink backlinks)
@@ -5354,7 +5354,7 @@ If the property is already set, replace its value."
 	       (error (nth 1 err))))))
   (defun ram-org-roam-id-and-element-store-link ()
     "Store `ram-org-roam-id-el'."
-    (when-let ((link-plist (and
+    (when-let* ((link-plist (and
                             ;; symlinks to files in repositories do not work correctly
                             ;; either org-roam-buffer-p fails or magit-status.
                             ;; see a note one "... debug symlink in org-roam-directory ..."
@@ -5837,7 +5837,7 @@ ARG value is 4."
 (defun ram-org-roam-monthly-note-p (&optional file)
   "Return t if FILE is a monthly note.
 Use the current buffer file-path if FILE is nil."
-  (when-let ((buffer-name
+  (when-let* ((buffer-name
               (or file
                   (buffer-file-name (buffer-base-buffer))))
              (path (expand-file-name
@@ -6000,7 +6000,7 @@ When ARG is 1, update the current note."
 (defun ram-org-roam-weekly-note-p (&optional file)
   "Return t if FILE is a weekly note.
 Use the current buffer file-path if FILE is nil."
-  (when-let ((buffer-name
+  (when-let* ((buffer-name
               (or file
                   (buffer-file-name (buffer-base-buffer))))
              (path (expand-file-name
@@ -6901,7 +6901,7 @@ Use regexp match group 1. Default to group 0."
   ("m" git-gutter:mark-hunk "mark")
   ("d" (lambda ()
          (interactive)
-         (if-let ((diff-win (ram-get-git-gutter-diff-window)))
+         (if-let* ((diff-win (ram-get-git-gutter-diff-window)))
              (quit-window nil diff-win)
            (git-gutter:popup-hunk)))
    "diff")
@@ -7798,7 +7798,7 @@ If ARG is `nil', do not `push-mark'."
                          (looking-at-p "[[:space:]\n]+"))
          (looking-at-p "[[:space:]\n]+"))
     (when (re-search-backward "[^[:space:]\n]\\{1\\}")
-      (if-let ((bounds (save-excursion (forward-char) (ram-thing-bounds))))
+      (if-let* ((bounds (save-excursion (forward-char) (ram-thing-bounds))))
           (progn (goto-char  (car bounds))
                  (when (not (ram-at-delimited-beg-p))
                    (ram-backward-list))))))
@@ -7856,7 +7856,7 @@ If cannot move forward, go `up-list' and try again from there."
 
 (defun ram-forward-to-delim ()
   "Jump forward to the open delimiter that is not in a string or comment."
-  (if-let ((match-point (re-search-forward ram-open-delimiters-re (point-max) t 1)))
+  (if-let* ((match-point (re-search-forward ram-open-delimiters-re (point-max) t 1)))
       ;; skip matches in strings and comments
       (let ((s (syntax-ppss)))
         (if (or (nth 3 s)
@@ -8074,14 +8074,14 @@ If ARG is 4, move to the end of defun."
 
 (defun ram-inline-comment-bounds ()
   "Return a pair of the inline comment beginning and end. "
-  (if-let (beg (and (ram-in-comment-p)
-                    (save-excursion
-                      (ram-goto-beg-of-comment))))
+  (if-let* ((beg (and (ram-in-comment-p)
+                      (save-excursion
+                        (ram-goto-beg-of-comment)))))
       (cons beg (point-at-eol))))
 
 (defun ram-block-comment-bounds ()
   "Return the beginning and end pair of a comment block."
-  (if-let ((beg (save-excursion
+  (if-let* ((beg (save-excursion
                   (let ((beg (ram-goto-comment-block-beg)))
                     (when (and beg
                                (looking-back "^[[:space:]]*" (point-at-bol)))
@@ -8098,7 +8098,7 @@ If ARG is 4, move to the end of defun."
 
 (defun ram-goto-beg-of-comment ()
   "Go to comment beginning if in comment. Do Nothing otherwise."
-  (if-let ((comment-start
+  (if-let* ((comment-start
             (when (and (ram-in-comment-p)
                        (not (minibufferp)))
               (comment-normalize-vars)
@@ -8161,11 +8161,11 @@ If ARG is 4, move to the end of defun."
        (point)))
 
 (defun ram-at-comment-block-beg-p ()
-  (if-let ((beg (save-excursion (ram-goto-comment-block-beg))))
+  (if-let* ((beg (save-excursion (ram-goto-comment-block-beg))))
       (= (point) beg)))
 
 (defun ram-at-comment-block-end-p ()
-  (if-let ((end (save-excursion (ram-goto-comment-block-end))))
+  (if-let* ((end (save-excursion (ram-goto-comment-block-end))))
       (= (point) end)))
 
 (defun ram-at-thing-beg-p ()
@@ -8273,7 +8273,7 @@ Before invoking `newline-and-indent':
 
 (defun ram-string-bounds ()
   "Return the beginning and end of a string as a pair."
-  (if-let ((ppss (syntax-ppss))
+  (if-let* ((ppss (syntax-ppss))
            (beg (or (when (nth 3 ppss)
                       (nth 8 ppss))
                     (or
@@ -8289,7 +8289,7 @@ Before invoking `newline-and-indent':
   "Return bounds delimited by `ram-open-delimiters-re' and `ram-close-delimiters-re'.
 With SELECT-NTH-ANCESTOR value greater than zero, return bounds
 for than ancestor."
-  (if-let ((ppss (syntax-ppss))
+  (if-let* ((ppss (syntax-ppss))
            (beg (cond
                  ((> (or select-nth-ancestor 0) 0)
                   ;; when between defuns, there is no parent, select previous defun
@@ -8426,7 +8426,7 @@ Whichever happens to be first."
 The beginning and end of sexp is defined by return value of
 `ram-sexp-bounds'."
   (interactive)
-  (if-let ((bounds (if (eq last-command this-command)
+  (if-let* ((bounds (if (eq last-command this-command)
                        (ram-delimited-sexp-bounds 1)
                      (ram-sexp-bounds))))
       (progn
