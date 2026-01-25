@@ -4214,6 +4214,50 @@ Use it from `org-mode-hook'.
 ;;   (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch)
 ;;   (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch))
 
+
+(defun ram-org-link-header-face-setup ()
+  "Apply a distinct faces to links found within Level 1 headers.
+
+Specifically, links to weekly and daily notes."
+  (font-lock-add-keywords
+   'org-mode
+   `(
+     ;; level 1 header links to weekly notes
+     (,(concat
+             "^\\* .*?\\(\\[\\[.*?\\]\\[\\"
+             "(?:Jan\\|Feb\\|Mar\\|Apr\\|May\\|Jun\\|Jul\\|Aug\\|Sep\\|Oct\\|Nov\\|Dec\\)"
+             ".*\\]\\]\\)")
+      (1 '(
+           :inherit org-link
+           :foreground "red4"
+           :weight bold
+           :underline nil             ; '(:color "red4" :style dashes)
+           ) t))
+     ;; level 1 header links to daily notes
+     (,(concat
+             "^\\* .*?\\(\\[\\[.*?\\]\\[\\"
+             "(?:MON\\|TUE\\|WED\\|THU\\|FRI\\|SAT\\|SUN\\)"
+             ".*\\]\\]\\)")
+      (1 '(
+           :inherit org-link
+           :foreground "orchid3"
+           :weight bold
+           :underline nil          ; '(:color "orchid3" :style dashes)
+           ) t))
+     ;; level 2 header links to daily notes
+     (,(concat
+             "^\\*\\* .*?\\(\\[\\[.*?\\]\\[\\"
+             "(?:MON\\|TUE\\|WED\\|THU\\|FRI\\|SAT\\|SUN\\)"
+             ".*\\]\\]\\)")
+                 ; Match Level 1 header and the link
+      (1 '(
+           :inherit org-link
+           :foreground "orchid3"
+           :weight bold
+           :underline nil         ;  '(:color "orchid3" :style dashes)
+           ) t)))
+   'append))
+
 ;;** org-mode: emphasis
 
 ;; modify org-emphasis-regexp-components, 3rd entry, to include char to emphasis markup
@@ -4591,6 +4635,8 @@ If the result table width exceeds that value, shrink columns.")
 
 ;; (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook #'ram-set-org-faces)
+(add-hook 'org-mode-hook #'ram-org-link-header-face-setup)
+
 ;; !!! this may cause error for very large blocks
 ;;       - file will fail to load
 ;;(add-hook 'org-mode-hook #'org-fold-hide-block-all)
