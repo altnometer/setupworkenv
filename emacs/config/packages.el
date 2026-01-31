@@ -12848,6 +12848,8 @@ ANY of these param-value pairs.
                                    '(try-expand-line
                                      try-expand-line-all-buffers) t))
 
+;;** hippie-expand: expand line
+
 (define-key global-map (kbd "H-/") #'ram-hippie-expand-line)
 
 
