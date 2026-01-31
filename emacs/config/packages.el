@@ -12146,27 +12146,6 @@ Remaping <sigusr2> does not work."
 (define-key global-map (kbd "<s-return>") 'smart-open-line)
 (define-key global-map (kbd "<S-s-return>") 'smart-open-line-above)
 
-;;* xah-fly-keys
-
-;; load lisp/xah-fly-keys.el
-;; (setq xah-fly-use-control-key nil)
-;; (require 'xah-fly-keys)
-
-;; (xah-fly-keys-set-layout "mybeakl10")
-
-;; (xah-fly-keys 1)
-
-;;* scimax hydra
-
-;; load lisp/scimax-hydra.el
-;; (my-with-elapsed-timer "Loading lisp/scimax-hydra.el"
-;;   (when (file-readable-p "~/.emacs.d/lisp/scimax-hydra.el")
-;;     (load-file (expand-file-name "~/.emacs.d/lisp/scimax-hydra.el"))))
-
-;; (my-with-elapsed-timer "Loading ../lisp/emacs-keybinding-command-tooltip-mode.el"
-;;   (when (file-readable-p "~/.emacs.d/lisp/emacs-keybinding-command-tooltip-mode.el")
-;;     (load-file (expand-file-name "~/.emacs.d/lisp/emacs-keybinding-command-tooltip-mode.el"))))
-
 ;;* templates, snippets
 
 ;;** templates, snippets: tempo
