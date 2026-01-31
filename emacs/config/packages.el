@@ -5659,6 +5659,18 @@ ARG value is 4."
     (beginning-of-buffer)
     (ram-org-capture-element-to-daily-notes arg)))
 
+(defalias 'ram-org-capture-note-to-daily-notes
+  'ram-org-capture-title-to-daily-notes
+  "This is an alias for `ram-org-capture-title-to-daily-notes'.
+
+This alias is supposed to have a specific name for capturing an org-roam
+note. `ram-org-capture-title-to-daily-notes' does not explicitly mention
+'note' however its meaning is not capture the note title.
+
+Decide whether you need to rename the function or keep the alias.")
+
+(put 'ram-org-capture-note-to-daily-notes 'command-symbol t)
+
 (defun ram-org-capture-defun-to-daily-notes (&optional arg)
   "Capture the defun into a `org-roam' daily note.
 Insert into daily note for ARG days from now. Or use calendar if
@@ -5814,7 +5826,8 @@ ARG value is 4."
 ;;   (define-key global-map (kbd "s-c") org-roam-dailies-map))
 (with-eval-after-load "org"
   (define-key org-mode-map (kbd "s-c a") #'ram-org-capture-element-to-daily-notes)
-  (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-daily-notes))
+  (define-key org-mode-map (kbd "s-c A") #'ram-org-capture-title-to-daily-notes)
+  (define-key org-mode-map (kbd "s-c n") #'ram-org-capture-note-to-daily-notes))
 
 (define-key emacs-lisp-mode-map (kbd "s-c a") #'ram-org-capture-defun-to-daily-notes)
 
@@ -5823,10 +5836,12 @@ ARG value is 4."
   (define-key magit-revision-mode-map (kbd "s-c a") #'ram-org-capture-magit-commit-to-daily-notes))
 
 (define-key global-map (kbd "s-c w") #'ram-org-capture-weekly-note)
+(define-key global-map (kbd "s-c W") #'ram-org-update-weekly-note)
 
 (define-key global-map (kbd "s-c m") #'ram-org-capture-monthly-note)
+(define-key global-map (kbd "s-c M") #'ram-org-update-monthly-note)
 
-(define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
+;;(define-key global-map (kbd "s-c n") #'org-roam-dailies-capture-today)
 (define-key global-map (kbd "s-c d") #'org-roam-dailies-goto-today)
 (define-key global-map (kbd "s-c f") #'ram-org-roam-next-note-dwim)
 (define-key global-map (kbd "s-c b") #'ram-org-roam-prev-note-dwim)
@@ -5875,6 +5890,85 @@ Use the current buffer file-path if FILE is nil."
                                                  (t (list val year-from-buffer-name))))))
     (ram-org-capture-monthly-note nil (encode-time 1 1 0 1 target-month target-year))))
 
+(defun ram-org-make-link-to-weekly-note (month-1st-day week-monday-time)
+  "Return an id link to weekly note.
+
+Its format is '[[id:weekly-note-id][%description]]'."
+  (let* ((weeklies-dir (expand-file-name ram-org-roam-weekly-notes-directory org-roam-directory))
+         (file-name (file-name-with-extension
+                     (format-time-string "%Y-%m-w%W" week-monday-time)
+                     "org"))
+         (file-path (file-name-concat weeklies-dir file-name))
+         (link))
+    (when (not (file-exists-p file-path))
+      ;; if it proves to be slow to create a complete
+      ;; weekly note, then create just the properties header analogous to
+      ;; the commented out code from creating properties header
+      ;; for the daily notes.
+      ;; create weekly note, return backlink
+      ;; (let* ((id (org-id-new))
+      ;;        (doc-title (file-name-base file-name))
+      ;;        (doc-header (concat
+      ;;                     ":PROPERTIES:\n"
+      ;;                     (format ":ID:       %s\n" id)
+      ;;                     ":END:\n"
+      ;;                     (format "#+TITLE: %s\n" doc-title)
+      ;;                     (format "#+DATE: %s\n"
+      ;;                             (format-time-string
+      ;;                              "%Y-%m-%d %a" (car days)))))
+      ;;        (week-day-heading
+      ;;         (format "[[id:%s][%s]]"
+      ;;                 id
+      ;;                 (upcase (format-time-string "%a %-d" (car days)))))
+      ;;        buffer)
+      ;;   (let ((inhibit-message t)
+      ;;         (message-log-max nil))
+      ;;     (setq buffer (find-file-noselect file-path))
+      ;;     (set-buffer buffer)
+      ;;     (insert doc-header)
+      ;;     (save-buffer)
+      ;;     (kill-buffer))
+      ;;   ;; (format "* [[id:%s][%s]]\n"
+      ;;   ;;         id
+      ;;   ;;         (upcase (format-time-string "%a %-d" (car days))))
+      ;;   (list 'headline
+      ;;         `(:raw-value ,week-day-heading
+      ;;                      :post-blank 1
+      ;;                      :level 1
+      ;;                      :title ,(list week-day-heading))))
+      (save-window-excursion (ram-org-capture-weekly-note nil week-monday-time))
+      ;; return backlink and headings in daily note
+      )
+    (with-temp-buffer
+      (insert-file-contents file-path)
+      (org-mode)
+      (let* ((parsed-buffer (org-element-parse-buffer))
+             (id (org-element-map
+                     parsed-buffer 'node-property
+                   (lambda (prop)
+                     (when (string= (org-element-property :key prop) "ID")
+                       (org-element-property :value prop)))
+                   'first-match t))
+             (link-to-week-note
+              ;; (format "[[id:%s][%s]]"
+              ;;         id
+              ;;         (format (format-time-string "%b w %%s" week-monday-time)
+              ;;                 ;; week number in the month
+              ;;                 (1+ (- (string-to-number
+              ;;                         (format-time-string "%W" week-monday-time))
+              ;;                        (string-to-number
+              ;;                         (format-time-string "%W" month-1st-day))))))
+              (org-link-make-string (concat "id:" id)
+                                    (format (format-time-string "%b w %%s" week-monday-time)
+                                            ;; week number in the month
+                                            (1+ (- (string-to-number
+                                                    (format-time-string "%W" week-monday-time))
+                                                   (string-to-number
+                                                    (format-time-string "%W" month-1st-day))))))))
+        (setq link link-to-week-note)))
+
+    link))
+
 (defun ram-org-capture-monthly-element (month-1st-day)
   "Return an org-element for a month built from weekly headings."
   (let ((day-of-week (let ((dow (nth 6 (decode-time month-1st-day))))
@@ -5888,17 +5982,15 @@ Use the current buffer file-path if FILE is nil."
               (cons
                'headline
                (cons (let ((week-day-heading
-                            (format (format-time-string "%b w %%s" week-day)
-                                    ;; week number in the month
-                                    ;; (1+ (- (/ (time-to-day-in-year week-day) 7)
-                                    ;;        (/ (time-to-day-in-year month-1st-day) 7)))
-                                    (1+ (- (string-to-number
-                                            (format-time-string "%W" week-day))
-                                           (string-to-number
-                                            (format-time-string "%W" month-1st-day)))))))
-                       `(:raw-value ,week-day-heading
-                                    :pre-blank 0
-                                    :post-blank 2
+                            ;; (format (format-time-string "%b w %%s" week-day)
+                            ;;         (1+ (- (string-to-number
+                            ;;                 (format-time-string "%W" week-day))
+                            ;;                (string-to-number
+                            ;;                 (format-time-string "%W" month-1st-day)))))
+                            (ram-org-make-link-to-weekly-note month-1st-day week-day)))
+                       `(:raw-value ,(org-link-display-format week-day-heading)
+                                    :pre-blank 1
+                                    :post-blank 1
                                     :level 1
                                     :title ,(list week-day-heading)))
                      (cl-labels ((demote-headings (hs)
@@ -6002,6 +6094,14 @@ When ARG is 1, update the current note."
       (goto-char (point-min))
       (org-next-visible-heading 1))))
 
+(defun ram-org-update-monthly-note ()
+    "Update current monthly note.
+
+It just calls `ram-org-capture-monthly-note' with argument 1 which
+makes that function update the current monthly note."
+    (interactive)
+  (ram-org-capture-monthly-note 1))
+
 
 ;;*** org-roam/monthly: settings
 
@@ -6026,8 +6126,15 @@ Use the current buffer file-path if FILE is nil."
       (and (org-roam-file-p path)
            (f-descendant-of-p path directory)))))
 
-(defun ram-org-roam-weekly-note-next (&optional n)
-  "Goto or create next Nth weekly note."
+(defun ram-org-get-monday-date-from-weekly-note-file-name ()
+  "Return date-time extracted from weenkly note file name.
+
+The date-time corresponds to the date of the 1st of Jan
+plus number of days contained in the weeks extracted for file name.
+
+It kind of works by full weeks. So, the dates at the year borders may not
+correspond to the conventional logic or one defined by ISO, see
+https://en.wikipedia.org/wiki/ISO_week_date"
   (let* ((file-name (file-name-base (buffer-file-name (buffer-base-buffer))))
          (week-from-buffer-name (string-to-number (car (last (split-string file-name "-w")))))
          (year-from-buffer-name (string-to-number (car (split-string file-name "-"))))
@@ -6059,10 +6166,25 @@ Use the current buffer file-path if FILE is nil."
                                               (if (zerop dow-1st-of-jan)
                                                   7
                                                 dow-1st-of-jan)
-                                              (* 24 3600)))))
-         ;; add (or subtract) n weeks
+                                              (* 24 3600))))))
+    time-from-buffer-name))
+
+(defun ram-org-roam-weekly-note-next (&optional n)
+  "Goto or create next Nth weekly note."
+  (let* ((time-from-buffer-name
+          (ram-org-get-monday-date-from-weekly-note-file-name))
          (target-time (time-add time-from-buffer-name (* 7 (or n 1) 86400))))
     (ram-org-capture-weekly-note nil target-time)))
+
+(defun ram-org-update-weekly-note ()
+  "Update currently active weekly note.
+
+This is useful when you made changes to daily notes and want
+to reflect these changes in the weekly note."
+  (interactive)
+  (when (ram-org-roam-weekly-note-p)
+    (ram-org-capture-weekly-note
+     nil (ram-org-get-monday-date-from-weekly-note-file-name))))
 
 (defun ram-org-get-daily-notes-headings-from-week (time &optional include-backlink-p same-month-only-p)
   "Return an org-element made `org-roam' daily note headings for a week."
@@ -6162,7 +6284,11 @@ Use the current buffer file-path if FILE is nil."
 ;;    (could not find this fn with "capture weekly" search)
 ;; 3. May be include links to the actual notes.
 (defun ram-org-capture-weekly-note (&optional arg time)
-  "Create a weekly note from daily notes in an ARG week from now.
+  "Create the weekly note for the currently active daily note.
+
+If `prefix-arg' ARG is non-nil, jump to this number of weeks forward or
+back.
+
 Use calendar if ARG value is '(4)."
   (interactive "P")
   (require 'org)
