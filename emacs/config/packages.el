@@ -973,10 +973,16 @@ Disable `icomplete-vertical-mode' for this command."
                       "git-commit-pkg.el")
               :host github :repo "magit/magit"))
 
+;;** magit: dependencies
+
 ;; !!! You may have to run ~make info~ to create info and dir files
 ;; read more in the note for "magit info"
 ;; (add-to-list 'Info-default-directory-list "~/.local/share/emacs/my.emacs.d/straight/repos/magit/docs")
 ;; (add-to-list 'Info-directory-list "~/.local/share/emacs/my.emacs.d/straight/repos/magit/docs")
+
+;; either install ~/.local/share/info/gitman.info
+;; or use this setting:
+;;(setq magit-view-git-manual-method 'man)
 
 (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
 (setq magit-save-repository-buffers 'dontask)
