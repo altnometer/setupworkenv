@@ -9521,6 +9521,11 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 ;;* python
 
+(add-to-list 'major-mode-remap-alist
+             '(python-mode . python-ts-mode))
+
+
+
 ;;** python: ide
 
 (straight-use-package
@@ -9574,24 +9579,35 @@ Toggle `lsp-ido-show-symbol-filename'."
 
 (setq elpy-rpc-virtualenv-path "~/.virtualenvs/elpy-enc/")
 (setenv "PYTHONIOENCODING" "utf-8")
+
 (with-eval-after-load 'elpy
   (add-to-list 'process-coding-system-alist '("python" . (utf-8 . utf-8)))
   (add-to-list 'process-coding-system-alist '("elpy" . (utf-8 . utf-8)))
   (add-to-list 'process-coding-system-alist '("flake8" . (utf-8 . utf-8))))
 
+
+;;** python: bindings
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "H-h") 'ram-jump-to-outline))
+
+(with-eval-after-load 'python
+  (define-key python-ts-mode-map (kbd "H-h") 'ram-jump-to-outline))
+
+;; (define-key python-mode-map (kbd "H-H") 'ram-jump-to-def)
+;; (define-key python-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun)
+;; (require 'flycheck-clj-kondo)
+
+;;** python: abbrev: hooks, advice, timers
+
 ;; (add-hook 'python-mode-hook #'elpy-enable)
 ;; (remove-hook 'python-mode-hook #'elpy-enable)
 
 (add-hook 'python-mode-hook #'outline-minor-mode)
-
 (add-hook 'python-mode-hook 'python-mode-outline-hook)
 
-(with-eval-after-load 'python
-  (define-key python-mode-map (kbd "H-h") 'ram-jump-to-outline))
-  ;; (define-key python-mode-map (kbd "H-H") 'ram-jump-to-def)
-  ;; (define-key python-mode-map (kbd "H-n") #'ram-toggle-narrow-to-defun)
-  ;; (require 'flycheck-clj-kondo)
-
+(add-hook 'python-ts-mode-hook #'outline-minor-mode)
+(add-hook 'python-ts-mode-hook 'python-mode-outline-hook)
 
 ;;* prolog
 
