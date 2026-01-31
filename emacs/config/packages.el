@@ -500,7 +500,10 @@ Disable `icomplete-vertical-mode' for this command."
 (setenv "SHELL" shell-file-name)
 (add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
 
-;;* eshell
+;;** shell: tree-sitter integration
+
+(add-to-list 'major-mode-remap-alist
+             '(sh-mode . bash-ts-mode));;* eshell
 
 ;;** eshell: completion
 
