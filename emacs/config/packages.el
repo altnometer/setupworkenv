@@ -187,6 +187,11 @@
 (defun endless/simple-get-word ()
   (car-safe (save-excursion (ispell-get-word nil))))
 
+;; Emacs 31.0.50 and above
+;; consider using ispell-save-corrections-as-abbrevs
+;; check that abbrevs are saved
+;; read comments to (setq-default abbrev-mode t)
+;; for how the abbrevs can be unintentionally be discarded
 (defun endless/ispell-word-then-abbrev (p)
   "Call `ispell-word', then create an abbrev for it.
 With prefix P, create local abbrev. Otherwise it will
@@ -4404,7 +4409,10 @@ Specifically, links to weekly and daily notes."
 
 ;;** org-mode: images, img
 
+;; obsolete since Org 9.8
 ;; org-toggle-inline-images (C-c C-x C-v)
+;; use org-link-preview
+
 
 (setq org-startup-with-inline-images t)
 ;; (setq org-image-actual-width '(800))
@@ -4416,6 +4424,7 @@ Specifically, links to weekly and daily notes."
  '(org-inline-anim :type git :flavor melpa :host github :repo "shg/org-inline-anim.el"))
 (with-eval-after-load 'org
   (add-hook 'org-mode-hook #'org-inline-anim-mode))
+
 ;;** org-mode: structure-templates, snippets
 
 ;; https://orgmode.org/manual/Structure-Templates.html
