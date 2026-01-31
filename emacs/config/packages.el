@@ -6706,7 +6706,7 @@ If you wish to cycle to deeper levels, then modify the parts:
      ;;   - show sublevels 2
      ((and (eq last-command this-command)
            (= 2 c))
-      (outline-show-all)
+      ;; (outline-show-all)
       (outline-map-region (lambda ()
                             (cond
                              ((= 1 (funcall outline-level)) (outline-hide-subtree))
@@ -6731,7 +6731,7 @@ If you wish to cycle to deeper levels, then modify the parts:
      ;;   - show sublevels 3
      ((and (eq last-command this-command)
            (= 3 c))
-      (outline-show-all)
+      ;; (outline-show-all)
       (outline-map-region (lambda ()
                             (cond
                              ((= 1 (funcall outline-level)) (outline-hide-subtree))
@@ -6757,7 +6757,10 @@ If you wish to cycle to deeper levels, then modify the parts:
      ;;   - outline-show-all
      ((and (eq last-command this-command)
            (= max-level c))
-      (outline-show-all)
+      ;; (outline-show-all)
+      (save-restriction
+        (narrow-to-region beg end)
+        (outline-show-all))
       (setq ram-outline-toggle-plist (plist-put ram-outline-toggle-plist :counter (1+ c)))
       (goto-char p))
      ;; should not happend, but just in case
