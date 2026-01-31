@@ -4452,6 +4452,8 @@ Specifically, links to weekly and daily notes."
   (add-to-list 'org-structure-template-alist
                '("ps" . "src python :results value :session my-Python-session"))
   (add-to-list 'org-structure-template-alist
+               '("pys" . "src python :results value :session my-Python-session"))
+  (add-to-list 'org-structure-template-alist
                '("pns" . "src python :results value"))
   (add-to-list 'org-structure-template-alist
                '("rsc" . "src R :results value :colnames yes :session my-R-session"))
@@ -4505,7 +4507,8 @@ Specifically, links to weekly and daily notes."
 ;;(setq python-shell-interpreter "/usr/bin/python3")
 (setq python-shell-interpreter "~/.venv/org-babel/bin/python3")
 ;;(setq python-shell-interpreter-args "-i") ;; default is "-i"
-(setq org-babel-python-command-nonsession "python3")
+(setq org-babel-python-command-nonsession "~/.venv/org-babel/bin/python3")
+(setq org-babel-python-command-session "~/.venv/org-babel/bin/python3")
 (setq python-shell-virtualenv-root "~/.venv/org-babel/")
 
 ;;*** org-mode/org-babel: prolog
