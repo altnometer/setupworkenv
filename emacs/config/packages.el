@@ -11461,7 +11461,7 @@ With a prefix argument N, (un)comment that many sexps."
                :height 190
                )
               (set-face-attribute
-               'mode-line frame
+               'mode-line-active frame
                :box '(:line-width 6 :style flat-button)
                :foreground "black" :background "grey55"
                :weight 'light
@@ -11471,8 +11471,13 @@ With a prefix argument N, (un)comment that many sexps."
                'mode-line-inactive frame
                :box '(:line-width 6 :style flat-button)
                :weight 'light
-               :foreground "grey20" :background "grey90"
-               :height 230))
+               :foreground "grey20" :background "grey80"
+               :height 230)
+              (set-face-attribute
+               'minibuffer-nonselected
+               frame
+               :foreground "black" :background "red"
+               ))
              ;;--------------------------
              ;; UPERFECT 18 inch 4K (UDH)
              ;;--------------------------
@@ -11526,20 +11531,24 @@ With a prefix argument N, (un)comment that many sexps."
                :slant 'italic
                )
               ;; mode-line
-              (set-face-attribute
-               'mode-line frame
-               :foreground "black" :background "grey55"
-               :box '(:line-width 6 :style flat-button)
-               :height 290
-               :weight 'light
-               )
-              (set-face-attribute
-               'mode-line-inactive frame
-               :foreground "black" :background "grey90"
-               :box '(:line-width 6 :style flat-button)
-               :height 290
-               :weight 'light
-               ))
+              (set-face-attribute 'mode-line-active
+                                  frame
+                                  :foreground "black" :background "grey55"
+                                  :box '(:line-width 6 :style flat-button)
+                                  :height 290
+                                  :weight 'light
+                                  )
+              (set-face-attribute 'mode-line-inactive
+                                  frame
+                                  :foreground "black" :background "grey80"
+                                  :box '(:line-width 6 :style flat-button)
+                                  :height 290
+                                  :weight 'light
+                                  )
+              (set-face-attribute 'minibuffer-nonselected
+                                  frame
+                                  :foreground "black" :background "red"
+                                  ))
              (t nil)
              )))))
 
