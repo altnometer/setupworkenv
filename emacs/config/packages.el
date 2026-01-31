@@ -693,7 +693,7 @@ Disable `icomplete-vertical-mode' for this command."
 
         (,(kbd "<f2> c") . ram-reveal-clear)
 
-        (,(kbd "s-c n") . org-roam-dailies-capture-today)
+        ;; (,(kbd "s-c n") . org-roam-dailies-capture-today)
         (,(kbd "s-c d") . org-roam-dailies-goto-today)
         (,(kbd "s-c f") . ram-org-roam-next-note-dwim)
         (,(kbd "s-c b") . ram-org-roam-prev-note-dwim)
@@ -11312,9 +11312,9 @@ That is, remove a non kept dired from the recent list."
   (define-key flyspell-mode-map (kbd "C-M-i") nil)
 
   (define-key flyspell-mode-map (kbd "C-,") nil)
-  (define-key global-map (kbd "s-M-c") 'ispell-word)
+  (define-key global-map (kbd "M-s-c") 'ispell-word)
 
-  (define-key global-map (kbd "s-M-C") 'flyspell-check-next-highlighted-word))
+  (define-key global-map (kbd "M-s-C") 'flyspell-check-next-highlighted-word))
 
   ;; hyper key is disables in favor of f1, ... keys
   ;; (define-key global-map (kbd "C-H-e") 'flycheck-next-error)
