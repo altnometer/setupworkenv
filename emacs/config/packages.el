@@ -10580,6 +10580,15 @@ Hopefully, this function would cover some edge cases."
 (straight-use-package
  '(iedit :type git :host github :repo "victorhge/iedit"))
 
+;; I am sick of iedit rebinding "C-M-;" to iedit-execute-last-modification
+;; in global-map
+;; I have "C-M-;" bound to
+;; (define-key global-map (kbd "C-M-;") #'comment-or-uncomment-sexp)
+;; hence, rebind it again after 'iedit loads
+
+(eval-after-load "iedit"
+  '(define-key global-map (kbd "C-M-;") #'comment-or-uncomment-sexp))
+
 ;;** packages: imenu
 
 (setq imenu-use-markers t)
