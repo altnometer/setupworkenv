@@ -10830,19 +10830,27 @@ It is in the left-most frame. It is at the bottom."
 (setq recentf-auto-cleanup 'never) ;; disable before we start recentf!
 (recentf-mode 1)
 (setq recentf-max-saved-items 4000)
-(run-at-time nil (* 1 60) 'recentf-save-list)
+
+;; (run-at-time nil (* 1 60) 'recentf-save-list)
+;; Emacs 31.0.50 and above
+(setq recentf-autosave-interval 60)
+
 (run-at-time nil (* 3.3 60) #'ram-recentf-remove-non-existent-files)
+
 (add-to-list 'recentf-exclude (format "%s.+" (expand-file-name org-roam-directory)))
 
 ;; do not show message in minibuffer
 ;; credit to
 ;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2016-08/msg00367.html
-(defun recentf-save-silently-advice (original &rest args)
-  (let ((inhibit-message t)
-        (message-log-max nil))
-    (apply original args)))
+;; (defun recentf-save-silently-advice (original &rest args)
+;;   (let ((inhibit-message t)
+;;         (message-log-max nil))
+;;     (apply original args)))
 
-(advice-add 'recentf-save-list :around #'recentf-save-silently-advice)
+;; (advice-add 'recentf-save-list :around #'recentf-save-silently-advice)
+
+;; Emacs 31.0.50 and above
+(setq recentf-show-messages nil)
 
 ;;*** packages/recentf: functions
 
