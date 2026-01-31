@@ -12511,6 +12511,37 @@ ANY of these param-value pairs.
 (when (file-readable-p "~/.emacs.d/lisp/ram-tempo-templates.el")
     (load-file (expand-file-name "~/.emacs.d/lisp/ram-tempo-templates.el")))
 
+
+;; * tree-sitter
+
+(setq treesit-extra-load-path '("~/backup/emacs/tree-sitter"))
+
+(setq treesit-language-source-alist
+      '((c "https://github.com/tree-sitter/tree-sitter-c")
+        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+        (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+        (python "https://github.com/tree-sitter/tree-sitter-python")
+        (bash  "https://github.com/tree-sitter/tree-sitter-bash")
+        (R "https://github.com/DavisVaughan/r-tree-sitter")
+        ;; Add other languages as needed
+        ))
+
+
+;; compile all language grammars in treesit-language-source-alist
+;; make it conditional on whether it is already compiled and available
+;;(mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+
+
+
+
+;; Remap major modes to use tree-sitter modes
+;(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+;; (add-to-list 'major-mode-remap-alist '(c++-mode . cpp-ts-mode))
+
+
+
 ;;* sayid
 ;; (straight-use-package
 ;;  '(sayid :type git :flavor melpa :files ("src/el/*.el" "sayid-pkg.el") :host github :repo "clojure-emacs/sayid"))
