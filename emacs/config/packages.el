@@ -4085,6 +4085,149 @@ Leave a mark to return to."
   (interactive)
   (scroll-up-command -1))
 
+;;*** org-mode/functions: navigate TODO
+
+(defvar ram-org-jump-to-todo-history nil
+  "history list for `ram-org-jump-to-todo' navigation.")
+(put 'ram-org-jump-to-todo-history 'history-length 100)
+
+(defun ram-org-jump-to-todo (ram-org-todo &optional swap-history-p)
+  "Jump to my custom org (TODO: ...) item.
+
+later, maybe include Org standard TODO: elements."
+  (interactive
+   (let* ((max-desc-length 100) ; how many chars to include in description
+          (name-at-point (thing-at-point 'symbol 'no-properties))
+          (ram-org-todos '())
+          (buffer (if (minibufferp)
+                      (with-minibuffer-selected-window
+                        (current-buffer))
+                    (current-buffer)))
+          (ram-org-todo-regex
+           "(TODO:\\(?:[ \n\t\r]+\\)\\([^)]+?\\)?)")
+          (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
+          (old-binding-to-C-w (cdr (assoc ?\C-w (cdr minibuffer-local-completion-map))))
+          (reset-keybindings (lambda ()
+                               (if old-binding-to-return
+                                   (setf (alist-get 'return (cdr minibuffer-local-completion-map)) old-binding-to-return)
+                                 (assq-delete-all 'return (cdr minibuffer-local-completion-map)))
+                               (if old-binding-to-C-w
+                                   (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map)) old-binding-to-C-w)
+                                 (assq-delete-all ?\C-w (cdr minibuffer-local-completion-map)))))
+          (hist-item (car ram-org-jump-to-todo-history))
+          val)
+     (setf (alist-get 'return (cdr minibuffer-local-completion-map))
+           (ram-add-to-history-cmd ram-add-to-jump-ram-org-todo-history-on-exit
+                                   'ram-org-jump-to-todo-history
+                                   minibuffer-force-complete-and-exit))
+
+     (setf (alist-get ?\C-w (cdr minibuffer-local-completion-map))
+           (ram-add-to-history-cmd ram-add-to-jump-ram-org-todo-history-on-kill
+                                   'ram-org-jump-to-todo-history
+                                   ram-kill-minibuffer-candidate
+                                   minibuffer-force-complete-and-exit
+                                   ))
+     (condition-case err
+         (progn (with-current-buffer buffer
+                  (save-excursion
+                    ;; 'save-restiction' means
+                    ;;   - if the buffer is narrowed:
+                    ;;     - we widen the buffer
+                    ;;     - execute the code
+                    ;;     - restore to the buffer to previous state
+                    (save-restriction
+                      (widen)
+                      (goto-char (point-max))
+                      (while (re-search-forward ram-org-todo-regex nil t -1)
+                        (setq ram-org-todos
+                              (cons
+                               (cons
+                                (replace-regexp-in-string "\n" "\n      " (match-string-no-properties 1))
+                                (point))
+                               ram-org-todos))))))
+                ;; (setq ram-org-todos (ram-make-duplicate-keys-unique ram-org-todos))
+                (setq val (cdr (assoc (completing-read
+                                       (format-prompt
+                                        "TODO" (or name-at-point
+                                                      (car ram-org-jump-to-todo-history)))
+                                       ram-org-todos
+                                       nil t nil
+                                       'ram-org-jump-to-todo-history
+                                       (or name-at-point
+                                           (car ram-org-jump-to-todo-history)))
+                                      ram-org-todos))))
+       (error
+        (funcall reset-keybindings)
+        (signal (car err) (cdr err)))
+       (minibuffer-quit
+        (funcall reset-keybindings)
+        (signal 'minibuffer-quit nil))
+       (quit
+        (funcall reset-keybindings)
+        (signal 'quit nil))
+       (:success
+        (funcall reset-keybindings)
+        ;; this list is returned from 'interactive block,
+        ;; list elements are mapped to command args, i.e.,
+        ;;   - 1st element mapped to  ORG-NAME
+        ;;   - 2d  element mapped to SWAP-HISTORY-P
+        (list
+         ;; this element is the value of ORG-NAME argument to the function
+         (if (equal val "")
+             name-at-point
+           val)
+         ;; this element is the value of SWAP-HISTORY-P argument to the function
+         ;; if two items are inserted, swap them
+         ;;   - because I want
+         ;;     + the search str that I typed in to be
+         ;;       the first item in history
+         ;;     + and actual selected item to be the second
+         ;;  - I want it so because the search string narrows the
+         ;;    candidates,
+         ;;    + and I may want to select(try) another item
+         ;; This piece of logic just checks if
+         ;;   - true if two items wore inserted
+         ;;   - nil otherwise
+         (let ((third-element (caddr ram-org-jump-to-todo-history))
+               (second-element (cadr ram-org-jump-to-todo-history)))
+           (and second-element (equal hist-item third-element)))))))
+
+   )
+  ;; reorder history so that the search string is fist and the input is second.
+  ;; Use it for different order when pressing <M-p> for previous history item.
+  (when swap-history-p
+    (setq ram-org-jump-to-todo-history
+          (cons (cadr ram-org-jump-to-todo-history)
+                (cons (car ram-org-jump-to-todo-history)
+                      (cddr ram-org-jump-to-todo-history)))))
+  (when ram-org-todo
+    (when (minibufferp)
+      (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
+                                     (current-buffer))))
+        (switch-to-buffer pre-minibuffer-buffer)))
+    ;; (message ">>>>> this-command: %S" this-command)
+    ;; (message ">>>>> last-command: %S" last-command)
+    ;; (message ">>>>> real-last-command: %S" real-last-command)
+    ;; (message ">>>>> last-command-event: %S" last-command-event)
+    ;; (message ">>>>> current-minibuffer-command: %S" current-minibuffer-command)
+    ;; last-command-event: we are looking for event 'pressed ?\C-w'
+    ;; (eq last-command-event ?\C-w)
+    ;; means that 'ram-kill-minibuffer-candidate was called
+    ;; and you do not want to jump to the result
+    (when (not (eq last-command-event ?\C-w))
+      (push-mark)
+      (goto-char ram-org-todo)
+      (outline-show-entry)
+      (beginning-of-line)
+      (recenter))
+    ;; (let ((default (if (boundp pulse-flag)
+    ;;                    pulse-flag
+    ;;                  nil)))
+    ;;   ;; pulse-iteration pulse-delay
+    ;;   (setq pulse-flag nil)
+    ;;   (pulse-momentary-highlight-one-line (point) 'isearch)
+    ;;   (setq pulse-flag default))
+    ))
 
 ;;** org-mode: bindings
 
@@ -4095,6 +4238,7 @@ Leave a mark to return to."
   (define-key org-mode-map (kbd "C-'") nil)
 
   (define-key org-mode-map (kbd "H-H") #'ram-org-jump-to-name)
+  (define-key org-mode-map (kbd "H-M-h") #'ram-org-jump-to-todo)
 
   (define-key org-mode-map (kbd "H-n") #'ram-org-next-block)
   (define-key org-mode-map (kbd "C-c M-f") #'ram-org-next-block)
