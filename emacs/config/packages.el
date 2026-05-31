@@ -580,7 +580,9 @@ Disable `icomplete-vertical-mode' for this command."
 ;;** shell: tree-sitter integration
 
 (add-to-list 'major-mode-remap-alist
-             '(sh-mode . bash-ts-mode));;* eshell
+             '(sh-mode . bash-ts-mode))
+
+;;* eshell
 
 ;;** eshell: completion
 
@@ -12969,9 +12971,11 @@ ANY of these param-value pairs.
     (load-file (expand-file-name "~/.emacs.d/lisp/ram-tempo-templates.el")))
 
 
-;; * tree-sitter
+;;* tree-sitter
 
 (setq treesit-extra-load-path '("~/backup/emacs/tree-sitter"))
+
+;;** tree-sitter: available language source alist
 
 (setq treesit-language-source-alist
       '((c "https://github.com/tree-sitter/tree-sitter-c")
@@ -12983,6 +12987,9 @@ ANY of these param-value pairs.
         (R "https://github.com/DavisVaughan/r-tree-sitter")
         ;; Add other languages as needed
         ))
+
+;;** tree-sitter: enable ts mode
+
 
 
 ;; compile all language grammars in treesit-language-source-alist
