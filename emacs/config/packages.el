@@ -130,6 +130,17 @@ text parsing rules.")
 ;; if Org is loaded after the theme.. However, loading a theme itakes
 ;; long time, Seek other ways to fix the problem.
 
+;;* completions buffer
+
+(setq completion-eager-display nil)
+(setq completion-eager-update t)
+;; does not, maybe my custom key bindings
+;; in minibuffer interfere
+;; 't makes C-g close *Completions* buffer
+;; rather than the minibuffer
+(setq  minibuffer-visible-completions 'up-down)
+
+
 ;;* abbrev
 
 ;;** abbrev: table
