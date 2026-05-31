@@ -18,6 +18,70 @@
 ;;   - emacsclient --eval '(man "$1")'
 (server-start)
 
+
+;;* ai
+
+;;** ai: gptel
+
+(straight-use-package
+ '(gptel :type git :host github :repo "karthink/gptel"))
+
+;; Define the Gemini backend using your API key
+(setq gptel-api-key
+      (lambda ()
+        (let ((secret (plist-get (car
+                                  (auth-source-search
+                                   :host "google.com"
+                                   :user "api.gemini.ai"
+                                   :require '(:secret)
+                                   :secret)
+                                  ;; (auth-source-search
+                                  ;;  :machine "api.gemini.ai"
+                                  ;;  :require '(:secret))
+                                  )
+                                 :secret)))
+          (if (functionp secret) (funcall secret) secret))))
+
+(setq gptel-backend
+      (gptel-make-gemini "Gemini"
+        ;; Replace with your actual
+        ;; Gemini API key
+        ;; :key (getenv "GEMINI_API_KEY")
+        :key gptel-api-key
+        ;; :key
+        ;; (lambda ()
+        ;;        (auth-source-search 
+        ;;         :machine "api.gemini.ai" 
+        ;;         :require '(:secret)))
+        ;; :key
+        (lambda ()
+          (auth-source-pass-enable)
+          (auth-source-search
+           :host "google.com"
+           :user "api.gemini.ai"
+           :require '(:secret)
+           :secret))
+        :stream t))
+
+;; Establish Gemini as the default system-wide model for gptel
+(setq gptel-model 'gemini-2.5-flash)
+
+;; Enforce direct answers and native Org-mode syntax formatting
+(setq gptel-default-system-instruction
+        "You are an expert AI assistant. Deliver your responses instantly, concisely, 
+and directly without displaying any internal reasoning, chain-of-thought, or 
+analytical preamble. 
+
+Because the user is interacting with you from an Emacs Org-mode buffer, you 
+MUST format all source code blocks using native Org syntax 
+(#+begin_src language ... #+end_src). Do NOT use Markdown
+triple-backticks (```). Ensure list structures and headings match clean
+text parsing rules.")
+;;* gpg
+
+;; read gpg password for key
+(setq epg-pinentry-mode 'loopback)
+
 ;;* color-themes
 
 (defvar ram-after-load-theme-hook nil
@@ -26,6 +90,8 @@
 (defadvice load-theme (after run-ram-after-load-theme-hook activate)
   "Run `ram-after-load-theme-hook'."
   (run-hooks 'ram-after-load-theme-hook))
+
+
 
 ;;** color-themes: modus-themes
 
