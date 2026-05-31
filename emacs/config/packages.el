@@ -11880,22 +11880,22 @@ With a prefix argument N, (un)comment that many sexps."
               ;; (set-face-attribute 'variable-pitch frame :family "Bembo" :height 270 :weight 'normal)
               (set-face-attribute
                'variable-pitch frame
-               :family "Times New Roman" :height 220 :weight 'medium)
+               :family "Times New Roman" :height 260 :weight 'medium)
               (set-face-attribute
                'fixed-pitch frame
-               :family "Operator Mono Medium-20" :height 200 :weight 'light)
-              (set-frame-parameter frame 'font "Operator Mono Medium-20")
+               :family "Operator Mono Medium-20" :height 240 :weight 'light)
+              (set-frame-parameter frame 'font "Operator Mono Medium-24")
               (set-face-attribute
                'font-lock-comment-face frame
-               :family "Operator Mono Medium-19"
-               :height 190
+               :family "Operator Mono Medium-24"
+               :height 240
                :weight 'light
                :slant 'italic
                :foreground "grey60"
                )
               (set-face-attribute
                'font-lock-doc-face frame
-               :family "Operator Mono Light-19"
+               :family "Operator Mono Light-24"
                :foreground "grey60"
                :weight 'light
                :slant 'italic)
@@ -11906,14 +11906,14 @@ With a prefix argument N, (un)comment that many sexps."
                :foreground "#2544bb"    ; blue
                :weight 'light
                :slant 'italic
-               :height 190
+               :height 240
                )
               (set-face-attribute
                'mode-line-active frame
                :box '(:line-width 6 :style flat-button)
                :foreground "black" :background "grey55"
                :weight 'light
-               :family "Operator Mono Medium-19"
+               :family "Operator Mono Medium-24"
                :height 230)
               (set-face-attribute
                'mode-line-inactive frame
@@ -12114,10 +12114,19 @@ With a prefix argument N, (un)comment that many sexps."
 
 ;;*** system/general settings/hl (highlight) line: face hl-line
 
+;; (set-face-attribute 'hl-line nil
+;;                     :inherit nil
+;;                     :background "LightGoldenrod2"
+;;                     :underline "LightGoldenrod4" :extend t)
+
 (set-face-attribute 'hl-line nil
                     :inherit nil
-                    :background "LightGoldenrod2"
-                    :underline "LightGoldenrod4" :extend t)
+                    :background "thistle1"
+                    ;; ':position t' will draw the underline
+                    ;; at the bottom of the line rather than
+                    ;; at the baseline of characters
+                    :underline '(:color "LightSteelBlue1" :style line :position t)
+                    :extend t)
 
 
 (defun ram-remap-hl-line-face-in-find-file-hook ()
