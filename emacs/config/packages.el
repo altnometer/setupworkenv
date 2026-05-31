@@ -6061,7 +6061,10 @@ ARG value is 4."
 ;;*** org-roam/dailies: navigate notes
 
 (defun ram-org-roam-prev-note-dwim (&optional n)
-  "Goto the previous daily, weekly or monthly note."
+  "Goto the previous daily, weekly or monthly note.
+
+Currently, the `prefix-arg' N is used only to pass it on
+to display buffer functions."
   (interactive "p")
   (require 'org-roam-dailies)
   (cond
@@ -6069,7 +6072,7 @@ ARG value is 4."
          (org-roam-dailies--daily-note-p))
     (let ((current-note-time
            (time-convert (date-to-time (file-name-base (buffer-file-name))) 'integer)))
-      (org-roam-dailies--capture (time-add (* (- n) 86400) current-note-time) t)))
+      (org-roam-dailies--capture (time-add (- (* 24 60 60)) current-note-time) t)))
    ((ram-org-roam-weekly-note-p)
     (ram-org-roam-weekly-note-next -1))
    ((ram-org-roam-monthly-note-p)
@@ -6081,7 +6084,10 @@ ARG value is 4."
       (delete-other-windows))))
 
 (defun ram-org-roam-next-note-dwim (&optional n)
-  "Goto the next note of the same type as the current one."
+  "Goto the next note of the same type as the current one.
+
+Currently, the `prefix-arg' N is used only to pass it on
+to display buffer functions."
   (interactive "p")
   (require 'org-roam-dailies)
   (cond
@@ -6089,7 +6095,7 @@ ARG value is 4."
          (org-roam-dailies--daily-note-p))
     (let ((current-note-time
            (time-convert (date-to-time (file-name-base (buffer-file-name))) 'integer)))
-      (org-roam-dailies--capture (time-add (* n 86400) current-note-time) t)))
+      (org-roam-dailies--capture (time-add (* 24 60 60) current-note-time) t)))
    ((ram-org-roam-weekly-note-p)
     (ram-org-roam-weekly-note-next 1))
    ((ram-org-roam-monthly-note-p)
