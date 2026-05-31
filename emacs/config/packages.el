@@ -4493,6 +4493,61 @@ Specifically, links to weekly and daily notes."
            ) t)))
    'append))
 
+
+;;*** org-mode/faces, fonts: list bullets
+
+;; visually replace dashes/hyphens and plus chars in Org lists as bullets
+
+
+(with-eval-after-load 'org
+  ;; Define a subtle grey face for the bullets
+  (defface gemini-org-bullet-grey
+    '((t :foreground "gray66"))
+    "Face for subtle Org-mode list bullets.")
+
+  (font-lock-add-keywords 'org-mode
+                          '(
+                            ;; top level hyphen (-) as grey solid bullet (•)
+                            ("^\\(-\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "•" ))
+                            ;; non-top level hyphen (-) as bullet operator (∙)
+                            ("^[[:blank:]]+\\(-\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "∙"))
+                            ;; Replace plus (+) with a grey small hollow bullet (◦)
+                            ("^[[:blank:]]*\\(\\+\\)[[:blank:]]"
+                             1 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
+
+;;*** org-mode/faces, fonts: org-quote
+
+(with-eval-after-load 'org
+  (set-face-attribute 'org-quote nil 
+                      :foreground "grey40" 
+                      :slant 'italic))
+
+(with-eval-after-load 'org
+  ;; Function to add visual indentation (4 extra spaces) to quote blocks
+  (defun gemini-org-indent-quote-blocks (limit)
+    (let ((case-fold-search t))
+      (while (re-search-forward "^[ \t]*#\\+begin_quote" limit t)
+        (let* ((beg (match-end 0))
+               (end (save-excursion
+                      (re-search-forward "^[ \t]*#\\+end_quote" nil t)
+                      (match-beginning 0)))
+               ;; 1. Get the current indent string or default to empty
+               (current-prefix (get-text-property (line-beginning-position) 'line-prefix))
+               ;; 2. Create your extra indent with the grey face
+               (extra-indent (propertize "      " 'face 'org-quote))
+               ;; 3. Combine them
+               (combined-prefix (concat current-prefix extra-indent)))
+          (when (and beg end (> end beg))
+            (add-text-properties beg end
+                                 `(line-prefix ,combined-prefix
+                                               wrap-prefix ,combined-prefix)))))))
+  ;; Hook the indentation function into Org's font-lock process
+  (add-hook 'org-font-lock-hook #'gemini-org-indent-quote-blocks))
+
+(remove-hook 'org-font-lock-hook #'gemini-org-indent-quote-blocks)
+
 ;;** org-mode: emphasis
 
 ;; modify org-emphasis-regexp-components, 3rd entry, to include char to emphasis markup
