@@ -1586,7 +1586,10 @@ succession."
                                         (point))
                                        headlines)))
                     ))
-                ;; (setq headlines (ram-make-duplicate-keys-unique headlines))
+                ;; some headlines repeat in subtopics
+                ;; is it possible to sort them in a way that reflects
+                ;; their position in buffer?
+                (setq headlines (ram-make-duplicate-keys-unique headlines))
                 (setq val (cdr (assoc (completing-read
                                        (format-prompt
                                         "****heading:" (car ram-jump-to-outline-history))
