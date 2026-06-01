@@ -3047,7 +3047,7 @@ the `current-prefix-arg' is non nil"
               (lambda (buffer &optional alist)
                 (let ((mode (buffer-local-value 'major-mode (get-buffer buffer))))
                   (eq 'dired-mode mode)))
-              7 3))
+              6 4))
 
 ;;****** buffers/display/alist: ESS Emacs Speaks Statistics
 
