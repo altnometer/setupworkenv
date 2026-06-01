@@ -3303,7 +3303,7 @@ some commands. "
 ;;*** org-mode/functions: search, jump to #+name
 
 (defvar ram-org-jump-to-name-history nil
-  "`ram-describe-variable' history list.")
+  "history list for `ram-org-jump-to-name' navigation.")
 (put 'ram-org-jump-to-name-history 'history-length 100)
 
 
@@ -3312,7 +3312,7 @@ some commands. "
   (interactive
    (let* ((name-at-point
            (let ((old-syntax-for-equal (char-to-string (char-syntax ?=)))
-                 (old-syntax-for-dot (char-to-string (char-syntax ?=)))
+                 (old-syntax-for-dot (char-to-string (char-syntax ?.)))
                  symbol)
              ;; no not include "=" as symbol
              ;; i.e., in foo=bar, only select either foo bar
