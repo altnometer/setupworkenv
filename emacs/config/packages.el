@@ -3464,6 +3464,8 @@ some commands. "
     ;;   (setq pulse-flag default))
     ))
 
+;;*** org-mode/functions: todo
+
 ;; credit to https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
 (defun ram-org-buffer-contains-todos-p (&optional file-path)
   "Return non-nil if FILE buffer contains any to-dos.
@@ -4342,7 +4344,7 @@ left by `org-mark-element`."
   ;;   - results like 'data.append' will not show
   ;; Let us try '.' as a punctuation character
   (modify-syntax-entry ?. "." org-mode-syntax-table)
-  
+
   ;; the default for ?$ is word constituent.
   ;; in R code blocks references to table columns, e.g.,
   ;; 'planes$tailnum' are hard navigate by word,
@@ -4450,9 +4452,9 @@ Specifically, links to weekly and daily notes."
   (font-lock-add-keywords
    'org-mode
    `(
-     ;; level 1 header links to weekly notes
+     ;; level 1,2 header links to weekly notes
      (,(concat
-             "^\\* .*?\\(\\[\\[.*?\\]\\[\\"
+             "^\\*\\{1,2\\}.*?\\(\\[\\[.*?\\]\\[\\"
              "(?:Jan\\|Feb\\|Mar\\|Apr\\|May\\|Jun\\|Jul\\|Aug\\|Sep\\|Oct\\|Nov\\|Dec\\)"
              ".*\\]\\]\\)")
       (1 '(
@@ -4513,8 +4515,8 @@ Specifically, links to weekly and daily notes."
 ;;*** org-mode/faces, fonts: org-quote
 
 (with-eval-after-load 'org
-  (set-face-attribute 'org-quote nil 
-                      :foreground "grey40" 
+  (set-face-attribute 'org-quote nil
+                      :foreground "grey40"
                       :slant 'italic))
 
 (with-eval-after-load 'org
