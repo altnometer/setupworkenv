@@ -4639,7 +4639,7 @@ Specifically, links to weekly and daily notes."
                               '(org-activate-hidden-links-additional
                                 (0 '(face org-target invisible org-link))))))
 
-;; ** org-mode: LaTeX
+;;** org-mode: LaTeX
 
 ;; !!! works only if
 ;; (image-type-available-p 'svg) is t
@@ -4664,8 +4664,8 @@ Specifically, links to weekly and daily notes."
         :foreground default
         :background default
         ;; scaling size of the images to get more pixels
-        ;;:scale 2.5
-        :scale 4
+        :scale 1.2
+        ;;:scale 4
         :html-foreground "Black"
         :html-background "Transparent"
         :html-scale 1.0
@@ -4679,6 +4679,17 @@ Specifically, links to weekly and daily notes."
 ;;      "xelatex -interaction nonstopmode %f"))
 ;; for multiple passes
 ;; 'lualatex  -interaction=nonstopmode -recorder  "la_russie_en_1839_from_txt.tex"'
+
+;;*** org-mode/LaTeX: headers/settings
+
+
+
+;;*** org-mode/LaTeX: packages
+
+;; t means always inculed it, even for
+;; fragments and previews
+(with-eval-after-load 'org
+ (add-to-list 'org-latex-packages-alist '("" "bm" t)))
 
 
 ;;** org-mode: images, img
@@ -11014,7 +11025,9 @@ Hopefully, this function would cover some edge cases."
 
 (advice-add 'recenter-top-bottom :after #'hl-line-flash)
 
-(advice-add 'org-latex-preview :after #'hl-line-flash)
+;; hl-line-flash when idle should cover it
+;; otherwise, hl-line-flash cannot handle C-u prefix arguments
+;;(advice-add 'org-latex-preview :after #'hl-line-flash)
 
 (toggle-hl-line-when-idle)
 
