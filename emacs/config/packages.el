@@ -13077,6 +13077,12 @@ ANY of these param-value pairs.
 
 (global-set-key (kbd "C-c j") 'dired-jump)
 
+;;** dired: wdired
+
+;; allow renaming files that will affect their
+;; directory location
+(setq wdired-allow-to-redirect-links t)
+
 ;;* hippie-expand
 
 ;;** hippie-expand:  diacritic, accented
