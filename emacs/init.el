@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t -*-
 ;; fix "bad request issue"
 ;; https://github.com/syl20bnr/spacemacs/issues/12535
 ;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
@@ -272,6 +273,7 @@
  '(font-lock-comment-face ((t (:family "Operator Mono Light-19"))))
  '(font-lock-doc-face ((t (:family "Operator Mono Light-19" :slant italic))))
  '(font-lock-string-face ((t (:family "Operator Mono Light-19" :slant italic))))
+ '(mode-line ((t (:inherit modus-themes-ui-variable-pitch :background "blue" :foreground "black" :box (:line-width (6 . 6) :style flat-button) :weight light :height 290))))
  '(region ((t (:inherit nil :background "#5ada88" :foreground "#100a14"))))
  '(variable-pitch ((t (:family "Bembo" :height 260 :weight normal)))))
 (put 'magit-diff-edit-hunk-commit 'disabled nil)

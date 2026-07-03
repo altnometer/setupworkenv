@@ -1,3 +1,4 @@
+;; ram-tempo-templates.el --- my custom tempo templates  -*- lexical-binding: t -*-
 ;;* templates
 
 ;;* templates: org-mode

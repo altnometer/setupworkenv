@@ -1,4 +1,4 @@
-;;; ram-highlight-sexps.el --- highlight surrounding parentheses
+;;; ram-highlight-sexps.el --- highlight surrounding parentheses  -*- lexical-binding: t -*-
 ;;
 ;; Based on highlight-sexps.el
 ;;

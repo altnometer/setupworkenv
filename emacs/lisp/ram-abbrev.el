@@ -1,3 +1,4 @@
+;; ram-abbrev.el --- my abbrev completions  -*- lexical-binding: t -*-
 ;;* global-abbrev-table
 
 ;; credit to http://ergoemacs.org/emacs/emacs_abbrev_mode.html
