@@ -13041,6 +13041,114 @@ ANY of these param-value pairs.
 ;;(setq debug-on-error t)
 ;;(add-to-list 'debug-ignored-errors 'minibuffer-quit)
 
+;;* dictionary
+
+;;** dictionary: quick-sdcv
+
+(straight-use-package
+ '(quick-sdcv :type git :host github :repo "jamescherti/quick-sdcv.el"))
+
+;; if not loaded, it redefines
+;; 'quick-sdcv-dictionary-complete-list that
+;; I used to query specific dictionaries.
+(require 'quick-sdcv)
+
+;;*** dictionary/quick-sdcv: settings
+
+;; expand/collapse different dictionary results via folding
+;; t means you get the results all forded
+(setq quick-sdcv-fold-on-search nil)
+
+;; do not fuzzy-search for similar words,
+;; only return exact matches.
+;(setq quick-sdcv-exact-search nil)
+
+(setq quick-sdcv-dictionary-data-dir (expand-file-name "~/.stardict/dic"))
+
+;;*** dictionary/quick-sdcv: display buffer
+
+;; (add-to-list 'display-buffer-alist
+;;              '("\\*sdcv\\*"
+;;                (display-buffer-reuse-window display-buffer-at-bottom)
+;;                (window-height . 0.35)))
+
+;;*** dictionary/quick-sdcv: highlight
+
+(add-hook 'sdcv-mode-hook
+          (lambda ()
+            ;; Highlight the dictionary source headers (usually start with "-->")
+            (font-lock-add-keywords nil
+              '(;; dictionary name
+                ("^-->.*" . font-lock-keyword-face)
+                ;; => root word has font-lock-function-name-face defined somewhere
+                ("^\\s-+.*" . font-lock-doc-face)))
+            ;; Force font-lock to refresh the buffer style
+            (font-lock-flush)))
+
+;(setq quick-sdcv-program "/usr/bin/sdcv")
+
+;;*** dictionary/quick-sdcv: functions
+
+(defun quick-sdcv-thesaurus-at-point ()
+  "Search only the Thesaurus dictionary for the word at point."
+  (interactive)
+  (let ((quick-sdcv-dictionary-complete-list '("Moby Thesaurus II")))
+    (quick-sdcv-search-at-point)))
+
+(defun quick-sdcv-gcide-at-point ()
+  "Search only the gcide dictionary for the word at point."
+  (interactive)
+  (let ((quick-sdcv-dictionary-complete-list '("dictd_www.dict.org_gcide")))
+    (quick-sdcv-search-at-point)))
+
+(defun quick-sdcv-petit-robert-2003-at-point ()
+  "Search only the Petit Robert dictionary for the word at point."
+  (interactive)
+  (let ((quick-sdcv-dictionary-complete-list '("Petit Robert 2003")))
+    (quick-sdcv-search-at-point)))
+
+(defun quick-sdcv-petit-robert-2007-at-point ()
+  "Search only the Petit Robert dictionary for the word at point."
+  (interactive)
+  (let ((quick-sdcv-dictionary-complete-list '("Petit Robert 2007")))
+    (quick-sdcv-search-at-point)))
+
+(defun quick-sdcv-littre-at-point ()
+  "Search only the Littré dictionary for the word at point."
+  (interactive)
+  (let ((quick-sdcv-dictionary-complete-list '("XMLittre")))
+    (quick-sdcv-search-at-point)))
+
+(defun quick-sdcv-duden-at-point ()
+  "Search only the Duden dictionary for the word at point."
+  (interactive)
+  (let ((quick-sdcv-dictionary-complete-list '("Duden")))
+    (quick-sdcv-search-at-point)))
+
+
+;;*** dictionary/quick-sdcv: bindings
+
+(with-eval-after-load 'quick-sdcv
+  (global-set-key (kbd "C-c d t") #'quick-sdcv-thesaurus-at-point)
+  ;;(global-set-key (kbd "C-c d T") #'quick-sdcv-thesaurus-input)
+  (global-set-key (kbd "C-c d g") #'quick-sdcv-gcide-at-point)
+  ;;(global-set-key (kbd "C-c d G") #'quick-sdcv-gcide-input)
+  (global-set-key (kbd "C-c d p") #'quick-sdcv-petit-robert-2003-at-point)
+  (global-set-key (kbd "C-c d P") #'quick-sdcv-petit-robert-2007-at-point)
+  (global-set-key (kbd "C-c d l") #'quick-sdcv-littre-at-point)
+  (global-set-key (kbd "C-c d d") #'quick-sdcv-duden-at-point))
+
+(with-eval-after-load 'quick-sdcv
+  (define-key quick-sdcv-mode-map (kbd "n") #'outline-next-visible-heading)
+  (define-key quick-sdcv-mode-map (kbd "p") #'outline-previous-visible-heading)
+  (define-key quick-sdcv-mode-map (kbd "q") #'quit-window))
+
+;;*** dictionary/quick-sdcv: hooks, advice, timers
+(add-hook 'sdcv-mode-hook 
+          (lambda ()
+            (visual-line-mode 1)
+            (setq-local fill-column 80)
+            (auto-fill-mode 1)))
 
 ;;* dired
 
