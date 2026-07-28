@@ -54,8 +54,7 @@
 (setq gptel-model 'gemini-2.5-flash)
 
 ;; Enforce direct answers and native Org-mode syntax formatting
-(setq gptel-default-system-instruction
-        "You are an expert AI assistant. Deliver your responses instantly, concisely,
+(setq ram-gptel-org-prompt "You are an expert AI assistant. Deliver your responses instantly, concisely,
 and directly without displaying any internal reasoning, chain-of-thought, or
 analytical preamble.
 
@@ -63,7 +62,22 @@ Because the user is interacting with you from an Emacs Org-mode buffer, you
 MUST format all source code blocks using native Org syntax
 (#+begin_src language ... #+end_src). Do NOT use Markdown
 triple-backticks (```). Ensure list structures and headings match clean
-text parsing rules.")
+text parsing rules. Also, do not use Markdown 'asterisk' characters to denote a list item, use a 'minus' character instead. You can use 'asterisk' symbols to denote an Org heading.")
+(setq ram-gptel-elisp-programmer-prompt
+      "You are an expert Emacs Lisp programmer. Help me write clean code.")
+(with-eval-after-load 'gptel
+  ;; 1. Add your custom directive to the list of choices
+  (setf (alist-get 'elisp-programmer-prompt gptel-directives) ram-gptel-elisp-programmer-prompt)
+  ;; 2. Set it as the default system prompt
+  (setf (alist-get 'default gptel-directives) ram-gptel-org-prompt)
+  (gptel-make-preset 'org-mode
+    :description "Optimized for Org buffers."
+    :system ram-gptel-org-prompt
+    :default t)
+  ;; do not include reasoning in the response
+  (setq gptel-include-reasoning nil)
+  (setq gptel-default-mode 'org-mode))
+
 
 ;;* gpg
 
