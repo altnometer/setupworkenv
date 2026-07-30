@@ -4550,7 +4550,9 @@ Specifically, links to weekly and daily notes."
 (with-eval-after-load 'org
   (set-face-attribute 'org-quote nil
                       :foreground "grey40"
-                      :slant 'italic))
+                      ;:slant 'italic
+                      :slant 'normal
+                      ))
 
 (with-eval-after-load 'org
   ;; Function to add visual indentation (4 extra spaces) to quote blocks
