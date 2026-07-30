@@ -4518,13 +4518,32 @@ Specifically, links to weekly and daily notes."
                           '(
                             ;; top level hyphen (-) as grey solid bullet (•)
                             ("^\\(-\\)[[:blank:]]" 1
-                             '(face gemini-org-bullet-grey display "•" ))
+                             '(face gemini-org-bullet-grey display "⁃" ))
                             ;; non-top level hyphen (-) as bullet operator (∙)
-                            ("^[[:blank:]]+\\(-\\)[[:blank:]]" 1
-                             '(face gemini-org-bullet-grey display "∙"))
+                            ("^[[:blank:]]\\{2,3\\}\\(-\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "•"))
+                            ("^[[:blank:]]\\{4,4\\}\\(-\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "▪"))
+                            ("^[[:blank:]]\\{6,\\}\\(-\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "▫"))
+
                             ;; Replace plus (+) with a grey small hollow bullet (◦)
-                            ("^[[:blank:]]*\\(\\+\\)[[:blank:]]"
-                             1 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
+                            ("^[[:blank:]]\\{2,2\\}\\(\\+\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "‣" )
+                             ;; (prog1 () (compose-region (match-beginning 1) (match-end 1) "‣"))
+                             )
+                            ("^[[:blank:]]\\{4,4\\}\\(\\+\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "‣" )
+                             ;; (prog1 () (compose-region (match-beginning 1) (match-end 1) "‣"))
+                             )
+                            ("^[[:blank:]]\\{6,6\\}\\(\\+\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "⬩" )
+                             ;; (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))
+                             )
+                            ("^[[:blank:]]\\{8,\\}\\(\\+\\)[[:blank:]]" 1
+                             '(face gemini-org-bullet-grey display "⋄" )
+                             ;; (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))
+                             ))))
 
 ;;*** org-mode/faces, fonts: org-quote
 
