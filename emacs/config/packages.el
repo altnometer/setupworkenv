@@ -7998,18 +7998,6 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (setq avy-action nil)
     (avy-process cands)))
 
-(defun ram-avy-goto-paragraph-start ()
-  (interactive)
-  (ram-avy--make-backgrounds)
-  (let ((avy-command 'ram-avy-goto-paragraph-start)
-        (avy-style 'post)
-        (avy--overlay-offset -1))
-    (setq avy-action nil)
-    (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg nil :end nil))
-  (re-search-forward "[[:graph:]]" (window-end) t 1)
-  (backward-char)
-  (ram-avy--done))
-
 (defun ram-avy-goto-symbol-in-defun ()
   "Call `lispy-ace-paren'."
   (interactive)
