@@ -934,7 +934,7 @@ Disable `icomplete-vertical-mode' for this command."
 (exwm-debug-mode 1)
 (exwm-randr-mode 1)
 (exwm-xim-mode 1)
-(exwm-enable)
+(exwm-wm-mode)
 
 ;;*** exwm: navigate workspaces
 
