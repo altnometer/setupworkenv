@@ -1031,13 +1031,6 @@ Disable `icomplete-vertical-mode' for this command."
 ;;* magit
 
 (straight-use-package
- '(magit-section :type git
-                 :files ("lisp/magit-section.el"
-                         "Documentation/magit-section.texi")
-                 :host github
-                 :repo "magit/magit"))
-
-(straight-use-package
  '(magit :type git :flavor melpa
          :files ("lisp/magit*.el"
                  "lisp/git-rebase.el"
@@ -1052,6 +1045,15 @@ Disable `icomplete-vertical-mode' for this command."
                            "lisp/magit-section-pkg.el")
                  "magit-pkg.el")
          :host github :repo "magit/magit"))
+
+;;* magit: magit-sections
+
+(straight-use-package
+ '(magit-section :type git
+                 :files ("lisp/magit-section.el"
+                         "Documentation/magit-section.texi")
+                 :host github
+                 :repo "magit/magit"))
 
 ;;** magit: dependencies
 
