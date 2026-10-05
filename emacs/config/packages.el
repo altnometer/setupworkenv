@@ -4672,7 +4672,10 @@ Specifically, links to weekly and daily notes."
   (defface gemini-org-bullet-grey
     '((t :foreground "gray66"))
     "Face for subtle Org-mode list bullets.")
-
+  (defface my-numbered-list-bullet
+    ;; 20% larger and bold
+    '((t :foreground "gray66" :height 1.7 :weight normal))
+    "Face for numbered list bullets in Org-mode.")
   (font-lock-add-keywords 'org-mode
                           '(
                             ;; top level hyphen (-) as grey solid bullet (•)
@@ -4702,7 +4705,11 @@ Specifically, links to weekly and daily notes."
                             ("^[[:blank:]]\\{8,\\}\\(\\+\\)[[:blank:]]" 1
                              '(face gemini-org-bullet-grey display "⋄" )
                              ;; (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))
-                             ))))
+                             )
+                            ("^[[:blank:]]*\\([0-9]+[.)]\\)[[:blank:]]" 1
+                             '(face my-numbered-list-bullet))
+                            ;;
+)))
 
 ;;*** org-mode/faces, fonts: org-quote
 
@@ -4712,6 +4719,8 @@ Specifically, links to weekly and daily notes."
                       ;:slant 'italic
                       :slant 'normal
                       ))
+
+;;*** org-mode/faces, fonts: quote blocks
 
 (with-eval-after-load 'org
   ;; Function to add visual indentation (4 extra spaces) to quote blocks
@@ -4737,7 +4746,14 @@ Specifically, links to weekly and daily notes."
 
 (remove-hook 'org-font-lock-hook #'gemini-org-indent-quote-blocks)
 
-;;** org-mode: emphasis
+
+;;*** org-mode/faces, fonts: org-table
+
+
+(with-eval-after-load 'org
+  (set-face-attribute 'org-table nil
+                      :family "JuliaMono"
+                      ));;** org-mode: emphasis
 
 ;; modify org-emphasis-regexp-components, 3rd entry, to include char to emphasis markup
 ;; https://emacs.stackexchange.com/questions/13820/inline-verbatim-and-code-with-quotes-in-org-mode
