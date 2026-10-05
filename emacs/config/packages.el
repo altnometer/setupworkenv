@@ -11369,6 +11369,11 @@ Configure `orderless-matching-styles' for this command."
 ;;  '(haskell-mode :type git :flavor melpa
 ;;                 :files (:defaults "NEWS" "logo.svg" "haskell-mode-pkg.el")
 ;;                 :host github :repo "haskell/haskell-mode"))
+
+(straight-use-package
+ '(haskell-mode :type git
+                :files (:defaults "NEWS" "logo.svg" "haskell-mode-pkg.el")
+                :host github :repo "haskell/haskell-mode"))
 ;; (require 'haskell)
 ;; (setq haskell-interactive-mode-eval-mode 'haskell-mode)
 
