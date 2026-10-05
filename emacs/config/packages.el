@@ -4551,9 +4551,12 @@ left by `org-mark-element`."
 ;; (setq org-src-block-faces
 ;;       '(("clojure" (:family "Operator Mono Medium" :weight 'normal :background "#EEFFEE"))))
 
-;; (setq org-src-block-faces
-;;         '(("emacs-lisp" (:background "#EEE2FF"))
-;;           ("python" (:background "#e5ffb8"))))
+(setq org-src-block-faces
+        '(;; ("emacs-lisp" (:background "#EEE2FF"))
+          ;; ("python" (:background "#e5ffb8"))
+          ;; ("clojure" (:family "Operator Mono Medium" :weight 'normal :background "#EEFFEE"))
+          ("agda" (:family "JuliaMono" :weight 'normal :background "#FFFFFF"))
+          ("agda2" (:family "JuliaMono" :weight 'normal :background "#FFFFFF"))))
 
 ;; !!! Including :weight property would reset
 ;; font-lock-string-face and font-lock-doc-face that are set to light.
@@ -4594,7 +4597,7 @@ Use it from `org-mode-hook'.
   (face-remap-add-relative 'org-document-info-keyword '(:inherit fixed-pitch))
   (face-remap-add-relative 'org-indent '(:inherit fixed-pitch))
   (face-remap-add-relative 'org-meta-line '(:inherit fixed-pitch))
-  (face-remap-add-relative 'org-table '(:inherit fixed-pitch))
+  (face-remap-add-relative 'org-table '(:family "JuliaMono"))
   (face-remap-add-relative 'org-formula '(:inherit fixed-pitch))
   (face-remap-add-relative 'org-verbatim '(:inherit fixed-pitch))
   (face-remap-add-relative 'org-block-begin-line '(:inherit fixed-pitch))
