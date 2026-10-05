@@ -12876,8 +12876,8 @@ Remaping <sigusr2> does not work."
 
 Collect tags in `ram-tempo-org-template-tags'.
 Modify `tempo-match-finder'."
-  ;; use tags for templates that start with "<"
-  (setq-local tempo-match-finder "\\(<[[:word:]]+\\)\\=")
+  ;; use tags for templates that start with "<" or "\\" backslash
+  (setq-local tempo-match-finder "\\(\\(<\\|\\\\\\)[[:word:]]+\\)\\=")
   (tempo-use-tag-list 'ram-tempo-org-template-tags))
 
 (defvar ram-tempo-elisp-template-tags nil
@@ -13381,7 +13381,7 @@ ANY of these param-value pairs.
   (define-key quick-sdcv-mode-map (kbd "q") #'quit-window))
 
 ;;*** dictionary/quick-sdcv: hooks, advice, timers
-(add-hook 'sdcv-mode-hook 
+(add-hook 'sdcv-mode-hook
           (lambda ()
             (visual-line-mode 1)
             (setq-local fill-column 80)
