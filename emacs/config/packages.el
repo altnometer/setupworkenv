@@ -4920,7 +4920,7 @@ Specifically, links to weekly and daily notes."
 (with-eval-after-load 'org
   (add-hook 'org-mode-hook #'org-inline-anim-mode))
 
-;;** org-mode: structure-templates, snippets
+;;** org-mode: structure-templates, snippets, abbrev, expand, babel, code block
 
 ;; https://orgmode.org/manual/Structure-Templates.html
 
@@ -4935,6 +4935,11 @@ Specifically, links to weekly and daily notes."
                '("cls" . "src clojurescrsipt"))
   (add-to-list 'org-structure-template-alist
                '("rac" . "src racket :lang racket/base :results output"))
+  (add-to-list 'org-structure-template-alist
+               ;; execute in REPL, display output
+               '("hr" . "src haskell :results output :compile no :session my-Haskell-session"))
+  (add-to-list 'org-structure-template-alist
+               '("hc" . "src haskell :results output :compile yes"))
   (add-to-list 'org-structure-template-alist
                '("pl" . "src prolog :results silent"))
   (add-to-list 'org-structure-template-alist
@@ -4955,8 +4960,9 @@ Specifically, links to weekly and daily notes."
                '("rgr" . "src R :file /tmp/R-img.png :results output graphics file :session my-R-session"))
   (add-to-list 'org-structure-template-alist
                '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist
-               '("n" . "name"))
+  ;; does not work anything expands to a block
+  ;; (add-to-list 'org-structure-template-alist
+  ;;              '("n" . "#+name:"))
   (add-to-list 'org-structure-template-alist
                '("ex" . "example"))
   (add-to-list 'org-structure-template-alist
