@@ -4990,6 +4990,7 @@ Specifically, links to weekly and daily notes."
      (dot . t)
      (lisp . t)
      (latex . t)
+     (lean4 . t)
      (octave . t)
      (prolog . t)
      (python . t)
@@ -13692,3 +13693,71 @@ ANY of these param-value pairs.
 ;;   (backward-char 1))
 
 ;; (define-key ram-leader-map-tap-global (kbd "/") 'yf/replace-or-delete-pair)
+
+;;* agda
+
+;; Keep This is at the end of the config
+;; because of "~.lagda.md" is recet to
+;; markdown-mode in auto-mode-alist
+;; rather than keeping it
+;; agda2-mode as i set it here
+
+;; interpret *.lagda.md file with agda2-mode rather than md-mode
+;; auto-load agda-mode for .agda and .lagda.md
+
+;; this seem to clash with what plfa version provides
+;;
+;; (straight-use-package
+;;  '(agda2-mode :type git :host github :repo "emacsmirror/agda2-mode"))
+
+;; load 'agda2-mode from PLFA source
+;;
+(load-file (let ((coding-system-for-read 'utf-8))
+                (shell-command-to-string "agda --emacs-mode locate")))
+
+(setq auto-mode-alist
+   (append
+     '(("\\.agda\\'" . agda2-mode)
+       ;; agda2-mode literal programming will
+       ;; render markdown as comments and ignore it
+       ("\\.lagda.md\\'" . agda2-mode)
+       ;; rather, use org-agda-mode
+       ;; because agda2-mode will just comment out
+       ;; the Org content
+       ;; ("\\.lagda.org\\'" . agda2-mode)
+       )
+     auto-mode-alist))
+
+
+;; ** agda: polymode
+
+;; !!! needed for org-agda-mode
+
+(straight-use-package
+ '(polymode :type git :host github :repo "polymode/polymode"))
+
+(require 'polymode)
+
+;; *** agda/polymode: poly-org
+
+;; !!! every bloc is its own mode
+;;     do not need that
+;;
+;; (straight-use-package
+;;  '(poly-org :type git :host github :repo "polymode/poly-org"))
+
+;; *** agda/polymode: org-agda-mode
+
+;; !!! when trying to install with straight-use-package,
+;;    it gives errors.
+
+;; (straight-use-package
+;;  '(org-agda-mode
+;;    :host github
+;;    :repo "alhassy/org-agda-mode"
+;;    :branch "master"
+;;    :files ("org-agda-mode.el")
+;;    ))
+
+;; I have it in my 'lisp/' directory
+(require 'org-agda-mode)
