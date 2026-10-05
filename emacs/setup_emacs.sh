@@ -504,7 +504,28 @@ fi
 # fi
 
 
-# ** link EMACS_CONF_DIR (${HOME}/.emacs.d) to EMACS_CONF_DEST_DIR
+# link gpg config file
+GPG_CONF_SOURCE_PATH="${BACKUP_DIR}/emacs/gpg-agent.conf"
+GPG_CONF_DEST_DIR="~/.gnupg"
+GPG_CONF_DEST_PATH="${GPG_CONF_DEST_DIR}/gpg-agent.conf"
+
+if [ -f $GPG_CONF_SOURCE_PATH ];
+then
+    echo -e "\n\x1b[33;01m Linking $GPG_CONF_SOURCE_PATH to $GPG_CONF_DEST_PATH ... \x1b[39;49;00m\n"
+    if [ -f "$GPG_CONF_DEST_PATH" ]; then
+        rm $GPG_CONF_DEST_PATH
+    fi
+    if [ -h "$GPG_CONF_DEST_PATH" ]; then  # -h, true if file exist and a symbolic link.
+        rm $GPG_CONF_DEST_PATH
+    fi
+    sudo -u ${SUDO_USER} mkdir -p $GPG_CONF_DEST_DIR
+    sudo -u ${SUDO_USER} ln -s $GPG_CONF_SOURCE_PATH $GPG_CONF_DEST_PATH
+else
+    echo -e "\n\x1b[31;01m $GPG_CONF_SOURCE_PATH does not exist. Quiting ... \x1b[39;49;00m\n"
+	exit 1
+fi
+
+#** link EMACS_CONF_DIR (${HOME}/.emacs.d) to EMACS_CONF_DEST_DIR
 EMACS_CONF_DIR="${HOME}/.emacs.d"
 
 if [ -d $EMACS_CONF_DEST_DIR ];
