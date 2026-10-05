@@ -8079,7 +8079,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
         (avy-style 'post)
         (avy--overlay-offset -1))
     (setq avy-action nil)
-    (avy-jump "\n\n[ \t]*[[:graph:]]" :window-flip nil :beg nil :end nil))
+    (avy-jump "\\(?:\n\n[ \t]*[[:graph:]]\\)\\|\\(\n[[:space:]]*[-[:digit:]#]\\)" :window-flip nil :beg nil :end nil))
   (re-search-forward "[[:graph:]]" (window-end) t 1)
   (backward-char)
   (ram-avy--done))
