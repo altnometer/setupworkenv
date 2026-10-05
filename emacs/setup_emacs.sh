@@ -29,11 +29,13 @@ EMACS_REPO_DIR="${HOME}/Repos/emacs"
 # EMACS_BRANCH_NAME="emacs-29"
 EMACS_BRANCH_NAME="master"
 BACKUP_DIR="${HOME}/backup"
-EMACS_COMMIT="000f919b3c7"
-
+#EMACS_COMMIT="000f919b3c7"
+#EMACS_COMMIT="emacs-30.2"
+# latest commit so far: Jan 22, 2026
+EMACS_COMMIT="3b547e4f5dc99dc157b52a059cf234f7a5d15112"
 ##* install xorg
 
-if  hash xorg 2>/dev/null; then
+if  hash Xorg 2>/dev/null; then
     echo -e "\n\x1b[33;01m xorg is installed, not installing or upgrading.\x1b[39;49;00m\n" && sleep 1
 else
     echo -e "\n\x1b[33;01m Installing xorg and supporting packages ...  \x1b[39;49;00m\n" && sleep 1
@@ -41,7 +43,10 @@ else
     apt-get install -y xorg xattr xinput firefox-esr \
             feh mupdf zathura zathura-djvu hunspell \
             hunspell-fr-classical hunspell-de-de \
-            aspell graphviz r-base r-base-dev mpv alsa-utils
+            aspell graphviz r-base r-base-dev mpv alsa-utils \
+            libdbus-glib-1-dev jq \
+            pkg-config python3-dev libgirepository-2.0-dev \
+            inxi # needed for figuring out how many monitors are used
     # Org image resizing requires imagemagick
     # you need to specify compile config option --with-imagemagick
     apt-get install -y imagemagick libmagick++-dev libmagickwand-dev libmagickcore-dev
@@ -51,7 +56,15 @@ else
     apt-get install -y libssl-dev libcurl4-openssl-dev
     apt-get install -y silversearcher-ag ripgrep pass
     apt-get install -y lm-sensors upower ispell dictionaries-common iamerican
+    # sdcv dictionary
+    apt-get install -y sdcv
     apt-get install -y fonts-noto-color-emoji
+    # octave matrix prograpping
+    apt-get install -y octave octave-image
+    # since Debian 13 trixie, the insallation is minimal
+    # and may not include manpages, install them:
+    apt-get install -y --reinstall man-db manpages
+    mandb
 fi
 
 # link .XResources --------------------------------------------------------{{{
@@ -130,7 +143,7 @@ else
     echo -e "\n\x1b[31;01m ${SOURCE_ZATHURA_CONF_FILE} does not exist. Quiting ... \x1b[39;49;00m\n"
 	exit 1
 fi
-
+exit 0
 ##* install emacs
 
 # consider installing the latest version, follow instructions in the link
@@ -163,7 +176,7 @@ else
     apt-get install -y autoconf make gcc texinfo \
             cmake libtool-bin \
             libjpeg-dev libxpm-dev libgif-dev libpng-dev libtiff-dev librsvg2-dev \
-            libgccjit-14-dev libtree-sitter-dev \
+            libgccjit-14-dev # libtree-sitter-dev OLD: ABI 14, grammars are ABI 15 now, compile from source
             libgnutls28-dev libtinfo-dev \
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
@@ -272,13 +285,13 @@ else
          --with-xft \
          --with-mailutils \
          --without-toolkit-scroll-bars \
-         --with-xwidgets \
          --disable-ns-self-contained \
          --with-xml2 \
          --with-xim \
          --with-imagemagick \
          --with-tree-sitter \
          --without-compress-install
+         #--with-xwidgets
     #         --disable-ns-self-contained # respect --prefix
     ## continue installation only after ./configure success
     ## otherwise you may encounter errors late, like:
@@ -311,7 +324,7 @@ else
     #apt-get install -y emacs
 fi
 
-#exit 0
+exit 0
 
 #* link files
 
