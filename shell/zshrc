@@ -174,33 +174,6 @@ function minemacs(){
     emacs "$@"
 }
 
-# start emacs for trying features
-function temacs(){
-    rm -r ~/.emacs.d
-    ln -s ~/.local/share/emacs/try.emacs.d ~/.emacs.d
-    emacs "$@"
-}
-
-# start my emacs
-function memacs(){
-  rm -r ~/.emacs.d
-  ln -s ~/.local/share/emacs/my.emacs.d ~/.emacs.d
-  emacs "$@"
-}
-
-# start spacemacs emacs
-function semacs(){
-  rm -r ~/.emacs.d
-  ln -s ~/.local/share/emacs/space.emacs.d ~/.emacs.d
-  emacs "$@"
-}
-
-# start doom emacs
-function demacs(){
-  rm -r ~/.emacs.d
-  ln -s ~/.local/share/emacs/doom.emacs.d ~/.emacs.d
-  emacs "$@"
-}
 
 # source ~/.profile
 [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
@@ -302,10 +275,9 @@ fi
 test -r /home/sam/.opam/opam-init/init.zsh && . /home/sam/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 ## show man pages in Emacs with (man ...) command
-function emacs_man () { emacsclient -e '(man "'"$1"'")' }    
-## this alias is overwritten unless is put at the end
-alias man="emacs_man"
+function emacs_man () { emacsclient -e '(man "'"$1"'")' }
 export MANPAGER="man"
 #export MANPAGER="nvim +set\ filetype=man -"
 
+## this alias is overwritten unless is put at the end
 alias man="emacs_man"
