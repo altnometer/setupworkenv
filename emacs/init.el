@@ -216,7 +216,8 @@
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
  '(safe-local-variable-values
-   '((org-roam-db-location
+   '((eval turn-off-auto-fill)
+     (org-roam-db-location
       . "~/.local/share/emacs/my.emacs.d/org-roam.db")
      (org-roam-directory . "~/backup/books")
      (vc-prepare-patches-separately)
