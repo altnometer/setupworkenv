@@ -1,4 +1,22 @@
 ;; ram-tempo-templates.el --- my custom tempo templates  -*- lexical-binding: t -*-
+
+;;* functions
+
+(defun ram-org-get-heading-number ()
+  "Return a numbering of the current heading.
+
+e.g., from \"* 1.1 example headline\" return \"1.1\"
+For unnumbered heading, return \"0\"
+"
+
+  (save-match-data
+  (let ((str (org-get-heading)))
+   (if (string-match "^[[:digit:]\.]+" str)
+       (match-string 0 str)
+     "0")))
+  )
+
+
 ;;* templates
 
 ;;* templates: org-mode
@@ -123,7 +141,7 @@
                        '(
                          (ram-org-prev-code-block-copy-for-lang-with-or-without-params
                           'shell nil nil))
-                       "<shbc"
+                       "<shc"
                        "Previous Org code block for shell."
                        'ram-tempo-org-template-tags)
 
@@ -136,6 +154,72 @@
                        "<elbc"
                        "Previous Org code block for emacs-lisp."
                        'ram-tempo-org-template-tags)
+
+;;*** templates/org-mode/code blocks: haskell
+;;** templates/org-mode: keywords
+
+(tempo-define-template "HASKELL-block-with-previous-block-content"
+                       '(
+                         (ram-org-prev-code-block-copy-for-lang-with-or-without-params
+                          'haskell nil nil))
+                       "<hbc"
+                       "Previous Org code block for Haskell."
+                       'ram-tempo-org-template-tags)
+
+(tempo-define-template
+ "Org-key-word-#+name-with-copied_heading-numbering"
+ '((tempo-save-named 'headline_num (ram-org-get-heading-number))
+   "#+name: " (s headline_num) "_")
+ "<nn"
+ "Expand to Org #+name:'copied heading numbering'.
+
+Get the 'heading numbering' from the current headline numbering."
+ 'ram-tempo-org-template-tags
+ )
+
+(tempo-define-template
+ "Org-key-word-#+name-for-an-example"
+ '((tempo-save-named 'headline_num (ram-org-get-heading-number))
+   "#+name: " (s headline_num) "_example_")
+ "<ne"
+ "Expand to Org #+name:  for numbered 'example' .
+
+Get the 'number' from the current headline numbering."
+ 'ram-tempo-org-template-tags
+ )
+
+(tempo-define-template
+ "Org-key-word-#+name-for-an-formula"
+ '((tempo-save-named 'headline_num (ram-org-get-heading-number))
+   "#+name: " (s headline_num) "_formula_")
+ "<nf"
+ "Expand to Org #+name:  for numbered 'formula' .
+
+Get the 'number' from the current headline numbering."
+ 'ram-tempo-org-template-tags
+ )
+
+(tempo-define-template
+ "Org-key-word-#+name-for-an-definition"
+ '((tempo-save-named 'headline_num (ram-org-get-heading-number))
+   "#+name: " (s headline_num) "_definition_")
+ "<nd"
+ "Expand to Org #+name:  for numbered 'definition' .
+
+Get the 'number' from the current headline numbering."
+ 'ram-tempo-org-template-tags
+ )
+
+(tempo-define-template
+ "Org-key-word-#+name-for-an-exercise"
+ '((tempo-save-named 'headline_num (ram-org-get-heading-number))
+   "#+name: " (s headline_num) "_exercise_")
+ "<nx"
+ "Expand to Org #+name:  for numbered 'exercise' .
+
+Get the 'number' from the current headline numbering."
+ 'ram-tempo-org-template-tags
+ )
 
 ;;* templates: testing
 
@@ -224,6 +308,93 @@
 ;;(trivlist "\\begin{trivlist}\n" r> n> "\\end{trivlist}")
 ;;(verbatim "\\begin{verbatim}\n" r> n> "\\end{verbatim}")
 ;;(verbatimm "\\begin{verbatim*}\n" r> n> "\\end{verbatim*}")
+
+;;** LaTeX-mode: tag ram-tempo-latex-template-tags
+
+(defvar ram-tempo-latex-template-tags nil
+  "A template tag list for `tempo-use-tag-list' for LaTeX.")
+
+;;** LaTeX-mode: init
+
+(defun ram-tempo-init-latex-template-tags ()
+  "Use specific to emacs-lisp settings.
+
+Collect tags in `ram-tempo-latex-template-tags'.
+Modify `tempo-match-finder'."
+  ;; use tags for templates that start with "<"
+  ;; define only if not exist in the buffer
+  (if (not (and (local-variable-p 'tempo-match-finder)
+                (buffer-local-value 'tempo-match-finder (current-buffer))))
+      (setq-local tempo-match-finder "\\(\\(<\\|\\\\\\)[[:word:]]+\\)\\="))
+  (tempo-use-tag-list 'ram-tempo-latex-template-tags))
+
+(add-hook 'org-mode-hook #'ram-tempo-init-latex-template-tags)
+(add-hook 'prog-mode-hook #'ram-tempo-init-latex-template-tags)
+
+;;** LaTeX-mode: templates
+
+;;*** LaTeX-mode/templates: unnumbered-equation
+
+;;(abstract "\\begin{abstract}\n" r> n> "\\end{abstract}")
+(tempo-define-template  "LaTeX-\\hspace{2mm}"
+                        '("\\hspace{2mm}")
+                        "\\s"
+                        "LaTeX \\hspace{2mm}"
+                        'ram-tempo-latex-template-tags)
+
+;;(abstract "\\begin{abstract}\n" r> n> "\\end{abstract}")
+(tempo-define-template  "LaTeX-\\longrightarrow{}"
+                        '("\\longrightarrow{}")
+                        "\\a"
+                        "LaTeX \\longrightarrow{}"
+                        'ram-tempo-latex-template-tags)
+
+(tempo-define-template  "LaTeX-\\mathbf{"
+                        '("\\mathbf{")
+                        "\\b"
+                        "LaTeX \\mathbf{"
+                        'ram-tempo-latex-template-tags)
+
+(tempo-define-template  "LaTeX-\\$\\lambda{}x.x$"
+                        '("$\\lambda{}x.x$")
+                        "\\lx"
+                        "LaTeX \\$\\lambda{}x.x$"
+                        'ram-tempo-latex-template-tags)
+
+(tempo-define-template  "LaTeX-\\$\\lambda{}y.y$"
+                        '("$\\lambda{}y.y$")
+                        "\\ly"
+                        "LaTeX \\$\\lambda{}y.y$"
+                        'ram-tempo-latex-template-tags)
+
+
+(tempo-define-template  "LaTeX-\\times{}"
+                        '("\\times{}")
+                        "\\t"
+                        "LaTeX \\times{}"
+                        'ram-tempo-latex-template-tags)
+
+(tempo-define-template  "LaTeX-unnumbered-equation"
+                        '("\\begin{equation*}" n
+                           "  " p n
+                           "\\end{equation*}" n
+                           (tempo-forward-mark))
+                        "\\leq"
+                        "LaTeX unnumbered equation."
+                        'ram-tempo-latex-template-tags)
+
+(tempo-define-template  "LaTeX-set_function_f"
+                        '("$f:S\\longrightarrow{}T$")
+                        "\\lf"
+                        "LaTeX-set_function_f"
+                        'ram-tempo-latex-template-tags)
+
+(tempo-define-template  "LaTeX-set_function_g"
+                        '("$g:T\\longrightarrow{}U$")
+                        "\\lg"
+                        "LaTeX-set_function_g"
+                        'ram-tempo-latex-template-tags)
+
 
 ;;* texinfo-mode
 
