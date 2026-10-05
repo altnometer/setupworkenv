@@ -26,6 +26,8 @@
 (straight-use-package
  '(gptel :type git :host github :repo "karthink/gptel"))
 
+;;*** ai/gptel: settings
+
 (setq gptel-backend
       (gptel-make-gemini "Gemini"
         ;; Replace with your actual
@@ -53,18 +55,46 @@
 ;; Establish Gemini as the default system-wide model for gptel
 (setq gptel-model 'gemini-2.5-flash)
 
-;; Enforce direct answers and native Org-mode syntax formatting
-(setq ram-gptel-org-prompt "You are an expert AI assistant. Deliver your responses instantly, concisely,
-and directly without displaying any internal reasoning, chain-of-thought, or
-analytical preamble.
+;;*** ai/gptel: prompts
 
-Because the user is interacting with you from an Emacs Org-mode buffer, you
-MUST format all source code blocks using native Org syntax
+;; Enforce direct answers and native Org-mode syntax formatting
+(setq ram-gptel-org-prompt "You are an expert AI assistant.
+
+Deliver your responses instantly, concisely, and directly without
+displaying any internal reasoning, chain-of-thought, or analytical
+preamble.
+
+Because the user is interacting with you from an Emacs Org-mode buffer,
+you MUST format the response in Org formatting syntax. Here are especially
+important formatting rules:
+
+All source code blocks must use native Org syntax
 (#+begin_src language ... #+end_src). Do NOT use Markdown
-triple-backticks (```). Ensure list structures and headings match clean
-text parsing rules. Also, do not use Markdown 'asterisk' characters to denote a list item, use a 'minus' character instead. You can use 'asterisk' symbols to denote an Org heading.")
+triple-backticks (```).
+
+Do not use '*' characters to denote unordered list items, use '-', '+'
+characters for all levels of unordered lits. Reserve '*' symbols at the
+beginning of a line to denote an Org heading only.
+
+Do not use '**' wrapping (double star symbol wrapping) or triple star
+ '***' wrapping marking. Instead:
+- wrap text with single star '*' to mark it as bold.
+- wrap text with slash symbol '/' to mark it as italic.
+
+LaTeX fragments must not be followed by '-', instead, use single quote.
+
+Prefer using heading-subheading structure for basic structure of your
+responses. If appropriate, use numbering to identify child subheadings
+belonging to a parent heading. Each deeper level of subheadings is
+marked with an addition of '*' symbol. Do not use any extra marking for
+headings and subheadings.
+
+")
+
 (setq ram-gptel-elisp-programmer-prompt
       "You are an expert Emacs Lisp programmer. Help me write clean code.")
+
+
 (with-eval-after-load 'gptel
   ;; 1. Add your custom directive to the list of choices
   (setf (alist-get 'elisp-programmer-prompt gptel-directives) ram-gptel-elisp-programmer-prompt)
@@ -78,6 +108,90 @@ text parsing rules. Also, do not use Markdown 'asterisk' characters to denote a 
   (setq gptel-include-reasoning nil)
   (setq gptel-default-mode 'org-mode))
 
+;;*** ai/gptel: functions
+
+;; credit to Gemini
+(defun ram-org-paragraph-fill-region (beg end)
+  "Fill paragraphs and other fillable Org elements between BEG and END.
+Iterates backwards to ensure buffer modifications from `fill-paragraph'
+do not invalidate positions of subsequent elements."
+  (let* ((original-point (point))
+         (elements-to-fill '())
+         ;; Define which types of Org elements contain text that should be filled.
+         ;; Extend this list if other element types also need filling.
+         (fillable-types '(paragraph item quote-block verse-block footnote-definition))
+         (response (buffer-substring beg end)))
+    (with-temp-buffer
+      (insert response)
+      (org-mode)
+      (let ((parsed-buffer (org-element-parse-buffer)))
+        (org-element-map parsed-buffer
+            fillable-types
+          (lambda (el)
+            ;; For list items, we want to fill the *content* part, not the whole item.
+            ;; For others, the element's start is typically where filling should begin.
+            (let ((pos (cond
+                        ((eq (org-element-type el) 'item)
+                         ;; Check for contents-begin, as an item might be empty
+                         (org-element-property :contents-begin el))
+                        (t
+                         (org-element-property :begin el)))))
+              (when pos            ; Ensure a valid position was found
+                (push (+ beg pos) elements-to-fill)))))
+        ))
+    (setq elements-to-fill (sort (cl-remove-duplicates elements-to-fill :test 'eq) '>))
+    ;; (message "$$$$$$$ %S" elements-to-fill)
+    ;; 2. Sort the collected positions in descending order.
+    ;; This is crucial: processing from the end backwards ensures that
+    ;; changes made by `fill-paragraph` to an earlier part of the buffer
+    ;; do not affect the absolute starting positions of elements yet to be processed.
+    ;; 3. Iterate through the elements (backwards) and apply `fill-paragraph`.
+    ;; (message "[[[[[[[[[ ...")
+    (unwind-protect
+        (dolist (pos elements-to-fill)
+          (goto-char pos) ; Move point to the original start of the element's fillable content
+          ;; (message ">>>> %S" (org-element-type (org-element-at-point)))
+          (fill-paragraph))             ; Apply `fill-paragraph`
+
+      ;; 4. Restore original point
+      (goto-char original-point))
+    ;; (message "... ]]]]]]]]]]")
+    ))
+;; (defun ram-org-paragraph-fill-region (beg end)
+;;   (when (derived-mode-p 'org-mode)
+;;     (save-excursion
+;;       (goto-char beg)
+;;       ;; Loop through the response block line by line/paragraph by paragraph
+;;       (while (and (< (point) end)
+;;                   ;; it seems there is always some org element
+;;                   ;; (org-element-at-point)
+;;                   ;; last line reached, may be redundant
+;;                   (< (1+ (pos-eol)) (point-max)))
+;;         (let ((element (org-element-at-point)))
+;;           (message ">>> fill par for %S" element)
+;;           ;; Only fill if the cursor is sitting on plain text paragraphs or list items
+;;           (if (memq (org-element-type element) '(paragraph item plain-list))
+;;               (progn
+;;                 (org-fill-paragraph)
+;;                 ;; Skip past the end of the processed element to save cycles
+;;                 (goto-char (org-element-property :end element))
+;;                 (org--latex-preview-region (org-element-property :begin element)
+;;                                            (org-element-property :end element))
+;;                 )
+;;             (goto-char (org-element-property :end element))
+;;             ;; If it's a code block or heading, do not fill; jump to the next line
+;;             ;;(forward-line 1)
+;;             ))))))
+
+;;*** ai/gptel: hooks, advice, timers
+(with-eval-after-load 'gptel
+  (defun ram-gptel-format-responseorg (beg end)
+    "Format incoming gptel text using."
+    (when (derived-mode-p 'org-mode)
+      (ram-org-paragraph-fill-region beg end)
+      ))
+  ;; Register your context-aware formatter to run after every finished stream
+  (add-hook 'gptel-post-response-functions #'ram-gptel-format-responseorg))
 
 ;;* gpg
 
