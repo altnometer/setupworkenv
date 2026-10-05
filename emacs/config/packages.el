@@ -9499,14 +9499,55 @@ at the next sexp."
 (add-hook 'racket-mode-hook #'ram-manage-sexps-mode)
 (add-hook 'racket-repl-mode-hook #'ram-manage-sexps-mode)
 
+;;* lean4
+
+
+;;** lean4: nael
+
+(straight-use-package
+ '(nael
+   :type git
+   :host github
+   :repo "bustercopley/nael"
+   :files ("nael.el")))
+
+;; must require, does not autoload anyting
+(require 'nael)
+
+(defun my-nael-setup ()
+     (interactive)
+     ;; Enable Emacs' built-in `TeX' input-method.  Alternatively, you
+     ;; could install the external `unicode-math-input' package and
+     ;; use the `unicode-math' input-method.
+     (set-input-method "TeX")
+     ;; Enable Emacs' built-in LSP-client Eglot.
+     (eglot-ensure))
+
+(add-hook 'nael-mode-hook #'my-nael-setup)
+
+(straight-use-package
+ '(ob-lean4
+   :type git
+   :host github
+   :repo "soymou/ob-lean4"))
+
+
+
+(with-eval-after-load 'org
+  ;; (add-to-list 'org-src-lang-modes '("lean4" . nael))
+  (require 'ob-lean4)
+  (setq ob-lean4-command "~/.elan/bin/lean"))
+
 ;;* linters
 
-;;* linters: flycheck-clj-kondo
+;;** linters: flycheck-clj-kondo
+
 ;; First install the package:
 ;; (straight-use-package
 ;;  '(flycheck-clj-kondo :type git :flavor melpa :host github :repo "borkdude/flycheck-clj-kondo"))
 
 ;;* Calc
+
 ;; when setting running this sequence (e.g., from #+TBLFM in Org)
 ;; (save-excursion (salc-create-buffer))
 ;; (calc-over-notation (format "/%d" total))
