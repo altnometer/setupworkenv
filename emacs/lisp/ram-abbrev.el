@@ -50,10 +50,10 @@
     (".n" "ṇ")
     (".L" "Ḷ")
     (".l" "ḷ")
-    
+
     ;; ipa (international pronunciation alphabet)
     ("ε~" "ɛ̃")
-    
+
     ))
 
 ;;* clojure-mode-abbrev-table
@@ -320,7 +320,7 @@
         ("diffy" "difficulty")
         ("diffs" "difficulties")
 
-        ("dp" "dependency")
+        ;("dp" "dependency")
         ("dps" "dependencies")
 
         ("dft" "default")
@@ -434,7 +434,7 @@
         ("intern" "interpretation")
         ("interns" "interpretations")
 
-        ("inv" "invoke")
+        ;("inv" "invoke")
         ("invd" "invoked")
         ("invg" "invoking")
         ("invn" "invocation")
@@ -608,7 +608,7 @@
 
         ;;*** org-mode-abbrev-table/define: s
 
-        ("seq" "sequence")
+        ;; ("seq" "sequence")
         ("seql" "sequential")
 
         ("sd" "should")
@@ -636,7 +636,7 @@
         ("syms" "symbols")
 
         ("st" "structure")
-        ("std" "structured")
+        ;; ("std" "structured")
         ("sts" "structures")
 
         ("stn" "standard")
