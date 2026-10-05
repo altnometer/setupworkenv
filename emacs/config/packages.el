@@ -3469,7 +3469,7 @@ some commands. "
                         (current-buffer))
                     (current-buffer)))
           (org-name-regex
-           "^#\\+name:\\(?: *\\)\\(.*?\\)?[[:blank:]]*$")
+           "^[[:blank:]]*#\\+name:\\(?: *\\)\\(.*?\\)?[[:blank:]]*$")
           (old-binding-to-return (cdr (assoc 'return (cdr minibuffer-local-completion-map))))
           (old-binding-to-C-w (cdr (assoc ?\C-w (cdr minibuffer-local-completion-map))))
           (reset-keybindings (lambda ()
@@ -3494,40 +3494,73 @@ some commands. "
                                    ))
 
      (condition-case err
-         (progn (with-current-buffer buffer
-                  (save-excursion
-                    ;; 'save-restiction' means
-                    ;;   - if the buffer is narrowed:
-                    ;;     - we widen the buffer
-                    ;;     - execute the code
-                    ;;     - restore to the buffer to previous state
-                    (save-restriction
-                      (widen)
-                      (goto-char (point-max))
-                      (while (re-search-forward org-name-regex nil t -1)
-                        (setq org-names
+         (progn
+           (with-current-buffer buffer
+             (save-excursion
+               ;; 'save-restiction' means
+               ;;   - if the buffer is narrowed:
+               ;;     - we widen the buffer
+               ;;     - execute the code
+               ;;     - restore to the buffer to previous state
+               (save-restriction
+                 (widen)
+                 (goto-char (point-max))
+                 (condition-case error-collecting-org-names
+                     (while (condition-case error-re-searching-org-names
+                                (re-search-forward org-name-regex nil t -1)
+                              (error
+                               (signal 'error
+                                       (format "error-re-searching-org-names: %s"
+                                               error-re-searching-org-names))))
+                       (setq org-names
+                             (cons
                               (cons
-                               (cons
-                                (concat
-                                 (if (= 1 (length (match-string-no-properties 2)))
-                                     "`"
-                                   (concat "`"
-                                           (s-repeat (max 0 (1- (save-match-data (org-current-level)))) "  `"))  )
-                                 (match-string-no-properties 1))
-                                ;; (concat (s-repeat (max 0 (1- (save-match-data (org-current-level))))  "  ` ")
-                                ;;         (match-string-no-properties 1))
-                                (point)) org-names))))))
-                ;; (setq org-names (ram-make-duplicate-keys-unique org-names))
-                (setq val (cdr (assoc (completing-read
-                                       (format-prompt
-                                        "#+name:" (or name-at-point
-                                                      (car ram-org-jump-to-name-history)))
-                                       org-names
-                                       nil t nil
-                                       'ram-org-jump-to-name-history
-                                       (or name-at-point
-                                           (car ram-org-jump-to-name-history)))
-                                      org-names))))
+                               (concat
+                                (if (= 1
+                                       (condition-case error-when-cons-org-names
+                                           (length (match-string-no-properties 2))
+                                         (error (signal
+                                                 'error
+                                                 (format "error-when-cons-org-names: %s"
+                                                         error-when-cons-org-names))))
+                                       )
+                                    "`"
+                                  (concat "`"
+                                          (condition-case error-adding-levels-to-org-name
+                                              (s-repeat
+                                               (max 0 (1- (save-match-data (or (org-current-level) 1))))
+                                               "  `")
+                                            (error (signal 'error
+                                                           (format "error-adding-levels-to-org-name: %s"
+                                                                   error-adding-levels-to-org-name))))
+                                          )
+
+                                  )
+                                (match-string-no-properties 1))
+                               ;; (concat (s-repeat (max 0 (1- (save-match-data (org-current-level))))  "  ` ")
+                               ;;         (match-string-no-properties 1))
+                               (point)) org-names)
+                             ))
+                   (error
+                    (signal
+                     'error
+                     (format "error-collecting-org-names: %s" error-collecting-org-names))
+                    )
+                   )
+                 )
+               ))
+
+           ;; (setq org-names (ram-make-duplicate-keys-unique org-names))
+           (setq val (cdr (assoc (completing-read
+                                  (format-prompt
+                                   "#+name:" (or name-at-point
+                                                 (car ram-org-jump-to-name-history)))
+                                  org-names
+                                  nil t nil
+                                  'ram-org-jump-to-name-history
+                                  (or name-at-point
+                                      (car ram-org-jump-to-name-history)))
+                                 org-names))))
        (error
         (funcall reset-keybindings)
         (signal (car err) (cdr err)))
@@ -3566,12 +3599,12 @@ some commands. "
 
    )
   ;; reorder history so that the search string is fist and the input is second.
-   ;; Use it for different order when pressing <M-p> for previous history item.
-   (when swap-history-p
-     (setq ram-org-jump-to-name-history
-           (cons (cadr ram-org-jump-to-name-history)
-                 (cons (car ram-org-jump-to-name-history)
-                       (cddr ram-org-jump-to-name-history)))))
+  ;; Use it for different order when pressing <M-p> for previous history item.
+  (when swap-history-p
+    (setq ram-org-jump-to-name-history
+          (cons (cadr ram-org-jump-to-name-history)
+                (cons (car ram-org-jump-to-name-history)
+                      (cddr ram-org-jump-to-name-history)))))
   (when org-name
     (when (minibufferp)
       (let ((pre-minibuffer-buffer (with-minibuffer-selected-window
