@@ -1162,12 +1162,19 @@ Disable `icomplete-vertical-mode' for this command."
 
 ;;* magit: magit-sections
 
+;; (straight-use-package
+;;  '(magit-section :type git
+;;                  :files ("lisp/magit-section.el"
+;;                          "Documentation/magit-section.texi")
+;;                  :host github
+;;                  :repo "magit/magit"))
+
 (straight-use-package
  '(magit-section :type git
                  :files ("lisp/magit-section.el"
-                         "Documentation/magit-section.texi")
-                 :host github
-                 :repo "magit/magit"))
+                         "docs/magit-section.texi"
+                         "magit-section-pkg.el")
+                 :host github :repo "magit/magit"))
 
 ;;** magit: dependencies
 
